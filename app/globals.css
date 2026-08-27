@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #09090b;
+  --color-surface: #101014;
+  --color-surface-2: #17171d;
+  --color-line: #26262e;
+  --color-neon: #22c55e;
+  --color-neon-soft: #4ade80;
+  --color-violet: #a855f7;
+  --color-violet-soft: #c084fc;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --animate-pop: pop 0.25s ease-out;
+  --animate-flash: flash 0.6s ease-out;
+
+  @keyframes pop {
+    0% {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes flash {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+}
+
+html,
+body {
+  background-color: var(--color-ink);
+  color: #f4f4f5;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+@layer utilities {
+  .glow-neon {
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-neon) 70%, transparent);
+  }
+
+  .glow-violet {
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-violet) 70%, transparent);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 18px color-mix(in srgb, var(--color-neon) 55%, transparent);
+  }
+
+  .text-glow-violet {
+    text-shadow: 0 0 18px color-mix(in srgb, var(--color-violet) 55%, transparent);
+  }
+
+  .grid-noise {
+    background-image:
+      radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--color-violet) 16%, transparent), transparent 45%),
+      radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--color-neon) 14%, transparent), transparent 40%);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
