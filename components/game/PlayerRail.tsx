@@ -29,7 +29,7 @@ export function PlayerRail({
             className={cn(
               "min-w-[136px] shrink-0 rounded-xl border bg-surface p-2.5 transition-colors",
               isLeader
-                ? "border-neon/60 glow-neon"
+                ? "border-neon leader-pulse"
                 : player.id === nextId
                   ? "border-violet/50"
                   : "border-line",
@@ -37,7 +37,14 @@ export function PlayerRail({
             )}
           >
             <div className="flex items-center gap-1.5">
-              <span className="text-base">{player.emoji}</span>
+              <span
+                className={cn(
+                  "grid size-7 shrink-0 place-items-center rounded-full border text-sm",
+                  isLeader ? "border-neon bg-neon/15 leader-pulse" : "border-line bg-surface-2",
+                )}
+              >
+                {player.emoji}
+              </span>
               <span className="truncate text-sm font-semibold">{player.name}</span>
               {isLeader ? <Gavel className="ms-auto size-3.5 shrink-0 text-neon" /> : null}
               {player.id === selfId && !isLeader ? (

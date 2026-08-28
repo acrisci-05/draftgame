@@ -111,3 +111,26 @@
   `data/categories.json`. Si modificano a mano nel file oppure dallo Studio (/studio), che salva le
   modifiche sul dispositivo ed esporta il JSON pronto da incollare nel file dati.
 - Ogni elemento accetta anche l'URL di un'immagine: se presente sostituisce la copertina generata.
+
+======================================================================
+8. ECONOMIA DELL'ASTA, SCARTI E PAGINA CATEGORIE
+======================================================================
+- Riserva obbligatoria: l'offerta massima è "saldo - (slot ancora vuoti - 1)". Nessuno può quindi
+  arrivare a zero con la lista incompleta: se mancano 3 elementi il saldo non scende sotto 3.
+- Pulsante Max: offre esattamente il tetto consentito dalla riserva, senza rilanci ripetuti.
+- Lotti finali: se resta un solo giocatore da completare e i lotti bastano appena, gli vengono
+  assegnati d'ufficio al prezzo base, così la lista si chiude sempre.
+- Scarti: interruttore in configurazione stanza. Attivi (default) un lotto senza offerte finisce
+  negli scarti; disattivati viene assegnato a chi ha meno elementi al prezzo base.
+- Pagina categorie: legenda delle fasce (S/A/B/C/D con prezzo e significato), badge con tooltip al
+  tocco o al passaggio del mouse, ricerca istantanea (nome categoria o elemento), filtri per
+  macro-tema (Tutte, Sport, Pop Culture, Gaming, Cibo, Vita quotidiana) e schede interamente
+  cliccabili con anteprima dei nomi principali.
+- Asta: cronologia scorrevole e richiudibile sotto il lotto, alone pulsante su chi detiene
+  l'offerta più alta, comandi fissi in fondo allo schermo su telefono (pulsanti da 48px o più).
+- Card 9:16: roster raggruppato per fascia, dal 5 in alto all'1 in fondo, con badge dorato del
+  prezzo pagato su ogni miniatura.
+- Immagini reali: dallo Studio si cercano su Wikipedia (una alla volta o tutta la lista) e l'URL
+  finisce nel file dati. Le licenze Wikimedia variano: prima di pubblicare vanno verificate.
+- Le emoji bandiera non sono usate nei cataloghi: Windows non ha i glifi e le mostra come sigle
+  ("IT", "GB"). Restano solo nel selettore della lingua, dove la sigla resta comunque leggibile.

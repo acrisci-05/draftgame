@@ -1,8 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Ban, Gavel, PackageOpen } from "lucide-react";
-import { bidOptions, canBid, canClaim, canPass, isMysteryLot, rosterFull } from "@/lib/game";
+import { Ban, Gavel, PackageOpen, Zap } from "lucide-react";
+import {
+  bidOptions,
+  canBid,
+  canClaim,
+  canPass,
+  isMysteryLot,
+  maxBidOption,
+  rosterFull,
+  slotsLeft,
+} from "@/lib/game";
 import { useT } from "@/lib/settings";
 import type { GameState, Player } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
@@ -37,25 +46,36 @@ export function BidControls({
   const full = rosterFull(state, player);
   const opening = !state.highBidderId;
   const mystery = isMysteryLot(state);
+  const max = maxBidOption(state, player);
+  const showMax = !mystery && max !== null && !options.some((option) => option.amount === max);
+  const reserve = Math.max(0, slotsLeft(state, player) - 1);
+  const buttonHeight = compact ? "h-12" : "h-14";
 
   return (
     <motion.div
-      animate={highlight ? { scale: [1, 1.01, 1] } : { scale: 1 }}
+      animate={highlight && !isLeader ? { scale: [1, 1.01, 1] } : { scale: 1 }}
       transition={highlight ? { duration: 1.6, repeat: Infinity } : { duration: 0.2 }}
       className={cn(
         "rounded-2xl border bg-surface transition-colors",
         isLeader
-          ? "border-neon/60 glow-neon"
+          ? "border-neon leader-pulse"
           : highlight
             ? "border-violet/60"
             : "border-line",
         (hasPassed || full) && !isLeader ? "opacity-50" : "",
-        compact ? "p-2.5" : "p-4",
+        compact ? "p-2.5" : "p-3",
       )}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <span className={compact ? "text-lg" : "text-xl"}>{player.emoji}</span>
+          <span
+            className={cn(
+              "grid size-8 shrink-0 place-items-center rounded-full border text-lg",
+              isLeader ? "border-neon bg-neon/15 leader-pulse" : "border-line bg-surface-2",
+            )}
+          >
+            {player.emoji}
+          </span>
           <span className={cn("truncate font-bold", compact ? "text-sm" : "text-base")}>
             {player.name}
           </span>
@@ -91,14 +111,13 @@ export function BidControls({
 
       {mystery ? (
         <div className="grid grid-cols-2 gap-1.5">
-          <motion.button
+          <button
             type="button"
-            whileTap={canClaim(state, player.id) ? { scale: 0.93 } : undefined}
             disabled={!canClaim(state, player.id)}
             onClick={onClaim}
             className={cn(
-              "flex items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors",
-              compact ? "h-11 text-xs" : "h-14 text-sm",
+              "flex items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
+              buttonHeight,
               canClaim(state, player.id)
                 ? "border-violet/60 bg-violet/15 text-violet hover:bg-violet/25"
                 : "cursor-not-allowed border-line bg-surface-2 text-faint",
@@ -106,55 +125,88 @@ export function BidControls({
           >
             <PackageOpen className="size-4" />
             {t("auction.take")} {money(state.lotPrice, currency)}
-          </motion.button>
+          </button>
           <PassButton
-            compact={compact}
+            height={buttonHeight}
             disabled={!canPass(state, player.id)}
             onClick={onPass}
             label={t("auction.pass")}
           />
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-1.5">
-          {options.map(({ step, amount }) => {
-            const enabled = canBid(state, player.id, amount);
-            return (
-              <motion.button
-                key={step}
+        <div className="flex flex-col gap-1.5">
+          <div className={cn("grid gap-1.5", showMax ? "grid-cols-4" : "grid-cols-3")}>
+            {options.map(({ step, amount }) => {
+              const enabled = canBid(state, player.id, amount);
+              return (
+                <button
+                  key={step}
+                  type="button"
+                  disabled={!enabled}
+                  onClick={() => onBid(amount)}
+                  className={cn(
+                    "flex flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
+                    buttonHeight,
+                    enabled
+                      ? "border-neon/50 bg-neon/10 text-neon hover:bg-neon/20"
+                      : "cursor-not-allowed border-line bg-surface-2 text-faint",
+                  )}
+                >
+                  <span className={compact ? "text-sm" : "text-lg"}>
+                    {opening ? money(amount, currency) : `+${money(step, currency)}`}
+                  </span>
+                  {!compact ? (
+                    <span className="text-[10px] font-medium text-faint">
+                      = {money(amount, currency)}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+
+            {showMax && max !== null ? (
+              <button
                 type="button"
-                whileTap={enabled ? { scale: 0.93 } : undefined}
-                disabled={!enabled}
-                onClick={() => onBid(amount)}
+                disabled={!canBid(state, player.id, max)}
+                onClick={() => onBid(max)}
                 className={cn(
-                  "flex flex-col items-center justify-center rounded-xl border font-bold transition-colors",
-                  compact ? "h-11 text-xs" : "h-14 text-sm",
-                  enabled
-                    ? "border-neon/50 bg-neon/10 text-neon hover:bg-neon/20"
+                  "flex flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
+                  buttonHeight,
+                  canBid(state, player.id, max)
+                    ? "border-gold/60 bg-gold/10 text-gold hover:bg-gold/20"
                     : "cursor-not-allowed border-line bg-surface-2 text-faint",
                 )}
               >
-                <span className={compact ? "text-sm" : "text-lg"}>
-                  {opening ? money(amount, currency) : `+${money(step, currency)}`}
+                <span className={cn("flex items-center gap-1", compact ? "text-sm" : "text-lg")}>
+                  <Zap className="size-3.5" />
+                  {t("auction.max")}
                 </span>
                 {!compact ? (
                   <span className="text-[10px] font-medium text-faint">
-                    = {money(amount, currency)}
+                    = {money(max, currency)}
                   </span>
                 ) : null}
-              </motion.button>
-            );
-          })}
+              </button>
+            ) : null}
+          </div>
 
           <PassButton
-            compact={compact}
+            height={buttonHeight}
             disabled={!canPass(state, player.id)}
             onClick={onPass}
             label={t("auction.pass")}
+            full
           />
         </div>
       )}
 
-      <div className="mt-2.5 flex items-center gap-1.5 border-t border-line pt-2">
+      {reserve > 0 && !full ? (
+        <p className="mt-2 text-center text-[11px] text-faint">
+          {t("auction.reserve", { amount: money(reserve, currency) })}
+        </p>
+      ) : null}
+
+      <div className="mt-2 flex items-center gap-1.5 border-t border-line pt-2">
         <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-faint">
           {t("auction.inventory")}
         </span>
@@ -181,32 +233,34 @@ export function BidControls({
 }
 
 function PassButton({
-  compact,
+  height,
   disabled,
   onClick,
   label,
+  full = false,
 }: {
-  compact: boolean;
+  height: string;
   disabled: boolean;
   onClick: () => void;
   label: string;
+  full?: boolean;
 }) {
   return (
-    <motion.button
+    <button
       type="button"
-      whileTap={disabled ? undefined : { scale: 0.93 }}
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center gap-1 rounded-xl border font-bold transition-colors",
-        compact ? "h-11 text-xs" : "h-14 text-sm",
+        "flex items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
+        height,
+        full ? "w-full" : "",
         disabled
           ? "cursor-not-allowed border-line bg-surface-2 text-faint"
-          : "border-line bg-surface-2 text-muted hover:border-red-500/50 hover:text-red-500",
+          : "border-red-500/50 bg-red-500/10 text-red-500 hover:bg-red-500/20",
       )}
     >
-      <Ban className={compact ? "size-3.5" : "size-4"} />
+      <Ban className="size-4" />
       {label}
-    </motion.button>
+    </button>
   );
 }

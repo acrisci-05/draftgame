@@ -25,7 +25,20 @@ function check(label, condition, detail) {
 /* ---------------- Catalogo ---------------- */
 
 const categories = catalog.OFFICIAL_CATEGORIES;
-check("catalogo: 22 liste ufficiali", categories.length === 22, categories.length);
+check("catalogo: almeno 25 liste ufficiali", categories.length >= 25, categories.length);
+check(
+  "catalogo: ogni lista ha un macro-tema",
+  categories.every((c) => ["sport", "pop", "gaming", "food", "life"].includes(c.theme)),
+  categories.filter((c) => !c.theme).map((c) => c.id).join(","),
+);
+check(
+  "catalogo: nessuna emoji bandiera (illeggibili su Windows)",
+  categories.every((c) =>
+    [c.emoji, ...c.items.map((i) => i.emoji ?? "")].every(
+      (emoji) => !/[\u{1F1E6}-\u{1F1FF}]/u.test(emoji),
+    ),
+  ),
+);
 check(
   "ogni lista ha 30 elementi",
   categories.every((c) => c.items.length === 30),
@@ -185,6 +198,64 @@ broke.players.forEach((p) => {
 broke = game.reducer(broke, { type: "tick", now: broke.deadline + 1 });
 broke = game.reducer(broke, { type: "tick", now: broke.deadline + 1 });
 check("budget esauriti: partita finita", broke.phase === "ended");
+
+/* ---------------- Riserva di budget ---------------- */
+
+let reserve = lobby({ budget: 20, slots: 5 });
+reserve = game.reducer(reserve, { type: "start", now: t0 });
+const ana = game.playerById(reserve, "a");
+check("riserva: con 5 slot liberi si può offrire al massimo budget - 4", game.maxBid(reserve, ana) === 16, game.maxBid(reserve, ana));
+check("riserva: offerta oltre il tetto rifiutata", !game.canBid(reserve, "a", 17));
+check("riserva: offerta al tetto accettata", game.canBid(reserve, "a", 16));
+check("riserva: pulsante Max propone il tetto", game.maxBidOption(reserve, ana) === 16);
+
+reserve = game.reducer(reserve, { type: "bid", playerId: "a", amount: 16, now: t0 + 1000 });
+reserve = game.reducer(reserve, { type: "pass", playerId: "b", now: t0 + 1200 });
+const anaAfter = game.playerById(reserve, "a");
+check("riserva: budget residuo pari agli slot mancanti", anaAfter.budget === 4 && anaAfter.roster.length === 1);
+check(
+  "riserva: restano esattamente 1 credito per slot",
+  anaAfter.budget === game.slotsLeft(reserve, anaAfter),
+);
+check("riserva: può ancora offrire il minimo", game.maxBid(reserve, anaAfter) >= 1);
+
+/* ---------------- Scarti disattivati ---------------- */
+
+let noDiscard = lobby({ budget: 20, slots: 4, allowDiscards: false });
+noDiscard = game.reducer(noDiscard, { type: "start", now: t0 });
+noDiscard = game.reducer(noDiscard, { type: "tick", now: noDiscard.deadline + 1 });
+check("senza scarti: il lotto viene comunque assegnato", noDiscard.lastResult.winnerId !== null);
+check("senza scarti: prezzo base", noDiscard.lastResult.price === 1);
+check("senza scarti: nessuno scarto registrato", noDiscard.discards.length === 0);
+check("senza scarti: feed segnala l'assegnazione d'ufficio", noDiscard.feed[0].kind === "auto");
+
+let withDiscard = lobby({ budget: 20, slots: 4, allowDiscards: true });
+withDiscard = game.reducer(withDiscard, { type: "start", now: t0 });
+withDiscard = game.reducer(withDiscard, { type: "tick", now: withDiscard.deadline + 1 });
+check("con scarti: nessuna offerta manda il lotto agli scarti", withDiscard.discards.length === 1);
+
+/* ---------------- Assegnazione dei lotti finali ---------------- */
+
+let closing = lobby({ budget: 20, slots: 2 });
+closing = game.reducer(closing, { type: "start", now: t0 });
+// Bea completa subito la sua lista, Ana resta l'unica da servire.
+["b", "b"].forEach(() => {
+  closing = game.reducer(closing, { type: "bid", playerId: "b", amount: 1, now: t0 });
+  closing = game.reducer(closing, { type: "pass", playerId: "a", now: t0 });
+  closing = game.reducer(closing, { type: "tick", now: closing.deadline + 1 });
+});
+check("chiusura: Bea ha la lista piena", game.playerById(closing, "b").roster.length === 2);
+let safety = 0;
+while (closing.phase !== "ended" && safety < 80) {
+  closing = game.reducer(closing, { type: "tick", now: closing.deadline + 1 });
+  safety += 1;
+}
+check("chiusura: anche Ana completa la lista", game.playerById(closing, "a").roster.length === 2);
+check("chiusura: partita terminata", closing.phase === "ended");
+check(
+  "chiusura: nessun giocatore resta a zero con slot vuoti",
+  closing.players.every((p) => p.roster.length === 2),
+);
 
 /* ---------------- Codice stanza ---------------- */
 

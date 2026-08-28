@@ -235,6 +235,44 @@ export const en: Dictionary = {
   "shared.playNow": "Play now",
   "shared.notFound": "Category not found.",
 
+  "tier.legend": "Value tiers",
+  "tier.tooltip": "Tier {letter}: base price {price}",
+  "tier.name5": "Top / Legendary",
+  "tier.name4": "Great",
+  "tier.name3": "Good",
+  "tier.name2": "Average",
+  "tier.name1": "Basic",
+
+  "categories.search": "Search a category",
+  "categories.noResults": "No category found.",
+  "categories.filterAll": "All",
+  "categories.filterSport": "Sport",
+  "categories.filterPop": "Pop Culture",
+  "categories.filterGaming": "Gaming",
+  "categories.filterFood": "Food",
+  "categories.filterLife": "Everyday life",
+
+  "lobby.discards": "Discards on",
+  "lobby.discardsHint": "With discards a lot nobody bids on is set aside; switch them off and it is assigned anyway",
+
+  "auction.max": "Max",
+  "auction.reserve": "Keep {amount} for the slots you still need",
+  "auction.feedAuto": "{player} completes the roster with {item}",
+  "auction.history": "History",
+
+  "studio.findImage": "Find image",
+  "studio.findAll": "Find all images",
+  "studio.searching": "Searching...",
+  "studio.imageNotFound": "No image found",
+  "studio.imageSource": "Images from Wikipedia/Wikimedia: check licence and attribution before publishing.",
+
+  "rules.nobid.title": "When nobody bids",
+  "rules.nobid.body":
+    "With discards on the lot is set aside and nobody gets it. If the host switches them off, the lot goes to whoever has fewest items at the base price.",
+  "rules.reserve.title": "Nobody ends up stuck",
+  "rules.reserve.body":
+    "You always keep one credit per empty slot: three items missing means you cannot go below 3. If you are the last one left to complete, the remaining lots are assigned to you at the base price.",
+
   "support.quick": "Support with {amount}",
   "support.oneLine": "No ads, no paywall: the project runs on your support.",
 

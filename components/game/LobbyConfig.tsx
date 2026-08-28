@@ -123,6 +123,12 @@ export function LobbyConfig({ config, disabled = false, onChange }: LobbyConfigP
             label={t("lobby.mystery")}
             hint={t("lobby.mysteryHint")}
           />
+          <Switch
+            checked={config.allowDiscards}
+            onChange={(allowDiscards) => !disabled && onChange({ allowDiscards })}
+            label={t("lobby.discards")}
+            hint={t("lobby.discardsHint")}
+          />
         </div>
       </div>
     </Panel>

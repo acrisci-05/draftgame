@@ -1,6 +1,15 @@
 "use client";
 
-import { Check, Copy, ImageIcon, RotateCcw, Save, TriangleAlert } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ImageIcon,
+  Loader2,
+  RotateCcw,
+  Save,
+  Search,
+  TriangleAlert,
+} from "lucide-react";
 import { useState } from "react";
 import {
   ITEMS_PER_TIER,
@@ -10,15 +19,16 @@ import {
   validateCategory,
   type TierDraft,
 } from "@/lib/catalog";
-import { useT } from "@/lib/settings";
+import { findImage } from "@/lib/images";
+import { useSettings } from "@/lib/settings";
 import { removeOverride, saveCustomCategory, saveOverride } from "@/lib/storage";
 import type { Category, Tier } from "@/lib/types";
-import { TIER_ORDER, TIER_STYLES, cn, copyText } from "@/lib/utils";
+import { TIER_ORDER, cn, copyText } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { ItemCover } from "./ItemCover";
-import { TierChip } from "./TierChip";
+import { TierChip, tierNameKey } from "./TierChip";
 
 interface ListEditorProps {
   category: Category;
@@ -29,7 +39,9 @@ interface ListEditorProps {
 }
 
 export function ListEditor({ category, official, overridden, onSaved }: ListEditorProps) {
-  const t = useT();
+  const { locale, t } = useSettings();
+  const [searching, setSearching] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState<string[]>([]);
   const [name, setName] = useState(category.name);
   const [emoji, setEmoji] = useState(category.emoji);
   const [tiers, setTiers] = useState<TierDraft>(() => itemsToTierDraft(category.items));
@@ -44,6 +56,36 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
       rows[index] = { ...rows[index], ...patch };
       return { ...current, [tier]: rows };
     });
+  };
+
+  const lookup = async (tier: Tier, index: number) => {
+    const row = tiers[tier][index];
+    if (!row?.name.trim()) return;
+    const key = `${tier}-${index}`;
+    setSearching(key);
+    const url = await findImage(row.name, locale, name.trim());
+    if (url) {
+      setRow(tier, index, { image: url });
+      setNotFound((current) => current.filter((entry) => entry !== key));
+    } else {
+      setNotFound((current) => (current.includes(key) ? current : [...current, key]));
+    }
+    setSearching(null);
+  };
+
+  const lookupAll = async () => {
+    setSearching("all");
+    setNotFound([]);
+    for (const tier of TIER_ORDER) {
+      for (let index = 0; index < tiers[tier].length; index += 1) {
+        const row = tiers[tier][index];
+        if (!row.name.trim() || row.image.trim()) continue;
+        const url = await findImage(row.name, locale, name.trim());
+        if (url) setRow(tier, index, { image: url });
+        await new Promise((resolve) => setTimeout(resolve, 120));
+      }
+    }
+    setSearching(null);
   };
 
   const build = (): Category => ({
@@ -108,10 +150,24 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
             />
           </div>
         </div>
+
+        <Button
+          variant="outline"
+          className="mt-3 w-full"
+          disabled={searching !== null}
+          onClick={lookupAll}
+        >
+          {searching === "all" ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Search className="size-4" />
+          )}
+          {searching === "all" ? t("studio.searching") : t("studio.findAll")}
+        </Button>
+        <p className="mt-2 text-xs text-faint">{t("studio.imageSource")}</p>
       </Panel>
 
       {TIER_ORDER.map((tier) => {
-        const style = TIER_STYLES[tier];
         const filled = tiers[tier].filter((row) => row.name.trim()).length;
         return (
           <Panel key={tier}>
@@ -128,7 +184,9 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
               }
             >
               <TierChip tier={tier} />
-              <span className="ms-2 normal-case tracking-normal text-muted">{style.label}</span>
+              <span className="ms-2 normal-case tracking-normal text-muted">
+                {t(tierNameKey(tier))}
+              </span>
             </PanelTitle>
 
             <div className="flex flex-col gap-2">
@@ -163,6 +221,20 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
                       />
                       <button
                         type="button"
+                        aria-label={t("studio.findImage")}
+                        title={t("studio.findImage")}
+                        disabled={searching !== null || !row.name.trim()}
+                        onClick={() => lookup(tier, index)}
+                        className="grid size-11 shrink-0 place-items-center rounded-xl border border-line bg-surface-2 text-faint transition-colors hover:text-neon disabled:opacity-40"
+                      >
+                        {searching === key ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Search className="size-4" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
                         aria-label="URL"
                         onClick={() => setOpenImage(openImage === key ? null : key)}
                         className={cn(
@@ -175,6 +247,10 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
                         <ImageIcon className="size-4" />
                       </button>
                     </div>
+
+                    {notFound.includes(key) ? (
+                      <p className="text-xs text-amber-500">{t("studio.imageNotFound")}</p>
+                    ) : null}
 
                     {openImage === key ? (
                       <input

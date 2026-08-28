@@ -16,12 +16,16 @@ export interface CatalogItem {
 
 export type CategorySource = "official" | "custom" | "shared";
 
+/** Macro-tema usato dai filtri nella pagina delle categorie. */
+export type CategoryTheme = "sport" | "pop" | "gaming" | "food" | "life";
+
 export interface Category {
   id: string;
   name: string;
   /** Nome in inglese per le liste ufficiali. */
   nameEn?: string;
   emoji: string;
+  theme?: CategoryTheme;
   items: CatalogItem[];
   source: CategorySource;
   /** Id remoto usato per il link di condivisione. */
@@ -73,9 +77,22 @@ export interface RoomConfig {
   slots: number;
   blindDraft: boolean;
   mysteryBox: boolean;
+  /**
+   * true: un lotto senza offerte finisce negli scarti.
+   * false: ogni lotto viene comunque assegnato a chi ha ancora slot liberi.
+   */
+  allowDiscards: boolean;
 }
 
-export type FeedKind = "bid" | "pass" | "won" | "discard" | "mystery" | "lot" | "start";
+export type FeedKind =
+  | "bid"
+  | "pass"
+  | "won"
+  | "discard"
+  | "mystery"
+  | "lot"
+  | "start"
+  | "auto";
 
 export interface FeedEntry {
   id: string;

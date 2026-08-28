@@ -10,9 +10,87 @@ import { APP_NAME, SITE_DOMAIN } from "@/lib/config";
 import { coverPalette } from "@/lib/covers";
 import { rosterValue } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
-import type { GameState } from "@/lib/types";
-import { TIER_STYLES, hashString, initials, money } from "@/lib/utils";
+import type { CurrencyCode, GameState, RosterEntry } from "@/lib/types";
+import { TIER_ORDER, TIER_STYLES, hashString, initials, money } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+
+/** Tassello di un elemento vinto, con badge dorato del prezzo pagato. */
+function RosterTile({
+  entry,
+  currency,
+  width,
+}: {
+  entry: RosterEntry;
+  currency: CurrencyCode;
+  width: number;
+}) {
+  const palette = coverPalette(entry.itemId + entry.name);
+  const tint = TIER_STYLES[entry.tier].hex;
+
+  return (
+    <div style={{ width, display: "flex", flexDirection: "column", gap: 6 }}>
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          aspectRatio: "1 / 1",
+          borderRadius: 16,
+          border: `2px solid ${tint}66`,
+          backgroundImage: `linear-gradient(140deg, ${palette.from}, ${palette.to})`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+        }}
+      >
+        {entry.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={entry.image}
+            alt=""
+            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        ) : (
+          <span style={{ fontSize: 34, fontWeight: 900, color: "#ffffffdd" }}>
+            {entry.emoji ?? initials(entry.name)}
+          </span>
+        )}
+        <span
+          style={{
+            position: "absolute",
+            top: 6,
+            right: 6,
+            backgroundColor: GOLD,
+            color: "#3f2d00",
+            fontSize: 20,
+            fontWeight: 900,
+            borderRadius: 999,
+            padding: "3px 10px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.45)",
+          }}
+        >
+          {money(entry.price, currency)}
+        </span>
+      </div>
+      <span
+        style={{
+          fontSize: 18,
+          fontWeight: 600,
+          lineHeight: 1.15,
+          color: "#e4e4e7",
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
+        {entry.name}
+      </span>
+    </div>
+  );
+}
 
 export const CARD_WIDTH = 1080;
 export const CARD_HEIGHT = 1920;
@@ -117,7 +195,7 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
 
   const currency = state.config.currency;
   const columns = state.players.length <= 3 ? 1 : 2;
-  const perRow = Math.min(5, state.config.slots <= 5 ? state.config.slots : Math.ceil(state.config.slots / 2));
+  const tileWidth = columns === 1 ? 150 : 118;
   const backdrop = coverPalette(state.category.id + state.code);
 
   return (
@@ -285,90 +363,60 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                       flex: 1,
                       minHeight: 0,
                       display: "flex",
-                      flexWrap: "wrap",
-                      alignContent: "flex-start",
-                      gap: 12,
+                      flexDirection: "column",
+                      gap: 10,
                     }}
                   >
                     {player.roster.length === 0 ? (
                       <span style={{ fontSize: 24, color: "#52525b" }}>—</span>
                     ) : (
-                      player.roster.map((entry) => {
-                        const palette = coverPalette(entry.itemId + entry.name);
-                        const tint = TIER_STYLES[entry.tier].hex;
+                      // Roster ordinato per fascia: i 5 in alto, gli 1 in fondo.
+                      TIER_ORDER.map((tier) => {
+                        const entries = player.roster.filter((entry) => entry.tier === tier);
+                        if (entries.length === 0) return null;
+                        const tint = TIER_STYLES[tier].hex;
                         return (
                           <div
-                            key={entry.itemId}
-                            style={{
-                              width: `calc((100% - ${(perRow - 1) * 12}px) / ${perRow})`,
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: 6,
-                            }}
+                            key={tier}
+                            style={{ display: "flex", alignItems: "flex-start", gap: 10 }}
                           >
-                            <div
+                            <span
                               style={{
-                                position: "relative",
-                                width: "100%",
-                                aspectRatio: "1 / 1",
-                                borderRadius: 16,
+                                flexShrink: 0,
+                                width: 32,
+                                height: 32,
+                                marginTop: 4,
+                                borderRadius: 10,
                                 border: `2px solid ${tint}66`,
-                                backgroundImage: `linear-gradient(140deg, ${palette.from}, ${palette.to})`,
+                                backgroundColor: `${tint}20`,
+                                color: tint,
+                                fontSize: 17,
+                                fontWeight: 900,
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                overflow: "hidden",
                               }}
                             >
-                              {entry.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={entry.image}
-                                  alt=""
-                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                />
-                              ) : (
-                                <span
-                                  style={{
-                                    fontSize: 34,
-                                    fontWeight: 900,
-                                    color: "#ffffffdd",
-                                  }}
-                                >
-                                  {entry.emoji ?? initials(entry.name)}
-                                </span>
-                              )}
-                              <span
-                                style={{
-                                  position: "absolute",
-                                  top: 6,
-                                  right: 6,
-                                  backgroundColor: GOLD,
-                                  color: "#3f2d00",
-                                  fontSize: 20,
-                                  fontWeight: 900,
-                                  borderRadius: 999,
-                                  padding: "3px 10px",
-                                  boxShadow: "0 2px 10px rgba(0,0,0,0.45)",
-                                }}
-                              >
-                                {money(entry.price, currency)}
-                              </span>
-                            </div>
-                            <span
-                              style={{
-                                fontSize: 19,
-                                fontWeight: 600,
-                                lineHeight: 1.15,
-                                color: "#e4e4e7",
-                                display: "-webkit-box",
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: "vertical",
-                                overflow: "hidden",
-                              }}
-                            >
-                              {entry.name}
+                              {TIER_STYLES[tier].letter}
                             </span>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 10,
+                                flex: 1,
+                                minWidth: 0,
+                              }}
+                            >
+                              {entries.map((entry) => (
+                                <RosterTile
+                                  key={entry.itemId}
+                                  entry={entry}
+                                  currency={currency}
+                                  width={tileWidth}
+                                />
+                              ))}
+                            </div>
                           </div>
                         );
                       })

@@ -1,12 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Ban, Gavel, PackageOpen, Radio, Trash2, Trophy } from "lucide-react";
+import { Ban, ChevronDown, Gavel, PackageOpen, Radio, Trash2, Trophy, Wand2 } from "lucide-react";
+import { useState } from "react";
 import { useT } from "@/lib/settings";
-import type { CurrencyCode, FeedEntry } from "@/lib/types";
-import { money } from "@/lib/utils";
+import type { CurrencyCode, FeedEntry, FeedKind } from "@/lib/types";
+import { cn, money } from "@/lib/utils";
 
-const ICONS = {
+const ICONS: Record<FeedKind, typeof Gavel> = {
   bid: Gavel,
   pass: Ban,
   won: Trophy,
@@ -14,9 +15,10 @@ const ICONS = {
   mystery: PackageOpen,
   lot: Radio,
   start: Radio,
-} as const;
+  auto: Wand2,
+};
 
-const TONES = {
+const TONES: Record<FeedKind, string> = {
   bid: "text-neon",
   pass: "text-faint",
   won: "text-neon",
@@ -24,7 +26,8 @@ const TONES = {
   mystery: "text-violet",
   lot: "text-muted",
   start: "text-muted",
-} as const;
+  auto: "text-gold",
+};
 
 function label(entry: FeedEntry, currency: CurrencyCode, t: ReturnType<typeof useT>): string {
   const player = `${entry.playerEmoji ?? ""} ${entry.playerName ?? ""}`.trim();
@@ -38,6 +41,8 @@ function label(entry: FeedEntry, currency: CurrencyCode, t: ReturnType<typeof us
       return t("auction.feedWon", { player, item: entry.itemName ?? "", amount });
     case "mystery":
       return t("auction.feedMystery", { player, item: entry.itemName ?? "", amount });
+    case "auto":
+      return t("auction.feedAuto", { player, item: entry.itemName ?? "" });
     case "discard":
       return t("auction.feedDiscard", { item: entry.itemName ?? "" });
     case "lot":
@@ -50,24 +55,46 @@ function label(entry: FeedEntry, currency: CurrencyCode, t: ReturnType<typeof us
 export function BidFeed({
   feed,
   currency,
-  limit = 6,
+  limit = 12,
+  collapsible = true,
 }: {
   feed: FeedEntry[];
   currency: CurrencyCode;
   limit?: number;
+  collapsible?: boolean;
 }) {
   const t = useT();
+  const [open, setOpen] = useState(true);
   const entries = feed.slice(0, limit);
+  const latest = feed[0];
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-3">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
-        {t("auction.feed")}
-      </p>
-      {entries.length === 0 ? (
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+          {t("auction.feed")}
+        </p>
+        {collapsible ? (
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            aria-expanded={open}
+            className="flex items-center gap-1 text-[11px] font-semibold text-faint transition-colors hover:text-fg"
+          >
+            {t("auction.history")}
+            <ChevronDown
+              className={cn("size-3.5 transition-transform", open ? "rotate-180" : "")}
+            />
+          </button>
+        ) : null}
+      </div>
+
+      {!open && latest ? (
+        <p className="truncate text-sm text-muted">{label(latest, currency, t)}</p>
+      ) : !open ? null : entries.length === 0 ? (
         <p className="text-sm text-faint">{t("auction.feedEmpty")}</p>
       ) : (
-        <ul className="flex flex-col gap-1.5">
+        <ul className="no-scrollbar flex max-h-40 flex-col gap-1.5 overflow-y-auto">
           <AnimatePresence initial={false}>
             {entries.map((entry) => {
               const Icon = ICONS[entry.kind];

@@ -13,13 +13,18 @@ Le regole complete sono in [`PROJECT_SPECS.md`](./PROJECT_SPECS.md).
 - **Regole configurabili**: budget, valuta (EUR/USD/GBP/JPY), numero di giocatori ed elementi per
   roster, più le varianti Blind Draft e Mystery Box.
 - **Anti-sniping**: ogni rilancio riporta il timer a 10 secondi, così l'ultimo secondo non decide.
+- **Riserva di budget**: si tiene sempre un credito per ogni slot vuoto, nessuno resta a zero con la
+  lista incompleta; i lotti finali vengono assegnati d'ufficio a chi deve ancora completare.
+- **Scarti opzionali**: l'host decide se un lotto senza offerte finisce negli scarti o viene
+  comunque assegnato.
 - **Due modalità**: stanza locale sullo stesso dispositivo oppure stanza online con codice di 5
   caratteri (copia rapida e QR) sincronizzata via Supabase Realtime Channels.
 - **Card 9:16** esportabile in PNG (1080x1920) con roster, budget residuo e QR del voto.
 - **Votazione** senza registrazione: un voto per dispositivo sul link generato a fine partita.
-- **22 liste ufficiali** a nomi corti con emoji di copertina, definite in `data/categories.json`.
-- **Studio categorie** (`/studio`): vedi e modifica ogni lista elemento per elemento ed esporta il
-  JSON pronto da incollare nel file dati.
+- **26 liste ufficiali** a nomi corti con emoji di copertina, definite in `data/categories.json`,
+  con ricerca istantanea e filtri per macro-tema nella pagina Categorie.
+- **Studio categorie** (`/studio`): vedi e modifica ogni lista elemento per elemento, cerca le foto
+  reali su Wikipedia ed esporta il JSON pronto da incollare nel file dati.
 - **Editor di categorie** no-code: 30 elementi divisi in 5 fasce, emoji e immagine per elemento,
   salvataggio locale e pubblicazione con link condivisibile.
 - **10 lingue** (it, en, fr, es, de, pt, ru, zh, ja, ar) con selettore in navbar e nel menu, tema
@@ -63,7 +68,7 @@ components/ui/          bottoni, badge, input, modali, pannelli, selettore lingu
 components/game/        asta, timer, controlli di offerta, card finale, editor categorie
 lib/                    motore di gioco, realtime, catalogo, storage, i18n, utility
 lib/i18n/               dizionari delle 10 lingue (italiano lingua sorgente)
-data/categories.json    liste ufficiali: 22 categorie da 30 elementi
+data/categories.json    liste ufficiali: 26 categorie da 30 elementi
 scripts/engine-check.js controlli sul motore di gioco e sul catalogo
 public/logo.svg         marchio dell'app, sostituibile con il file originale
 supabase/               schema SQL per categorie condivise, suggerimenti, risultati e voti

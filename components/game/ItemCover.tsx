@@ -1,6 +1,7 @@
 "use client";
 
 import { HelpCircle } from "lucide-react";
+import { useState } from "react";
 import { coverContent } from "@/lib/covers";
 import type { CatalogItem, RosterEntry } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,14 @@ const SIZES: Record<CoverSize, string> = {
   md: "size-20 rounded-2xl text-xl",
   lg: "size-28 rounded-2xl text-3xl",
   xl: "w-full aspect-square rounded-3xl text-7xl",
+};
+
+const FALLBACK_ICON: Record<CoverSize, string> = {
+  xs: "size-5",
+  sm: "size-6",
+  md: "size-8",
+  lg: "size-12",
+  xl: "size-24",
 };
 
 interface ItemCoverProps {
@@ -30,6 +39,8 @@ export function ItemCover({
   mystery = false,
   className,
 }: ItemCoverProps) {
+  const [broken, setBroken] = useState(false);
+
   if (mystery || !item) {
     return (
       <div
@@ -39,22 +50,13 @@ export function ItemCover({
           className,
         )}
       >
-        <HelpCircle
-          className={
-            size === "xl"
-              ? "size-24"
-              : size === "lg"
-                ? "size-12"
-                : size === "md"
-                  ? "size-8"
-                  : "size-5"
-          }
-        />
+        <HelpCircle className={FALLBACK_ICON[size]} />
       </div>
     );
   }
 
   const cover = coverContent(item);
+  const showImage = Boolean(cover.image) && !broken;
 
   return (
     <div
@@ -65,18 +67,23 @@ export function ItemCover({
         className,
       )}
     >
-      {cover.image ? (
+      {showImage ? (
+        // Immagine remota: crossOrigin serve a poterla riesportare nella card PNG.
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={cover.image}
           alt=""
-          className={cn("size-full object-cover", blurred && "blur-md scale-110")}
+          loading="lazy"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+          onError={() => setBroken(true)}
+          className={cn("size-full object-cover", blurred && "scale-110 blur-md")}
         />
       ) : (
         <div
           className={cn(
             "grid size-full place-items-center font-black text-white/90",
-            blurred && "blur-md scale-110",
+            blurred && "scale-110 blur-md",
           )}
         >
           {cover.emoji ?? cover.label}

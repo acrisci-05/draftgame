@@ -1,5 +1,5 @@
 import rawCategories from "@/data/categories.json";
-import type { CatalogItem, Category, Locale, Tier } from "./types";
+import type { CatalogItem, Category, CategoryTheme, Locale, Tier } from "./types";
 import { slugify, TIER_ORDER } from "./utils";
 
 /** Le liste ufficiali hanno 30 elementi: 6 per ciascuna delle 5 fasce. */
@@ -118,6 +118,7 @@ export interface RawCategory {
   name: string;
   nameEn?: string;
   emoji: string;
+  theme?: CategoryTheme;
   tiers: Record<string, [string, string?, string?][]>;
 }
 
@@ -136,6 +137,7 @@ export function fromRawCategory(raw: RawCategory): Category {
     name: raw.name,
     nameEn: raw.nameEn,
     emoji: raw.emoji,
+    theme: raw.theme,
     items: buildItems(raw.id, draft),
     source: "official",
   };
@@ -158,6 +160,7 @@ export function toRawCategory(category: Category): RawCategory {
     name: category.name,
     nameEn: category.nameEn,
     emoji: category.emoji,
+    theme: category.theme,
     tiers,
   };
 }

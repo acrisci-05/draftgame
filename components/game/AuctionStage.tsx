@@ -247,6 +247,8 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
         </AnimatePresence>
       </div>
 
+      <BidFeed feed={state.feed} currency={currency} />
+
       {turnId && state.mode === "local" ? (
         <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-violet">
           {t("auction.turnOf", { player: playerById(state, turnId)?.name ?? "" })}
@@ -270,25 +272,32 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
         </div>
       ) : (
         <>
+          <PlayerRail state={state} selfId={selfId} nextId={turnId} />
+
           {self ? (
-            <BidControls
-              state={state}
-              player={self}
-              highlight={self.id === turnId}
-              onBid={(amount) => bid(self.id, amount)}
-              onPass={() => pass(self.id)}
-              onClaim={() => claim(self.id)}
-            />
+            <>
+              {/* Su telefono i comandi restano fissi in basso, a portata di pollice. */}
+              <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ink/95 p-3 backdrop-blur safe-bottom sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+                <div className="mx-auto w-full max-w-2xl">
+                  <BidControls
+                    state={state}
+                    player={self}
+                    highlight={self.id === turnId}
+                    onBid={(amount) => bid(self.id, amount)}
+                    onPass={() => pass(self.id)}
+                    onClaim={() => claim(self.id)}
+                  />
+                </div>
+              </div>
+              <div aria-hidden className="h-56 sm:hidden" />
+            </>
           ) : (
             <p className="rounded-2xl border border-line bg-surface p-4 text-center text-sm text-faint">
               {t("auction.spectator")}
             </p>
           )}
-          <PlayerRail state={state} selfId={selfId} nextId={turnId} />
         </>
       )}
-
-      <BidFeed feed={state.feed} currency={currency} />
 
       {isHost ? (
         <Button variant="ghost" size="sm" onClick={() => dispatch({ type: "end" })}>

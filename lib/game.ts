@@ -40,6 +40,7 @@ export const DEFAULT_CONFIG: RoomConfig = {
   slots: 5,
   blindDraft: false,
   mysteryBox: false,
+  allowDiscards: true,
 };
 
 /** Costo fisso della Mystery Box, proporzionato al budget di partenza. */
@@ -130,6 +131,20 @@ export function minimumBid(state: GameState): number {
   return state.highBidderId ? state.currentBid + 1 : OPENING_BID;
 }
 
+/** Slot ancora da riempire per un giocatore. */
+export function slotsLeft(state: GameState, player: Player): number {
+  return Math.max(0, state.config.slots - player.roster.length);
+}
+
+/**
+ * Offerta massima consentita: si tiene sempre da parte un credito per ogni slot
+ * che resterebbe vuoto, così nessuno può arrivare a zero con la lista incompleta.
+ */
+export function maxBid(state: GameState, player: Player): number {
+  const reserve = Math.max(0, slotsLeft(state, player) - 1);
+  return Math.max(0, player.budget - reserve);
+}
+
 /** Le tre opzioni dei controlli di rilancio (+1, +2, +5). */
 export function bidOptions(state: GameState): { step: number; amount: number }[] {
   return RAISE_STEPS.map((step) => ({
@@ -143,7 +158,19 @@ export function canCompete(state: GameState, player: Player): boolean {
   if (player.id === state.highBidderId) return true;
   if (state.passed.includes(player.id)) return false;
   if (rosterFull(state, player)) return false;
-  return player.budget >= minimumBid(state);
+  return maxBid(state, player) >= minimumBid(state);
+}
+
+/** Offerta "tutto quello che posso" per il pulsante rapido, null se non praticabile. */
+export function maxBidOption(state: GameState, player: Player): number | null {
+  const cap = maxBid(state, player);
+  const min = minimumBid(state);
+  return cap >= min ? cap : null;
+}
+
+/** Giocatori che devono ancora completare la lista. */
+export function pendingPlayers(state: GameState): Player[] {
+  return state.players.filter((p) => !rosterFull(state, p));
 }
 
 export function activePlayers(state: GameState): Player[] {
@@ -157,8 +184,8 @@ export function canBid(state: GameState, playerId: string, amount: number): bool
   if (state.passed.includes(playerId)) return false;
   if (state.highBidderId === playerId) return false;
   if (rosterFull(state, player)) return false;
-  if (!bidOptions(state).some((o) => o.amount === amount)) return false;
-  return player.budget - amount >= 0;
+  if (!Number.isInteger(amount) || amount < minimumBid(state)) return false;
+  return amount <= maxBid(state, player);
 }
 
 export function canClaim(state: GameState, playerId: string): boolean {
@@ -167,7 +194,7 @@ export function canClaim(state: GameState, playerId: string): boolean {
   if (!player) return false;
   if (state.passed.includes(playerId)) return false;
   if (rosterFull(state, player)) return false;
-  return player.budget >= state.lotPrice;
+  return maxBid(state, player) >= state.lotPrice;
 }
 
 export function canPass(state: GameState, playerId: string): boolean {
@@ -274,6 +301,37 @@ function draw(state: GameState, now: number): GameState {
   }
 
   const lotNumber = state.lotNumber + 1;
+
+  // Se resta un solo giocatore da completare e i lotti bastano appena, glieli assegniamo d'ufficio.
+  const pending = pendingPlayers(state);
+  if (pending.length === 1) {
+    const player = pending[0];
+    const needed = state.config.slots - player.roster.length;
+    const [nextId, ...rest] = state.queue;
+    const item = state.items.find((i) => i.id === nextId);
+    if (state.queue.length <= needed && item && maxBid(state, player) >= OPENING_BID) {
+      return award(
+        {
+          ...state,
+          queue: rest,
+          lotKind: "item",
+          lotPrice: 0,
+          currentItemId: nextId,
+          currentBid: OPENING_BID,
+          highBidderId: null,
+          passed: [],
+          sniped: false,
+          lotNumber,
+        },
+        now,
+        player,
+        item,
+        OPENING_BID,
+        { forced: true },
+      );
+    }
+  }
+
   const mystery = state.config.mysteryBox && lotNumber % MYSTERY_EVERY === 0;
 
   if (mystery) {
@@ -327,7 +385,7 @@ function award(
   winner: Player,
   item: CatalogItem,
   price: number,
-  options: { mystery?: boolean; queue?: string[] } = {},
+  options: { mystery?: boolean; queue?: string[]; forced?: boolean } = {},
 ): GameState {
   const result: AuctionResult = {
     itemId: item.id,
@@ -371,7 +429,7 @@ function award(
         history: [...state.history, result],
         deadline: now + RESULT_SECONDS * 1000,
       },
-      feedEntry(options.mystery ? "mystery" : "won", now, {
+      feedEntry(options.mystery ? "mystery" : options.forced ? "auto" : "won", now, {
         playerName: winner.name,
         playerEmoji: winner.emoji,
         itemName: item.name,
@@ -424,6 +482,14 @@ function resolve(state: GameState, now: number, reason: "timeout" | "lastman"): 
   }
 
   if (winner) return award(state, now, winner, item, price);
+
+  // Con gli scarti disattivati il lotto va comunque a chi deve ancora completare la lista.
+  if (!state.config.allowDiscards) {
+    const fallback = pendingPlayers(state)
+      .filter((p) => maxBid(state, p) >= OPENING_BID)
+      .sort((a, b) => a.roster.length - b.roster.length || b.budget - a.budget)[0];
+    if (fallback) return award(state, now, fallback, item, OPENING_BID, { forced: true });
+  }
 
   const result: AuctionResult = {
     itemId: item.id,

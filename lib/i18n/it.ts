@@ -236,6 +236,44 @@ export const it = {
   "shared.playNow": "Gioca ora",
   "shared.notFound": "Categoria non trovata.",
 
+  "tier.legend": "Fasce di valore",
+  "tier.tooltip": "Tier {letter}: prezzo base {price}",
+  "tier.name5": "Top / Leggendario",
+  "tier.name4": "Ottimo",
+  "tier.name3": "Buono",
+  "tier.name2": "Medio",
+  "tier.name1": "Base",
+
+  "categories.search": "Cerca una categoria",
+  "categories.noResults": "Nessuna categoria trovata.",
+  "categories.filterAll": "Tutte",
+  "categories.filterSport": "Sport",
+  "categories.filterPop": "Pop Culture",
+  "categories.filterGaming": "Gaming",
+  "categories.filterFood": "Cibo",
+  "categories.filterLife": "Vita quotidiana",
+
+  "lobby.discards": "Scarti attivi",
+  "lobby.discardsHint": "Se nessuno offre il lotto va agli scarti; disattivandoli viene assegnato d'ufficio",
+
+  "auction.max": "Max",
+  "auction.reserve": "Tieni {amount} per gli slot che ti restano",
+  "auction.feedAuto": "{player} completa la lista con {item}",
+  "auction.history": "Cronologia",
+
+  "studio.findImage": "Cerca immagine",
+  "studio.findAll": "Trova tutte le immagini",
+  "studio.searching": "Cerco...",
+  "studio.imageNotFound": "Nessuna immagine trovata",
+  "studio.imageSource": "Immagini da Wikipedia/Wikimedia: controlla licenza e attribuzione prima di pubblicare.",
+
+  "rules.nobid.title": "Se nessuno offre",
+  "rules.nobid.body":
+    "Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno. Se l'host li disattiva, il lotto va d'ufficio a chi ha meno elementi al prezzo base.",
+  "rules.reserve.title": "Nessuno resta a secco",
+  "rules.reserve.body":
+    "Devi sempre tenere un credito per ogni slot ancora vuoto: se ti mancano 3 elementi non puoi scendere sotto 3. Se resti l'unico da completare, gli ultimi lotti ti vengono assegnati al prezzo base.",
+
   "support.quick": "Sostieni con {amount}",
   "support.oneLine": "Zero pubblicità, zero paywall: il progetto vive col tuo aiuto.",
 

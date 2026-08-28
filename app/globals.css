@@ -79,6 +79,32 @@ body {
   color: var(--pp-fg);
 }
 
+/* Alone pulsante su chi detiene l'offerta più alta. */
+@keyframes pp-leader-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pp-neon) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--pp-neon) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pp-neon) 0%, transparent);
+  }
+}
+
+@layer utilities {
+  .leader-pulse {
+    animation: pp-leader-pulse 1.6s ease-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .leader-pulse {
+      animation: none;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--pp-neon) 45%, transparent);
+    }
+  }
+}
+
 @layer utilities {
   .glow-neon {
     box-shadow: 0 0 24px -6px color-mix(in srgb, var(--pp-neon) 70%, transparent);
