@@ -21,8 +21,12 @@ Le regole complete sono in [`PROJECT_SPECS.md`](./PROJECT_SPECS.md).
   caratteri (copia rapida e QR) sincronizzata via Supabase Realtime Channels.
 - **Card 9:16** esportabile in PNG (1080x1920) con roster, budget residuo e QR del voto.
 - **Votazione** senza registrazione: un voto per dispositivo sul link generato a fine partita.
+- **Foto reali automatiche**: se l'elemento non ha un URL, l'app cerca la foto su Wikipedia e la
+  tiene in cache; ripiego su Unsplash e, in ultima istanza, sulla copertina con emoji.
 - **26 liste ufficiali** a nomi corti con emoji di copertina, definite in `data/categories.json`,
   con ricerca istantanea e filtri per macro-tema nella pagina Categorie.
+- **Modalità creatore**: Studio ed editor delle categorie sono protetti da `NEXT_PUBLIC_ADMIN_KEY`.
+- **Voto del gioco** da 1 a 5 stelle, anonimo, con commento facoltativo che legge solo il creatore.
 - **Studio categorie** (`/studio`): vedi e modifica ogni lista elemento per elemento, cerca le foto
   reali su Wikipedia ed esporta il JSON pronto da incollare nel file dati.
 - **Editor di categorie** no-code: 30 elementi divisi in 5 fasce, emoji e immagine per elemento,

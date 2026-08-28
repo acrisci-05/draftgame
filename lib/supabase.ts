@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { RawCategory } from "./catalog";
 import type { Category, Player, VoteResultPayload, VoteTally } from "./types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -94,6 +95,85 @@ export async function sendSuggestion(name: string, idea: string): Promise<void> 
     idea: idea.trim().slice(0, 1000),
   });
   if (error) throw new Error(error.message);
+}
+
+/* ---------------------------------------------------------------- */
+/* Liste ufficiali pubblicate dal creatore                           */
+/* ---------------------------------------------------------------- */
+
+export const OFFICIAL_LISTS_TABLE = "official_lists";
+
+interface OfficialListRow {
+  id: string;
+  name: string;
+  name_en: string | null;
+  emoji: string;
+  theme: string | null;
+  tiers: RawCategory["tiers"];
+}
+
+/**
+ * Liste ufficiali salvate sul database. Sono in sola lettura per l'app:
+ * si aggiungono dall'SQL editor di Supabase (lo Studio prepara la query).
+ */
+export async function fetchOfficialLists(): Promise<RawCategory[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from(OFFICIAL_LISTS_TABLE)
+    .select("id, name, name_en, emoji, theme, tiers");
+  if (error || !data) return [];
+  return (data as OfficialListRow[]).map((row) => ({
+    id: row.id,
+    name: row.name,
+    nameEn: row.name_en ?? undefined,
+    emoji: row.emoji,
+    theme: (row.theme as RawCategory["theme"]) ?? undefined,
+    tiers: row.tiers,
+  }));
+}
+
+/* ---------------------------------------------------------------- */
+/* Voto del gioco (1-5 stelle, anonimo)                              */
+/* ---------------------------------------------------------------- */
+
+export const FEEDBACK_TABLE = "feedback";
+export const RATING_SUMMARY_VIEW = "ratings_summary";
+
+export interface RatingSummary {
+  average: number;
+  count: number;
+}
+
+/** Un voto per dispositivo: `voterKey` evita i doppioni. */
+export async function sendRating(
+  stars: number,
+  comment: string,
+  voterKey: string,
+): Promise<void> {
+  const supabase = requireClient();
+  const { error } = await supabase.from(FEEDBACK_TABLE).upsert(
+    {
+      stars: Math.min(5, Math.max(1, Math.round(stars))),
+      comment: comment.trim().slice(0, 1000) || null,
+      voter_key: voterKey,
+    },
+    { onConflict: "voter_key" },
+  );
+  if (error) throw new Error(error.message);
+}
+
+/** Media e numero di voti: la vista espone solo i due numeri, non i commenti. */
+export async function fetchRatingSummary(): Promise<RatingSummary | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from(RATING_SUMMARY_VIEW)
+    .select("average, count")
+    .single();
+  if (error || !data) return null;
+  const row = data as { average: number | null; count: number | null };
+  return { average: Number(row.average ?? 0), count: Number(row.count ?? 0) };
 }
 
 /* ---------------------------------------------------------------- */

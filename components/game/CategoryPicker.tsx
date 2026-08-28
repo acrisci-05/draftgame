@@ -2,6 +2,7 @@
 
 import { Check, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAdmin } from "@/lib/admin";
 import { OFFICIAL_CATEGORIES, categoryName } from "@/lib/catalog";
 import { useClientValue } from "@/lib/client-store";
 import { useSettings } from "@/lib/settings";
@@ -21,6 +22,7 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
   const router = useRouter();
   const { locale, t } = useSettings();
   const categories = useClientValue<Category[]>(allCategories, OFFICIAL_CATEGORIES);
+  const isAdmin = useAdmin();
 
   return (
     <div className="flex flex-col gap-2">
@@ -52,10 +54,12 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
         );
       })}
 
-      <Button variant="outline" onClick={() => router.push("/categories/new")}>
-        <Plus className="size-4" />
-        {t("editor.newTitle")}
-      </Button>
+      {isAdmin ? (
+        <Button variant="outline" onClick={() => router.push("/categories/new")}>
+          <Plus className="size-4" />
+          {t("editor.newTitle")}
+        </Button>
+      ) : null}
     </div>
   );
 }

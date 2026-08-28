@@ -3,6 +3,7 @@
 import {
   Check,
   Copy,
+  Database,
   ImageIcon,
   Loader2,
   RotateCcw,
@@ -49,6 +50,7 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
   const [errors, setErrors] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedSql, setCopiedSql] = useState(false);
 
   const setRow = (tier: Tier, index: number, patch: Partial<TierDraft[Tier][number]>) => {
     setTiers((current) => {
@@ -122,6 +124,28 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
     if (await copyText(json)) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  /** Query pronta per l'SQL editor di Supabase: pubblica la lista per tutti. */
+  const exportSql = async () => {
+    const raw = toRawCategory(build());
+    const quote = (value: string | undefined) =>
+      value === undefined ? "null" : `'${value.replace(/'/g, "''")}'`;
+    const sql = [
+      "insert into public.official_lists (id, name, name_en, emoji, theme, tiers)",
+      `values (${quote(raw.id)}, ${quote(raw.name)}, ${quote(raw.nameEn)}, ${quote(raw.emoji)}, ${quote(raw.theme)}, ${quote(JSON.stringify(raw.tiers))}::jsonb)`,
+      "on conflict (id) do update set",
+      "  name = excluded.name,",
+      "  name_en = excluded.name_en,",
+      "  emoji = excluded.emoji,",
+      "  theme = excluded.theme,",
+      "  tiers = excluded.tiers,",
+      "  updated_at = now();",
+    ].join("\n");
+    if (await copyText(sql)) {
+      setCopiedSql(true);
+      setTimeout(() => setCopiedSql(false), 3000);
     }
   };
 
@@ -285,6 +309,12 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
         </p>
       ) : null}
 
+      {copiedSql ? (
+        <p className="rounded-xl border border-violet/40 bg-violet/10 p-3 text-sm text-violet">
+          {t("admin.sqlCopied")}
+        </p>
+      ) : null}
+
       <div className="sticky bottom-0 flex flex-col gap-2 bg-ink/90 py-3 backdrop-blur safe-bottom">
         <div className="grid grid-cols-2 gap-2">
           <Button onClick={save}>
@@ -296,6 +326,10 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
             {t("studio.export")}
           </Button>
         </div>
+        <Button variant="violet" size="sm" onClick={exportSql}>
+          {copiedSql ? <Check className="size-4" /> : <Database className="size-4" />}
+          {t("admin.sql")}
+        </Button>
         {official && overridden ? (
           <Button variant="danger" size="sm" onClick={restore}>
             <RotateCcw className="size-4" />

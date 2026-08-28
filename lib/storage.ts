@@ -2,6 +2,7 @@
 
 import { OFFICIAL_CATEGORIES, findOfficial } from "./catalog";
 import { notifyClientStore } from "./client-store";
+import { remoteCategories } from "./remote-lists";
 import type { Category, Profile, RoomConfig, RoomSession } from "./types";
 import { DEFAULT_CONFIG, PLAYER_EMOJIS } from "./game";
 import { uid } from "./utils";
@@ -116,10 +117,16 @@ export function isOverridden(id: string): boolean {
   return id in readOverrides();
 }
 
-/** Lista ufficiale con applicate le modifiche fatte nello Studio. */
+/**
+ * Liste ufficiali: quelle incluse nel codice, aggiornate da quelle pubblicate sul
+ * database e infine dalle modifiche locali fatte nello Studio.
+ */
 export function officialCategories(): Category[] {
   const overrides = readOverrides();
-  return OFFICIAL_CATEGORIES.map((category) => overrides[category.id] ?? category);
+  const merged = new Map<string, Category>();
+  OFFICIAL_CATEGORIES.forEach((category) => merged.set(category.id, category));
+  remoteCategories().forEach((category) => merged.set(category.id, category));
+  return [...merged.values()].map((category) => overrides[category.id] ?? category);
 }
 
 export function allCategories(): Category[] {

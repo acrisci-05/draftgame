@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Pencil, Play, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useAdmin } from "@/lib/admin";
 import { OFFICIAL_CATEGORIES, categoryName } from "@/lib/catalog";
 import { useClientValue } from "@/lib/client-store";
 import type { TranslationKey } from "@/lib/i18n";
@@ -41,6 +42,7 @@ export default function CategoriesPage() {
   const custom = useClientValue<Category[]>(listCustomCategories, NO_CATEGORIES);
   const official = useClientValue<Category[]>(officialCategories, OFFICIAL_CATEGORIES);
 
+  const isAdmin = useAdmin();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -87,14 +89,18 @@ export default function CategoriesPage() {
           {t("common.home")}
         </button>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => router.push("/studio")}>
-            <SlidersHorizontal className="size-4" />
-            {t("studio.open")}
-          </Button>
-          <Button size="sm" onClick={() => router.push("/categories/new")}>
-            <Plus className="size-4" />
-            {t("categories.new")}
-          </Button>
+          {isAdmin ? (
+            <>
+              <Button size="sm" variant="outline" onClick={() => router.push("/studio")}>
+                <SlidersHorizontal className="size-4" />
+                {t("studio.open")}
+              </Button>
+              <Button size="sm" onClick={() => router.push("/categories/new")}>
+                <Plus className="size-4" />
+                {t("categories.new")}
+              </Button>
+            </>
+          ) : null}
         </div>
       </header>
 
@@ -154,7 +160,7 @@ export default function CategoriesPage() {
               category={category}
               locale={locale}
               onPlay={() => playWith(category)}
-              onEdit={() => router.push(`/categories/edit/${category.id}`)}
+              onEdit={isAdmin ? () => router.push(`/categories/edit/${category.id}`) : undefined}
             />
           ))}
         </section>

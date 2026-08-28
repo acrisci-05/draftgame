@@ -111,3 +111,117 @@ create policy "votes_public_update"
 
 -- Le stanze di gioco viaggiano sui Realtime Channels (broadcast + presence)
 -- e non richiedono tabelle dedicate.
+
+-- ---------------------------------------------------------------------------
+-- Voto del gioco: da 1 a 5 stelle, anonimo, un voto per dispositivo.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.feedback (
+  id uuid primary key default gen_random_uuid(),
+  stars smallint not null check (stars between 1 and 5),
+  comment text,
+  voter_key text not null unique,
+  created_at timestamptz not null default now()
+);
+
+alter table public.feedback enable row level security;
+
+-- Si può votare e correggere il proprio voto, ma non leggere quelli altrui:
+-- i commenti restano visibili solo al creatore dalla console Supabase.
+drop policy if exists "feedback_public_insert" on public.feedback;
+create policy "feedback_public_insert"
+  on public.feedback for insert
+  with check (char_length(voter_key) between 1 and 64 and char_length(coalesce(comment, '')) <= 1000);
+
+drop policy if exists "feedback_public_update" on public.feedback;
+create policy "feedback_public_update"
+  on public.feedback for update
+  using (true)
+  with check (char_length(coalesce(comment, '')) <= 1000);
+
+-- Vista pubblica: espone solo media e numero di voti, mai i commenti.
+create or replace view public.ratings_summary as
+select
+  coalesce(round(avg(stars)::numeric, 2), 0) as average,
+  count(*)::int as count
+from public.feedback;
+
+grant select on public.ratings_summary to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Liste ufficiali gestite dal creatore.
+-- Lettura per tutti, scrittura solo dall'SQL editor o con la service key:
+-- l'app non ha alcun modo di inserire liste ufficiali.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.official_lists (
+  id text primary key,
+  name text not null,
+  name_en text,
+  emoji text not null default '🔥',
+  theme text,
+  tiers jsonb not null,
+  published boolean not null default true,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.official_lists enable row level security;
+
+drop policy if exists "official_lists_public_read" on public.official_lists;
+create policy "official_lists_public_read"
+  on public.official_lists for select
+  using (published);
+
+-- ---------------------------------------------------------------------------
+-- Predisposizione per la sezione amici "Pickpockets".
+-- Le tabelle esistono ma restano inutilizzate finché non si attiva Supabase Auth:
+-- l'interfaccia (registrazione, inviti, lista amici) è il passo successivo.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.profiles (
+  id uuid primary key references auth.users on delete cascade,
+  nickname text not null unique check (char_length(nickname) between 3 and 20),
+  emoji text not null default '🔥',
+  created_at timestamptz not null default now()
+);
+
+alter table public.profiles enable row level security;
+
+drop policy if exists "profiles_public_read" on public.profiles;
+create policy "profiles_public_read" on public.profiles for select using (true);
+
+drop policy if exists "profiles_self_write" on public.profiles;
+create policy "profiles_self_write"
+  on public.profiles for insert
+  with check (auth.uid() = id);
+
+drop policy if exists "profiles_self_update" on public.profiles;
+create policy "profiles_self_update"
+  on public.profiles for update
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+create table if not exists public.friendships (
+  user_id uuid not null references public.profiles on delete cascade,
+  friend_id uuid not null references public.profiles on delete cascade,
+  status text not null default 'pending' check (status in ('pending', 'accepted')),
+  created_at timestamptz not null default now(),
+  primary key (user_id, friend_id)
+);
+
+alter table public.friendships enable row level security;
+
+drop policy if exists "friendships_own_read" on public.friendships;
+create policy "friendships_own_read"
+  on public.friendships for select
+  using (auth.uid() = user_id or auth.uid() = friend_id);
+
+drop policy if exists "friendships_own_write" on public.friendships;
+create policy "friendships_own_write"
+  on public.friendships for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "friendships_own_update" on public.friendships;
+create policy "friendships_own_update"
+  on public.friendships for update
+  using (auth.uid() = user_id or auth.uid() = friend_id);

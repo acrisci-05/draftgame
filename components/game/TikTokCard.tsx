@@ -8,6 +8,7 @@ import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
 import { APP_NAME, SITE_DOMAIN } from "@/lib/config";
 import { coverPalette } from "@/lib/covers";
+import { useItemImage } from "@/lib/images";
 import { rosterValue } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import type { CurrencyCode, GameState, RosterEntry } from "@/lib/types";
@@ -19,13 +20,16 @@ function RosterTile({
   entry,
   currency,
   width,
+  hint,
 }: {
   entry: RosterEntry;
   currency: CurrencyCode;
   width: number;
+  hint?: string;
 }) {
   const palette = coverPalette(entry.itemId + entry.name);
   const tint = TIER_STYLES[entry.tier].hex;
+  const { src, onError } = useItemImage(entry, hint);
 
   return (
     <div style={{ width, display: "flex", flexDirection: "column", gap: 6 }}>
@@ -43,13 +47,14 @@ function RosterTile({
           overflow: "hidden",
         }}
       >
-        {entry.image ? (
+        {src ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={entry.image}
+            src={src}
             alt=""
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
+            onError={onError}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
@@ -414,6 +419,7 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                                   entry={entry}
                                   currency={currency}
                                   width={tileWidth}
+                                  hint={state.category.name}
                                 />
                               ))}
                             </div>

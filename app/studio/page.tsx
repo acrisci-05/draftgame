@@ -3,6 +3,7 @@
 import { ArrowLeft, Copy, Pencil, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAdmin } from "@/lib/admin";
 import { OFFICIAL_CATEGORIES, categoryName, toRawCategory } from "@/lib/catalog";
 import { useClientValue } from "@/lib/client-store";
 import { useSettings } from "@/lib/settings";
@@ -14,6 +15,7 @@ import {
 } from "@/lib/storage";
 import type { Category } from "@/lib/types";
 import { copyText } from "@/lib/utils";
+import { AdminLocked, AdminModal } from "@/components/ui/AdminModal";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -32,6 +34,8 @@ export default function StudioPage() {
   const overrides = useClientValue<Record<string, Category>>(readOverrides, NO_OVERRIDES);
   const [editing, setEditing] = useState<Category | null>(null);
   const [copiedAll, setCopiedAll] = useState(false);
+  const isAdmin = useAdmin();
+  const [adminOpen, setAdminOpen] = useState(false);
 
   const exportAll = async () => {
     const json = JSON.stringify(allCategories().filter((c) => c.source === "official").map(toRawCategory), null, 2);
@@ -76,10 +80,12 @@ export default function StudioPage() {
           <ArrowLeft className="size-4" />
           {t("categories.title")}
         </button>
-        <Button size="sm" variant="outline" onClick={exportAll}>
-          <Copy className="size-4" />
-          {copiedAll ? t("studio.exported") : t("studio.export")}
-        </Button>
+        {isAdmin ? (
+          <Button size="sm" variant="outline" onClick={exportAll}>
+            <Copy className="size-4" />
+            {copiedAll ? t("studio.exported") : t("studio.export")}
+          </Button>
+        ) : null}
       </header>
 
       <div>
@@ -88,7 +94,16 @@ export default function StudioPage() {
         <p className="mt-1 text-xs text-faint">{t("studio.exportHint")}</p>
       </div>
 
-      <Panel>
+      {!isAdmin ? (
+        <>
+          <AdminLocked onOpen={() => setAdminOpen(true)} />
+          <AdminModal open={adminOpen} onClose={() => setAdminOpen(false)} />
+        </>
+      ) : null}
+
+      {isAdmin ? (
+        <>
+          <Panel>
         <PanelTitle
           action={
             <Button variant="ghost" size="sm" onClick={() => router.push("/categories/new")}>
@@ -125,7 +140,9 @@ export default function StudioPage() {
             onSaved={() => setEditing(null)}
           />
         ) : null}
-      </Modal>
+          </Modal>
+        </>
+      ) : null}
     </main>
   );
 }

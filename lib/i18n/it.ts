@@ -236,6 +236,32 @@ export const it = {
   "shared.playNow": "Gioca ora",
   "shared.notFound": "Categoria non trovata.",
 
+  "nav.admin": "Modalità creatore",
+  "nav.rate": "Vota il gioco",
+
+  "admin.title": "Area creatore",
+  "admin.hint":
+    "Le liste ufficiali le aggiunge solo il creatore. Inserisci la chiave per sbloccare lo Studio.",
+  "admin.key": "Chiave creatore",
+  "admin.unlock": "Sblocca",
+  "admin.invalid": "Chiave non valida.",
+  "admin.active": "Modalità creatore attiva",
+  "admin.lock": "Esci dalla modalità creatore",
+  "admin.devNote": "Nessuna chiave configurata: in sviluppo basta un valore qualsiasi.",
+  "admin.locked": "Solo il creatore può aggiungere o modificare le liste.",
+  "admin.sql": "Copia SQL per il database",
+  "admin.sqlCopied": "SQL copiato: incollalo nell'SQL editor di Supabase.",
+
+  "rate.title": "Vota il gioco",
+  "rate.subtitle": "Da 1 a 5 stelle. Il voto è anonimo e lo legge solo il creatore.",
+  "rate.comment": "Vuoi aggiungere qualcosa?",
+  "rate.commentPlaceholder": "Cosa miglioreresti?",
+  "rate.send": "Invia voto",
+  "rate.thanks": "Grazie per il voto!",
+  "rate.average": "Media {avg} su {count} voti",
+  "rate.offline": "Il voto richiede la configurazione del database.",
+  "rate.error": "Invio non riuscito. Riprova più tardi.",
+
   "tier.legend": "Fasce di valore",
   "tier.tooltip": "Tier {letter}: prezzo base {price}",
   "tier.name5": "Top / Leggendario",

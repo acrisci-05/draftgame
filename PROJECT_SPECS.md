@@ -134,3 +134,28 @@
   finisce nel file dati. Le licenze Wikimedia variano: prima di pubblicare vanno verificate.
 - Le emoji bandiera non sono usate nei cataloghi: Windows non ha i glifi e le mostra come sigle
   ("IT", "GB"). Restano solo nel selettore della lingua, dove la sigla resta comunque leggibile.
+
+======================================================================
+9. FOTO REALI, MODALITÀ CREATORE E VOTO DEL GIOCO
+======================================================================
+- Ogni elemento ha il campo facoltativo `image`. `getItemImage(item)` restituisce quell'URL oppure
+  l'indirizzo generico di Unsplash costruito sul nome dell'elemento.
+- In gioco la foto passa da `useItemImage`, che prova nell'ordine: URL salvato sull'elemento,
+  ricerca automatica su Wikipedia (risultato messo in cache sul dispositivo), URL generico di
+  Unsplash, infine la copertina con emoji dentro un badge. Il tag immagine usa `loading="lazy"`,
+  `crossOrigin` per poter finire nella card PNG e `onError` per scalare al ripiego successivo.
+- La card centrale dell'asta mostra l'immagine grande su fondo nero, con
+  `w-full h-full object-contain p-6 drop-shadow-2xl transition-all duration-300 hover:scale-105`.
+- Le liste ufficiali le aggiunge solo il creatore: Studio ed editor sono protetti dalla chiave
+  NEXT_PUBLIC_ADMIN_KEY (modalità creatore attivabile dal menu). Senza chiave impostata restano
+  accessibili solo in sviluppo. È una protezione dell'interfaccia: sul database la scrittura delle
+  liste ufficiali è vietata dalle policy e passa solo dall'SQL editor.
+- Tabella `official_lists`: lettura pubblica, scrittura riservata. Lo Studio genera la query di
+  inserimento pronta da incollare; l'app scarica le liste una volta per sessione e le tiene in
+  cache, quindi resta giocabile offline con quelle incluse nel codice.
+- Voto del gioco: sezione dedicata nel menu, da 1 a 5 stelle più commento facoltativo, anonimo e
+  con un voto per dispositivo. I commenti li legge solo il creatore dalla console: la vista
+  pubblica `ratings_summary` espone soltanto media e numero di voti.
+- Sezione amici "Pickpockets": lo schema (`profiles`, `friendships`) è pronto nel database, ma
+  l'interfaccia richiede l'autenticazione e non è ancora implementata. Per lo stesso motivo i
+  suggerimenti di categoria restano anonimi anziché riservati agli utenti registrati.

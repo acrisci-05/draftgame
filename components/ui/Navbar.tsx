@@ -8,28 +8,33 @@ import {
   Lightbulb,
   Menu,
   Moon,
+  ShieldCheck,
+  Star,
   Sun,
   User,
   Volume2,
   VolumeX,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { INSTAGRAM_URL } from "@/lib/config";
 import { primeAudio } from "@/lib/audio";
 import { languageOption } from "@/lib/i18n";
+import { syncRemoteLists } from "@/lib/remote-lists";
 import { useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
+import { AdminModal } from "./AdminModal";
 import { Drawer } from "./Drawer";
 import { CreatorModal } from "./CreatorModal";
 import { LanguagePicker } from "./LanguagePicker";
 import { Logo } from "./Logo";
 import { Modal } from "./Modal";
+import { RatingModal } from "./RatingModal";
 import { RulesModal } from "./RulesModal";
 import { SuggestModal } from "./SuggestModal";
 import { SupportModal } from "./SupportModal";
 
-type Panel = "rules" | "suggest" | "creator" | "support" | "language" | null;
+type Panel = "rules" | "suggest" | "creator" | "support" | "language" | "rate" | "admin" | null;
 
 /** Importo del badge rapido nel menu. */
 const QUICK_DONATION = 2;
@@ -38,6 +43,11 @@ export function Navbar() {
   const { locale, theme, sound, toggleTheme, toggleSound, t } = useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
+
+  // Le liste pubblicate sul database arrivano una volta per sessione.
+  useEffect(() => {
+    void syncRemoteLists();
+  }, []);
 
   const language = languageOption(locale);
 
@@ -55,6 +65,8 @@ export function Navbar() {
     { key: "rules", icon: BookOpen, label: t("nav.rules") },
     { key: "suggest", icon: Lightbulb, label: t("nav.suggest") },
     { key: "creator", icon: User, label: t("nav.creator") },
+    { key: "rate", icon: Star, label: t("nav.rate") },
+    { key: "admin", icon: ShieldCheck, label: t("nav.admin") },
   ];
 
   return (
@@ -143,6 +155,8 @@ export function Navbar() {
       <SuggestModal open={panel === "suggest"} onClose={() => setPanel(null)} />
       <CreatorModal open={panel === "creator"} onClose={() => setPanel(null)} />
       <SupportModal open={panel === "support"} onClose={() => setPanel(null)} />
+      <RatingModal open={panel === "rate"} onClose={() => setPanel(null)} />
+      <AdminModal open={panel === "admin"} onClose={() => setPanel(null)} />
 
       <Modal open={panel === "language"} title={t("nav.language")} onClose={() => setPanel(null)}>
         <LanguagePicker onPicked={() => setPanel(null)} />

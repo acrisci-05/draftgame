@@ -1,8 +1,8 @@
 "use client";
 
 import { HelpCircle } from "lucide-react";
-import { useState } from "react";
 import { coverContent } from "@/lib/covers";
+import { useItemImage } from "@/lib/images";
 import type { CatalogItem, RosterEntry } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +29,10 @@ interface ItemCoverProps {
   size?: CoverSize;
   blurred?: boolean;
   mystery?: boolean;
+  /** Cerca online una foto reale quando l'elemento non ne ha già una. */
+  auto?: boolean;
+  /** Nome della categoria: rende più precisa la ricerca automatica. */
+  hint?: string;
   className?: string;
 }
 
@@ -37,9 +41,11 @@ export function ItemCover({
   size = "md",
   blurred = false,
   mystery = false,
+  auto = false,
+  hint,
   className,
 }: ItemCoverProps) {
-  const [broken, setBroken] = useState(false);
+  const { src, onError } = useItemImage(item, hint, auto && !mystery);
 
   if (mystery || !item) {
     return (
@@ -56,37 +62,51 @@ export function ItemCover({
   }
 
   const cover = coverContent(item);
-  const showImage = Boolean(cover.image) && !broken;
+  const large = size === "xl";
 
   return (
     <div
-      style={cover.style}
+      style={large ? undefined : cover.style}
       className={cn(
-        "relative shrink-0 overflow-hidden border border-white/10",
+        "relative shrink-0 overflow-hidden border",
+        // Fondo scuro fisso dietro le foto: fa risaltare PNG e JPG ad alto contrasto.
+        large ? "border-line bg-zinc-950" : "border-white/10",
         SIZES[size],
         className,
       )}
     >
-      {showImage ? (
-        // Immagine remota: crossOrigin serve a poterla riesportare nella card PNG.
+      {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={cover.image}
-          alt=""
+          src={src}
+          alt={item.name}
           loading="lazy"
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
-          onError={() => setBroken(true)}
-          className={cn("size-full object-cover", blurred && "scale-110 blur-md")}
+          onError={onError}
+          className={cn(
+            large
+              ? "h-full w-full object-contain p-6 drop-shadow-2xl transition-all duration-300 hover:scale-105"
+              : "size-full object-cover",
+            blurred && "scale-110 blur-md",
+          )}
         />
       ) : (
         <div
+          style={large ? cover.style : undefined}
           className={cn(
             "grid size-full place-items-center font-black text-white/90",
             blurred && "scale-110 blur-md",
           )}
         >
-          {cover.emoji ?? cover.label}
+          <span
+            className={cn(
+              large &&
+                "grid size-28 place-items-center rounded-3xl border border-white/15 bg-black/30 backdrop-blur-sm",
+            )}
+          >
+            {cover.emoji ?? cover.label}
+          </span>
         </div>
       )}
     </div>

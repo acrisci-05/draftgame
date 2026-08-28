@@ -2,8 +2,10 @@
 
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { CategoryEditor } from "@/components/game/CategoryEditor";
+import { AdminLocked, AdminModal } from "@/components/ui/AdminModal";
+import { useAdmin } from "@/lib/admin";
 import { useClientValue, useIsClient } from "@/lib/client-store";
 import { useT } from "@/lib/settings";
 import { listCustomCategories } from "@/lib/storage";
@@ -13,6 +15,8 @@ export function EditCategoryClient({ id }: { id: string }) {
   const router = useRouter();
   const t = useT();
   const isClient = useIsClient();
+  const isAdmin = useAdmin();
+  const [adminOpen, setAdminOpen] = useState(false);
   const readCategory = useCallback(
     () => listCustomCategories().find((item) => item.id === id) ?? null,
     [id],
@@ -38,6 +42,11 @@ export function EditCategoryClient({ id }: { id: string }) {
         <p className="rounded-xl border border-line bg-surface p-4 text-sm text-muted">
           {t("categories.notFound")}
         </p>
+      ) : !isAdmin ? (
+        <>
+          <AdminLocked onOpen={() => setAdminOpen(true)} />
+          <AdminModal open={adminOpen} onClose={() => setAdminOpen(false)} />
+        </>
       ) : (
         <>
           <h1 className="text-3xl font-black tracking-tight">{t("editor.editTitle")}</h1>

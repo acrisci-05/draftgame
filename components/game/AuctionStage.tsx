@@ -114,7 +114,14 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               transition={{ type: "spring", stiffness: 240, damping: 22 }}
               className="w-full"
             >
-              <ItemCover item={item ?? null} size="xl" mystery={mystery} blurred={blurred} />
+              <ItemCover
+                item={item ?? null}
+                size="xl"
+                mystery={mystery}
+                blurred={blurred}
+                auto
+                hint={state.category.name}
+              />
             </motion.div>
           </AnimatePresence>
 
@@ -203,7 +210,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               >
                 {state.lastResult.winnerId ? (
                   <>
-                    <ItemCover item={resultItem ?? null} size="lg" />
+                    <ItemCover item={resultItem ?? null} size="lg" auto hint={state.category.name} />
                     <span className="flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-faint">
                       {state.lastResult.mystery ? (
                         <PackageOpen className="size-3.5 text-violet" />
