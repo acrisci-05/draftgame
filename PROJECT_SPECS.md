@@ -156,6 +156,25 @@
 - Voto del gioco: sezione dedicata nel menu, da 1 a 5 stelle più commento facoltativo, anonimo e
   con un voto per dispositivo. I commenti li legge solo il creatore dalla console: la vista
   pubblica `ratings_summary` espone soltanto media e numero di voti.
-- Sezione amici "Pickpockets": lo schema (`profiles`, `friendships`) è pronto nel database, ma
-  l'interfaccia richiede l'autenticazione e non è ancora implementata. Per lo stesso motivo i
-  suggerimenti di categoria restano anonimi anziché riservati agli utenti registrati.
+- Sezione amici "Pickpockets": vedi il capitolo 10.
+
+======================================================================
+10. ACCESSO E SEZIONE PICKPOCKETS
+======================================================================
+- Accesso senza password: si inserisce l'email e Supabase manda il link di ingresso. Se il template
+  dell'email include {{ .Token }} funziona anche il codice a 6 cifre, comodo da telefono.
+  L'app non vede né gestisce password.
+- Al primo accesso si sceglie un nickname pubblico (lettere, numeri e underscore) e un avatar:
+  il nickname è l'indirizzo con cui gli amici ti aggiungono. Vive nella tabella `profiles`.
+- Pickpockets (/pickpockets): profilo con nickname da copiare, invio richieste di amicizia per
+  nickname, richieste ricevute da accettare, elenco amici e draft ricevuti da votare.
+- Amicizie: una riga per coppia in `friendships`. Chi invita è `user_id`, chi accetta è `friend_id`
+  e porta lo stato da `pending` ad `accepted`. Le policy permettono di leggere e modificare solo le
+  righe in cui compare il proprio id.
+- Condivisione dei draft: a fine partita, generato il link di voto, si scelgono gli amici a cui
+  mandarlo. Ogni invio è una riga in `shared_results`, leggibile solo da mittente e destinatario.
+  Chi riceve trova il draft nella sua sezione Pickpockets e vota dalla pagina di voto.
+- I suggerimenti di categoria richiedono l'accesso: la policy accetta solo utenti autenticati e
+  salva l'autore, così i doppioni e gli abusi restano tracciabili.
+- Restano anonimi e senza account: partite locali, stanze online, voto del gioco a stelle e
+  votazione dei draft tramite link o QR.

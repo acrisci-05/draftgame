@@ -14,7 +14,12 @@ export function getSupabase(): SupabaseClient | null {
   if (!isSupabaseConfigured) return null;
   if (!client) {
     client = createClient(SUPABASE_URL as string, SUPABASE_ANON_KEY as string, {
-      auth: { persistSession: false },
+      auth: {
+        // La sessione resta sul dispositivo: serve per l'accesso e la sezione amici.
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
       realtime: { params: { eventsPerSecond: 20 } },
     });
   }
@@ -88,11 +93,17 @@ export async function fetchSharedCategory(shareId: string): Promise<Category> {
 /* Suggerimenti anonimi                                              */
 /* ---------------------------------------------------------------- */
 
-export async function sendSuggestion(name: string, idea: string): Promise<void> {
+/** Richiede l'accesso: l'autore resta collegato al suggerimento. */
+export async function sendSuggestion(
+  name: string,
+  idea: string,
+  author: string,
+): Promise<void> {
   const supabase = requireClient();
   const { error } = await supabase.from(SUGGESTIONS_TABLE).insert({
     name: name.trim().slice(0, 60),
     idea: idea.trim().slice(0, 1000),
+    author,
   });
   if (error) throw new Error(error.message);
 }

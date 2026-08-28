@@ -2,23 +2,26 @@
 
 import { Check, Loader2, Send } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth";
 import { useT } from "@/lib/settings";
 import { isSupabaseConfigured, sendSuggestion } from "@/lib/supabase";
+import { AuthPanel } from "./AuthModal";
 import { Button } from "./Button";
 import { Input, Textarea } from "./Input";
 import { Modal } from "./Modal";
 
 export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useT();
+  const { account } = useAuth();
   const [name, setName] = useState("");
   const [idea, setIdea] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   const submit = async () => {
-    if (!name.trim()) return;
+    if (!name.trim() || !account) return;
     setStatus("sending");
     try {
-      await sendSuggestion(name, idea);
+      await sendSuggestion(name, idea, account.id);
       setStatus("sent");
       setName("");
       setIdea("");
@@ -26,6 +29,18 @@ export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => 
       setStatus("error");
     }
   };
+
+  // I suggerimenti arrivano solo da chi ha fatto l'accesso: restano collegati al profilo.
+  if (!account) {
+    return (
+      <Modal open={open} title={t("suggest.title")} onClose={onClose}>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-muted">{t("auth.required")}</p>
+          <AuthPanel />
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal open={open} title={t("suggest.title")} onClose={onClose}>

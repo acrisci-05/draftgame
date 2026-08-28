@@ -27,6 +27,9 @@ Le regole complete sono in [`PROJECT_SPECS.md`](./PROJECT_SPECS.md).
   con ricerca istantanea e filtri per macro-tema nella pagina Categorie.
 - **Modalità creatore**: Studio ed editor delle categorie sono protetti da `NEXT_PUBLIC_ADMIN_KEY`.
 - **Voto del gioco** da 1 a 5 stelle, anonimo, con commento facoltativo che legge solo il creatore.
+- **Accesso senza password**: email con link (o codice a 6 cifre) e nickname pubblico.
+- **Pickpockets** (`/pickpockets`): amici per nickname, richieste da accettare e draft mandati agli
+  amici perché li votino.
 - **Studio categorie** (`/studio`): vedi e modifica ogni lista elemento per elemento, cerca le foto
   reali su Wikipedia ed esporta il JSON pronto da incollare nel file dati.
 - **Editor di categorie** no-code: 30 elementi divisi in 5 fasce, emoji e immagine per elemento,
@@ -57,6 +60,14 @@ Serve per le stanze online, la condivisione delle categorie, i suggerimenti e la
 2. Copia `.env.example` in `.env.local` e inserisci URL e chiave anon del progetto.
 3. Esegui [`supabase/schema.sql`](./supabase/schema.sql) nell'SQL editor.
 
+Per l'accesso e la sezione Pickpockets servono due impostazioni in più:
+
+4. **Authentication → Providers → Email**: lascia attivo il provider (niente password, solo link).
+5. **Authentication → URL Configuration**: metti il dominio del sito in *Site URL* e aggiungi
+   `http://localhost:3000/pickpockets` e `https://iltuodominio/pickpockets` fra le *Redirect URLs*.
+6. Facoltativo: in **Authentication → Email Templates → Magic Link** aggiungi `{{ .Token }}` al
+   testo per far arrivare anche il codice a 6 cifre, più comodo da telefono.
+
 ## Donazioni
 
 Il progetto è gratuito e senza pubblicità: la sezione "Sostieni il progetto" nel menu rimanda a
@@ -67,10 +78,10 @@ arrivo". Nessun dato di pagamento passa dall'app.
 ## Struttura
 
 ```
-app/                    pagine e rotte (home, creazione, stanza, categorie, studio, voto)
+app/                    pagine e rotte (home, creazione, stanza, categorie, studio, amici, voto)
 components/ui/          bottoni, badge, input, modali, pannelli, selettore lingua
 components/game/        asta, timer, controlli di offerta, card finale, editor categorie
-lib/                    motore di gioco, realtime, catalogo, storage, i18n, utility
+lib/                    motore di gioco, realtime, catalogo, storage, i18n, accesso, amici
 lib/i18n/               dizionari delle 10 lingue (italiano lingua sorgente)
 data/categories.json    liste ufficiali: 26 categorie da 30 elementi
 scripts/engine-check.js controlli sul motore di gioco e sul catalogo

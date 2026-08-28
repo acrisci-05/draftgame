@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { QrCode } from "@/components/ui/QrCode";
+import { FriendShare } from "./FriendShare";
 import { TikTokCard } from "./TikTokCard";
 
 interface ResultsProps {
@@ -27,6 +28,7 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
   const router = useRouter();
   const { locale, t } = useSettings();
   const [voteUrl, setVoteUrl] = useState<string | null>(null);
+  const [resultId, setResultId] = useState<string | null>(null);
   const [voteBusy, setVoteBusy] = useState(false);
   const [voteError, setVoteError] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -48,6 +50,7 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
         currency,
         players: state.players,
       });
+      setResultId(id);
       setVoteUrl(voteUrlFor(id));
     } catch {
       setVoteError(true);
@@ -152,6 +155,8 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
             </Button>
           </div>
         )}
+
+        {isSupabaseConfigured ? <FriendShare resultId={resultId} /> : null}
       </Panel>
 
       <Panel>

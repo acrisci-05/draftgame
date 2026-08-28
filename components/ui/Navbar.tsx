@@ -10,6 +10,8 @@ import {
   Moon,
   ShieldCheck,
   Star,
+  UserRound,
+  Users,
   Sun,
   User,
   Volume2,
@@ -24,6 +26,7 @@ import { syncRemoteLists } from "@/lib/remote-lists";
 import { useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { AdminModal } from "./AdminModal";
+import { AuthModal } from "./AuthModal";
 import { Drawer } from "./Drawer";
 import { CreatorModal } from "./CreatorModal";
 import { LanguagePicker } from "./LanguagePicker";
@@ -34,7 +37,16 @@ import { RulesModal } from "./RulesModal";
 import { SuggestModal } from "./SuggestModal";
 import { SupportModal } from "./SupportModal";
 
-type Panel = "rules" | "suggest" | "creator" | "support" | "language" | "rate" | "admin" | null;
+type Panel =
+  | "rules"
+  | "suggest"
+  | "creator"
+  | "support"
+  | "language"
+  | "rate"
+  | "admin"
+  | "account"
+  | null;
 
 /** Importo del badge rapido nel menu. */
 const QUICK_DONATION = 2;
@@ -65,6 +77,7 @@ export function Navbar() {
     { key: "rules", icon: BookOpen, label: t("nav.rules") },
     { key: "suggest", icon: Lightbulb, label: t("nav.suggest") },
     { key: "creator", icon: User, label: t("nav.creator") },
+    { key: "account", icon: UserRound, label: t("nav.account") },
     { key: "rate", icon: Star, label: t("nav.rate") },
     { key: "admin", icon: ShieldCheck, label: t("nav.admin") },
   ];
@@ -109,6 +122,16 @@ export function Navbar() {
               <ChevronRight className="size-4 shrink-0 text-faint" />
             </button>
           ))}
+
+          <Link
+            href="/pickpockets"
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-3 rounded-2xl border border-line bg-surface-2 p-4 text-start transition-colors hover:border-neon/50"
+          >
+            <Users className="size-5 shrink-0 text-neon" />
+            <span className="flex-1 font-semibold">{t("nav.pickpockets")}</span>
+            <ChevronRight className="size-4 shrink-0 text-faint" />
+          </Link>
 
           <Link
             href="/categories"
@@ -157,6 +180,7 @@ export function Navbar() {
       <SupportModal open={panel === "support"} onClose={() => setPanel(null)} />
       <RatingModal open={panel === "rate"} onClose={() => setPanel(null)} />
       <AdminModal open={panel === "admin"} onClose={() => setPanel(null)} />
+      <AuthModal open={panel === "account"} onClose={() => setPanel(null)} />
 
       <Modal open={panel === "language"} title={t("nav.language")} onClose={() => setPanel(null)}>
         <LanguagePicker onPicked={() => setPanel(null)} />

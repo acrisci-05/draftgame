@@ -225,3 +225,54 @@ drop policy if exists "friendships_own_update" on public.friendships;
 create policy "friendships_own_update"
   on public.friendships for update
   using (auth.uid() = user_id or auth.uid() = friend_id);
+
+drop policy if exists "friendships_own_delete" on public.friendships;
+create policy "friendships_own_delete"
+  on public.friendships for delete
+  using (auth.uid() = user_id or auth.uid() = friend_id);
+
+-- Draft mandati agli amici perché li votino.
+create table if not exists public.shared_results (
+  id uuid primary key default gen_random_uuid(),
+  result_id uuid not null references public.results on delete cascade,
+  from_user uuid not null references public.profiles on delete cascade,
+  to_user uuid not null references public.profiles on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (result_id, to_user)
+);
+
+alter table public.shared_results enable row level security;
+
+drop policy if exists "shared_results_own_read" on public.shared_results;
+create policy "shared_results_own_read"
+  on public.shared_results for select
+  using (auth.uid() = from_user or auth.uid() = to_user);
+
+drop policy if exists "shared_results_own_insert" on public.shared_results;
+create policy "shared_results_own_insert"
+  on public.shared_results for insert
+  with check (auth.uid() = from_user);
+
+drop policy if exists "shared_results_own_update" on public.shared_results;
+create policy "shared_results_own_update"
+  on public.shared_results for update
+  using (auth.uid() = from_user)
+  with check (auth.uid() = from_user);
+
+-- ---------------------------------------------------------------------------
+-- I suggerimenti di categoria arrivano solo da chi ha fatto l'accesso.
+-- ---------------------------------------------------------------------------
+
+alter table public.suggestions
+  add column if not exists author uuid references public.profiles on delete set null;
+
+drop policy if exists "suggestions_public_insert" on public.suggestions;
+drop policy if exists "suggestions_signed_insert" on public.suggestions;
+create policy "suggestions_signed_insert"
+  on public.suggestions for insert
+  to authenticated
+  with check (
+    auth.uid() is not null
+    and char_length(name) between 1 and 60
+    and char_length(idea) <= 1000
+  );
