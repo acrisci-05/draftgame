@@ -30,7 +30,7 @@ export type RoomMessage =
 
 export type TransportStatus = "connecting" | "waiting" | "live" | "error";
 
-export type TransportKind = "supabase" | "local";
+export type TransportKind = "supabase" | "server" | "local";
 
 export interface TransportHandlers {
   onMessage: (message: RoomMessage) => void;
@@ -50,7 +50,9 @@ const STATE_PREFIX = "pp:room-state:";
 
 /** Quale trasporto verrà usato con la configurazione attuale. */
 export function transportKind(): TransportKind {
-  return getSupabase() ? "supabase" : "local";
+  if (getSupabase()) return "supabase";
+  if (typeof window !== "undefined" && "EventSource" in window) return "server";
+  return "local";
 }
 
 /* ------------------------------------------------------------------ */
@@ -103,6 +105,76 @@ function createSupabaseTransport(
     close: () => {
       void supabase.removeChannel(channel);
     },
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Trasporto via server dell'app (dispositivi e reti diverse)          */
+/* ------------------------------------------------------------------ */
+
+interface ServerEnvelope {
+  type: string;
+  clientId?: string;
+  peers?: string[];
+}
+
+function createServerTransport(
+  code: string,
+  self: RoomPeer,
+  isHost: boolean,
+  handlers: TransportHandlers,
+): RoomTransport {
+  const base = `/api/rooms/${encodeURIComponent(code)}`;
+  const source = new EventSource(`${base}/stream?client=${encodeURIComponent(self.id)}`);
+  let peers: string[] = [];
+
+  handlers.onStatus("connecting");
+
+  source.onopen = () => {
+    handlers.onStatus(isHost ? "live" : "waiting");
+  };
+
+  source.onmessage = (event) => {
+    let payload: ServerEnvelope;
+    try {
+      payload = JSON.parse(event.data) as ServerEnvelope;
+    } catch {
+      return;
+    }
+
+    // Messaggi di servizio del canale: chi è collegato in questo momento.
+    if (payload.type === "ready" || payload.type === "peers") {
+      const next = payload.peers ?? [];
+      peers
+        .filter((id) => !next.includes(id))
+        .forEach((id) => handlers.onLeave?.(id));
+      peers = next;
+      handlers.onPresence?.(next);
+      return;
+    }
+
+    handlers.onMessage(payload as unknown as RoomMessage);
+  };
+
+  // EventSource riprova da solo: si segnala solo che la stanza non è raggiungibile.
+  source.onerror = () => {
+    if (source.readyState === EventSource.CLOSED) handlers.onStatus("error");
+    else handlers.onStatus("connecting");
+  };
+
+  return {
+    kind: "server",
+    send: (message) => {
+      void fetch(`${base}/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId: self.id, message }),
+        keepalive: true,
+      }).catch(() => {
+        /* un messaggio perso non blocca la partita: l'host ritrasmette lo stato */
+      });
+    },
+    close: () => source.close(),
   };
 }
 
@@ -167,14 +239,20 @@ function createLocalTransport(
   };
 }
 
+/**
+ * Sceglie il canale migliore disponibile:
+ * database in cloud, poi il server dell'app, infine il solo browser.
+ */
 export function createTransport(
   code: string,
   self: RoomPeer,
   isHost: boolean,
   handlers: TransportHandlers,
 ): RoomTransport {
-  return (
-    createSupabaseTransport(code, self, isHost, handlers) ??
-    createLocalTransport(code, self, isHost, handlers)
-  );
+  const remote = createSupabaseTransport(code, self, isHost, handlers);
+  if (remote) return remote;
+  if (typeof window !== "undefined" && "EventSource" in window) {
+    return createServerTransport(code, self, isHost, handlers);
+  }
+  return createLocalTransport(code, self, isHost, handlers);
 }

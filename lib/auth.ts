@@ -87,6 +87,123 @@ export function clearLocalAccount() {
 /* Accesso via email (con database)                                  */
 /* ---------------------------------------------------------------- */
 
+export type AuthError =
+  | "nickname-taken"
+  | "nickname-invalid"
+  | "email-invalid"
+  | "password-short"
+  | "wrong-credentials"
+  | "email-taken"
+  | "confirm-email"
+  | "offline"
+  | "unknown";
+
+export class AuthFailure extends Error {
+  constructor(readonly reason: AuthError) {
+    super(reason);
+    this.name = "AuthFailure";
+  }
+}
+
+export const MIN_PASSWORD = 8;
+const PENDING_PROFILE_KEY = "pp:pending-profile";
+
+/** Nickname e avatar scelti in registrazione, in attesa della conferma via email. */
+function savePendingProfile(nickname: string, emoji: string) {
+  try {
+    window.localStorage.setItem(PENDING_PROFILE_KEY, JSON.stringify({ nickname, emoji }));
+  } catch {
+    /* senza storage il nickname verrà richiesto al primo accesso */
+  }
+}
+
+function readPendingProfile(): { nickname: string; emoji: string } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(PENDING_PROFILE_KEY);
+    return raw ? (JSON.parse(raw) as { nickname: string; emoji: string }) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearPendingProfile() {
+  try {
+    window.localStorage.removeItem(PENDING_PROFILE_KEY);
+  } catch {
+    /* niente da ripulire */
+  }
+}
+
+/** true se il nickname è libero. Il vincolo vero resta quello del database. */
+export async function isNicknameAvailable(nickname: string): Promise<boolean> {
+  const clean = normalizeNickname(nickname);
+  if (clean.length < 3) return false;
+  const existing = await findAccountByNickname(clean);
+  return existing === null;
+}
+
+/**
+ * Registrazione con email e password.
+ * La password viaggia verso il servizio di autenticazione, che la conserva
+ * cifrata: l'app non la salva né la vede mai in chiaro.
+ */
+export async function signUpWithPassword(input: {
+  email: string;
+  password: string;
+  nickname: string;
+  emoji: string;
+}): Promise<{ confirmationRequired: boolean }> {
+  const supabase = getSupabase();
+  if (!supabase) throw new AuthFailure("offline");
+
+  const nickname = normalizeNickname(input.nickname);
+  if (nickname.length < 3) throw new AuthFailure("nickname-invalid");
+  if (input.password.length < MIN_PASSWORD) throw new AuthFailure("password-short");
+  if (!input.email.includes("@")) throw new AuthFailure("email-invalid");
+  if (!(await isNicknameAvailable(nickname))) throw new AuthFailure("nickname-taken");
+
+  const { data, error } = await supabase.auth.signUp({
+    email: input.email.trim(),
+    password: input.password,
+  });
+
+  if (error) {
+    if (/already/i.test(error.message)) throw new AuthFailure("email-taken");
+    throw new AuthFailure("unknown");
+  }
+
+  // Con la conferma via email attiva la sessione arriva solo dopo il clic sul link.
+  if (!data.session) {
+    savePendingProfile(nickname, input.emoji);
+    return { confirmationRequired: true };
+  }
+
+  await createAccount(data.user!.id, nickname, input.emoji);
+  return { confirmationRequired: false };
+}
+
+export async function signInWithPassword(email: string, password: string): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) throw new AuthFailure("offline");
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
+  if (error) throw new AuthFailure("wrong-credentials");
+}
+
+/** Manda il link per reimpostare la password. */
+export async function requestPasswordReset(email: string): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) throw new AuthFailure("offline");
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: typeof window === "undefined" ? undefined : `${window.location.origin}/pickpockets`,
+  });
+  if (error) throw new AuthFailure("unknown");
+}
+
 export async function signInWithEmail(email: string): Promise<void> {
   const supabase = requireClient();
   const { error } = await supabase.auth.signInWithOtp({
@@ -150,7 +267,8 @@ export async function createAccount(
     .upsert({ id: userId, nickname: normalizeNickname(nickname), emoji })
     .select("id, nickname, emoji")
     .single();
-  if (error) throw new Error(error.message);
+  // 23505 è il codice del vincolo di unicità: il nickname è già di qualcun altro.
+  if (error) throw new AuthFailure(error.code === "23505" ? "nickname-taken" : "unknown");
   const row = data as ProfileRow;
   return { id: row.id, nickname: row.nickname, emoji: row.emoji };
 }
@@ -219,9 +337,33 @@ export function useAuth(): AuthState {
   useEffect(() => {
     if (!userId) return;
     let active = true;
-    fetchAccount(userId).then((result) => {
-      if (active) setRemoteAccount(result);
+
+    fetchAccount(userId).then(async (result) => {
+      if (!active) return;
+      if (result) {
+        setRemoteAccount(result);
+        clearPendingProfile();
+        return;
+      }
+
+      // Primo accesso dopo la conferma via email: si crea il profilo scelto allora.
+      const pending = readPendingProfile();
+      if (!pending) {
+        setRemoteAccount(null);
+        return;
+      }
+      try {
+        const created = await createAccount(userId, pending.nickname, pending.emoji);
+        if (!active) return;
+        clearPendingProfile();
+        setRemoteAccount(created);
+      } catch {
+        // Nickname nel frattempo occupato: verrà richiesto di sceglierne un altro.
+        clearPendingProfile();
+        if (active) setRemoteAccount(null);
+      }
     });
+
     return () => {
       active = false;
     };

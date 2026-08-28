@@ -260,6 +260,31 @@ export const en: Dictionary = {
   "nav.account": "Sign in",
   "nav.pickpockets": "Pickpockets",
 
+  "auth.tabSignIn": "Sign in",
+  "auth.tabSignUp": "Sign up",
+  "auth.password": "Password",
+  "auth.passwordHint": "At least {n} characters.",
+  "auth.signIn": "Enter",
+  "auth.signUp": "Create account",
+  "auth.forgot": "Forgot your password?",
+  "auth.resetSent": "We sent you the link to change your password.",
+  "auth.confirmSent":
+    "Account created. Confirm your address from the link we sent, then come back here.",
+  "auth.errNicknameTaken": "Nickname already taken, pick another one.",
+  "auth.errNicknameInvalid": "The nickname needs at least 3 characters.",
+  "auth.errEmailInvalid": "Invalid email address.",
+  "auth.errPasswordShort": "The password needs at least {n} characters.",
+  "auth.errWrongCredentials": "Wrong email or password.",
+  "auth.errEmailTaken": "An account with this email already exists: sign in.",
+  "auth.errOffline": "Creating an account needs the database.",
+  "auth.errUnknown": "Something went wrong. Try again.",
+  "auth.nicknameFree": "Nickname available",
+  "auth.nicknameChecking": "Checking...",
+  "auth.noAccountTitle": "Play without an account",
+  "auth.noAccountHint":
+    "Signing in with email and password needs the database. In the meantime you can create a profile on this device and play right away.",
+  "auth.playLocal": "Create profile on this device",
+
   "auth.title": "Sign in",
   "auth.subtitle": "No password: you get a link by email.",
   "auth.email": "Your email",
@@ -284,7 +309,7 @@ export const en: Dictionary = {
   "friends.localMode":
     "With a local profile friends do not sync: adding them needs the database.",
   "create.onlineLocalHint":
-    "Without a database an online room works across tabs and windows of this computer, which is great for testing. Connect the database to play from different phones.",
+    "The room goes through this app's server: it works with every device that can reach it, across networks too once the site is published. Connect the database and it survives server restarts as well.",
   "room.localTransport": "room on this browser",
 
   "friends.title": "Pickpockets",

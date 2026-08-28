@@ -236,10 +236,15 @@ create policy "official_lists_public_read"
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users on delete cascade,
-  nickname text not null unique check (char_length(nickname) between 3 and 20),
-  emoji text not null default '🔥',
+  -- Nickname pubblico e unico: solo minuscole, cifre e underscore, così
+  -- "Marco" e "marco" non possono coesistere.
+  nickname text not null unique check (nickname ~ '^[a-z0-9_]{3,20}$'),
+  emoji text not null default 'flame',
   created_at timestamptz not null default now()
 );
+
+-- Allineamento per chi aveva già creato la tabella.
+alter table public.profiles alter column emoji set default 'flame';
 
 alter table public.profiles enable row level security;
 

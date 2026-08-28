@@ -67,6 +67,7 @@ Vercel, e usare l'indirizzo pubblico.
 | `npm run lint` | controlla stile e regole del codice |
 | `npm run check:engine` | esegue 63 verifiche automatiche su regole d'asta e cataloghi |
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
+| `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 
 ---
 
@@ -165,10 +166,13 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   dispositivo, nessuna registrazione.
 
 ### Account e amici
-- **Accesso senza password**: si inserisce l'email e arriva il link di ingresso; se il template
-  dell'email include il token, funziona anche il codice a 6 cifre. L'app non vede né conserva
-  password.
-- Al primo accesso si sceglie un **nickname pubblico** e un avatar.
+- **Registrazione e accesso con email e password**, in due schede dentro la stessa finestra.
+  In registrazione si scelgono nickname e avatar, con il controllo di disponibilità mentre si
+  scrive; c'è anche il recupero password. Le password vanno al servizio di autenticazione, che le
+  conserva cifrate: l'app non le salva né le vede mai in chiaro.
+- Il **nickname è unico**: lo garantiscono il controllo prima dell'invio e un vincolo del
+  database che accetta solo minuscole, cifre e underscore, così "Marco" e "marco" non convivono.
+- Senza database si può comunque creare un **profilo su questo dispositivo** e giocare subito.
 - **Pickpockets**: rubrica amici per nickname, richieste da accettare, e invio dei propri draft
   agli amici perché li votino.
 - I **suggerimenti di categoria** arrivano solo da chi ha fatto l'accesso.
@@ -195,17 +199,30 @@ L'app non si blocca mai: quando le chiavi del database mancano, ogni funzione ha
 | Funzione | Senza database | Con database |
 | --- | --- | --- |
 | Partita locale | completa | completa |
-| Profilo | nickname e avatar su questo dispositivo | accesso via email, profilo su tutti i dispositivi |
-| Stanza online | fra schede e finestre dello stesso browser | fra dispositivi diversi, ovunque |
+| Stanza online fra dispositivi | dal server dell'app | dai canali del database |
+| Profilo | nickname e avatar su questo dispositivo | account con email e password |
 | Amici Pickpockets | non disponibile | completa |
 | Voto del gioco | salvato sul dispositivo | arriva al creatore |
 | Suggerimenti | salvati sul dispositivo | arrivano al creatore |
 | Link di voto dei draft | non disponibile | link e QR condivisibili |
 
-La stanza online senza database usa il canale interno del browser: due schede o due finestre
-sullo stesso computer si sincronizzano davvero (offerte, timer, aggiudicazioni), ed è il modo più
-rapido per provare una partita a due. Per giocare da telefoni diversi serve il database, che è
-gratuito.
+### Come viaggiano le stanze online
+
+L'app sceglie da sola il canale migliore fra i tre disponibili:
+
+1. **Database** (se configurato): il più solido. Funziona ovunque e regge il riavvio del sito.
+2. **Server dell'app**: due indirizzi, `/api/rooms/[codice]/stream` per ricevere e
+   `/api/rooms/[codice]/message` per inviare. Tutti i dispositivi che raggiungono il server
+   giocano insieme: sulla stessa Wi-Fi usando l'indirizzo di rete del computer, oppure da reti
+   qualsiasi quando il sito è pubblicato. Le stanze vivono nella memoria del server, quindi si
+   azzerano se il server si riavvia.
+3. **Solo browser**: ultimo ripiego, sincronizza schede e finestre dello stesso computer.
+
+In alto nella stanza c'è sempre scritto quale canale è in uso.
+
+> Una nota per la pubblicazione: il canale del server ha bisogno di un processo sempre attivo
+> (Railway, Render, Fly, un server proprio). Su hosting a funzioni separate come Vercel le stanze
+> vanno collegate al database, che è la strada consigliata comunque.
 
 ## 7. Configurazione del database (facoltativa)
 

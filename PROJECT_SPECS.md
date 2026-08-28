@@ -180,7 +180,30 @@
   votazione dei draft tramite link o QR.
 
 ======================================================================
-11. FUNZIONAMENTO SENZA DATABASE
+11. ACCESSO CON PASSWORD E STANZE FRA DISPOSITIVI
+======================================================================
+- Registrazione e accesso con email e password (schede "Accedi" e "Registrati"), più recupero
+  password. Le credenziali vanno al servizio di autenticazione, che conserva la password cifrata:
+  l'app non la salva e non la vede mai in chiaro.
+- Il nickname è unico: controllo di disponibilità mentre si scrive, vincolo `unique` sul database
+  e formato limitato a minuscole, cifre e underscore, così non esistono doppioni per differenza
+  di maiuscole. Se il nickname viene occupato nel frattempo, l'errore lo dice e se ne chiede
+  un altro.
+- Se la conferma via email è attiva, nickname e avatar scelti in registrazione restano in attesa
+  e il profilo viene creato da solo al primo accesso confermato.
+- Stanze online: l'app sceglie il canale migliore fra tre, nell'ordine.
+  1. Database, quando configurato: funziona ovunque e regge il riavvio del sito.
+  2. Server dell'app (`/api/rooms/[code]/stream` in ricezione, `/api/rooms/[code]/message` in
+     invio): tutti i dispositivi che raggiungono il server giocano insieme, anche su reti diverse
+     se il sito è pubblicato. Lo stato vive nella memoria del server ed è un canale di passaggio,
+     non un archivio.
+  3. Canale interno del browser: ultimo ripiego fra schede dello stesso computer.
+  La stanza mostra sempre quale canale sta usando.
+- Il canale del server richiede un processo sempre attivo: su hosting a funzioni separate va usato
+  il database.
+
+======================================================================
+12. FUNZIONAMENTO SENZA DATABASE
 ======================================================================
 - Nessuna funzione blocca l'interfaccia quando mancano le chiavi: ognuna ha una via locale.
 - Profilo: senza database si sceglie nickname e avatar e restano su quel dispositivo
@@ -199,7 +222,7 @@
   stato di una stanza online, utile a chi ricarica la pagina o rientra.
 
 ======================================================================
-12. AVATAR A ICONE E INSTALLAZIONE SULLA SCHERMATA HOME
+13. AVATAR A ICONE E INSTALLAZIONE SULLA SCHERMATA HOME
 ======================================================================
 - Gli avatar del profilo non sono più emoji ma icone vettoriali (fiamma, fulmine, corona, scudo,
   joypad, teschio, coppa, fantasma, gemma). Nel gioco circola solo l'identificativo testuale
@@ -217,3 +240,5 @@
   (`allowedDevOrigins`): senza, in sviluppo Next blocca i file JavaScript quando il sito viene
   aperto dal telefono con l'indirizzo IP, e la pagina resta a metà. Lo stesso file disattiva la
   generazione automatica dei file di istruzioni per strumenti esterni.
+
+

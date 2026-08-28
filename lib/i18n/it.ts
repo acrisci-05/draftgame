@@ -261,6 +261,31 @@ export const it = {
   "nav.account": "Accedi",
   "nav.pickpockets": "Pickpockets",
 
+  "auth.tabSignIn": "Accedi",
+  "auth.tabSignUp": "Registrati",
+  "auth.password": "Password",
+  "auth.passwordHint": "Almeno {n} caratteri.",
+  "auth.signIn": "Entra",
+  "auth.signUp": "Crea account",
+  "auth.forgot": "Password dimenticata?",
+  "auth.resetSent": "Ti abbiamo mandato il link per cambiare password.",
+  "auth.confirmSent":
+    "Account creato. Conferma l'indirizzo dal link che ti abbiamo mandato, poi torna qui.",
+  "auth.errNicknameTaken": "Nickname già preso, scegline un altro.",
+  "auth.errNicknameInvalid": "Il nickname deve avere almeno 3 caratteri.",
+  "auth.errEmailInvalid": "Indirizzo email non valido.",
+  "auth.errPasswordShort": "La password deve avere almeno {n} caratteri.",
+  "auth.errWrongCredentials": "Email o password non corretti.",
+  "auth.errEmailTaken": "Esiste già un account con questa email: accedi.",
+  "auth.errOffline": "Serve il database per creare un account.",
+  "auth.errUnknown": "Qualcosa non ha funzionato. Riprova.",
+  "auth.nicknameFree": "Nickname libero",
+  "auth.nicknameChecking": "Controllo...",
+  "auth.noAccountTitle": "Gioca senza account",
+  "auth.noAccountHint":
+    "Il login con email e password richiede il database. Intanto puoi crearti un profilo su questo dispositivo e giocare subito.",
+  "auth.playLocal": "Crea profilo su questo dispositivo",
+
   "auth.title": "Accedi",
   "auth.subtitle": "Nessuna password: ti arriva un link via email.",
   "auth.email": "La tua email",
@@ -285,7 +310,7 @@ export const it = {
   "friends.localMode":
     "Con il profilo locale gli amici non si sincronizzano: per aggiungerli serve il database.",
   "create.onlineLocalHint":
-    "Senza database la stanza online funziona fra schede e finestre di questo computer: perfetta per provare. Per giocare da telefoni diversi collega il database.",
+    "La stanza passa dal server di questa app: funziona con tutti i dispositivi che lo raggiungono, anche da reti diverse se il sito è pubblicato. Collegando il database resta attiva anche quando il server si riavvia.",
   "room.localTransport": "stanza su questo browser",
 
   "friends.title": "Pickpockets",

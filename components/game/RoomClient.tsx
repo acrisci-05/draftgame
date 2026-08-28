@@ -91,7 +91,8 @@ export function RoomClient({ code }: { code: string }) {
             <>
               <Radio className={cn("size-3", status === "live" ? "text-neon" : "text-amber-400")} />
               {status === "live"
-                ? transport === "local"
+                ? // Il canale locale copre solo questo browser: va detto.
+                  transport === "local"
                   ? t("room.localTransport")
                   : t("room.online")
                 : status === "error"
