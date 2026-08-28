@@ -178,3 +178,23 @@
   salva l'autore, così i doppioni e gli abusi restano tracciabili.
 - Restano anonimi e senza account: partite locali, stanze online, voto del gioco a stelle e
   votazione dei draft tramite link o QR.
+
+======================================================================
+11. AVATAR A ICONE E INSTALLAZIONE SULLA SCHERMATA HOME
+======================================================================
+- Gli avatar del profilo non sono più emoji ma icone vettoriali (fiamma, fulmine, corona, scudo,
+  joypad, teschio, coppa, fantasma, gemma). Nel gioco circola solo l'identificativo testuale
+  ("flame", "zap", ...), quindi nessun carattere speciale attraversa file di dati, database o
+  sincronizzazione: il problema dei caratteri corrotti è eliminato alla radice.
+- Il selettore mostra cerchi scuri; quello scelto ha bordo verde neon e alone. I profili salvati
+  prima del passaggio continuano a funzionare: se il valore non è un'icona nota viene mostrato
+  com'era.
+- Installazione: componente con striscia in basso su telefono e voce nel menu. Le istruzioni sono
+  divise in due schede, iPhone/iPad e Android, con passi numerati su card scure. Dove il browser
+  espone l'installazione automatica compare anche il pulsante che la avvia. Funziona anche in
+  sviluppo su HTTP, perché le istruzioni sono manuali e non dipendono dal service worker.
+- `public/manifest.webmanifest` dichiara nome, icona, colori e apertura a tutto schermo.
+- `next.config.ts` autorizza da solo gli indirizzi di rete locale della macchina
+  (`allowedDevOrigins`): senza, in sviluppo Next blocca i file JavaScript quando il sito viene
+  aperto dal telefono con l'indirizzo IP, e la pagina resta a metà. Lo stesso file disattiva la
+  generazione automatica dei file di istruzioni per strumenti esterni.

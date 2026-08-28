@@ -11,6 +11,7 @@ import { useSettings } from "@/lib/settings";
 import { saveConfig } from "@/lib/storage";
 import type { Category, GameState, RoomConfig } from "@/lib/types";
 import { TIER_ORDER, copyText, money, uid } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -169,7 +170,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                 exit={{ opacity: 0, x: 12 }}
                 className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-2.5"
               >
-                <span className="text-xl">{player.emoji}</span>
+                <Avatar id={player.emoji} size="sm" />
                 <span className="min-w-0 flex-1 truncate font-semibold">{player.name}</span>
                 {player.id === state.hostId ? <Badge tone="violet">{t("lobby.host")}</Badge> : null}
                 {player.id === selfId && !isLocal ? (

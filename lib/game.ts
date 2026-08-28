@@ -1,3 +1,4 @@
+import { avatarForIndex } from "./avatars";
 import type {
   AuctionResult,
   CatalogItem,
@@ -23,15 +24,16 @@ export const MAX_SLOTS = 10;
 export const MIN_BUDGET = 5;
 export const MAX_BUDGET = 500;
 export const OPENING_BID = 1;
-/** Un rilancio dentro questa finestra Ã¨ considerato "in extremis". */
+/** Un rilancio dentro questa finestra è considerato "in extremis". */
 export const SNIPE_WINDOW_SECONDS = 3;
 export const RAISE_STEPS = [1, 2, 5] as const;
 export const BUDGET_PRESETS = [10, 20, 50, 100];
-/** Ogni quanti lotti compare una Mystery Box, quando Ã¨ attiva. */
+/** Ogni quanti lotti compare una Mystery Box, quando è attiva. */
 export const MYSTERY_EVERY = 5;
 export const FEED_LIMIT = 24;
 
-export const PLAYER_EMOJIS = ["ðŸ”¥", "âš¡", "ðŸ‘‘", "ðŸ‰", "ðŸ¦ˆ", "ðŸŽ¯", "ðŸ€", "ðŸ›¸"];
+/** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
+export { AVATAR_IDS, DEFAULT_AVATAR, randomAvatar } from "./avatars";
 
 export const DEFAULT_CONFIG: RoomConfig = {
   budget: 20,
@@ -153,7 +155,7 @@ export function bidOptions(state: GameState): { step: number; amount: number }[]
   }));
 }
 
-/** Un giocatore Ã¨ in corsa se ha slot liberi, non ha passato e copre l'offerta minima. */
+/** Un giocatore è in corsa se ha slot liberi, non ha passato e copre l'offerta minima. */
 export function canCompete(state: GameState, player: Player): boolean {
   if (player.id === state.highBidderId) return true;
   if (state.passed.includes(player.id)) return false;
@@ -441,7 +443,7 @@ function award(
 
 /**
  * Aggiudica il lotto corrente.
- * - `timeout`: vince chi detiene l'offerta piÃ¹ alta, altrimenti il lotto va agli scarti.
+ * - `timeout`: vince chi detiene l'offerta più alta, altrimenti il lotto va agli scarti.
  * - `lastman`: tutti tranne uno hanno passato, quindi il superstite si aggiudica il lotto.
  */
 function resolve(state: GameState, now: number, reason: "timeout" | "lastman"): GameState {
@@ -532,7 +534,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
       const player: Player = {
         id: action.player.id,
         name: action.player.name.trim().slice(0, 16) || `Player ${index + 1}`,
-        emoji: action.player.emoji || PLAYER_EMOJIS[index % PLAYER_EMOJIS.length],
+        emoji: action.player.emoji || avatarForIndex(index),
         budget: state.config.budget,
         roster: [],
       };

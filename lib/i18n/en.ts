@@ -235,6 +235,24 @@ export const en: Dictionary = {
   "shared.playNow": "Play now",
   "shared.notFound": "Category not found.",
 
+  "nav.install": "Install the app",
+
+  "install.title": "Install the Pick & Pay app",
+  "install.subtitle": "Add it to your Home Screen: it opens full screen, without browser bars.",
+  "install.banner": "Tap Share, then Add to Home Screen",
+  "install.ios": "iPhone / iPad",
+  "install.android": "Android",
+  "install.ios1": "Tap the Share button in the Safari bar.",
+  "install.ios2": "Scroll the list and choose Add to Home Screen.",
+  "install.ios3": "Confirm with Add: the icon shows up with your apps.",
+  "install.android1": "Open the three-dot menu at the top right.",
+  "install.android2": "Choose Install app or Add to Home screen.",
+  "install.android3": "Confirm: the icon shows up with your apps.",
+  "install.now": "Install now",
+  "install.later": "Later",
+  "install.done": "The app is already installed on this device.",
+  "install.step": "Step {n}",
+
   "nav.account": "Sign in",
   "nav.pickpockets": "Pickpockets",
 

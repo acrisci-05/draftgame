@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClientValue } from "@/lib/client-store";
 import { APP_TAGLINE } from "@/lib/config";
-import { PLAYER_EMOJIS } from "@/lib/game";
+import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { useSettings } from "@/lib/settings";
 import { ensureProfile, readProfile, saveProfile, saveSession } from "@/lib/storage";
 import type { Profile } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { AvatarPicker } from "@/components/ui/Avatar";
 import { Input } from "@/components/ui/Input";
 import { JoinModal } from "@/components/ui/JoinModal";
 import { LogoMark, LogoWordmark } from "@/components/ui/Logo";
@@ -29,7 +29,7 @@ export default function HomePage() {
   const [supportOpen, setSupportOpen] = useState(false);
 
   const name = nameDraft ?? stored?.name ?? "";
-  const emoji = emojiDraft ?? stored?.emoji ?? PLAYER_EMOJIS[0];
+  const emoji = emojiDraft ?? stored?.emoji ?? DEFAULT_AVATAR;
 
   const persistProfile = (): Profile => {
     const profile = { ...ensureProfile(), name: name.trim() || "Player", emoji };
@@ -79,35 +79,19 @@ export default function HomePage() {
         </div>
 
         <div className="mt-6 border-t border-line p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <div className="flex-1">
-              <Input
-                label={t("home.profile")}
-                value={name}
-                maxLength={16}
-                placeholder={t("home.namePlaceholder")}
-                onChange={(event) => setNameDraft(event.target.value)}
-              />
-            </div>
-            <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-0.5">
-              {PLAYER_EMOJIS.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  aria-label={option}
-                  aria-pressed={option === emoji}
-                  onClick={() => setEmojiDraft(option)}
-                  className={cn(
-                    "size-11 shrink-0 rounded-full border text-xl transition-all",
-                    option === emoji
-                      ? "border-neon bg-neon/15 glow-neon"
-                      : "border-line bg-surface-2 opacity-70 hover:opacity-100",
-                  )}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
+          <Input
+            label={t("home.profile")}
+            value={name}
+            maxLength={16}
+            placeholder={t("home.namePlaceholder")}
+            onChange={(event) => setNameDraft(event.target.value)}
+          />
+
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
+              {t("home.avatar")}
+            </p>
+            <AvatarPicker value={emoji} onChange={setEmojiDraft} />
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">

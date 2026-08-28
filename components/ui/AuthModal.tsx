@@ -9,9 +9,9 @@ import {
   verifyEmailCode,
   useAuth,
 } from "@/lib/auth";
-import { PLAYER_EMOJIS } from "@/lib/game";
+import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { useT } from "@/lib/settings";
-import { cn } from "@/lib/utils";
+import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { Modal } from "./Modal";
@@ -35,7 +35,7 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
   const [address, setAddress] = useState("");
   const [code, setCode] = useState("");
   const [nickname, setNickname] = useState("");
-  const [emoji, setEmoji] = useState(PLAYER_EMOJIS[0]);
+  const [emoji, setEmoji] = useState<string>(DEFAULT_AVATAR);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error" | "taken">("idle");
 
   if (!available) {
@@ -145,23 +145,7 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
           }
         />
 
-        <div className="flex flex-wrap gap-2">
-          {PLAYER_EMOJIS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-label={option}
-              aria-pressed={option === emoji}
-              onClick={() => setEmoji(option)}
-              className={cn(
-                "size-11 rounded-full border text-xl transition-all",
-                option === emoji ? "border-neon bg-neon/15 glow-neon" : "border-line bg-surface-2",
-              )}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
+        <AvatarPicker value={emoji} onChange={setEmoji} />
 
         {status === "taken" ? (
           <p className="text-sm text-red-500">{t("auth.nicknameTaken")}</p>
@@ -183,9 +167,7 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3 rounded-2xl border border-neon/40 bg-neon/10 p-4">
-        <span className="grid size-12 shrink-0 place-items-center rounded-full border border-neon/50 bg-surface text-2xl">
-          {account.emoji}
-        </span>
+        <Avatar id={account.emoji} size="lg" selected />
         <span className="min-w-0">
           <span className="block truncate font-black">@{account.nickname}</span>
           <span className="block truncate text-xs text-muted">{email}</span>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { DEFAULT_CATEGORY } from "@/lib/catalog";
 import { useClientValue, useIsClient } from "@/lib/client-store";
-import { PLAYER_EMOJIS } from "@/lib/game";
+import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { useRoom } from "@/lib/realtime";
 import { useSettings } from "@/lib/settings";
 import {
@@ -19,6 +19,7 @@ import {
 } from "@/lib/storage";
 import type { Profile, RoomSession } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { AvatarPicker } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -48,7 +49,7 @@ export function RoomClient({ code }: { code: string }) {
     () => ({
       id: session?.playerId ?? "",
       name: session?.name ?? "",
-      emoji: session?.emoji ?? PLAYER_EMOJIS[0],
+      emoji: session?.emoji ?? DEFAULT_AVATAR,
     }),
     [session?.playerId, session?.name, session?.emoji],
   );
@@ -143,7 +144,7 @@ function JoinRoom({ code }: { code: string }) {
   const [emojiDraft, setEmojiDraft] = useState<string | null>(null);
 
   const name = nameDraft ?? stored?.name ?? "";
-  const emoji = emojiDraft ?? stored?.emoji ?? PLAYER_EMOJIS[0];
+  const emoji = emojiDraft ?? stored?.emoji ?? DEFAULT_AVATAR;
 
   const join = () => {
     const player = { ...ensureProfile(), name: name.trim() || "Player", emoji };
@@ -182,23 +183,7 @@ function JoinRoom({ code }: { code: string }) {
         <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-faint">
           {t("home.avatar")}
         </p>
-        <div className="flex flex-wrap gap-2">
-          {PLAYER_EMOJIS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-label={option}
-              aria-pressed={option === emoji}
-              onClick={() => setEmojiDraft(option)}
-              className={cn(
-                "size-11 rounded-xl border text-xl transition-colors",
-                option === emoji ? "border-neon bg-neon/10" : "border-line bg-surface",
-              )}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
+        <AvatarPicker value={emoji} onChange={setEmojiDraft} />
       </div>
 
       <Button size="lg" onClick={join}>

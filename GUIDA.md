@@ -44,6 +44,19 @@ Senza nessuna configurazione la **partita locale funziona subito**: due o più g
 stesso telefono o computer, categorie incluse, card finale scaricabile. Restano spente solo le
 funzioni che richiedono il database (stanze online, accesso, amici, voti, suggerimenti).
 
+### Vederlo dal telefono
+
+Con il computer e il telefono sulla stessa Wi-Fi, all'avvio il terminale stampa due indirizzi:
+uno `Local` e uno `Network`, tipo `http://192.168.1.124:3000`. Basta aprire quello dal telefono.
+
+La configurazione in `next.config.ts` rileva da sola gli indirizzi di rete della macchina e li
+autorizza: senza quella riga Next, in sviluppo, blocca i file JavaScript quando la pagina viene
+aperta da un indirizzo diverso da `localhost`, e il sito si vede a metà.
+
+Se la Wi-Fi isola i dispositivi fra loro (capita sulle reti condivise) il telefono non raggiunge
+il computer: in quel caso conviene pubblicare il sito, per esempio importando il repository su
+Vercel, e usare l'indirizzo pubblico.
+
 ### Comandi disponibili
 
 | Comando | Cosa fa |
@@ -162,6 +175,12 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - **Voto del gioco** da 1 a 5 stelle con commento facoltativo, anonimo.
 - Sezione **sostegno al progetto** con rimando a Revolut. Nessun dato di pagamento passa dall'app.
 - **Modalità creatore** protetta da chiave: solo chi la possiede vede Studio ed editor.
+- **Avatar a icone**: i profili usano icone vettoriali (fiamma, fulmine, corona, scudo, joypad,
+  teschio, coppa, fantasma, gemma) al posto delle emoji, così non esiste alcun rischio di
+  caratteri corrotti fra dispositivi e file di dati.
+- **Installazione sulla schermata Home**: su telefono compare una striscia in basso e nel menu c'è
+  la voce dedicata, con istruzioni passo passo separate per iPhone/iPad e Android. Dove il browser
+  lo permette (Android) l'installazione parte con un solo tocco.
 
 ---
 

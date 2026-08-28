@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { listFriends, shareResultWithFriends, type Friend } from "@/lib/friends";
 import { useT } from "@/lib/settings";
 import { cn } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 
 /** Manda il draft appena concluso agli amici Pickpockets perché lo votino. */
@@ -70,7 +71,7 @@ export function FriendShare({ resultId }: { resultId: string | null }) {
                   : "border-line bg-surface-2 text-muted hover:text-fg",
               )}
             >
-              <span>{friend.account.emoji}</span>@{friend.account.nickname}
+              <Avatar id={friend.account.emoji} size="xs" />@{friend.account.nickname}
             </button>
           );
         })}

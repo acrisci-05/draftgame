@@ -9,6 +9,7 @@ import {
   Menu,
   Moon,
   ShieldCheck,
+  Smartphone,
   Star,
   UserRound,
   Users,
@@ -27,6 +28,7 @@ import { useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { AdminModal } from "./AdminModal";
 import { AuthModal } from "./AuthModal";
+import { InstallPwaModal } from "./InstallPwaModal";
 import { Drawer } from "./Drawer";
 import { CreatorModal } from "./CreatorModal";
 import { LanguagePicker } from "./LanguagePicker";
@@ -46,6 +48,7 @@ type Panel =
   | "rate"
   | "admin"
   | "account"
+  | "install"
   | null;
 
 /** Importo del badge rapido nel menu. */
@@ -80,6 +83,7 @@ export function Navbar() {
     { key: "account", icon: UserRound, label: t("nav.account") },
     { key: "rate", icon: Star, label: t("nav.rate") },
     { key: "admin", icon: ShieldCheck, label: t("nav.admin") },
+    { key: "install", icon: Smartphone, label: t("nav.install") },
   ];
 
   return (
@@ -181,6 +185,7 @@ export function Navbar() {
       <RatingModal open={panel === "rate"} onClose={() => setPanel(null)} />
       <AdminModal open={panel === "admin"} onClose={() => setPanel(null)} />
       <AuthModal open={panel === "account"} onClose={() => setPanel(null)} />
+      <InstallPwaModal open={panel === "install"} onClose={() => setPanel(null)} />
 
       <Modal open={panel === "language"} title={t("nav.language")} onClose={() => setPanel(null)}>
         <LanguagePicker onPicked={() => setPanel(null)} />

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Gavel } from "lucide-react";
 import type { GameState } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 
 export function PlayerRail({
   state,
@@ -37,14 +38,12 @@ export function PlayerRail({
             )}
           >
             <div className="flex items-center gap-1.5">
-              <span
-                className={cn(
-                  "grid size-7 shrink-0 place-items-center rounded-full border text-sm",
-                  isLeader ? "border-neon bg-neon/15 leader-pulse" : "border-line bg-surface-2",
-                )}
-              >
-                {player.emoji}
-              </span>
+              <Avatar
+                id={player.emoji}
+                size="xs"
+                selected={isLeader}
+                className={isLeader ? "leader-pulse" : undefined}
+              />
               <span className="truncate text-sm font-semibold">{player.name}</span>
               {isLeader ? <Gavel className="ms-auto size-3.5 shrink-0 text-neon" /> : null}
               {player.id === selfId && !isLeader ? (

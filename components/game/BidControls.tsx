@@ -15,6 +15,7 @@ import {
 import { useT } from "@/lib/settings";
 import type { GameState, Player } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 import { ItemCover } from "./ItemCover";
 
 interface BidControlsProps {
@@ -68,14 +69,12 @@ export function BidControls({
     >
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <span
-            className={cn(
-              "grid size-8 shrink-0 place-items-center rounded-full border text-lg",
-              isLeader ? "border-neon bg-neon/15 leader-pulse" : "border-line bg-surface-2",
-            )}
-          >
-            {player.emoji}
-          </span>
+          <Avatar
+            id={player.emoji}
+            size="sm"
+            selected={isLeader}
+            className={isLeader ? "leader-pulse" : undefined}
+          />
           <span className={cn("truncate font-bold", compact ? "text-sm" : "text-base")}>
             {player.name}
           </span>

@@ -236,6 +236,24 @@ export const it = {
   "shared.playNow": "Gioca ora",
   "shared.notFound": "Categoria non trovata.",
 
+  "nav.install": "Installa l'app",
+
+  "install.title": "Installa l'app Pick & Pay",
+  "install.subtitle": "Aggiungila alla schermata Home: si apre a tutto schermo, senza barre del browser.",
+  "install.banner": "Tocca Condividi, poi Aggiungi alla schermata Home",
+  "install.ios": "iPhone / iPad",
+  "install.android": "Android",
+  "install.ios1": "Tocca il pulsante Condividi nella barra di Safari.",
+  "install.ios2": "Scorri l'elenco e scegli Aggiungi alla schermata Home.",
+  "install.ios3": "Conferma con Aggiungi: l'icona compare fra le tue app.",
+  "install.android1": "Apri il menu con i tre puntini in alto a destra.",
+  "install.android2": "Scegli Installa app oppure Aggiungi a schermata Home.",
+  "install.android3": "Conferma: l'icona compare fra le tue app.",
+  "install.now": "Installa ora",
+  "install.later": "Più tardi",
+  "install.done": "L'app è già installata su questo dispositivo.",
+  "install.step": "Passo {n}",
+
   "nav.account": "Accedi",
   "nav.pickpockets": "Pickpockets",
 

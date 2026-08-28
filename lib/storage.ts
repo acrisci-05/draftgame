@@ -4,7 +4,8 @@ import { OFFICIAL_CATEGORIES, findOfficial } from "./catalog";
 import { notifyClientStore } from "./client-store";
 import { remoteCategories } from "./remote-lists";
 import type { Category, Profile, RoomConfig, RoomSession } from "./types";
-import { DEFAULT_CONFIG, PLAYER_EMOJIS } from "./game";
+import { randomAvatar } from "./avatars";
+import { DEFAULT_CONFIG } from "./game";
 import { uid } from "./utils";
 
 const CATEGORIES_KEY = "pp:categories";
@@ -50,7 +51,7 @@ export function ensureProfile(): Profile {
   const profile: Profile = {
     id: uid("p"),
     name: "",
-    emoji: PLAYER_EMOJIS[Math.floor(Math.random() * PLAYER_EMOJIS.length)],
+    emoji: randomAvatar(),
   };
   write(PROFILE_KEY, profile);
   return profile;

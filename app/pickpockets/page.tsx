@@ -27,6 +27,7 @@ import {
 import { useT } from "@/lib/settings";
 import { copyText } from "@/lib/utils";
 import { AuthPanel } from "@/components/ui/AuthModal";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
@@ -101,9 +102,7 @@ export default function PickpocketsPage() {
           <Panel>
             <PanelTitle>{t("friends.you")}</PanelTitle>
             <div className="flex items-center gap-3">
-              <span className="grid size-12 shrink-0 place-items-center rounded-full border border-neon/50 bg-neon/10 text-2xl">
-                {account.emoji}
-              </span>
+              <Avatar id={account.emoji} size="lg" selected />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-lg font-black">@{account.nickname}</span>
               </span>
@@ -264,9 +263,7 @@ export default function PickpocketsPage() {
 function FriendRow({ friend, children }: { friend: Friend; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-2.5">
-      <span className="grid size-9 shrink-0 place-items-center rounded-full border border-line bg-surface text-lg">
-        {friend.account.emoji}
-      </span>
+      <Avatar id={friend.account.emoji} size="sm" />
       <span className="min-w-0 flex-1 truncate font-semibold">@{friend.account.nickname}</span>
       {children}
     </div>

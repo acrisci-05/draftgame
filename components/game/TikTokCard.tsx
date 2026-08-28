@@ -13,6 +13,7 @@ import { rosterValue } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import type { CurrencyCode, GameState, RosterEntry } from "@/lib/types";
 import { TIER_ORDER, TIER_STYLES, hashString, initials, money } from "@/lib/utils";
+import { AvatarGlyph } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 
 /** Tassello di un elemento vinto, con badge dorato del prezzo pagato. */
@@ -344,7 +345,21 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                         textOverflow: "ellipsis",
                       }}
                     >
-                      <span>{player.emoji}</span>
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 44,
+                          height: 44,
+                          borderRadius: 999,
+                          backgroundColor: "#27272a",
+                          color: accent,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <AvatarGlyph id={player.emoji} size={24} />
+                      </span>
                       {player.name}
                     </span>
                     <span

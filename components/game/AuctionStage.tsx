@@ -20,6 +20,7 @@ import { HAPTIC_BID, HAPTIC_PASS, HAPTIC_WIN, vibrate } from "@/lib/haptics";
 import { useSettings } from "@/lib/settings";
 import type { GameState } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { RoomCode } from "@/components/ui/RoomCode";
 import { BidControls } from "./BidControls";
@@ -168,7 +169,8 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
             {leader ? (
               <p className="flex items-center justify-end gap-1.5 text-sm font-bold text-neon text-glow">
                 <Gavel className="size-4" />
-                {leader.emoji} {leader.name}
+                <Avatar id={leader.emoji} size="xs" />
+                {leader.name}
               </p>
             ) : (
               <p className="flex items-center justify-end gap-1.5 text-sm text-faint">

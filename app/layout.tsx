@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { APP_FULL_NAME, APP_NAME } from "@/lib/config";
 import { Navbar } from "@/components/ui/Navbar";
+import { PwaInstallBanner } from "@/components/ui/InstallPwaModal";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,7 +20,12 @@ export const metadata: Metadata = {
   description:
     "Asta live a budget fisso: costruisci il roster perfetto, sfida i tuoi amici e esporta la card in formato 9:16.",
   applicationName: APP_NAME,
-  icons: { icon: [{ url: "/logo.svg", type: "image/svg+xml" }] },
+  icons: {
+    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/logo.svg" }],
+  },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = {
@@ -50,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-full flex-col bg-ink text-fg">
         <Navbar />
         {children}
+        <PwaInstallBanner />
       </body>
     </html>
   );

@@ -11,6 +11,7 @@ import { useSettings } from "@/lib/settings";
 import { isSupabaseConfigured, publishResult } from "@/lib/supabase";
 import type { CatalogItem, GameState } from "@/lib/types";
 import { TIER_STYLES, cn, copyText, money } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
@@ -93,7 +94,7 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="flex min-w-0 items-center gap-2 font-bold">
-                  <span className="text-lg">{player.emoji}</span>
+                  <Avatar id={player.emoji} size="sm" />
                   <span className="truncate">{player.name}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
