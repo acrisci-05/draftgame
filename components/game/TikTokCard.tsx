@@ -22,15 +22,17 @@ function RosterTile({
   currency,
   width,
   hint,
+  auto,
 }: {
   entry: RosterEntry;
   currency: CurrencyCode;
   width: number;
   hint?: string;
+  auto: boolean;
 }) {
   const palette = coverPalette(entry.itemId + entry.name);
   const tint = TIER_STYLES[entry.tier].hex;
-  const { src, onError } = useItemImage(entry, hint);
+  const { src, onError } = useItemImage(entry, hint, auto);
 
   return (
     <div style={{ width, display: "flex", flexDirection: "column", gap: 6 }}>
@@ -108,7 +110,7 @@ const INK = "#09090b";
 const CARD_BG = "#101014";
 
 export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: string | null }) {
-  const { locale, t } = useSettings();
+  const { locale, autoImages, t } = useSettings();
   const cardRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.3);
@@ -435,6 +437,7 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                                   currency={currency}
                                   width={tileWidth}
                                   hint={state.category.name}
+                                  auto={autoImages}
                                 />
                               ))}
                             </div>

@@ -66,6 +66,7 @@ Vercel, e usare l'indirizzo pubblico.
 | `npm run start` | serve la versione compilata |
 | `npm run lint` | controlla stile e regole del codice |
 | `npm run check:engine` | esegue 63 verifiche automatiche su regole d'asta e cataloghi |
+| `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 
 ---
 
@@ -148,10 +149,13 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   per elemento, salva sul dispositivo ed esporta il JSON o la query SQL già pronta.
 
 ### Immagini
-- Ogni elemento può avere un URL immagine. Se manca, l'app cerca da sola una foto pertinente su
-  Wikipedia e la tiene in cache sul dispositivo.
-- Se la ricerca non trova nulla si passa a un'immagine generica e, in ultima istanza, alla
-  copertina con emoji dentro un badge. Nessun link da inserire a mano.
+- Ogni elemento mostra una copertina con la sua icona: sempre giusta, sempre disponibile.
+- Nello **Studio** si fissa la foto vera di ogni elemento: c'è la ricerca automatica, il campo per
+  incollare un indirizzo e il pulsante per togliere una foto sbagliata. Quelle fissate valgono
+  sempre e finiscono nel file dati.
+- Nel menu c'è l'interruttore **Foto automatiche**, spento di default: acceso, l'app cerca da sola
+  una foto per gli elementi che non ne hanno. Indovina i nomi famosi ma può sbagliare quelli
+  ambigui ("Up", "Cars", "Snake"), quindi resta una comodità e non il comportamento base.
 
 ### Fine partita
 - Card verticale **1080x1920** con roster raggruppato per fascia, badge dorato del prezzo pagato
@@ -184,9 +188,29 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 
 ---
 
-## 6. Configurazione del database (facoltativa)
+## 6. Cosa funziona senza database, e cosa aggiunge
 
-Serve per: stanze online, accesso, amici, votazioni, suggerimenti, liste pubblicate.
+L'app non si blocca mai: quando le chiavi del database mancano, ogni funzione ha una via locale.
+
+| Funzione | Senza database | Con database |
+| --- | --- | --- |
+| Partita locale | completa | completa |
+| Profilo | nickname e avatar su questo dispositivo | accesso via email, profilo su tutti i dispositivi |
+| Stanza online | fra schede e finestre dello stesso browser | fra dispositivi diversi, ovunque |
+| Amici Pickpockets | non disponibile | completa |
+| Voto del gioco | salvato sul dispositivo | arriva al creatore |
+| Suggerimenti | salvati sul dispositivo | arrivano al creatore |
+| Link di voto dei draft | non disponibile | link e QR condivisibili |
+
+La stanza online senza database usa il canale interno del browser: due schede o due finestre
+sullo stesso computer si sincronizzano davvero (offerte, timer, aggiudicazioni), ed è il modo più
+rapido per provare una partita a due. Per giocare da telefoni diversi serve il database, che è
+gratuito.
+
+## 7. Configurazione del database (facoltativa)
+
+Serve per: stanze fra dispositivi, accesso via email, amici, votazioni, suggerimenti, liste
+pubblicate.
 
 1. Crea un progetto gratuito su [supabase.com](https://supabase.com).
 2. Copia `.env.example` in `.env.local` e riempi:
@@ -220,7 +244,7 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
 
 ---
 
-## 7. Verifiche automatiche
+## 8. Verifiche automatiche
 
 `npm run check:engine` compila il motore ed esegue **63 controlli**: distribuzione delle fasce,
 unicità degli identificativi, apertura dell'asta, rilanci, aggiudicazione per tempo scaduto o per
@@ -231,7 +255,7 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 
 ---
 
-## 8. Stato del lavoro e limiti noti
+## 9. Stato del lavoro e limiti noti
 
 **Funziona senza configurazione**: partita locale, tutte le 26 categorie, regole complete, card
 9:16 scaricabile, lingue, temi, audio.
@@ -255,7 +279,7 @@ Da sapere:
 
 ---
 
-## 9. Dove guardare il codice
+## 10. Dove guardare il codice
 
 | Domanda | File |
 | --- | --- |

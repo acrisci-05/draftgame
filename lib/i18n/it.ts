@@ -237,6 +237,10 @@ export const it = {
   "shared.notFound": "Categoria non trovata.",
 
   "nav.install": "Installa l'app",
+  "nav.autoImages": "Foto automatiche",
+  "nav.autoImagesHint":
+    "Cerca online una foto per ogni elemento. Indovina i nomi famosi ma può sbagliare quelli ambigui: le immagini fissate nello Studio restano comunque quelle giuste.",
+  "studio.clearImage": "Togli immagine",
 
   "install.title": "Installa l'app Pick & Pay",
   "install.subtitle": "Aggiungila alla schermata Home: si apre a tutto schermo, senza barre del browser.",
@@ -273,7 +277,16 @@ export const it = {
   "auth.nicknamePlaceholder": "es. marco_23",
   "auth.nicknameTaken": "Nickname già preso, provane un altro.",
   "auth.save": "Salva profilo",
-  "auth.required": "Serve l'accesso per usare questa sezione.",
+  "auth.required": "Serve un profilo per usare questa sezione.",
+  "auth.localHint":
+    "Scegli nickname e avatar: il profilo resta su questo dispositivo. Collegando il database si sincronizza ovunque.",
+  "auth.localProfile": "Profilo su questo dispositivo",
+  "auth.createProfile": "Crea il profilo",
+  "friends.localMode":
+    "Con il profilo locale gli amici non si sincronizzano: per aggiungerli serve il database.",
+  "create.onlineLocalHint":
+    "Senza database la stanza online funziona fra schede e finestre di questo computer: perfetta per provare. Per giocare da telefoni diversi collega il database.",
+  "room.localTransport": "stanza su questo browser",
 
   "friends.title": "Pickpockets",
   "friends.subtitle": "I tuoi borseggiatori di fiducia: sfidali e fatti votare i draft.",
@@ -325,6 +338,8 @@ export const it = {
   "rate.thanks": "Grazie per il voto!",
   "rate.average": "Media {avg} su {count} voti",
   "rate.offline": "Il voto richiede la configurazione del database.",
+  "rate.localSaved": "Grazie! Il voto è salvato su questo dispositivo.",
+  "suggest.localSaved": "Grazie! Il suggerimento è salvato su questo dispositivo.",
   "rate.error": "Invio non riuscito. Riprova più tardi.",
 
   "tier.legend": "Fasce di valore",

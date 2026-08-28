@@ -3,7 +3,7 @@
 import { Check, Loader2, Send, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/settings";
-import { ensureProfile } from "@/lib/storage";
+import { ensureProfile, saveLocalFeedback } from "@/lib/storage";
 import { fetchRatingSummary, isSupabaseConfigured, sendRating } from "@/lib/supabase";
 import type { RatingSummary } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -34,7 +34,12 @@ export function RatingModal({ open, onClose }: { open: boolean; onClose: () => v
     if (stars < 1) return;
     setStatus("sending");
     try {
-      await sendRating(stars, comment, ensureProfile().id);
+      if (isSupabaseConfigured) {
+        await sendRating(stars, comment, ensureProfile().id);
+      } else {
+        // Senza database il voto resta sul dispositivo: niente blocchi.
+        saveLocalFeedback(stars, comment);
+      }
       setStatus("sent");
       setComment("");
     } catch {
@@ -89,16 +94,14 @@ export function RatingModal({ open, onClose }: { open: boolean; onClose: () => v
           </p>
         ) : null}
 
-        {!isSupabaseConfigured ? (
-          <p className="text-sm text-amber-500">{t("rate.offline")}</p>
-        ) : null}
         {status === "error" ? <p className="text-sm text-red-500">{t("rate.error")}</p> : null}
-        {status === "sent" ? <p className="text-sm text-neon">{t("rate.thanks")}</p> : null}
+        {status === "sent" ? (
+          <p className="text-sm text-neon">
+            {isSupabaseConfigured ? t("rate.thanks") : t("rate.localSaved")}
+          </p>
+        ) : null}
 
-        <Button
-          onClick={submit}
-          disabled={!isSupabaseConfigured || stars < 1 || status === "sending"}
-        >
+        <Button onClick={submit} disabled={stars < 1 || status === "sending"}>
           {status === "sending" ? (
             <Loader2 className="size-4 animate-spin" />
           ) : status === "sent" ? (

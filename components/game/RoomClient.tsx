@@ -73,7 +73,7 @@ export function RoomClient({ code }: { code: string }) {
     return <JoinRoom code={code} />;
   }
 
-  const { state, status, errorKey, dispatch, now, isHost } = room;
+  const { state, status, error: errorKey, transport, dispatch, now, isHost } = room;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-4 safe-bottom">
@@ -91,7 +91,9 @@ export function RoomClient({ code }: { code: string }) {
             <>
               <Radio className={cn("size-3", status === "live" ? "text-neon" : "text-amber-400")} />
               {status === "live"
-                ? t("room.online")
+                ? transport === "local"
+                  ? t("room.localTransport")
+                  : t("room.online")
                 : status === "error"
                   ? t("room.offline")
                   : t("room.connecting")}

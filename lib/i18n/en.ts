@@ -236,6 +236,10 @@ export const en: Dictionary = {
   "shared.notFound": "Category not found.",
 
   "nav.install": "Install the app",
+  "nav.autoImages": "Automatic photos",
+  "nav.autoImagesHint":
+    "Looks a photo up online for every item. It gets famous names right but can miss ambiguous ones: images pinned in the Studio always win.",
+  "studio.clearImage": "Remove image",
 
   "install.title": "Install the Pick & Pay app",
   "install.subtitle": "Add it to your Home Screen: it opens full screen, without browser bars.",
@@ -272,7 +276,16 @@ export const en: Dictionary = {
   "auth.nicknamePlaceholder": "e.g. marco_23",
   "auth.nicknameTaken": "Nickname already taken, try another one.",
   "auth.save": "Save profile",
-  "auth.required": "You need to sign in to use this section.",
+  "auth.required": "You need a profile to use this section.",
+  "auth.localHint":
+    "Pick a nickname and an avatar: the profile stays on this device. Connect the database and it syncs everywhere.",
+  "auth.localProfile": "Profile on this device",
+  "auth.createProfile": "Create profile",
+  "friends.localMode":
+    "With a local profile friends do not sync: adding them needs the database.",
+  "create.onlineLocalHint":
+    "Without a database an online room works across tabs and windows of this computer, which is great for testing. Connect the database to play from different phones.",
+  "room.localTransport": "room on this browser",
 
   "friends.title": "Pickpockets",
   "friends.subtitle": "Your trusted pickpockets: challenge them and get your drafts voted.",
@@ -323,6 +336,8 @@ export const en: Dictionary = {
   "rate.thanks": "Thanks for rating!",
   "rate.average": "{avg} average out of {count} ratings",
   "rate.offline": "Rating needs the database to be configured.",
+  "rate.localSaved": "Thanks! The rating is saved on this device.",
+  "suggest.localSaved": "Thanks! The suggestion is saved on this device.",
   "rate.error": "Sending failed. Try again later.",
 
   "tier.legend": "Value tiers",

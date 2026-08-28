@@ -113,6 +113,62 @@ create policy "votes_public_update"
 -- e non richiedono tabelle dedicate.
 
 -- ---------------------------------------------------------------------------
+-- Stanze online.
+-- La partita viaggia sui canali realtime; queste tabelle conservano l'ultimo
+-- stato salvato dall'host, così chi ricarica o rientra ritrova la stanza.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.games (
+  code text primary key,
+  host_id text not null,
+  phase text not null default 'lobby',
+  state jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.games enable row level security;
+
+-- Chi ha il codice può leggere e aggiornare la propria stanza: nessun dato
+-- personale ci transita, solo lo stato della partita in corso.
+drop policy if exists "games_public_read" on public.games;
+create policy "games_public_read" on public.games for select using (true);
+
+drop policy if exists "games_public_insert" on public.games;
+create policy "games_public_insert"
+  on public.games for insert
+  with check (char_length(code) between 4 and 8);
+
+drop policy if exists "games_public_update" on public.games;
+create policy "games_public_update"
+  on public.games for update
+  using (true)
+  with check (char_length(code) between 4 and 8);
+
+create table if not exists public.game_players (
+  code text not null references public.games on delete cascade,
+  player_id text not null,
+  name text not null,
+  emoji text not null default 'flame',
+  joined_at timestamptz not null default now(),
+  primary key (code, player_id)
+);
+
+alter table public.game_players enable row level security;
+
+drop policy if exists "game_players_public_read" on public.game_players;
+create policy "game_players_public_read" on public.game_players for select using (true);
+
+drop policy if exists "game_players_public_insert" on public.game_players;
+create policy "game_players_public_insert"
+  on public.game_players for insert
+  with check (char_length(name) between 1 and 32);
+
+drop policy if exists "game_players_public_delete" on public.game_players;
+create policy "game_players_public_delete"
+  on public.game_players for delete
+  using (true);
+
+-- ---------------------------------------------------------------------------
 -- Voto del gioco: da 1 a 5 stelle, anonimo, un voto per dispositivo.
 -- ---------------------------------------------------------------------------
 

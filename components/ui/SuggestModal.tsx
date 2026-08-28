@@ -4,6 +4,7 @@ import { Check, Loader2, Send } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useT } from "@/lib/settings";
+import { saveLocalSuggestion } from "@/lib/storage";
 import { isSupabaseConfigured, sendSuggestion } from "@/lib/supabase";
 import { AuthPanel } from "./AuthModal";
 import { Button } from "./Button";
@@ -21,7 +22,12 @@ export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => 
     if (!name.trim() || !account) return;
     setStatus("sending");
     try {
-      await sendSuggestion(name, idea, account.id);
+      if (isSupabaseConfigured) {
+        await sendSuggestion(name, idea, account.id);
+      } else {
+        // Senza database il suggerimento resta sul dispositivo: niente blocchi.
+        saveLocalSuggestion(name, idea);
+      }
       setStatus("sent");
       setName("");
       setIdea("");
@@ -63,16 +69,14 @@ export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => 
           onChange={(event) => setIdea(event.target.value)}
         />
 
-        {!isSupabaseConfigured ? (
-          <p className="text-sm text-amber-500">{t("suggest.offline")}</p>
-        ) : null}
         {status === "error" ? <p className="text-sm text-red-500">{t("suggest.error")}</p> : null}
-        {status === "sent" ? <p className="text-sm text-neon">{t("suggest.sent")}</p> : null}
+        {status === "sent" ? (
+          <p className="text-sm text-neon">
+            {isSupabaseConfigured ? t("suggest.sent") : t("suggest.localSaved")}
+          </p>
+        ) : null}
 
-        <Button
-          onClick={submit}
-          disabled={!isSupabaseConfigured || status === "sending" || !name.trim()}
-        >
+        <Button onClick={submit} disabled={status === "sending" || !name.trim()}>
           {status === "sending" ? (
             <Loader2 className="size-4 animate-spin" />
           ) : status === "sent" ? (

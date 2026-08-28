@@ -19,6 +19,12 @@ export interface Settings {
   locale: Locale;
   theme: Theme;
   sound: boolean;
+  /**
+   * Ricerca automatica delle foto degli elementi.
+   * Spenta di default: indovina i nomi famosi ma sbaglia quelli ambigui
+   * ("Up", "Cars", "Snake"), quindi la si accende solo volendo.
+   */
+  autoImages: boolean;
 }
 
 export const SETTINGS_KEY = "pp:settings";
@@ -27,6 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
   locale: DEFAULT_LOCALE,
   theme: "dark",
   sound: true,
+  autoImages: false,
 };
 
 /** Lingua del browser: usata solo finché l'utente non ne sceglie una. */
@@ -46,6 +53,7 @@ export function readSettings(): Settings {
       locale: isLocale(parsed.locale) ? parsed.locale : browserLocale(),
       theme: parsed.theme === "light" ? "light" : "dark",
       sound: parsed.sound !== false,
+      autoImages: parsed.autoImages === true,
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -80,6 +88,7 @@ export interface SettingsApi extends Settings {
   toggleTheme: () => void;
   setSound: (sound: boolean) => void;
   toggleSound: () => void;
+  setAutoImages: (autoImages: boolean) => void;
   t: (key: TranslationKey, params?: TranslateParams) => string;
 }
 
@@ -89,6 +98,10 @@ export function useSettings(): SettingsApi {
   const setLocale = useCallback((locale: Locale) => writeSettings({ locale }), []);
   const setTheme = useCallback((theme: Theme) => writeSettings({ theme }), []);
   const setSound = useCallback((sound: boolean) => writeSettings({ sound }), []);
+  const setAutoImages = useCallback(
+    (autoImages: boolean) => writeSettings({ autoImages }),
+    [],
+  );
 
   const toggleTheme = useCallback(
     () => writeSettings({ theme: readSettings().theme === "dark" ? "light" : "dark" }),
@@ -109,6 +122,7 @@ export function useSettings(): SettingsApi {
     toggleTheme,
     setSound,
     toggleSound,
+    setAutoImages,
     t,
   };
 }

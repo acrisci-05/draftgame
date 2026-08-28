@@ -121,6 +121,12 @@ export default function PickpocketsPage() {
             </div>
           </Panel>
 
+          {account.local ? (
+            <p className="rounded-xl border border-line bg-surface p-3 text-sm text-muted">
+              {t("friends.localMode")}
+            </p>
+          ) : null}
+
           <Panel>
             <PanelTitle icon={<UserPlus className="size-3.5" />}>{t("friends.add")}</PanelTitle>
             <div className="flex gap-2">

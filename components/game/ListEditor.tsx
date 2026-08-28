@@ -9,6 +9,7 @@ import {
   RotateCcw,
   Save,
   Search,
+  Trash2,
   TriangleAlert,
 } from "lucide-react";
 import { useState } from "react";
@@ -277,12 +278,25 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
                     ) : null}
 
                     {openImage === key ? (
-                      <input
-                        value={row.image}
-                        placeholder={t("editor.imagePlaceholder", { optional: t("common.optional") })}
-                        onChange={(event) => setRow(tier, index, { image: event.target.value })}
-                        className="h-10 w-full rounded-xl border border-line bg-surface-2 px-3 text-xs text-fg placeholder:text-faint/70 focus:border-neon/70 focus:outline-none"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          placeholder={t("editor.imagePlaceholder", {
+                            optional: t("common.optional"),
+                          })}
+                          onChange={(event) => setRow(tier, index, { image: event.target.value })}
+                          className="h-10 min-w-0 flex-1 rounded-xl border border-line bg-surface-2 px-3 text-xs text-fg placeholder:text-faint/70 focus:border-neon/70 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          aria-label={t("studio.clearImage")}
+                          title={t("studio.clearImage")}
+                          disabled={!row.image}
+                          onClick={() => setRow(tier, index, { image: "" })}
+                          className="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-surface-2 text-faint transition-colors hover:text-red-500 disabled:opacity-40"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
                     ) : null}
                   </div>
                 );

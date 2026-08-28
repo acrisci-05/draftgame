@@ -38,6 +38,7 @@ import { RatingModal } from "./RatingModal";
 import { RulesModal } from "./RulesModal";
 import { SuggestModal } from "./SuggestModal";
 import { SupportModal } from "./SupportModal";
+import { Switch } from "./Switch";
 
 type Panel =
   | "rules"
@@ -55,7 +56,8 @@ type Panel =
 const QUICK_DONATION = 2;
 
 export function Navbar() {
-  const { locale, theme, sound, toggleTheme, toggleSound, t } = useSettings();
+  const { locale, theme, sound, autoImages, toggleTheme, toggleSound, setAutoImages, t } =
+    useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
 
@@ -159,6 +161,13 @@ export function Navbar() {
             {t("support.quick", { amount: `€${QUICK_DONATION}` })}
           </button>
         </section>
+
+        <Switch
+          checked={autoImages}
+          onChange={setAutoImages}
+          label={t("nav.autoImages")}
+          hint={t("nav.autoImagesHint")}
+        />
 
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-faint">

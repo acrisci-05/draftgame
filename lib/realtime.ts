@@ -1,13 +1,19 @@
-﻿"use client";
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createGame, reducer, type GameAction } from "./game";
 import type { TranslationKey } from "./i18n";
-import { getSupabase } from "./supabase";
+import {
+  createTransport,
+  transportKind,
+  type RoomMessage,
+  type RoomTransport,
+  type TransportKind,
+  type TransportStatus,
+} from "./multiplayer";
 import type { Category, GameState, RoomConfig, RoomMode } from "./types";
 
-export type RoomStatus = "connecting" | "waiting" | "live" | "error";
+export type RoomStatus = TransportStatus;
 
 interface SelfPlayer {
   id: string;
@@ -29,46 +35,43 @@ interface UseRoomArgs {
 export interface RoomApi {
   state: GameState | null;
   status: RoomStatus;
-  /** Chiave di traduzione dell'errore da mostrare, null se va tutto bene. */
-  errorKey: TranslationKey | null;
+  /** Chiave di traduzione dell'errore, non un testo già formato. */
+  error: TranslationKey | null;
   online: string[];
   isHost: boolean;
+  /** Come viaggiano i dati: database in cloud oppure solo su questo browser. */
+  transport: TransportKind;
   dispatch: (action: GameAction) => void;
   /** Orologio allineato al dispositivo che ospita la stanza. */
   now: () => number;
 }
 
-const CHANNEL_PREFIX = "dg-room-";
 const TICK_MS = 250;
 const HELLO_RETRY_MS = 1500;
 
-
 export function useRoom({ code, mode, isHost, self, category, config }: UseRoomArgs): RoomApi {
   const [state, setState] = useState<GameState | null>(null);
-  const [channelStatus, setChannelStatus] = useState<RoomStatus>("connecting");
-  const [channelError, setChannelError] = useState<TranslationKey | null>(null);
+  const [status, setStatus] = useState<RoomStatus>("connecting");
+  const [error, setError] = useState<TranslationKey | null>(null);
   const [online, setOnline] = useState<string[]>([]);
-  const supabase = useMemo(() => getSupabase(), []);
 
   const stateRef = useRef<GameState | null>(null);
-  const channelRef = useRef<RealtimeChannel | null>(null);
+  const transportRef = useRef<RoomTransport | null>(null);
   const offsetRef = useRef(0);
   const selfRef = useRef(self);
   const categoryRef = useRef(category);
   const configRef = useRef(config);
+  const isHostRef = useRef(isHost);
 
   useEffect(() => {
     selfRef.current = self;
     categoryRef.current = category;
     configRef.current = config;
-  }, [self, category, config]);
+    isHostRef.current = isHost;
+  }, [self, category, config, isHost]);
 
   const broadcastState = useCallback((next: GameState) => {
-    channelRef.current?.send({
-      type: "broadcast",
-      event: "state",
-      payload: { state: next, now: Date.now() },
-    });
+    transportRef.current?.send({ type: "state", state: next, now: Date.now() });
   }, []);
 
   const commit = useCallback(
@@ -76,22 +79,22 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
       if (next === stateRef.current) return;
       stateRef.current = next;
       setState(next);
-      if (isHost) broadcastState(next);
+      if (isHostRef.current) broadcastState(next);
     },
-    [isHost, broadcastState],
+    [broadcastState],
   );
 
   const dispatch = useCallback(
     (action: GameAction) => {
-      if (isHost) {
+      if (isHostRef.current) {
         const current = stateRef.current;
         if (!current) return;
         commit(reducer(current, action));
         return;
       }
-      channelRef.current?.send({ type: "broadcast", event: "intent", payload: { action } });
+      transportRef.current?.send({ type: "intent", action });
     },
-    [isHost, commit],
+    [commit],
   );
 
   /* Creazione dello stato iniziale sul dispositivo che ospita la stanza. */
@@ -111,92 +114,72 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
     setState(withHost);
   }, [code, mode, isHost, category]);
 
-  /* Canale realtime (solo stanze online). */
+  /* Canale della stanza: database in cloud oppure BroadcastChannel locale. */
   useEffect(() => {
-    if (mode !== "online" || !supabase) return;
+    // In locale non serve alcun canale: lo stato vive solo su questo dispositivo.
+    if (mode !== "online") return;
 
     const me = selfRef.current;
-    const channel = supabase.channel(`${CHANNEL_PREFIX}${code}`, {
-      config: { broadcast: { self: false }, presence: { key: me.id } },
-    });
-    channelRef.current = channel;
 
-    channel.on("broadcast", { event: "state" }, ({ payload }) => {
-      if (isHost) return;
-      const incoming = payload.state as GameState;
-      offsetRef.current = (payload.now as number) - Date.now();
-      stateRef.current = incoming;
-      setState(incoming);
-      setChannelStatus("live");
-    });
+    const handleMessage = (message: RoomMessage) => {
+      const host = isHostRef.current;
 
-    channel.on("broadcast", { event: "hello" }, ({ payload }) => {
-      if (!isHost) return;
-      const current = stateRef.current;
-      if (!current) return;
-      const next = reducer(current, {
-        type: "add_player",
-        player: payload.player as SelfPlayer,
-      });
-      stateRef.current = next;
-      setState(next);
-      broadcastState(next);
-    });
-
-    channel.on("broadcast", { event: "intent" }, ({ payload }) => {
-      if (!isHost) return;
-      const current = stateRef.current;
-      if (!current) return;
-      commit(reducer(current, payload.action as GameAction));
-    });
-
-    channel.on("presence", { event: "sync" }, () => {
-      setOnline(Object.keys(channel.presenceState()));
-    });
-
-    channel.on("presence", { event: "leave" }, ({ key }) => {
-      if (!isHost) return;
-      const current = stateRef.current;
-      if (!current || current.phase !== "lobby" || key === current.hostId) return;
-      commit(reducer(current, { type: "remove_player", playerId: key }));
-    });
-
-    channel.subscribe(async (subscription) => {
-      if (subscription === "SUBSCRIBED") {
-        await channel.track({ id: me.id, name: me.name });
-        if (isHost) {
-          setChannelStatus("live");
-          if (stateRef.current) broadcastState(stateRef.current);
-        } else {
-          setChannelStatus("waiting");
-          channel.send({ type: "broadcast", event: "hello", payload: { player: me } });
-        }
+      if (message.type === "state") {
+        if (host) return;
+        offsetRef.current = message.now - Date.now();
+        stateRef.current = message.state;
+        setState(message.state);
+        setStatus("live");
         return;
       }
-      if (subscription === "CHANNEL_ERROR" || subscription === "TIMED_OUT") {
-        setChannelStatus("error");
-        setChannelError("room.errConnection");
+
+      if (!host) return;
+      const current = stateRef.current;
+      if (!current) return;
+
+      if (message.type === "hello") {
+        const next = reducer(current, { type: "add_player", player: message.player });
+        stateRef.current = next;
+        setState(next);
+        // Si ritrasmette sempre: chi entra deve ricevere lo stato anche se era già in lista.
+        broadcastState(next);
+        return;
       }
+
+      commit(reducer(current, message.action));
+    };
+
+    const transport = createTransport(code, me, isHost, {
+      onMessage: handleMessage,
+      onStatus: (next) => {
+        setStatus(next);
+        setError(next === "error" ? "room.errConnection" : null);
+      },
+      onPresence: setOnline,
+      onLeave: (id) => {
+        if (!isHostRef.current) return;
+        const current = stateRef.current;
+        if (!current || current.phase !== "lobby" || id === current.hostId) return;
+        commit(reducer(current, { type: "remove_player", playerId: id }));
+      },
     });
 
-    return () => {
-      channelRef.current = null;
-      supabase.removeChannel(channel);
-    };
-  }, [code, mode, isHost, supabase, broadcastState, commit]);
+    transportRef.current = transport;
 
-  /* Chi entra continua a presentarsi finche' non riceve il primo stato. */
+    return () => {
+      transportRef.current = null;
+      transport.close();
+    };
+  }, [code, mode, isHost, broadcastState, commit]);
+
+  /* Chi entra continua a presentarsi finché non riceve il primo stato. */
   useEffect(() => {
-    if (mode !== "online" || isHost || channelStatus !== "waiting") return;
+    if (mode !== "online" || isHost || status !== "waiting") return;
     const timer = setInterval(() => {
-      channelRef.current?.send({
-        type: "broadcast",
-        event: "hello",
-        payload: { player: selfRef.current },
-      });
+      transportRef.current?.send({ type: "hello", player: selfRef.current });
     }, HELLO_RETRY_MS);
     return () => clearInterval(timer);
-  }, [mode, isHost, channelStatus]);
+  }, [mode, isHost, status]);
 
   /* Il timer dell'asta gira sul dispositivo che ospita la stanza. */
   useEffect(() => {
@@ -212,8 +195,14 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
 
   const now = useCallback(() => Date.now() + offsetRef.current, []);
 
-  const status: RoomStatus = mode !== "online" ? "live" : supabase ? channelStatus : "error";
-  const errorKey = mode === "online" && !supabase ? "room.errKeys" : channelError;
-
-  return { state, status, errorKey, online, isHost, dispatch, now };
+  return {
+    state,
+    status: mode === "local" ? "live" : status,
+    error,
+    online,
+    isHost,
+    transport: transportKind(),
+    dispatch,
+    now,
+  };
 }

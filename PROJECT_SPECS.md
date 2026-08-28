@@ -180,7 +180,26 @@
   votazione dei draft tramite link o QR.
 
 ======================================================================
-11. AVATAR A ICONE E INSTALLAZIONE SULLA SCHERMATA HOME
+11. FUNZIONAMENTO SENZA DATABASE
+======================================================================
+- Nessuna funzione blocca l'interfaccia quando mancano le chiavi: ognuna ha una via locale.
+- Profilo: senza database si sceglie nickname e avatar e restano su quel dispositivo
+  (`lib/auth.ts` decide da solo la modalità). Con le chiavi si passa all'accesso via email e al
+  profilo condiviso, senza cambiare nulla nell'interfaccia.
+- Stanze online: `lib/multiplayer.ts` espone un trasporto unico con due implementazioni. Con le
+  chiavi usa i canali realtime e funziona fra dispositivi diversi; senza, usa il canale interno
+  del browser e sincronizza schede e finestre dello stesso computer, salvando l'ultimo stato per
+  chi ricarica. Il modello resta lo stesso: chi crea la stanza è l'autorità, gli altri mandano
+  intenzioni.
+- Voto del gioco e suggerimenti: senza database restano salvati sul dispositivo, con un messaggio
+  che lo dice; con il database arrivano al creatore.
+- Amici Pickpockets e link di voto richiedono il database, perché per definizione mettono in
+  comunicazione persone diverse: l'interfaccia lo spiega invece di mostrare un errore.
+- `supabase/schema.sql` include anche le tabelle `games` e `game_players` per conservare l'ultimo
+  stato di una stanza online, utile a chi ricarica la pagina o rientra.
+
+======================================================================
+12. AVATAR A ICONE E INSTALLAZIONE SULLA SCHERMATA HOME
 ======================================================================
 - Gli avatar del profilo non sono più emoji ma icone vettoriali (fiamma, fulmine, corona, scudo,
   joypad, teschio, coppa, fantasma, gemma). Nel gioco circola solo l'identificativo testuale

@@ -159,6 +159,43 @@ export function clearSession(code: string) {
 }
 
 /* ---------------------------------------------------------------- */
+/* Voti e suggerimenti senza database                                */
+/* ---------------------------------------------------------------- */
+
+const FEEDBACK_KEY = "pp:feedback";
+const SUGGESTIONS_KEY = "pp:suggestions";
+
+export interface LocalFeedback {
+  stars: number;
+  comment: string;
+  at: string;
+}
+
+export interface LocalSuggestion {
+  name: string;
+  idea: string;
+  at: string;
+}
+
+/** Senza database il voto resta qui: lo si potrà inviare quando il database c'è. */
+export function saveLocalFeedback(stars: number, comment: string) {
+  write(FEEDBACK_KEY, { stars, comment, at: new Date().toISOString() } satisfies LocalFeedback);
+}
+
+export function readLocalFeedback(): LocalFeedback | null {
+  return read<LocalFeedback | null>(FEEDBACK_KEY, null);
+}
+
+export function saveLocalSuggestion(name: string, idea: string) {
+  const all = read<LocalSuggestion[]>(SUGGESTIONS_KEY, []);
+  write(SUGGESTIONS_KEY, [...all, { name, idea, at: new Date().toISOString() }].slice(-50));
+}
+
+export function readLocalSuggestions(): LocalSuggestion[] {
+  return read<LocalSuggestion[]>(SUGGESTIONS_KEY, []);
+}
+
+/* ---------------------------------------------------------------- */
 /* Voto già espresso                                                 */
 /* ---------------------------------------------------------------- */
 

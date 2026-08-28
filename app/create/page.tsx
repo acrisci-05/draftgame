@@ -86,12 +86,11 @@ export default function CreatePage() {
             icon={<Wifi className="size-5" />}
             title={t("create.online")}
             hint={t("create.onlineHint")}
-            disabled={!isSupabaseConfigured}
             onClick={() => setMode("online")}
           />
         </div>
-        {!isSupabaseConfigured ? (
-          <p className="mt-2 text-xs text-faint">{t("home.supabaseHint")}</p>
+        {mode === "online" && !isSupabaseConfigured ? (
+          <p className="mt-2 text-xs text-faint">{t("create.onlineLocalHint")}</p>
         ) : null}
       </Panel>
 

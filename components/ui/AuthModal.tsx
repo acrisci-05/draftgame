@@ -1,13 +1,15 @@
 "use client";
 
-import { Check, LogIn, LogOut, Mail, Loader2 } from "lucide-react";
+import { Check, LogIn, LogOut, Mail, Loader2, Smartphone } from "lucide-react";
 import { useState } from "react";
 import {
   createAccount,
+  normalizeNickname,
+  saveLocalAccount,
   signInWithEmail,
   signOut,
-  verifyEmailCode,
   useAuth,
+  verifyEmailCode,
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { useT } from "@/lib/settings";
@@ -22,25 +24,21 @@ export function AuthModal({ open, onClose }: { open: boolean; onClose: () => voi
 
   return (
     <Modal open={open} title={t("auth.title")} onClose={onClose}>
-      <AuthPanel onDone={onClose} key={auth.session?.user.id ?? "anon"} />
+      <AuthPanel onDone={onClose} key={auth.account?.id ?? auth.session?.user.id ?? "anon"} />
     </Modal>
   );
 }
 
-/** Pannello riutilizzabile: accesso, scelta del nickname, uscita. */
+/** Pannello riutilizzabile: registrazione, accesso, uscita. */
 export function AuthPanel({ onDone }: { onDone?: () => void }) {
   const t = useT();
-  const { available, session, email, account, refreshAccount } = useAuth();
+  const { mode, session, email, account, refreshAccount } = useAuth();
 
   const [address, setAddress] = useState("");
   const [code, setCode] = useState("");
   const [nickname, setNickname] = useState("");
   const [emoji, setEmoji] = useState<string>(DEFAULT_AVATAR);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error" | "taken">("idle");
-
-  if (!available) {
-    return <p className="text-sm text-amber-500">{t("auth.offline")}</p>;
-  }
 
   const sendLink = async () => {
     if (!address.trim()) return;
@@ -66,11 +64,15 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
   };
 
   const saveProfile = async () => {
-    if (!session || nickname.trim().length < 3) return;
+    if (normalizeNickname(nickname).length < 3) return;
     setStatus("sending");
     try {
-      await createAccount(session.user.id, nickname, emoji);
-      refreshAccount();
+      if (mode === "local") {
+        saveLocalAccount(nickname, emoji);
+      } else if (session) {
+        await createAccount(session.user.id, nickname, emoji);
+        refreshAccount();
+      }
       setStatus("idle");
       onDone?.();
     } catch {
@@ -78,7 +80,71 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
     }
   };
 
-  /* Passo 1: non hai ancora fatto l'accesso. */
+  /* Profilo già pronto: si mostra e si può uscire. */
+  if (account) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-3 rounded-2xl border border-neon/40 bg-neon/10 p-4">
+          <Avatar id={account.emoji} size="lg" selected />
+          <span className="min-w-0">
+            <span className="block truncate font-black">@{account.nickname}</span>
+            <span className="block truncate text-xs text-muted">
+              {email ?? t("auth.localProfile")}
+            </span>
+          </span>
+        </div>
+
+        <Button
+          variant="danger"
+          onClick={async () => {
+            await signOut();
+            onDone?.();
+          }}
+        >
+          <LogOut className="size-4" />
+          {t("auth.signOut")}
+        </Button>
+      </div>
+    );
+  }
+
+  /* Senza database: registrazione immediata sul dispositivo. */
+  if (mode === "local") {
+    return (
+      <div className="flex flex-col gap-3">
+        <p className="flex items-start gap-2 text-sm text-muted">
+          <Smartphone className="mt-0.5 size-4 shrink-0 text-neon" />
+          {t("auth.localHint")}
+        </p>
+
+        <Input
+          label={t("auth.nickname")}
+          hint={t("auth.nicknameHint")}
+          value={nickname}
+          maxLength={20}
+          placeholder={t("auth.nicknamePlaceholder")}
+          onChange={(event) => setNickname(normalizeNickname(event.target.value))}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") void saveProfile();
+          }}
+        />
+
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
+            {t("home.avatar")}
+          </p>
+          <AvatarPicker value={emoji} onChange={setEmoji} />
+        </div>
+
+        <Button onClick={saveProfile} disabled={normalizeNickname(nickname).length < 3}>
+          <Check className="size-4" />
+          {t("auth.createProfile")}
+        </Button>
+      </div>
+    );
+  }
+
+  /* Con database, primo passo: arriva il link via email. */
   if (!session) {
     return (
       <div className="flex flex-col gap-3">
@@ -92,7 +158,7 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
           value={address}
           onChange={(event) => setAddress(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter") sendLink();
+            if (event.key === "Enter") void sendLink();
           }}
         />
 
@@ -128,61 +194,41 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
     );
   }
 
-  /* Passo 2: sei dentro ma manca il nickname pubblico. */
-  if (!account) {
-    return (
-      <div className="flex flex-col gap-3">
-        <p className="text-sm text-muted">{t("auth.signedAs", { email: email ?? "" })}</p>
-
-        <Input
-          label={t("auth.nickname")}
-          hint={t("auth.nicknameHint")}
-          value={nickname}
-          maxLength={20}
-          placeholder={t("auth.nicknamePlaceholder")}
-          onChange={(event) =>
-            setNickname(event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
-          }
-        />
-
-        <AvatarPicker value={emoji} onChange={setEmoji} />
-
-        {status === "taken" ? (
-          <p className="text-sm text-red-500">{t("auth.nicknameTaken")}</p>
-        ) : null}
-
-        <Button onClick={saveProfile} disabled={nickname.trim().length < 3 || status === "sending"}>
-          {status === "sending" ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Check className="size-4" />
-          )}
-          {t("auth.save")}
-        </Button>
-      </div>
-    );
-  }
-
-  /* Passo 3: profilo completo. */
+  /* Con database, secondo passo: scelta del nickname pubblico. */
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 rounded-2xl border border-neon/40 bg-neon/10 p-4">
-        <Avatar id={account.emoji} size="lg" selected />
-        <span className="min-w-0">
-          <span className="block truncate font-black">@{account.nickname}</span>
-          <span className="block truncate text-xs text-muted">{email}</span>
-        </span>
+      <p className="text-sm text-muted">{t("auth.signedAs", { email: email ?? "" })}</p>
+
+      <Input
+        label={t("auth.nickname")}
+        hint={t("auth.nicknameHint")}
+        value={nickname}
+        maxLength={20}
+        placeholder={t("auth.nicknamePlaceholder")}
+        onChange={(event) => setNickname(normalizeNickname(event.target.value))}
+      />
+
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
+          {t("home.avatar")}
+        </p>
+        <AvatarPicker value={emoji} onChange={setEmoji} />
       </div>
 
+      {status === "taken" ? (
+        <p className="text-sm text-red-500">{t("auth.nicknameTaken")}</p>
+      ) : null}
+
       <Button
-        variant="danger"
-        onClick={async () => {
-          await signOut();
-          onDone?.();
-        }}
+        onClick={saveProfile}
+        disabled={normalizeNickname(nickname).length < 3 || status === "sending"}
       >
-        <LogOut className="size-4" />
-        {t("auth.signOut")}
+        {status === "sending" ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Check className="size-4" />
+        )}
+        {t("auth.save")}
       </Button>
     </div>
   );
