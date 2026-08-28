@@ -241,6 +241,8 @@ export const it = {
   "nav.autoImagesHint":
     "Cerca online una foto per ogni elemento. Indovina i nomi famosi ma può sbagliare quelli ambigui: le immagini fissate nello Studio restano comunque quelle giuste.",
   "studio.clearImage": "Togli immagine",
+  "studio.pickImage": "Scegli la foto giusta:",
+  "studio.notRelevant": "poco attinente",
 
   "install.title": "Installa l'app Pick & Pay",
   "install.subtitle": "Aggiungila alla schermata Home: si apre a tutto schermo, senza barre del browser.",

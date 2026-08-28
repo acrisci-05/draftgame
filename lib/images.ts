@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useSettings } from "./settings";
 import type { CatalogItem, Locale, RosterEntry } from "./types";
+import { isRelevant } from "./image-match";
+
+export { isRelevant };
 
 /**
  * Foto reali per gli elementi del catalogo.
@@ -59,6 +62,9 @@ export function getItemImage(item: { name: string; image?: string }): string {
 }
 
 interface WikiPage {
+  title?: string;
+  index?: number;
+  description?: string;
   thumbnail?: { source?: string };
 }
 
@@ -66,13 +72,13 @@ interface WikiResponse {
   query?: { pages?: Record<string, WikiPage> };
 }
 
-function endpoint(lang: string, query: string): string {
+function endpoint(lang: string, query: string, limit: number): string {
   const params = new URLSearchParams({
     action: "query",
     generator: "search",
     gsrsearch: query,
-    gsrlimit: "1",
-    prop: "pageimages",
+    gsrlimit: String(limit),
+    prop: "pageimages|description",
     piprop: "thumbnail",
     pithumbsize: "600",
     format: "json",
@@ -81,35 +87,73 @@ function endpoint(lang: string, query: string): string {
   return `https://${lang}.wikipedia.org/w/api.php?${params.toString()}`;
 }
 
-/** Cerca la miniatura su Wikipedia. Restituisce null se non trova nulla di adatto. */
-export async function findImage(
+export interface ImageCandidate {
+  title: string;
+  description?: string;
+  url: string;
+  /** true quando il titolo trovato corrisponde davvero al nome cercato. */
+  relevant: boolean;
+}
+
+/** Elenco di foto candidate, in ordine di pertinenza. */
+export async function searchImages(
   name: string,
   locale: Locale = "it",
   hint?: string,
-): Promise<string | null> {
+  limit = 6,
+): Promise<ImageCandidate[]> {
   const query = hint ? `${name} ${hint}` : name;
-  const key = `${locale}:${query.toLowerCase()}`;
-  if (memory.has(key)) return memory.get(key) ?? null;
-
   const languages = locale === "en" ? ["en"] : [locale, "en"];
+  const found: ImageCandidate[] = [];
+  const seen = new Set<string>();
+
   for (const lang of languages) {
     try {
-      const response = await fetch(endpoint(lang, query));
+      const response = await fetch(endpoint(lang, query, limit));
       if (!response.ok) continue;
       const data = (await response.json()) as WikiResponse;
       const pages = data.query?.pages ? Object.values(data.query.pages) : [];
-      const source = pages.find((page) => page.thumbnail?.source)?.thumbnail?.source;
-      if (source) {
-        memory.set(key, source);
-        return source;
-      }
+
+      pages
+        .sort((a, b) => (a.index ?? 0) - (b.index ?? 0))
+        .forEach((page) => {
+          const url = page.thumbnail?.source;
+          const title = page.title ?? "";
+          if (!url || seen.has(url)) return;
+          seen.add(url);
+          found.push({
+            title,
+            description: page.description,
+            url,
+            relevant: isRelevant(name, title),
+          });
+        });
+
+      if (found.some((candidate) => candidate.relevant)) break;
     } catch {
       /* offline o richiesta bloccata: si prova la lingua successiva */
     }
   }
 
-  memory.set(key, null);
-  return null;
+  return found.sort((a, b) => Number(b.relevant) - Number(a.relevant));
+}
+
+/**
+ * Foto automatica: si accetta solo un risultato pertinente.
+ * Meglio la copertina con l'icona che una foto sbagliata.
+ */
+export async function findImage(
+  name: string,
+  locale: Locale = "it",
+  hint?: string,
+): Promise<string | null> {
+  const key = `${locale}:${name.toLowerCase()}:${hint ?? ""}`;
+  if (memory.has(key)) return memory.get(key) ?? null;
+
+  const candidates = await searchImages(name, locale, hint, 6);
+  const best = candidates.find((candidate) => candidate.relevant)?.url ?? null;
+  memory.set(key, best);
+  return best;
 }
 
 /**

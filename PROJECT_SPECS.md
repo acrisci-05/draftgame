@@ -201,6 +201,13 @@
   La stanza mostra sempre quale canale sta usando.
 - Il canale del server richiede un processo sempre attivo: su hosting a funzioni separate va usato
   il database.
+- Da reti diverse serve un indirizzo pubblico. In sviluppo si ottiene con un tunnel temporaneo
+  (`npm run share`), i cui domini sono già autorizzati nella configurazione; per l'uso vero si
+  pubblica il sito.
+- Filtro di pertinenza delle foto (`lib/image-match.ts`): il titolo della pagina trovata viene
+  ridotto togliendo il chiarimento fra parentesi e accettato solo se coincide col nome cercato o
+  vi termina, come per i nomi di persona. Senza un risultato pertinente resta la copertina con
+  l'icona. Nello Studio la ricerca propone fino a sei candidati fra cui scegliere.
 
 ======================================================================
 12. FUNZIONAMENTO SENZA DATABASE

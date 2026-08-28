@@ -240,6 +240,8 @@ export const en: Dictionary = {
   "nav.autoImagesHint":
     "Looks a photo up online for every item. It gets famous names right but can miss ambiguous ones: images pinned in the Studio always win.",
   "studio.clearImage": "Remove image",
+  "studio.pickImage": "Pick the right photo:",
+  "studio.notRelevant": "loose match",
 
   "install.title": "Install the Pick & Pay app",
   "install.subtitle": "Add it to your Home Screen: it opens full screen, without browser bars.",

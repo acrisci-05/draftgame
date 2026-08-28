@@ -54,8 +54,32 @@ autorizza: senza quella riga Next, in sviluppo, blocca i file JavaScript quando 
 aperta da un indirizzo diverso da `localhost`, e il sito si vede a metà.
 
 Se la Wi-Fi isola i dispositivi fra loro (capita sulle reti condivise) il telefono non raggiunge
-il computer: in quel caso conviene pubblicare il sito, per esempio importando il repository su
-Vercel, e usare l'indirizzo pubblico.
+il computer: in quel caso serve un indirizzo pubblico, come spiegato qui sotto.
+
+### Giocare da reti diverse o da connessione dati
+
+Da un'altra rete il telefono non può raggiungere il computer di casa: è una regola di rete, non
+un difetto dell'app. Servono un indirizzo pubblico e un server raggiungibile. Tre strade, dalla
+più rapida alla più solida.
+
+**1. Tunnel temporaneo, per provare subito.** Con il sito già avviato (`npm run dev`), in un
+secondo terminale:
+
+```bash
+npx cloudflared tunnel --url http://localhost:3000
+```
+
+Stampa un indirizzo `https://qualcosa.trycloudflare.com` che funziona da qualsiasi rete, anche in
+4G. Vive finché il comando resta aperto, e mentre è attivo il computer è raggiungibile da
+internet: va chiuso quando non serve più. Gli indirizzi dei tunnel sono già autorizzati nella
+configurazione, quindi la pagina si carica intera.
+
+**2. Pubblicazione su un host sempre attivo** (Render, Railway, Fly, un server proprio): il canale
+delle stanze funziona senza altro, perché resta un processo acceso.
+
+**3. Pubblicazione su Vercel più database**: su Vercel le funzioni sono separate fra loro e non
+condividono memoria, quindi le stanze vanno appoggiate al database. È la strada consigliata per
+un uso vero e continuativo.
 
 ### Comandi disponibili
 
@@ -68,6 +92,8 @@ Vercel, e usare l'indirizzo pubblico.
 | `npm run check:engine` | esegue 63 verifiche automatiche su regole d'asta e cataloghi |
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
+| `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
+| `npm run share` | apre un indirizzo pubblico temporaneo per provare da rete dati |
 
 ---
 
@@ -151,12 +177,16 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 
 ### Immagini
 - Ogni elemento mostra una copertina con la sua icona: sempre giusta, sempre disponibile.
-- Nello **Studio** si fissa la foto vera di ogni elemento: c'è la ricerca automatica, il campo per
-  incollare un indirizzo e il pulsante per togliere una foto sbagliata. Quelle fissate valgono
-  sempre e finiscono nel file dati.
+- **Filtro di pertinenza**: una foto trovata online viene accettata solo se il titolo della pagina
+  corrisponde davvero al nome cercato. "Up" prende *Up (film 2009)* e non *Upload*, "Snake" non
+  diventa *Snake River*, "Smash Burger" non diventa *Hamburger*. Se nessun risultato è pertinente
+  resta l'icona: meglio nessuna foto che una sbagliata.
+- Nello **Studio** la ricerca mostra fino a sei candidati con titolo e anteprima: si sceglie
+  quello giusto con un clic, e i risultati poco attinenti sono segnalati. C'è anche il campo per
+  incollare un indirizzo e il pulsante per togliere una foto. Le scelte fatte qui valgono sempre e
+  finiscono nel file dati con "Esporta JSON".
 - Nel menu c'è l'interruttore **Foto automatiche**, spento di default: acceso, l'app cerca da sola
-  una foto per gli elementi che non ne hanno. Indovina i nomi famosi ma può sbagliare quelli
-  ambigui ("Up", "Cars", "Snake"), quindi resta una comodità e non il comportamento base.
+  una foto per gli elementi che non ne hanno, sempre passando dal filtro di pertinenza.
 
 ### Fine partita
 - Card verticale **1080x1920** con roster raggruppato per fascia, badge dorato del prezzo pagato

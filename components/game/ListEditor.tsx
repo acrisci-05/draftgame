@@ -21,7 +21,7 @@ import {
   validateCategory,
   type TierDraft,
 } from "@/lib/catalog";
-import { findImage } from "@/lib/images";
+import { findImage, searchImages, type ImageCandidate } from "@/lib/images";
 import { useSettings } from "@/lib/settings";
 import { removeOverride, saveCustomCategory, saveOverride } from "@/lib/storage";
 import type { Category, Tier } from "@/lib/types";
@@ -44,6 +44,12 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
   const { locale, t } = useSettings();
   const [searching, setSearching] = useState<string | null>(null);
   const [notFound, setNotFound] = useState<string[]>([]);
+  const [picker, setPicker] = useState<{
+    key: string;
+    tier: Tier;
+    index: number;
+    items: ImageCandidate[];
+  } | null>(null);
   const [name, setName] = useState(category.name);
   const [emoji, setEmoji] = useState(category.emoji);
   const [tiers, setTiers] = useState<TierDraft>(() => itemsToTierDraft(category.items));
@@ -61,19 +67,21 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
     });
   };
 
+  /** Mostra i risultati e lascia scegliere: l'automatismo da solo sbaglia troppo. */
   const lookup = async (tier: Tier, index: number) => {
     const row = tiers[tier][index];
     if (!row?.name.trim()) return;
     const key = `${tier}-${index}`;
     setSearching(key);
-    const url = await findImage(row.name, locale, name.trim());
-    if (url) {
-      setRow(tier, index, { image: url });
-      setNotFound((current) => current.filter((entry) => entry !== key));
-    } else {
-      setNotFound((current) => (current.includes(key) ? current : [...current, key]));
-    }
+    setPicker(null);
+    const results = await searchImages(row.name, locale, name.trim(), 6);
     setSearching(null);
+    if (results.length === 0) {
+      setNotFound((current) => (current.includes(key) ? current : [...current, key]));
+      return;
+    }
+    setNotFound((current) => current.filter((entry) => entry !== key));
+    setPicker({ key, tier, index, items: results });
   };
 
   const lookupAll = async () => {
@@ -275,6 +283,44 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
 
                     {notFound.includes(key) ? (
                       <p className="text-xs text-amber-500">{t("studio.imageNotFound")}</p>
+                    ) : null}
+
+                    {picker?.key === key ? (
+                      <div className="rounded-xl border border-line bg-surface-2 p-2">
+                        <p className="mb-2 text-xs font-semibold text-faint">
+                          {t("studio.pickImage")}
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {picker.items.map((candidate) => (
+                            <button
+                              key={candidate.url}
+                              type="button"
+                              onClick={() => {
+                                setRow(tier, index, { image: candidate.url });
+                                setPicker(null);
+                              }}
+                              className="flex flex-col gap-1 rounded-lg border border-line p-1 text-start transition-colors hover:border-neon"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={candidate.url}
+                                alt={candidate.title}
+                                loading="lazy"
+                                referrerPolicy="no-referrer"
+                                className="h-16 w-full rounded object-cover"
+                              />
+                              <span className="truncate text-[10px] leading-tight text-muted">
+                                {candidate.title}
+                              </span>
+                              {!candidate.relevant ? (
+                                <span className="text-[9px] text-amber-500">
+                                  {t("studio.notRelevant")}
+                                </span>
+                              ) : null}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     ) : null}
 
                     {openImage === key ? (

@@ -7,7 +7,15 @@ import type { NextConfig } from "next";
  * viene aperto dal telefono con l'indirizzo IP invece che da localhost.
  */
 function localAddresses(): string[] {
-  const addresses = new Set<string>(["localhost", "127.0.0.1"]);
+  const addresses = new Set<string>([
+    "localhost",
+    "127.0.0.1",
+    // Domini dei tunnel pubblici, per provare il gioco da rete dati.
+    "*.trycloudflare.com",
+    "*.loca.lt",
+    "*.ngrok-free.app",
+    "*.ngrok.io",
+  ]);
   for (const entries of Object.values(networkInterfaces())) {
     for (const entry of entries ?? []) {
       if (entry.family === "IPv4" && !entry.internal) addresses.add(entry.address);

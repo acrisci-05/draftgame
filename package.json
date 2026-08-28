@@ -9,7 +9,9 @@
     "lint": "eslint",
     "check:engine": "tsc -p tsconfig.check.json && node scripts/engine-check.js .tmp-check/lib",
     "check:multiplayer": "tsc -p tsconfig.check.json && node scripts/multiplayer-check.js",
-    "check:rooms": "node scripts/room-check.js http://localhost:3000"
+    "check:rooms": "node scripts/room-check.js http://localhost:3000",
+    "check:images": "tsc -p tsconfig.check.json && node scripts/images-check.js",
+    "share": "cloudflared tunnel --url http://localhost:3000"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

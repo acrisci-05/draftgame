@@ -9,5 +9,12 @@
     "incremental": false,
     "esModuleInterop": true
   },
-  "include": ["lib/game.ts", "lib/catalog.ts", "lib/utils.ts", "lib/types.ts", "data/categories.json"]
+  "include": [
+    "lib/game.ts",
+    "lib/catalog.ts",
+    "lib/utils.ts",
+    "lib/types.ts",
+    "data/categories.json",
+    "lib/image-match.ts"
+  ]
 }
