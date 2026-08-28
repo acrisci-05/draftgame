@@ -4,7 +4,8 @@ Asta live a budget fisso: ogni giocatore parte con lo stesso budget, gli element
 escono a caso uno alla volta e vince chi costruisce il roster più forte. A fine partita l'app genera
 una card verticale 9:16 pronta da postare e un link di voto per far decidere agli amici.
 
-Le regole complete sono in [`PROJECT_SPECS.md`](./PROJECT_SPECS.md).
+- **[GUIDA.md](./GUIDA.md)** — guida completa: tecnologie, avvio, funzioni, configurazione e limiti.
+- **[PROJECT_SPECS.md](./PROJECT_SPECS.md)** — regolamento e decisioni prese in fase di sviluppo.
 
 ## Funzionalità
 
