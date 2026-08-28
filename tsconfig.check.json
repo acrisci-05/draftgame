@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2020",
+    "outDir": ".tmp-check",
+    "noEmit": false,
+    "incremental": false,
+    "esModuleInterop": true
+  },
+  "include": ["lib/game.ts", "lib/catalog.ts", "lib/utils.ts", "lib/types.ts", "data/categories.json"]
+}

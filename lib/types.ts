@@ -1,16 +1,26 @@
 export type Tier = 1 | 2 | 3 | 4 | 5;
 
+export type Locale = "it" | "en" | "fr" | "es" | "de" | "pt" | "ru" | "zh" | "ja" | "ar";
+
+export type CurrencyCode = "EUR" | "USD" | "GBP" | "JPY";
+
 export interface CatalogItem {
   id: string;
   name: string;
   tier: Tier;
+  /** Immagine di copertina (URL). Se assente viene generata una cover con le iniziali. */
+  image?: string;
+  /** Emoji mostrata sulla cover generata. */
+  emoji?: string;
 }
 
-export type CategorySource = "builtin" | "custom" | "shared";
+export type CategorySource = "official" | "custom" | "shared";
 
 export interface Category {
   id: string;
   name: string;
+  /** Nome in inglese per le liste ufficiali. */
+  nameEn?: string;
   emoji: string;
   items: CatalogItem[];
   source: CategorySource;
@@ -24,6 +34,10 @@ export interface RosterEntry {
   name: string;
   tier: Tier;
   price: number;
+  image?: string;
+  emoji?: string;
+  /** true se l'elemento è arrivato da una Mystery Box. */
+  mystery?: boolean;
 }
 
 export interface Player {
@@ -41,22 +55,52 @@ export interface AuctionResult {
   winnerId: string | null;
   winnerName: string | null;
   price: number;
+  mystery?: boolean;
 }
 
 export type RoomMode = "local" | "online";
 
 export type Phase = "lobby" | "auction" | "result" | "ended";
 
+export type LotKind = "item" | "mystery";
+
+export interface RoomConfig {
+  budget: number;
+  currency: CurrencyCode;
+  /** Numero massimo di giocatori ammessi nella stanza. */
+  maxPlayers: number;
+  /** Elementi che ogni giocatore deve portare a casa. */
+  slots: number;
+  blindDraft: boolean;
+  mysteryBox: boolean;
+}
+
+export type FeedKind = "bid" | "pass" | "won" | "discard" | "mystery" | "lot" | "start";
+
+export interface FeedEntry {
+  id: string;
+  kind: FeedKind;
+  playerName?: string;
+  playerEmoji?: string;
+  itemName?: string;
+  amount?: number;
+  at: number;
+}
+
 export interface GameState {
   code: string;
   mode: RoomMode;
   hostId: string;
   phase: Phase;
-  category: { id: string; name: string; emoji: string };
+  config: RoomConfig;
+  category: { id: string; name: string; nameEn?: string; emoji: string };
   items: CatalogItem[];
   /** Id degli elementi non ancora estratti, in ordine casuale. */
   queue: string[];
   currentItemId: string | null;
+  lotKind: LotKind;
+  /** Prezzo fisso della Mystery Box in corso. */
+  lotPrice: number;
   currentBid: number;
   highBidderId: string | null;
   passed: string[];
@@ -66,6 +110,10 @@ export interface GameState {
   discards: string[];
   lastResult: AuctionResult | null;
   history: AuctionResult[];
+  feed: FeedEntry[];
+  lotNumber: number;
+  /** true quando l'ultimo rilancio è arrivato negli ultimi secondi del timer. */
+  sniped: boolean;
   updatedAt: number;
 }
 
@@ -78,10 +126,25 @@ export interface RoomSession {
   emoji: string;
   /** Categoria scelta prima di entrare in stanza (solo per chi ospita). */
   categoryId?: string;
+  /** Regole scelte nella schermata di configurazione (solo per chi ospita). */
+  config?: RoomConfig;
 }
 
 export interface Profile {
   id: string;
   name: string;
   emoji: string;
+}
+
+export interface VoteResultPayload {
+  code: string;
+  categoryName: string;
+  categoryEmoji: string;
+  currency: CurrencyCode;
+  players: Player[];
+}
+
+export interface VoteTally {
+  playerId: string;
+  votes: number;
 }

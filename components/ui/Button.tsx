@@ -4,7 +4,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "violet" | "outline" | "ghost" | "danger";
-type Size = "sm" | "md" | "lg";
+type Size = "sm" | "md" | "lg" | "icon";
 
 const VARIANTS: Record<Variant, string> = {
   primary:
@@ -12,15 +12,17 @@ const VARIANTS: Record<Variant, string> = {
   violet:
     "bg-violet text-white font-bold hover:bg-violet-soft glow-violet disabled:bg-violet/30 disabled:text-white/50 disabled:shadow-none",
   outline:
-    "border border-line bg-surface text-zinc-100 hover:border-neon/60 hover:text-neon disabled:opacity-40",
-  ghost: "text-zinc-400 hover:text-zinc-100 hover:bg-surface-2 disabled:opacity-40",
-  danger: "bg-red-500/15 text-red-300 border border-red-500/40 hover:bg-red-500/25 disabled:opacity-40",
+    "border border-line bg-surface text-fg hover:border-neon/60 hover:text-neon disabled:opacity-40",
+  ghost: "text-muted hover:text-fg hover:bg-surface-2 disabled:opacity-40",
+  danger:
+    "bg-red-500/15 text-red-500 border border-red-500/40 hover:bg-red-500/25 disabled:opacity-40",
 };
 
 const SIZES: Record<Size, string> = {
   sm: "h-9 px-3 text-sm rounded-lg gap-1.5",
   md: "h-11 px-4 text-sm rounded-xl gap-2",
   lg: "h-14 px-6 text-base rounded-2xl gap-2.5",
+  icon: "size-11 rounded-xl",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

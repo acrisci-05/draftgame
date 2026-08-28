@@ -7,10 +7,12 @@ import { DEFAULT_CATEGORY } from "@/lib/catalog";
 import { useClientValue, useIsClient } from "@/lib/client-store";
 import { PLAYER_EMOJIS } from "@/lib/game";
 import { useRoom } from "@/lib/realtime";
+import { useSettings } from "@/lib/settings";
 import {
   ensureProfile,
   getCategory,
   getSession,
+  readConfig,
   readProfile,
   saveProfile,
   saveSession,
@@ -26,6 +28,7 @@ import { Results } from "./Results";
 
 export function RoomClient({ code }: { code: string }) {
   const router = useRouter();
+  const { t } = useSettings();
   const isClient = useIsClient();
 
   const readSession = useCallback(() => getSession(code), [code]);
@@ -34,6 +37,11 @@ export function RoomClient({ code }: { code: string }) {
   const category = useMemo(() => {
     if (!session?.isHost) return null;
     return (session.categoryId ? getCategory(session.categoryId) : undefined) ?? DEFAULT_CATEGORY;
+  }, [session]);
+
+  const config = useMemo(() => {
+    if (!session?.isHost) return undefined;
+    return session.config ?? readConfig();
   }, [session]);
 
   const self = useMemo(
@@ -51,11 +59,12 @@ export function RoomClient({ code }: { code: string }) {
     isHost: Boolean(session?.isHost),
     self,
     category,
+    config,
   });
 
   if (!isClient) {
     return (
-      <CenteredNotice icon={<Loader2 className="size-6 animate-spin" />} text="Carico la stanza..." />
+      <CenteredNotice icon={<Loader2 className="size-6 animate-spin" />} text={t("room.loading")} />
     );
   }
 
@@ -63,7 +72,7 @@ export function RoomClient({ code }: { code: string }) {
     return <JoinRoom code={code} />;
   }
 
-  const { state, status, error, dispatch, now, isHost } = room;
+  const { state, status, errorKey, dispatch, now, isHost } = room;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-4 safe-bottom">
@@ -71,41 +80,41 @@ export function RoomClient({ code }: { code: string }) {
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="flex items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-100"
+          className="flex items-center gap-1.5 text-sm text-faint transition-colors hover:text-fg"
         >
           <ArrowLeft className="size-4" />
-          Esci
+          {t("room.exit")}
         </button>
         <Badge tone={session.mode === "online" ? "neon" : "neutral"}>
           {session.mode === "online" ? (
             <>
               <Radio className={cn("size-3", status === "live" ? "text-neon" : "text-amber-400")} />
-              {status === "live" ? "online" : status === "error" ? "offline" : "connessione..."}
+              {status === "live"
+                ? t("room.online")
+                : status === "error"
+                  ? t("room.offline")
+                  : t("room.connecting")}
             </>
           ) : (
             <>
               <Smartphone className="size-3" />
-              locale
+              {t("room.local")}
             </>
           )}
         </Badge>
       </header>
 
-      {error ? (
+      {errorKey ? (
         <p className="flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-200">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" />
-          {error}
+          {t(errorKey)}
         </p>
       ) : null}
 
       {!state ? (
         <CenteredNotice
           icon={<Loader2 className="size-6 animate-spin" />}
-          text={
-            status === "error"
-              ? "Stanza non raggiungibile."
-              : "In attesa dei dati della stanza dall'host..."
-          }
+          text={status === "error" ? t("room.unreachable") : t("room.waitingState")}
         />
       ) : state.phase === "lobby" ? (
         <Lobby state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
@@ -120,7 +129,7 @@ export function RoomClient({ code }: { code: string }) {
 
 function CenteredNotice({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-zinc-500">
+    <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-faint">
       {icon}
       <p className="text-sm">{text}</p>
     </div>
@@ -128,6 +137,7 @@ function CenteredNotice({ icon, text }: { icon: React.ReactNode; text: string })
 }
 
 function JoinRoom({ code }: { code: string }) {
+  const { t } = useSettings();
   const stored = useClientValue<Profile | null>(readProfile, null);
   const [nameDraft, setNameDraft] = useState<string | null>(null);
   const [emojiDraft, setEmojiDraft] = useState<string | null>(null);
@@ -151,17 +161,17 @@ function JoinRoom({ code }: { code: string }) {
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-5 px-4 py-10">
       <div className="text-center">
-        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Entra nella stanza</p>
+        <p className="text-xs uppercase tracking-[0.24em] text-faint">{t("room.join")}</p>
         <p className="mt-2 font-mono text-4xl font-black tracking-[0.35em] text-neon text-glow">
           {code}
         </p>
       </div>
 
       <Input
-        label="Il tuo nome"
+        label={t("room.yourName")}
         value={name}
         maxLength={16}
-        placeholder="Nome giocatore"
+        placeholder={t("home.namePlaceholder")}
         onChange={(event) => setNameDraft(event.target.value)}
         onKeyDown={(event) => {
           if (event.key === "Enter") join();
@@ -169,12 +179,16 @@ function JoinRoom({ code }: { code: string }) {
       />
 
       <div>
-        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">Avatar</p>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-faint">
+          {t("home.avatar")}
+        </p>
         <div className="flex flex-wrap gap-2">
           {PLAYER_EMOJIS.map((option) => (
             <button
               key={option}
               type="button"
+              aria-label={option}
+              aria-pressed={option === emoji}
               onClick={() => setEmojiDraft(option)}
               className={cn(
                 "size-11 rounded-xl border text-xl transition-colors",
@@ -188,7 +202,7 @@ function JoinRoom({ code }: { code: string }) {
       </div>
 
       <Button size="lg" onClick={join}>
-        Entra nella stanza
+        {t("room.join")}
       </Button>
     </div>
   );

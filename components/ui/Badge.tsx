@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-type Tone = "neutral" | "neon" | "violet" | "danger";
+type Tone = "neutral" | "neon" | "violet" | "gold" | "danger";
 
 const TONES: Record<Tone, string> = {
-  neutral: "border-line bg-surface-2 text-zinc-300",
+  neutral: "border-line bg-surface-2 text-muted",
   neon: "border-neon/40 bg-neon/10 text-neon",
-  violet: "border-violet/40 bg-violet/10 text-violet-soft",
-  danger: "border-red-500/40 bg-red-500/10 text-red-300",
+  violet: "border-violet/40 bg-violet/10 text-violet",
+  gold: "border-gold/50 bg-gold/10 text-gold",
+  danger: "border-red-500/40 bg-red-500/10 text-red-500",
 };
 
 export function Badge({

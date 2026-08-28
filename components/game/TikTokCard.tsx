@@ -2,11 +2,16 @@
 
 import { toPng } from "html-to-image";
 import { Download, Loader2, Share2 } from "lucide-react";
+import QRCode from "qrcode";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
-import { START_BUDGET, rosterValue } from "@/lib/game";
+import { APP_NAME, SITE_DOMAIN } from "@/lib/config";
+import { coverPalette } from "@/lib/covers";
+import { rosterValue } from "@/lib/game";
+import { useSettings } from "@/lib/settings";
 import type { GameState } from "@/lib/types";
-import { TIER_STYLES } from "@/lib/utils";
+import { TIER_STYLES, hashString, initials, money } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
 export const CARD_WIDTH = 1080;
@@ -14,14 +19,19 @@ export const CARD_HEIGHT = 1920;
 
 const NEON = "#22c55e";
 const VIOLET = "#a855f7";
+const GOLD = "#fbbf24";
 const INK = "#09090b";
+const CARD_BG = "#101014";
 
-export function TikTokCard({ state }: { state: GameState }) {
+export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: string | null }) {
+  const { locale, t } = useSettings();
   const cardRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.3);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Il QR resta legato al proprio link: così non serve azzerarlo quando il link cambia. */
+  const [qr, setQr] = useState<{ url: string; data: string } | null>(null);
   const isClient = useIsClient();
   const canShare = isClient && typeof navigator !== "undefined" && Boolean(navigator.canShare);
 
@@ -35,8 +45,23 @@ export function TikTokCard({ state }: { state: GameState }) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!voteUrl) return;
+    let active = true;
+    QRCode.toDataURL(voteUrl, { width: 320, margin: 1 })
+      .then((data) => {
+        if (active) setQr({ url: voteUrl, data });
+      })
+      .catch(() => {
+        /* senza QR la card mostra solo il dominio */
+      });
+    return () => {
+      active = false;
+    };
+  }, [voteUrl]);
+
   const render = useCallback(async () => {
-    if (!cardRef.current) throw new Error("Card non pronta");
+    if (!cardRef.current) throw new Error("card-not-ready");
     return toPng(cardRef.current, {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
@@ -47,7 +72,7 @@ export function TikTokCard({ state }: { state: GameState }) {
     });
   }, []);
 
-  const fileName = `draft-${state.code}-${state.category.id}.png`;
+  const fileName = `pick-and-pay-${state.code}.png`;
 
   const download = async () => {
     setBusy(true);
@@ -59,7 +84,7 @@ export function TikTokCard({ state }: { state: GameState }) {
       link.href = dataUrl;
       link.click();
     } catch {
-      setError("Esportazione non riuscita. Riprova.");
+      setError(t("results.exportError"));
     } finally {
       setBusy(false);
     }
@@ -73,7 +98,10 @@ export function TikTokCard({ state }: { state: GameState }) {
       const blob = await (await fetch(dataUrl)).blob();
       const file = new File([blob], fileName, { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: `$20 Draft · ${state.category.name}` });
+        await navigator.share({
+          files: [file],
+          title: `${APP_NAME} · ${categoryName(state.category, locale)}`,
+        });
       } else {
         const link = document.createElement("a");
         link.download = fileName;
@@ -81,13 +109,16 @@ export function TikTokCard({ state }: { state: GameState }) {
         link.click();
       }
     } catch {
-      setError("Condivisione non riuscita. Usa il download.");
+      setError(t("results.shareError"));
     } finally {
       setBusy(false);
     }
   };
 
+  const currency = state.config.currency;
   const columns = state.players.length <= 3 ? 1 : 2;
+  const perRow = Math.min(5, state.config.slots <= 5 ? state.config.slots : Math.ceil(state.config.slots / 2));
+  const backdrop = coverPalette(state.category.id + state.code);
 
   return (
     <div className="flex flex-col gap-3">
@@ -98,89 +129,82 @@ export function TikTokCard({ state }: { state: GameState }) {
       >
         <div
           ref={cardRef}
+          /* La card esportata resta sempre in layout LTR, anche con l'interfaccia in arabo. */
+          dir="ltr"
           style={{
             width: CARD_WIDTH,
             height: CARD_HEIGHT,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
             backgroundColor: INK,
+            backgroundImage: `radial-gradient(circle at 12% -6%, ${backdrop.from}, transparent 46%), radial-gradient(circle at 92% 4%, ${VIOLET}30, transparent 42%), radial-gradient(circle at 60% 108%, ${NEON}22, transparent 46%)`,
             color: "#f4f4f5",
             display: "flex",
             flexDirection: "column",
-            padding: 64,
+            padding: 56,
             boxSizing: "border-box",
-            position: "relative",
             overflow: "hidden",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              backgroundImage: `radial-gradient(circle at 15% -5%, ${VIOLET}33, transparent 45%), radial-gradient(circle at 95% 8%, ${NEON}2b, transparent 42%)`,
-            }}
-          />
-
-          <header style={{ position: "relative", flexShrink: 0 }}>
+          <header style={{ flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span
                 style={{
-                  fontSize: 26,
+                  fontSize: 24,
                   letterSpacing: 6,
                   textTransform: "uppercase",
-                  color: "#71717a",
+                  color: "#a1a1aa",
                   fontWeight: 700,
                 }}
               >
-                Stanza {state.code}
+                Room {state.code}
               </span>
               <span
                 style={{
-                  fontSize: 24,
-                  fontWeight: 700,
+                  fontSize: 22,
+                  fontWeight: 800,
                   color: NEON,
                   border: `2px solid ${NEON}55`,
                   borderRadius: 999,
-                  padding: "10px 22px",
+                  padding: "9px 20px",
                 }}
               >
-                ${START_BUDGET} BUDGET
+                {money(state.config.budget, currency)} · {state.config.slots} PICK
               </span>
             </div>
 
             <h1
               style={{
-                marginTop: 18,
-                fontSize: 116,
-                lineHeight: 0.92,
+                marginTop: 14,
+                fontSize: 104,
+                lineHeight: 0.9,
                 fontWeight: 900,
                 letterSpacing: -4,
               }}
             >
-              <span style={{ color: NEON, textShadow: `0 0 42px ${NEON}88` }}>$20</span>{" "}
-              <span>DRAFT</span>
+              <span style={{ color: NEON, textShadow: `0 0 42px ${NEON}88` }}>PICK</span>
+              <span style={{ color: "#52525b" }}> & </span>
+              <span style={{ color: VIOLET, textShadow: `0 0 42px ${VIOLET}88` }}>PAY</span>
             </h1>
 
             <p
               style={{
-                marginTop: 18,
-                fontSize: 40,
+                marginTop: 14,
+                fontSize: 38,
                 fontWeight: 700,
-                color: "#e4e4e7",
                 display: "flex",
                 alignItems: "center",
                 gap: 14,
               }}
             >
-              <span style={{ fontSize: 46 }}>{state.category.emoji}</span>
-              {state.category.name}
+              <span style={{ fontSize: 44 }}>{state.category.emoji}</span>
+              {categoryName(state.category, locale)}
             </p>
 
             <div
               style={{
-                marginTop: 26,
+                marginTop: 22,
                 height: 4,
-                width: "100%",
                 background: `linear-gradient(90deg, ${NEON}, ${VIOLET}, transparent)`,
                 borderRadius: 999,
               }}
@@ -189,14 +213,13 @@ export function TikTokCard({ state }: { state: GameState }) {
 
           <main
             style={{
-              position: "relative",
               flex: 1,
-              marginTop: 34,
+              minHeight: 0,
+              marginTop: 26,
               display: "grid",
               gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-              gap: 22,
-              alignContent: "start",
-              overflow: "hidden",
+              gridAutoRows: "1fr",
+              gap: 20,
             }}
           >
             {state.players.map((player, index) => {
@@ -205,14 +228,15 @@ export function TikTokCard({ state }: { state: GameState }) {
                 <section
                   key={player.id}
                   style={{
-                    border: `2px solid ${accent}40`,
+                    border: `2px solid ${accent}45`,
                     borderRadius: 26,
-                    backgroundColor: "#101014",
-                    padding: 22,
+                    backgroundColor: CARD_BG,
+                    padding: 20,
                     display: "flex",
                     flexDirection: "column",
                     gap: 14,
                     minHeight: 0,
+                    overflow: "hidden",
                   }}
                 >
                   <div
@@ -221,6 +245,7 @@ export function TikTokCard({ state }: { state: GameState }) {
                       alignItems: "center",
                       justifyContent: "space-between",
                       gap: 12,
+                      flexShrink: 0,
                     }}
                   >
                     <span
@@ -228,7 +253,7 @@ export function TikTokCard({ state }: { state: GameState }) {
                         display: "flex",
                         alignItems: "center",
                         gap: 10,
-                        fontSize: 34,
+                        fontSize: 32,
                         fontWeight: 800,
                         minWidth: 0,
                         overflow: "hidden",
@@ -236,72 +261,135 @@ export function TikTokCard({ state }: { state: GameState }) {
                         textOverflow: "ellipsis",
                       }}
                     >
-                      <span style={{ fontSize: 34 }}>{player.emoji}</span>
+                      <span>{player.emoji}</span>
                       {player.name}
                     </span>
                     <span
                       style={{
                         flexShrink: 0,
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: 800,
                         color: accent,
                         border: `2px solid ${accent}55`,
                         backgroundColor: `${accent}14`,
                         borderRadius: 999,
-                        padding: "8px 16px",
+                        padding: "7px 15px",
                       }}
                     >
-                      ${player.budget} left
+                      {money(player.budget, currency)} left
                     </span>
                   </div>
 
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                  <div
+                    style={{
+                      flex: 1,
+                      minHeight: 0,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignContent: "flex-start",
+                      gap: 12,
+                    }}
+                  >
                     {player.roster.length === 0 ? (
-                      <span style={{ fontSize: 24, color: "#52525b" }}>Nessun acquisto</span>
+                      <span style={{ fontSize: 24, color: "#52525b" }}>—</span>
                     ) : (
-                      player.roster.map((entry) => (
-                        <span
-                          key={entry.itemId}
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 10,
-                            border: `2px solid ${TIER_STYLES[entry.tier].hex}44`,
-                            backgroundColor: "#17171d",
-                            borderRadius: 16,
-                            padding: "10px 16px",
-                            fontSize: 26,
-                            fontWeight: 600,
-                          }}
-                        >
-                          <span
+                      player.roster.map((entry) => {
+                        const palette = coverPalette(entry.itemId + entry.name);
+                        const tint = TIER_STYLES[entry.tier].hex;
+                        return (
+                          <div
+                            key={entry.itemId}
                             style={{
-                              width: 12,
-                              height: 12,
-                              borderRadius: 999,
-                              backgroundColor: TIER_STYLES[entry.tier].hex,
+                              width: `calc((100% - ${(perRow - 1) * 12}px) / ${perRow})`,
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 6,
                             }}
-                          />
-                          {entry.name}
-                          <span style={{ color: TIER_STYLES[entry.tier].hex, fontWeight: 800 }}>
-                            ${entry.price}
-                          </span>
-                        </span>
-                      ))
+                          >
+                            <div
+                              style={{
+                                position: "relative",
+                                width: "100%",
+                                aspectRatio: "1 / 1",
+                                borderRadius: 16,
+                                border: `2px solid ${tint}66`,
+                                backgroundImage: `linear-gradient(140deg, ${palette.from}, ${palette.to})`,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {entry.image ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={entry.image}
+                                  alt=""
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                              ) : (
+                                <span
+                                  style={{
+                                    fontSize: 34,
+                                    fontWeight: 900,
+                                    color: "#ffffffdd",
+                                  }}
+                                >
+                                  {entry.emoji ?? initials(entry.name)}
+                                </span>
+                              )}
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  top: 6,
+                                  right: 6,
+                                  backgroundColor: GOLD,
+                                  color: "#3f2d00",
+                                  fontSize: 20,
+                                  fontWeight: 900,
+                                  borderRadius: 999,
+                                  padding: "3px 10px",
+                                  boxShadow: "0 2px 10px rgba(0,0,0,0.45)",
+                                }}
+                              >
+                                {money(entry.price, currency)}
+                              </span>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: 19,
+                                fontWeight: 600,
+                                lineHeight: 1.15,
+                                color: "#e4e4e7",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                              }}
+                            >
+                              {entry.name}
+                            </span>
+                          </div>
+                        );
+                      })
                     )}
                   </div>
 
                   <div
                     style={{
-                      marginTop: "auto",
-                      fontSize: 22,
+                      flexShrink: 0,
+                      fontSize: 20,
                       color: "#71717a",
                       display: "flex",
                       justifyContent: "space-between",
+                      borderTop: "1px solid #26262e",
+                      paddingTop: 10,
                     }}
                   >
-                    <span>{player.roster.length} elementi</span>
-                    <span>${rosterValue(player)} spesi</span>
+                    <span>
+                      {player.roster.length}/{state.config.slots}
+                    </span>
+                    <span>{money(rosterValue(player), currency)} spent</span>
                   </div>
                 </section>
               );
@@ -310,43 +398,64 @@ export function TikTokCard({ state }: { state: GameState }) {
 
           <footer
             style={{
-              position: "relative",
               flexShrink: 0,
-              marginTop: 26,
+              marginTop: 22,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 16,
+              gap: 18,
             }}
           >
-            <span style={{ fontSize: 32, fontWeight: 800, color: VIOLET }}>
-              Chi ha fatto il draft migliore?
-            </span>
-            <span
-              style={{
-                fontSize: 24,
-                fontWeight: 700,
-                letterSpacing: 3,
-                textTransform: "uppercase",
-                color: "#52525b",
-              }}
-            >
-              draft game
-            </span>
+            <div style={{ minWidth: 0 }}>
+              <p style={{ fontSize: 30, fontWeight: 900, color: GOLD }}>
+                {state.players.length > 1 ? t("card.question") : t("card.solo")}
+              </p>
+              <p style={{ marginTop: 6, fontSize: 24, fontWeight: 700, color: "#a1a1aa" }}>
+                {APP_NAME} • {t("card.footer", { domain: SITE_DOMAIN })}
+              </p>
+            </div>
+            {qr && qr.url === voteUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={qr.data}
+                alt=""
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 14,
+                  backgroundColor: "#fff",
+                  padding: 6,
+                  flexShrink: 0,
+                }}
+              />
+            ) : (
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  letterSpacing: 3,
+                  textTransform: "uppercase",
+                  color: "#3f3f46",
+                  flexShrink: 0,
+                }}
+              >
+                {hashString(state.code) % 2 === 0 ? "draft night" : "game night"}
+              </span>
+            )}
           </footer>
         </div>
       </div>
 
-      {error ? <p className="text-center text-sm text-red-400">{error}</p> : null}
+      {error ? <p className="text-center text-sm text-red-500">{error}</p> : null}
 
       <div className="grid grid-cols-2 gap-2">
         <Button onClick={download} disabled={busy}>
           {busy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
-          Scarica immagine
+          {t("results.download")}
         </Button>
         <Button variant="violet" onClick={share} disabled={busy || !canShare}>
           <Share2 className="size-4" />
-          Condividi
+          {t("common.share")}
         </Button>
       </div>
     </div>

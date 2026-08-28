@@ -1,54 +1,48 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, LayoutGrid, LogIn, Smartphone, Wifi } from "lucide-react";
+import { Gavel, Heart, LayoutGrid, LogIn, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClientValue } from "@/lib/client-store";
-import { MAX_PLAYERS, MIN_PLAYERS, PLAYER_EMOJIS, START_BUDGET } from "@/lib/game";
+import { APP_TAGLINE } from "@/lib/config";
+import { PLAYER_EMOJIS } from "@/lib/game";
+import { useSettings } from "@/lib/settings";
 import { ensureProfile, readProfile, saveProfile, saveSession } from "@/lib/storage";
-import { isSupabaseConfigured } from "@/lib/supabase";
-import type { Profile, RoomMode } from "@/lib/types";
-import { cn, roomCode } from "@/lib/utils";
+import type { Profile } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Panel, PanelTitle } from "@/components/ui/Panel";
+import { JoinModal } from "@/components/ui/JoinModal";
+import { LogoMark, LogoWordmark } from "@/components/ui/Logo";
+import { SupportModal } from "@/components/ui/SupportModal";
+
+const HOW_KEYS = ["home.how1", "home.how2", "home.how3", "home.how4"] as const;
 
 export default function HomePage() {
   const router = useRouter();
+  const { t } = useSettings();
   const stored = useClientValue<Profile | null>(readProfile, null);
   const [nameDraft, setNameDraft] = useState<string | null>(null);
   const [emojiDraft, setEmojiDraft] = useState<string | null>(null);
-  const [joinCode, setJoinCode] = useState("");
+  const [joinOpen, setJoinOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
 
   const name = nameDraft ?? stored?.name ?? "";
   const emoji = emojiDraft ?? stored?.emoji ?? PLAYER_EMOJIS[0];
-  const setName = setNameDraft;
-  const setEmoji = setEmojiDraft;
 
-  const persistProfile = () => {
+  const persistProfile = (): Profile => {
     const profile = { ...ensureProfile(), name: name.trim() || "Player", emoji };
     saveProfile(profile);
     return profile;
   };
 
-  const createRoom = (mode: RoomMode) => {
-    const profile = persistProfile();
-    const code = roomCode();
-    saveSession({
-      code,
-      mode,
-      playerId: profile.id,
-      isHost: true,
-      name: profile.name,
-      emoji: profile.emoji,
-    });
-    router.push(`/room/${code}`);
+  const goToCreate = () => {
+    persistProfile();
+    router.push("/create");
   };
 
-  const joinRoom = () => {
-    const code = joinCode.trim().toUpperCase();
-    if (code.length < 4) return;
+  const joinRoom = (code: string) => {
     const profile = persistProfile();
     saveSession({
       code,
@@ -62,122 +56,118 @@ export default function HomePage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-5 px-4 py-8 safe-bottom">
-      <motion.header
-        initial={{ opacity: 0, y: -12 }}
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6 safe-bottom">
+      <motion.section
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-3xl border border-line bg-surface grid-noise p-6 text-center"
+        className="overflow-hidden rounded-3xl border border-line bg-surface grid-noise"
       >
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-violet-soft">
-          <Gavel className="size-3" /> asta live
-        </span>
-        <h1 className="mt-4 text-5xl font-black leading-none tracking-tight sm:text-6xl">
-          <span className="text-neon text-glow">$20</span> DRAFT
-        </h1>
-        <p className="mx-auto mt-3 max-w-sm text-sm text-zinc-400">
-          Da {MIN_PLAYERS} a {MAX_PLAYERS} giocatori, ${START_BUDGET} a testa. Gli elementi escono a
-          caso, si rilancia a tempo e alla fine esce la card verticale da postare.
-        </p>
-      </motion.header>
-
-      <Panel>
-        <PanelTitle>Il tuo profilo</PanelTitle>
-        <Input
-          value={name}
-          maxLength={16}
-          placeholder="Nome giocatore"
-          onChange={(event) => setName(event.target.value)}
-        />
-        <div className="mt-3 flex flex-wrap gap-2">
-          {PLAYER_EMOJIS.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setEmoji(option)}
-              className={cn(
-                "size-11 rounded-xl border text-xl transition-colors",
-                option === emoji ? "border-neon bg-neon/10" : "border-line bg-surface-2",
-              )}
-            >
-              {option}
-            </button>
-          ))}
+        <div className="flex flex-col items-center gap-4 px-5 pt-8 text-center">
+          <LogoMark size={104} />
+          <div>
+            <h1 className="text-5xl font-black leading-none tracking-tight sm:text-6xl">
+              <LogoWordmark />
+            </h1>
+            <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.32em] text-violet">
+              {APP_TAGLINE}
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-violet">
+            <Gavel className="size-3" /> {t("home.badge")}
+          </span>
+          <p className="max-w-md text-sm text-muted">{t("home.subtitle")}</p>
         </div>
-      </Panel>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Button size="lg" onClick={() => createRoom("local")}>
-          <Smartphone className="size-5" />
-          Partita locale
-        </Button>
-        <Button
-          size="lg"
-          variant="violet"
-          disabled={!isSupabaseConfigured}
-          onClick={() => createRoom("online")}
+        <div className="mt-6 border-t border-line p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <Input
+                label={t("home.profile")}
+                value={name}
+                maxLength={16}
+                placeholder={t("home.namePlaceholder")}
+                onChange={(event) => setNameDraft(event.target.value)}
+              />
+            </div>
+            <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-0.5">
+              {PLAYER_EMOJIS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-label={option}
+                  aria-pressed={option === emoji}
+                  onClick={() => setEmojiDraft(option)}
+                  className={cn(
+                    "size-11 shrink-0 rounded-full border text-xl transition-all",
+                    option === emoji
+                      ? "border-neon bg-neon/15 glow-neon"
+                      : "border-line bg-surface-2 opacity-70 hover:opacity-100",
+                  )}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <Button size="lg" className="w-full rounded-xl" onClick={goToCreate}>
+              <Plus className="size-5" />
+              {t("home.create")}
+            </Button>
+            <Button
+              size="lg"
+              variant="violet"
+              className="w-full rounded-xl"
+              onClick={() => setJoinOpen(true)}
+            >
+              <LogIn className="size-5" />
+              {t("home.joinCta")}
+            </Button>
+          </div>
+
+          <p className="mt-2.5 text-center text-xs text-faint">{t("home.createHint")}</p>
+        </div>
+      </motion.section>
+
+      <section className="flex flex-col gap-3 text-sm text-muted">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-faint">
+            {t("home.howTitle")}
+          </h2>
+          <span className="h-px flex-1 bg-line" />
+        </div>
+        <ol className="grid gap-2 sm:grid-cols-2">
+          {HOW_KEYS.map((key, index) => (
+            <li key={key} className="flex gap-2">
+              <span className="font-mono text-xs font-bold text-neon">{index + 1}</span>
+              <span className="text-xs leading-relaxed">{t(key)}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4 text-xs text-faint">
+        <button
+          type="button"
+          onClick={() => router.push("/categories")}
+          className="flex items-center gap-1.5 transition-colors hover:text-fg"
         >
-          <Wifi className="size-5" />
-          Crea stanza online
-        </Button>
+          <LayoutGrid className="size-3.5" />
+          {t("home.categories")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setSupportOpen(true)}
+          className="flex items-center gap-1.5 transition-colors hover:text-violet"
+        >
+          <Heart className="size-3.5" />
+          {t("support.title")}
+        </button>
       </div>
 
-      {!isSupabaseConfigured ? (
-        <p className="-mt-2 text-center text-xs text-zinc-500">
-          Le stanze online si attivano aggiungendo le chiavi Supabase in <code>.env.local</code>.
-        </p>
-      ) : null}
-
-      <Panel>
-        <PanelTitle icon={<LogIn className="size-3.5" />}>Entra con un codice</PanelTitle>
-        <div className="flex gap-2">
-          <Input
-            value={joinCode}
-            maxLength={6}
-            placeholder="ABCD"
-            autoCapitalize="characters"
-            onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") joinRoom();
-            }}
-            className="font-mono text-2xl tracking-[0.3em] uppercase"
-          />
-          <Button
-            variant="outline"
-            className="h-12 shrink-0 px-5"
-            disabled={joinCode.trim().length < 4}
-            onClick={joinRoom}
-          >
-            Entra
-          </Button>
-        </div>
-      </Panel>
-
-      <Button variant="outline" onClick={() => router.push("/categories")}>
-        <LayoutGrid className="size-4" />
-        Categorie e tier list
-      </Button>
-
-      <Panel className="text-sm text-zinc-400">
-        <PanelTitle>Come funziona</PanelTitle>
-        <ol className="flex flex-col gap-2">
-          <li>
-            <span className="font-bold text-zinc-200">1.</span> Scegli la categoria: 25 elementi
-            divisi in fasce da $5 a $1.
-          </li>
-          <li>
-            <span className="font-bold text-zinc-200">2.</span> Ogni elemento parte da $1: rilanci
-            +$1, +$2, +$5 finché il budget regge.
-          </li>
-          <li>
-            <span className="font-bold text-zinc-200">3.</span> Timer a zero o tutti gli altri hanno
-            passato: il lotto è aggiudicato.
-          </li>
-          <li>
-            <span className="font-bold text-zinc-200">4.</span> A fine partita scarichi la card 9:16
-            con i roster e i budget residui.
-          </li>
-        </ol>
-      </Panel>
+      <JoinModal open={joinOpen} onClose={() => setJoinOpen(false)} onJoin={joinRoom} />
+      <SupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />
     </main>
   );
 }

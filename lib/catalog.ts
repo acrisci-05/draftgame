@@ -1,19 +1,26 @@
-import type { CatalogItem, Category, Tier } from "./types";
+import rawCategories from "@/data/categories.json";
+import type { CatalogItem, Category, Locale, Tier } from "./types";
 import { slugify, TIER_ORDER } from "./utils";
 
-export const ITEMS_PER_TIER = 5;
+/** Le liste ufficiali hanno 30 elementi: 6 per ciascuna delle 5 fasce. */
+export const ITEMS_PER_TIER = 6;
 export const ITEMS_PER_CATEGORY = ITEMS_PER_TIER * TIER_ORDER.length;
 
-export type TierDraft = Record<Tier, string[]>;
+/** Riga dell'editor: nome corto, emoji di copertina e immagine facoltativa. */
+export interface DraftItem {
+  name: string;
+  emoji: string;
+  image: string;
+}
+
+export type TierDraft = Record<Tier, DraftItem[]>;
+
+function emptyRows(): DraftItem[] {
+  return Array.from({ length: ITEMS_PER_TIER }, () => ({ name: "", emoji: "", image: "" }));
+}
 
 export function emptyTierDraft(): TierDraft {
-  return {
-    5: Array(ITEMS_PER_TIER).fill(""),
-    4: Array(ITEMS_PER_TIER).fill(""),
-    3: Array(ITEMS_PER_TIER).fill(""),
-    2: Array(ITEMS_PER_TIER).fill(""),
-    1: Array(ITEMS_PER_TIER).fill(""),
-  };
+  return { 5: emptyRows(), 4: emptyRows(), 3: emptyRows(), 2: emptyRows(), 1: emptyRows() };
 }
 
 /** Trasforma le liste per fascia in elementi di catalogo con id stabili. */
@@ -22,17 +29,28 @@ export function buildItems(categoryId: string, tiers: TierDraft): CatalogItem[] 
   const seen = new Set<string>();
   TIER_ORDER.forEach((tier) => {
     tiers[tier]
-      .map((name) => name.trim())
-      .filter(Boolean)
-      .forEach((name) => {
-        let id = `${categoryId}-${slugify(name) || "item"}`;
+      .map((row) => ({
+        name: row.name.trim(),
+        emoji: row.emoji.trim(),
+        image: row.image.trim(),
+      }))
+      .filter((row) => row.name.length > 0)
+      .forEach(({ name, emoji, image }) => {
+        const base = `${categoryId}-${slugify(name) || "item"}`;
+        let id = base;
         let suffix = 2;
         while (seen.has(id)) {
-          id = `${categoryId}-${slugify(name) || "item"}-${suffix}`;
+          id = `${base}-${suffix}`;
           suffix += 1;
         }
         seen.add(id);
-        items.push({ id, name, tier });
+        items.push({
+          id,
+          name,
+          tier,
+          emoji: emoji || undefined,
+          image: image || undefined,
+        });
       });
   });
   return items;
@@ -41,10 +59,12 @@ export function buildItems(categoryId: string, tiers: TierDraft): CatalogItem[] 
 export function itemsToTierDraft(items: CatalogItem[]): TierDraft {
   const draft = emptyTierDraft();
   TIER_ORDER.forEach((tier) => {
-    const names = items.filter((i) => i.tier === tier).map((i) => i.name);
+    const rows = items
+      .filter((i) => i.tier === tier)
+      .map((i) => ({ name: i.name, emoji: i.emoji ?? "", image: i.image ?? "" }));
     draft[tier] = Array.from(
-      { length: Math.max(ITEMS_PER_TIER, names.length) },
-      (_, index) => names[index] ?? "",
+      { length: Math.max(ITEMS_PER_TIER, rows.length) },
+      (_, index) => rows[index] ?? { name: "", emoji: "", image: "" },
     );
   });
   return draft;
@@ -54,71 +74,100 @@ export function countByTier(items: CatalogItem[], tier: Tier): number {
   return items.filter((i) => i.tier === tier).length;
 }
 
-/** Una categoria è giocabile solo con 5 elementi per ciascuna delle 5 fasce. */
-export function validateCategory(name: string, emoji: string, items: CatalogItem[]): string[] {
-  const errors: string[] = [];
-  if (!name.trim()) errors.push("Il nome della categoria è obbligatorio.");
-  if (!emoji.trim()) errors.push("Scegli un'icona o un'emoji.");
+export interface CategoryIssue {
+  key: "name" | "emoji" | "tier";
+  tier?: Tier;
+  count?: number;
+}
+
+/** Una categoria è giocabile solo con 6 elementi per ciascuna delle 5 fasce. */
+export function validateCategory(
+  name: string,
+  emoji: string,
+  items: CatalogItem[],
+): CategoryIssue[] {
+  const issues: CategoryIssue[] = [];
+  if (!name.trim()) issues.push({ key: "name" });
+  if (!emoji.trim()) issues.push({ key: "emoji" });
   TIER_ORDER.forEach((tier) => {
     const count = countByTier(items, tier);
-    if (count !== ITEMS_PER_TIER) {
-      errors.push(`Tier $${tier}: servono ${ITEMS_PER_TIER} elementi (ora ${count}).`);
-    }
+    if (count !== ITEMS_PER_TIER) issues.push({ key: "tier", tier, count });
   });
-  return errors;
+  return issues;
 }
 
-function builtin(id: string, name: string, emoji: string, tiers: TierDraft): Category {
-  return { id, name, emoji, items: buildItems(id, tiers), source: "builtin" };
+/** Le liste ufficiali hanno il nome italiano e quello inglese: l'inglese copre le altre lingue. */
+export function categoryName(
+  category: { name: string; nameEn?: string },
+  locale: Locale,
+): string {
+  return locale !== "it" && category.nameEn ? category.nameEn : category.name;
 }
 
-export const BUILTIN_CATEGORIES: Category[] = [
-  builtin("calcio", "Leggende del Calcio", "⚽", {
-    5: ["Messi", "Cristiano Ronaldo", "Maradona", "Pelé", "Ronaldo il Fenomeno"],
-    4: ["Zidane", "Ronaldinho", "Cruyff", "Del Piero", "Roberto Baggio"],
-    3: ["Totti", "Kaká", "Buffon", "Beckham", "Thierry Henry"],
-    2: ["Pirlo", "Nedved", "Sneijder", "Eto'o", "Drogba"],
-    1: ["Luca Toni", "Gattuso", "Materazzi", "Zambrotta", "Pazzini"],
-  }),
-  builtin("film", "Film Cult", "🎬", {
-    5: ["Il Padrino", "Pulp Fiction", "Il Signore degli Anelli", "Matrix", "Interstellar"],
-    4: ["Fight Club", "Inception", "Il Cavaliere Oscuro", "Forrest Gump", "Titanic"],
-    3: ["Jurassic Park", "Ritorno al Futuro", "Il Gladiatore", "Shining", "Alien"],
-    2: ["Rocky", "Mad Max: Fury Road", "Il Grande Lebowski", "Scarface", "Blade Runner"],
-    1: ["Sharknado", "Space Jam", "Twilight", "Piranha 3D", "The Room"],
-  }),
-  builtin("supereroi", "Supereroi", "🦸", {
-    5: ["Superman", "Batman", "Spider-Man", "Hulk", "Thor"],
-    4: ["Iron Man", "Wolverine", "Capitan America", "Doctor Strange", "Flash"],
-    3: ["Black Panther", "Wonder Woman", "Deadpool", "Venom", "Scarlet Witch"],
-    2: ["Ant-Man", "Aquaman", "Occhio di Falco", "Vedova Nera", "Silver Surfer"],
-    1: ["Robin", "Howard il Papero", "Squirrel Girl", "Matter-Eater Lad", "Arm-Fall-Off-Boy"],
-  }),
-  builtin("cibo", "Cibo Italiano", "🍕", {
-    5: ["Pizza Margherita", "Carbonara", "Lasagna", "Tiramisù", "Parmigiana"],
-    4: ["Amatriciana", "Risotto allo Zafferano", "Cacio e Pepe", "Ragù alla Bolognese", "Arancino"],
-    3: ["Pesto alla Genovese", "Focaccia", "Gnocchi", "Cannolo", "Porchetta"],
-    2: ["Bruschetta", "Piadina", "Supplì", "Caponata", "Panzanella"],
-    1: ["Insalata di riso", "Wurstel e patatine", "Sofficini", "Panino da autogrill", "Ananas sulla pizza"],
-  }),
-  builtin("videogiochi", "Videogiochi", "🎮", {
-    5: ["Minecraft", "GTA V", "Zelda: Breath of the Wild", "Super Mario Bros", "Fortnite"],
-    4: ["The Witcher 3", "Elden Ring", "Call of Duty", "Red Dead Redemption 2", "God of War"],
-    3: ["Skyrim", "Among Us", "Rocket League", "Dark Souls", "Pokémon Rosso"],
-    2: ["Tetris", "Crash Bandicoot", "Pac-Man", "Angry Birds", "Subway Surfers"],
-    1: ["Flappy Bird", "Snake", "Solitario", "Campo Minato", "Pong"],
-  }),
-  builtin("rap", "Rap Italiano", "🎤", {
-    5: ["Marracash", "Sfera Ebbasta", "Fabri Fibra", "Salmo", "Lazza"],
-    4: ["Ghali", "Guè", "Tedua", "Capo Plaza", "Geolier"],
-    3: ["Ernia", "Rkomi", "Shiva", "Paky", "Nayt"],
-    2: ["Jake La Furia", "Emis Killa", "Clementino", "Rocco Hunt", "Gemitaiz"],
-    1: ["Bello Figo", "Il Pagante", "DJ Matrix", "Fred De Palma", "Gionnyscandal"],
-  }),
-];
+/* ------------------------------------------------------------------ */
+/* Liste ufficiali                                                     */
+/* ------------------------------------------------------------------ */
 
-export function findBuiltin(id: string): Category | undefined {
-  return BUILTIN_CATEGORIES.find((c) => c.id === id);
+/**
+ * Forma dei dati in `data/categories.json`: ogni fascia contiene sei coppie
+ * [nome, emoji] e, se serve, un terzo valore con l'URL dell'immagine.
+ * È il file da modificare per aggiungere o correggere le liste ufficiali.
+ */
+export interface RawCategory {
+  id: string;
+  name: string;
+  nameEn?: string;
+  emoji: string;
+  tiers: Record<string, [string, string?, string?][]>;
 }
 
-export const DEFAULT_CATEGORY = BUILTIN_CATEGORIES[0];
+export function fromRawCategory(raw: RawCategory): Category {
+  const draft = emptyTierDraft();
+  TIER_ORDER.forEach((tier) => {
+    const rows = raw.tiers[String(tier)] ?? [];
+    draft[tier] = rows.map(([name, emoji, image]) => ({
+      name,
+      emoji: emoji ?? "",
+      image: image ?? "",
+    }));
+  });
+  return {
+    id: raw.id,
+    name: raw.name,
+    nameEn: raw.nameEn,
+    emoji: raw.emoji,
+    items: buildItems(raw.id, draft),
+    source: "official",
+  };
+}
+
+/** Converte una categoria nel formato del file dati, pronta da incollare. */
+export function toRawCategory(category: Category): RawCategory {
+  const tiers: RawCategory["tiers"] = {};
+  TIER_ORDER.forEach((tier) => {
+    tiers[String(tier)] = category.items
+      .filter((item) => item.tier === tier)
+      .map((item) =>
+        item.image
+          ? ([item.name, item.emoji ?? "", item.image] as [string, string, string])
+          : ([item.name, item.emoji ?? ""] as [string, string]),
+      );
+  });
+  return {
+    id: category.id,
+    name: category.name,
+    nameEn: category.nameEn,
+    emoji: category.emoji,
+    tiers,
+  };
+}
+
+export const OFFICIAL_CATEGORIES: Category[] = (
+  rawCategories as unknown as RawCategory[]
+).map(fromRawCategory);
+
+export function findOfficial(id: string): Category | undefined {
+  return OFFICIAL_CATEGORIES.find((c) => c.id === id);
+}
+
+export const DEFAULT_CATEGORY = OFFICIAL_CATEGORIES[0];

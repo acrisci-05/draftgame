@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Script Node di supporto, non fanno parte del bundle dell'app.
+    "scripts/**",
+    ".tmp-check/**",
   ]),
 ]);
 

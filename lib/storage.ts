@@ -1,14 +1,17 @@
 "use client";
 
-import { BUILTIN_CATEGORIES, findBuiltin } from "./catalog";
+import { OFFICIAL_CATEGORIES, findOfficial } from "./catalog";
 import { notifyClientStore } from "./client-store";
-import type { Category, Profile, RoomSession } from "./types";
-import { PLAYER_EMOJIS } from "./game";
+import type { Category, Profile, RoomConfig, RoomSession } from "./types";
+import { DEFAULT_CONFIG, PLAYER_EMOJIS } from "./game";
 import { uid } from "./utils";
 
-const CATEGORIES_KEY = "dg:categories";
-const PROFILE_KEY = "dg:profile";
-const SESSION_PREFIX = "dg:session:";
+const CATEGORIES_KEY = "pp:categories";
+const PROFILE_KEY = "pp:profile";
+const CONFIG_KEY = "pp:config";
+const OVERRIDES_KEY = "pp:overrides";
+const SESSION_PREFIX = "pp:session:";
+const VOTE_PREFIX = "pp:vote:";
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -57,6 +60,18 @@ export function saveProfile(profile: Profile) {
 }
 
 /* ---------------------------------------------------------------- */
+/* Ultime regole usate                                               */
+/* ---------------------------------------------------------------- */
+
+export function readConfig(): RoomConfig {
+  return { ...DEFAULT_CONFIG, ...read<Partial<RoomConfig>>(CONFIG_KEY, {}) };
+}
+
+export function saveConfig(config: RoomConfig) {
+  write(CONFIG_KEY, config);
+}
+
+/* ---------------------------------------------------------------- */
 /* Categorie personalizzate                                          */
 /* ---------------------------------------------------------------- */
 
@@ -67,7 +82,8 @@ export function listCustomCategories(): Category[] {
 export function saveCustomCategory(category: Category): Category[] {
   const all = listCustomCategories();
   const index = all.findIndex((c) => c.id === category.id);
-  const next = index >= 0 ? all.map((c) => (c.id === category.id ? category : c)) : [...all, category];
+  const next =
+    index >= 0 ? all.map((c) => (c.id === category.id ? category : c)) : [...all, category];
   write(CATEGORIES_KEY, next);
   return next;
 }
@@ -78,12 +94,42 @@ export function deleteCustomCategory(id: string): Category[] {
   return next;
 }
 
+/* ---------------------------------------------------------------- */
+/* Modifiche locali alle liste ufficiali (Studio)                    */
+/* ---------------------------------------------------------------- */
+
+export function readOverrides(): Record<string, Category> {
+  return read<Record<string, Category>>(OVERRIDES_KEY, {});
+}
+
+export function saveOverride(category: Category) {
+  write(OVERRIDES_KEY, { ...readOverrides(), [category.id]: category });
+}
+
+export function removeOverride(id: string) {
+  const next = { ...readOverrides() };
+  delete next[id];
+  write(OVERRIDES_KEY, next);
+}
+
+export function isOverridden(id: string): boolean {
+  return id in readOverrides();
+}
+
+/** Lista ufficiale con applicate le modifiche fatte nello Studio. */
+export function officialCategories(): Category[] {
+  const overrides = readOverrides();
+  return OFFICIAL_CATEGORIES.map((category) => overrides[category.id] ?? category);
+}
+
 export function allCategories(): Category[] {
-  return [...BUILTIN_CATEGORIES, ...listCustomCategories()];
+  return [...officialCategories(), ...listCustomCategories()];
 }
 
 export function getCategory(id: string): Category | undefined {
-  return findBuiltin(id) ?? listCustomCategories().find((c) => c.id === id);
+  const override = readOverrides()[id];
+  if (override) return override;
+  return findOfficial(id) ?? listCustomCategories().find((c) => c.id === id);
 }
 
 /* ---------------------------------------------------------------- */
@@ -102,4 +148,16 @@ export function clearSession(code: string) {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(SESSION_PREFIX + code);
   notifyClientStore();
+}
+
+/* ---------------------------------------------------------------- */
+/* Voto già espresso                                                 */
+/* ---------------------------------------------------------------- */
+
+export function readVote(resultId: string): string | null {
+  return read<string | null>(VOTE_PREFIX + resultId, null);
+}
+
+export function saveVote(resultId: string, playerId: string) {
+  write(VOTE_PREFIX + resultId, playerId);
 }

@@ -26,7 +26,7 @@ export function PanelTitle({
 }) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
-      <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-zinc-500">
+      <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-faint">
         {icon}
         {children}
       </h2>

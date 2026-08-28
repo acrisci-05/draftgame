@@ -1,0 +1,288 @@
+[
+  {
+    "id": "burger",
+    "name": "Burger",
+    "nameEn": "Burger",
+    "emoji": "🍔",
+    "tiers": {
+      "5": [["Smash Burger", "🍔"], ["Bacon", "🥓"], ["Cheddar", "🧀"], ["Pollo Fritto", "🍗"], ["Doppia Carne", "🥩"], ["Salsa BBQ", "🥫"]],
+      "4": [["Cipolla Croccante", "🧅"], ["Uovo", "🍳"], ["Provola", "🧀"], ["Guacamole", "🥑"], ["Funghi", "🍄"], ["Pane Brioche", "🍞"]],
+      "3": [["Ketchup", "🍅"], ["Maionese", "🥚"], ["Insalata", "🥬"], ["Pomodoro", "🍅"], ["Cetriolini", "🥒"], ["Patatine", "🍟"]],
+      "2": [["Cipolla Cruda", "🧅"], ["Senape", "🌭"], ["Peperoni", "🌶️"], ["Olive", "🫒"], ["Rucola", "🌿"], ["Sesamo", "🌰"]],
+      "1": [["Ananas", "🍍"], ["Sottiletta", "🧀"], ["Insalata Moscia", "🥀"], ["Pane Secco", "🍞"], ["Salsa Rosa", "🩷"], ["Stuzzicadenti", "🪥"]]
+    }
+  },
+  {
+    "id": "best-feelings",
+    "name": "Best Feelings",
+    "nameEn": "Best Feelings",
+    "emoji": "😌",
+    "tiers": {
+      "5": [["Andare a letto", "🛏️"], ["Bagno liberatorio", "🚽"], ["Snow day", "❄️"], ["Aria condizionata", "🧊"], ["Togliersi i calzini", "🧦"], ["Asciugacapelli acceso", "💨"]],
+      "4": [["Doccia calda", "🚿"], ["Venerdì sera", "🌙"], ["Cuscino freddo", "🛌"], ["Grattarsi la schiena", "🖐️"], ["Vacanza che inizia", "✈️"], ["Batteria al 100%", "🔋"]],
+      "3": [["Caffè del mattino", "☕"], ["Pisolino", "😴"], ["Musica a palla", "🎧"], ["Lenzuola pulite", "🧺"], ["Sole d'inverno", "🌤️"], ["Pizza in arrivo", "🍕"]],
+      "2": [["Wi-Fi che torna", "📶"], ["Semaforo verde", "🚦"], ["Pacco consegnato", "📦"], ["Trovare 10 euro", "💶"], ["Starnuto liberatorio", "🤧"], ["Bibita ghiacciata", "🥤"]],
+      "1": [["Sveglia che suona", "⏰"], ["Calzini bagnati", "🧦"], ["Batteria all'1%", "🪫"], ["Lunedì mattina", "📅"], ["Coda alle poste", "🧾"], ["Zanzara di notte", "🦟"]]
+    }
+  },
+  {
+    "id": "pixar",
+    "name": "Film Pixar",
+    "nameEn": "Pixar Movies",
+    "emoji": "🎈",
+    "tiers": {
+      "5": [["Toy Story", "🤠"], ["Up", "🎈"], ["Inside Out", "🧠"], ["Wall-E", "🤖"], ["Gli Incredibili", "🦸"], ["Monsters & Co", "👾"]],
+      "4": [["Nemo", "🐠"], ["Coco", "💀"], ["Ratatouille", "🐀"], ["Cars", "🏎️"], ["Soul", "🎹"], ["Vita da insetto", "🐜"]],
+      "3": [["Brave", "🏹"], ["Onward", "🧙"], ["Luca", "🐙"], ["Red", "🐼"], ["Arlo", "🦕"], ["Dory", "🐟"]],
+      "2": [["Cars 2", "🏁"], ["Monsters University", "🎓"], ["Toy Story 4", "🪀"], ["Incredibili 2", "💥"], ["Elemental", "🔥"], ["Lightyear", "🚀"]],
+      "1": [["Cars 3", "🚗"], ["Presto", "🎩"], ["Lifted", "🛸"], ["Knick Knack", "⛄"], ["La Luna", "🌙"], ["Piper", "🐦"]]
+    }
+  },
+  {
+    "id": "social",
+    "name": "Social Media",
+    "nameEn": "Social Media",
+    "emoji": "📱",
+    "tiers": {
+      "5": [["TikTok", "🎵"], ["Instagram", "📸"], ["YouTube", "▶️"], ["WhatsApp", "💬"], ["Facebook", "👍"], ["X", "🐦"]],
+      "4": [["Snapchat", "👻"], ["Reddit", "👽"], ["Telegram", "✈️"], ["Discord", "🎮"], ["Twitch", "🟣"], ["Pinterest", "📌"]],
+      "3": [["LinkedIn", "💼"], ["Threads", "🧵"], ["BeReal", "📷"], ["Tumblr", "📓"], ["Quora", "❓"], ["Spotify", "🎧"]],
+      "2": [["Skype", "📞"], ["Messenger", "💬"], ["Vine", "🌿"], ["Clubhouse", "🎙️"], ["Flickr", "🖼️"], ["VK", "🇷🇺"]],
+      "1": [["MySpace", "🎸"], ["Google+", "➕"], ["Badoo", "💘"], ["Ask.fm", "❔"], ["Habbo", "🏨"], ["Netlog", "🔗"]]
+    }
+  },
+  {
+    "id": "marvel",
+    "name": "Marvel",
+    "nameEn": "Marvel",
+    "emoji": "🦸",
+    "tiers": {
+      "5": [["Spider-Man", "🕷️"], ["Iron Man", "🤖"], ["Thor", "⚡"], ["Hulk", "💚"], ["Wolverine", "🐺"], ["Doctor Strange", "🌀"]],
+      "4": [["Capitan America", "🛡️"], ["Deadpool", "🔴"], ["Black Panther", "🐆"], ["Scarlet Witch", "🔮"], ["Venom", "🖤"], ["Loki", "🐍"]],
+      "3": [["Ant-Man", "🐜"], ["Vedova Nera", "🕸️"], ["Occhio di Falco", "🏹"], ["Star-Lord", "🎧"], ["Groot", "🌳"], ["Rocket", "🦝"]],
+      "2": [["Falcon", "🦅"], ["Winter Soldier", "❄️"], ["Ghost Rider", "🔥"], ["Blade", "🗡️"], ["Daredevil", "😈"], ["Moon Knight", "🌙"]],
+      "1": [["Howard il Papero", "🦆"], ["Squirrel Girl", "🐿️"], ["Mr. Immortale", "💀"], ["Stilt-Man", "🦵"], ["Uomo Ape", "🐝"], ["Forbush Man", "🍲"]]
+    }
+  },
+  {
+    "id": "superpowers",
+    "name": "Superpoteri",
+    "nameEn": "Superpowers",
+    "emoji": "⚡",
+    "tiers": {
+      "5": [["Volare", "🕊️"], ["Invisibilità", "👻"], ["Super forza", "💪"], ["Teletrasporto", "✨"], ["Fermare il tempo", "⏳"], ["Leggere la mente", "🧠"]],
+      "4": [["Super velocità", "💨"], ["Guarigione", "🩹"], ["Viaggio nel tempo", "⏰"], ["Telecinesi", "🌀"], ["Controllo del fuoco", "🔥"], ["Immortalità", "♾️"]],
+      "3": [["Raggi X", "🩻"], ["Respirare sott'acqua", "🌊"], ["Parlare con gli animali", "🐾"], ["Cambiare forma", "🎭"], ["Super udito", "👂"], ["Scudo di energia", "🛡️"]],
+      "2": [["Super salto", "🦘"], ["Arrampicarsi sui muri", "🧗"], ["Vista notturna", "🌚"], ["Elasticità", "🧵"], ["Rimpicciolirsi", "🐜"], ["Duplicarsi", "👥"]],
+      "1": [["Parlare con le piante", "🌱"], ["Prevedere la pioggia", "🌦️"], ["Cambiare colore", "🎨"], ["Fischiare fortissimo", "📢"], ["Non sudare mai", "💧"], ["Trattenere il respiro", "🫁"]]
+    }
+  },
+  {
+    "id": "drinks",
+    "name": "Drinks",
+    "nameEn": "Drinks",
+    "emoji": "🥤",
+    "tiers": {
+      "5": [["Coca Cola", "🥤"], ["Acqua", "💧"], ["Caffè", "☕"], ["Birra", "🍺"], ["Red Bull", "🐂"], ["Succo d'arancia", "🍊"]],
+      "4": [["Fanta", "🍊"], ["Sprite", "🫧"], ["Tè freddo", "🧊"], ["Latte", "🥛"], ["Smoothie", "🥭"], ["Limonata", "🍋"]],
+      "3": [["Cioccolata calda", "🍫"], ["Gatorade", "🏅"], ["Tè caldo", "🍵"], ["Spritz", "🍹"], ["Mojito", "🌿"], ["Frullato", "🍓"]],
+      "2": [["Chinotto", "🥃"], ["Acqua frizzante", "🫧"], ["Latte di mandorla", "🌰"], ["Kombucha", "🍶"], ["Menta", "🌱"], ["Tonica", "🍸"]],
+      "1": [["Acqua del rubinetto", "🚰"], ["Cola sgasata", "😐"], ["Camomilla", "🌼"], ["Brodo", "🍲"], ["Acqua di mare", "🌊"], ["Sciroppo per la tosse", "🥄"]]
+    }
+  },
+  {
+    "id": "videogiochi",
+    "name": "Videogiochi",
+    "nameEn": "Video Games",
+    "emoji": "🎮",
+    "tiers": {
+      "5": [["Minecraft", "⛏️"], ["GTA 5", "🚗"], ["Fortnite", "🪂"], ["FIFA", "⚽"], ["Super Mario", "🍄"], ["Roblox", "🧱"]],
+      "4": [["Call of Duty", "🔫"], ["Clash Royale", "👑"], ["Brawl Stars", "💥"], ["Among Us", "🔪"], ["Elden Ring", "⚔️"], ["Zelda", "🗡️"]],
+      "3": [["Fall Guys", "🫘"], ["FNAF", "🐻"], ["Rocket League", "🚀"], ["Wii Sports", "🎾"], ["Subway Surfers", "🛹"], ["Tetris", "🧩"]],
+      "2": [["Scacchi", "♟️"], ["Pac-Man", "👾"], ["Angry Birds", "🐦"], ["Temple Run", "🏃"], ["Candy Crush", "🍬"], ["Clash of Clans", "🏰"]],
+      "1": [["Flappy Bird", "🐤"], ["Snake", "🐍"], ["Solitario", "🃏"], ["Campo Minato", "💣"], ["Pong", "🏓"], ["Doodle Jump", "🦘"]]
+    }
+  },
+  {
+    "id": "calcio",
+    "name": "Leggende del Calcio",
+    "nameEn": "Football Legends",
+    "emoji": "⚽",
+    "tiers": {
+      "5": [["Messi", "🐐"], ["Cristiano Ronaldo", "🇵🇹"], ["Maradona", "🇦🇷"], ["Pelé", "🇧🇷"], ["Ronaldo Fenomeno", "🇧🇷"], ["Zidane", "🇫🇷"]],
+      "4": [["Ronaldinho", "🪄"], ["Cruyff", "🇳🇱"], ["Del Piero", "🇮🇹"], ["Baggio", "🐎"], ["Beckenbauer", "🇩🇪"], ["Totti", "🐺"]],
+      "3": [["Kaká", "✝️"], ["Buffon", "🧤"], ["Beckham", "🎯"], ["Henry", "🇫🇷"], ["Nesta", "🛡️"], ["Pirlo", "🎩"]],
+      "2": [["Nedved", "⚡"], ["Sneijder", "🟠"], ["Eto'o", "🇨🇲"], ["Drogba", "🇨🇮"], ["Cafu", "🏃"], ["Vieri", "💣"]],
+      "1": [["Luca Toni", "🐂"], ["Gattuso", "🐗"], ["Materazzi", "😏"], ["Zambrotta", "🏃"], ["Pazzini", "🎯"], ["Abbiati", "🧤"]]
+    }
+  },
+  {
+    "id": "artisti",
+    "name": "Artisti Musicali",
+    "nameEn": "Music Artists",
+    "emoji": "🎤",
+    "tiers": {
+      "5": [["The Weeknd", "🌆"], ["Dua Lipa", "💃"], ["Drake", "🦉"], ["Rihanna", "💎"], ["Bad Bunny", "🐰"], ["Taylor Swift", "✨"]],
+      "4": [["Ariana Grande", "🎀"], ["Justin Bieber", "💜"], ["Adele", "🎹"], ["Billie Eilish", "🕷️"], ["Ed Sheeran", "🎸"], ["Beyoncé", "🐝"]],
+      "3": [["Travis Scott", "🎢"], ["SZA", "🌊"], ["Post Malone", "🍺"], ["Doja Cat", "🐱"], ["Harry Styles", "🍉"], ["Olivia Rodrigo", "💔"]],
+      "2": [["Shakira", "💃"], ["Maroon 5", "🎺"], ["Camila Cabello", "🌴"], ["Sam Smith", "🕯️"], ["Lana Del Rey", "🌹"], ["Charlie Puth", "🎼"]],
+      "1": [["Lil Pump", "💊"], ["PSY", "🕺"], ["Baby Shark", "🦈"], ["Jason Derulo", "🎤"], ["Pitbull", "🕶️"], ["Luis Fonsi", "🎺"]]
+    }
+  },
+  {
+    "id": "apps",
+    "name": "App del Telefono",
+    "nameEn": "Phone Apps",
+    "emoji": "📲",
+    "tiers": {
+      "5": [["WhatsApp", "💬"], ["Spotify", "🎧"], ["Google Maps", "🗺️"], ["YouTube", "▶️"], ["Instagram", "📸"], ["Fotocamera", "📷"]],
+      "4": [["Safari", "🧭"], ["Netflix", "🎬"], ["Gmail", "✉️"], ["Note", "📝"], ["Meteo", "☀️"], ["Sveglia", "⏰"]],
+      "3": [["Messaggi", "💌"], ["Calendario", "📅"], ["Galleria", "🖼️"], ["Calcolatrice", "🔢"], ["Amazon", "📦"], ["Chrome", "🌐"]],
+      "2": [["Torcia", "🔦"], ["Traduttore", "🌍"], ["Podcast", "🎙️"], ["Salute", "❤️"], ["Bussola", "🧭"], ["Promemoria", "📌"]],
+      "1": [["Borsa", "📈"], ["Contatti", "📇"], ["Registratore", "🎚️"], ["Casa", "🏠"], ["File", "📄"], ["Radio", "📻"]]
+    }
+  },
+  {
+    "id": "capitali",
+    "name": "Capitali Europee",
+    "nameEn": "European Capitals",
+    "emoji": "🇪🇺",
+    "tiers": {
+      "5": [["Londra", "🇬🇧"], ["Parigi", "🇫🇷"], ["Roma", "🇮🇹"], ["Madrid", "🇪🇸"], ["Berlino", "🇩🇪"], ["Amsterdam", "🇳🇱"]],
+      "4": [["Lisbona", "🇵🇹"], ["Vienna", "🇦🇹"], ["Praga", "🇨🇿"], ["Atene", "🇬🇷"], ["Dublino", "🇮🇪"], ["Copenaghen", "🇩🇰"]],
+      "3": [["Budapest", "🇭🇺"], ["Varsavia", "🇵🇱"], ["Stoccolma", "🇸🇪"], ["Bruxelles", "🇧🇪"], ["Oslo", "🇳🇴"], ["Helsinki", "🇫🇮"]],
+      "2": [["Sofia", "🇧🇬"], ["Bucarest", "🇷🇴"], ["Zagabria", "🇭🇷"], ["Bratislava", "🇸🇰"], ["Lubiana", "🇸🇮"], ["Tallinn", "🇪🇪"]],
+      "1": [["Riga", "🇱🇻"], ["Vilnius", "🇱🇹"], ["La Valletta", "🇲🇹"], ["Nicosia", "🇨🇾"], ["Chisinau", "🇲🇩"], ["Andorra la Vella", "🇦🇩"]]
+    }
+  },
+  {
+    "id": "beach",
+    "name": "Build a Beach",
+    "nameEn": "Build a Beach",
+    "emoji": "🏖️",
+    "tiers": {
+      "5": [["Acqua cristallina", "💎"], ["Tempo perfetto", "☀️"], ["Beach house", "🏠"], ["Delfini", "🐬"], ["Jet ski", "🛥️"], ["Gelato", "🍦"]],
+      "4": [["Beach volley", "🏐"], ["Ombrellone", "⛱️"], ["Sabbia bianca", "🏝️"], ["Chiringuito", "🍹"], ["Tramonto", "🌅"], ["Materassino", "🛟"]],
+      "3": [["Doccia fresca", "🚿"], ["Pedalò", "🚲"], ["Frisbee", "🥏"], ["Musica lounge", "🎶"], ["Palme", "🌴"], ["Snorkeling", "🤿"]],
+      "2": [["Sdraio", "🪑"], ["Secchiello", "🪣"], ["Radio a pile", "📻"], ["Telo grande", "🧻"], ["Racchettoni", "🎾"], ["Cocco", "🥥"]],
+      "1": [["Meduse", "🪼"], ["Sassi al posto della sabbia", "🪨"], ["Alghe", "🌿"], ["Vento forte", "💨"], ["Gabbiani ladri", "🕊️"], ["Sabbia bollente", "🔥"]]
+    }
+  },
+  {
+    "id": "breakfast",
+    "name": "Build a Breakfast",
+    "nameEn": "Build a Breakfast",
+    "emoji": "🥐",
+    "tiers": {
+      "5": [["Cappuccino", "☕"], ["Croissant", "🥐"], ["Uova", "🍳"], ["Bacon", "🥓"], ["Pancake", "🥞"], ["Nutella", "🍫"]],
+      "4": [["French toast", "🍞"], ["Waffle", "🧇"], ["Succo d'arancia", "🍊"], ["Hashbrown", "🥔"], ["Donut", "🍩"], ["Nesquik", "🥛"]],
+      "3": [["Caffè", "☕"], ["Cornflakes", "🥣"], ["Salsiccia", "🌭"], ["Yogurt", "🍦"], ["Toast", "🍞"], ["Frutta", "🍓"]],
+      "2": [["Biscotti", "🍪"], ["Latte", "🥛"], ["Marmellata", "🍯"], ["Fette biscottate", "🍘"], ["Tè", "🍵"], ["Miele", "🍯"]],
+      "1": [["Cracker", "🧂"], ["Acqua e limone", "🍋"], ["Crusca", "🌾"], ["Caffè di ieri", "🥶"], ["Barretta dietetica", "🍫"], ["Niente", "🚫"]]
+    }
+  },
+  {
+    "id": "fastfood",
+    "name": "Fast Food",
+    "nameEn": "Fast Food",
+    "emoji": "🍟",
+    "tiers": {
+      "5": [["McDonald's", "🍟"], ["Burger King", "👑"], ["KFC", "🍗"], ["Domino's", "🍕"], ["Subway", "🥪"], ["Taco Bell", "🌮"]],
+      "4": [["Five Guys", "🍔"], ["Popeyes", "🐔"], ["Wendy's", "🍔"], ["Pizza Hut", "🍕"], ["Shake Shack", "🥤"], ["Chipotle", "🌯"]],
+      "3": [["Starbucks", "☕"], ["Dunkin'", "🍩"], ["Old Wild West", "🤠"], ["Roadhouse", "🥩"], ["Panda Express", "🐼"], ["In-N-Out", "🌴"]],
+      "2": [["Autogrill", "🛣️"], ["Spizzico", "🍕"], ["Alice Pizza", "🍕"], ["Sbarro", "🍝"], ["Quick", "🍔"], ["Wok d'asporto", "🥡"]],
+      "1": [["Kebab dubbio", "🌯"], ["Distributore automatico", "🥤"], ["Panino della stazione", "🥪"], ["All you can eat", "🍣"], ["Hot dog freddo", "🌭"], ["Piadineria chiusa", "🚪"]]
+    }
+  },
+  {
+    "id": "anime",
+    "name": "Anime",
+    "nameEn": "Anime",
+    "emoji": "🗾",
+    "tiers": {
+      "5": [["One Piece", "🏴‍☠️"], ["Naruto", "🍥"], ["Dragon Ball", "🐉"], ["Attack on Titan", "⚔️"], ["Death Note", "📓"], ["Demon Slayer", "🗡️"]],
+      "4": [["Jujutsu Kaisen", "👊"], ["Blue Lock", "⚽"], ["My Hero Academia", "💥"], ["Bleach", "🌸"], ["Hunter x Hunter", "🎣"], ["Fullmetal Alchemist", "⚗️"]],
+      "3": [["Tokyo Ghoul", "🎭"], ["Haikyuu", "🏐"], ["Sword Art Online", "⚔️"], ["Fairy Tail", "🧚"], ["Chainsaw Man", "🪚"], ["Spy x Family", "🕵️"]],
+      "2": [["Pokémon", "⚡"], ["Digimon", "🦖"], ["Inuyasha", "🐕"], ["Yu-Gi-Oh!", "🃏"], ["Beyblade", "🌀"], ["Captain Tsubasa", "⚽"]],
+      "1": [["Doraemon", "🔔"], ["Lupin III", "🎩"], ["Kiss Me Licia", "💋"], ["Holly e Benji", "⚽"], ["Sailor Moon", "🌙"], ["Mila e Shiro", "🏐"]]
+    }
+  },
+  {
+    "id": "cartoons",
+    "name": "Cartoni Animati",
+    "nameEn": "Cartoons",
+    "emoji": "📺",
+    "tiers": {
+      "5": [["SpongeBob", "🧽"], ["I Simpson", "🍩"], ["Rick and Morty", "🛸"], ["Tom & Jerry", "🐭"], ["Looney Tunes", "🥕"], ["Scooby-Doo", "🐕"]],
+      "4": [["Adventure Time", "⚔️"], ["Gravity Falls", "🌲"], ["Regular Show", "🦝"], ["Gumball", "🐱"], ["Phineas e Ferb", "🔧"], ["Fanta Genitori", "🧚"]],
+      "3": [["Ben 10", "⌚"], ["Kim Possible", "💇"], ["Braccio di Ferro", "🥫"], ["Le Superchicche", "💗"], ["Il laboratorio di Dexter", "🧪"], ["Futurama", "🚀"]],
+      "2": [["Ed Edd & Eddy", "🍬"], ["Johnny Bravo", "💪"], ["Codice Lyoko", "💻"], ["Winx", "🧚"], ["Yakari", "🐎"], ["Pucca", "❤️"]],
+      "1": [["Teletubbies", "📺"], ["Peppa Pig", "🐷"], ["Barbapapà", "🎈"], ["Bananas in Pigiama", "🍌"], ["Caillou", "👶"], ["Trollz", "🧌"]]
+    }
+  },
+  {
+    "id": "tvshows",
+    "name": "Serie TV",
+    "nameEn": "TV Shows",
+    "emoji": "📼",
+    "tiers": {
+      "5": [["Breaking Bad", "⚗️"], ["Game of Thrones", "🐉"], ["Friends", "☕"], ["Stranger Things", "🔦"], ["The Office", "📎"], ["La Casa di Carta", "🎭"]],
+      "4": [["Peaky Blinders", "🎩"], ["Dexter", "🔪"], ["Better Call Saul", "⚖️"], ["Squid Game", "🦑"], ["Lost", "🏝️"], ["Sherlock", "🔍"]],
+      "3": [["Vampire Diaries", "🧛"], ["Gossip Girl", "👠"], ["How I Met Your Mother", "🍺"], ["Suits", "💼"], ["Mr. Robot", "🤖"], ["Narcos", "🌿"]],
+      "2": [["Grey's Anatomy", "🩺"], ["Riverdale", "🍔"], ["Elite", "🎓"], ["Prison Break", "⛓️"], ["Modern Family", "👨‍👩‍👧"], ["Black Mirror", "📱"]],
+      "1": [["Baywatch", "🩱"], ["Beverly Hills", "🌴"], ["Il Segreto", "💌"], ["Un posto al sole", "🌅"], ["Temptation Island", "🏝️"], ["Grande Fratello", "👁️"]]
+    }
+  },
+  {
+    "id": "citta-italiane",
+    "name": "Città Italiane",
+    "nameEn": "Italian Cities",
+    "emoji": "🇮🇹",
+    "tiers": {
+      "5": [["Roma", "🏛️"], ["Milano", "🏙️"], ["Napoli", "🌋"], ["Firenze", "🎨"], ["Venezia", "🚤"], ["Torino", "🏔️"]],
+      "4": [["Bologna", "🍝"], ["Verona", "💘"], ["Palermo", "🍊"], ["Genova", "⚓"], ["Catania", "🌋"], ["Siena", "🐎"]],
+      "3": [["Caserta", "🏰"], ["Bari", "🐙"], ["Perugia", "🍫"], ["Pisa", "🗼"], ["Lecce", "🏛️"], ["Trieste", "☕"]],
+      "2": [["Padova", "⛪"], ["Rimini", "🏖️"], ["Cagliari", "🌊"], ["Parma", "🧀"], ["Salerno", "🌊"], ["Bergamo", "🏰"]],
+      "1": [["Latina", "🌾"], ["Frosinone", "🛣️"], ["Rovigo", "🌽"], ["Isernia", "🪨"], ["Vercelli", "🍚"], ["Crotone", "🐟"]]
+    }
+  },
+  {
+    "id": "meme",
+    "name": "Meme Web",
+    "nameEn": "Web Memes",
+    "emoji": "😂",
+    "tiers": {
+      "5": [["Gigachad", "💪"], ["Doge", "🐕"], ["Pepe the Frog", "🐸"], ["Rickroll", "🎤"], ["Distracted Boyfriend", "👀"], ["Drake Hotline Bling", "🙅"]],
+      "4": [["Woman Yelling at a Cat", "😾"], ["Hide the Pain Harold", "🙂"], ["Disaster Girl", "🔥"], ["Success Kid", "✊"], ["Spiderman Pointing", "🕷️"], ["Stonks", "📈"]],
+      "3": [["Roll Safe", "🧠"], ["Side-Eye Chloe", "👧"], ["Change My Mind", "☕"], ["One Does Not Simply", "🧙"], ["Kermit", "🐸"], ["Chill Guy", "😎"]],
+      "2": [["Nyan Cat", "🌈"], ["Pop Cat", "🐱"], ["Pedro Raccoon", "🦝"], ["Trade Offer", "🤝"], ["El Risitas", "😂"], ["Bad Luck Brian", "🍀"]],
+      "1": [["Harambe", "🦍"], ["Grumpy Cat", "😾"], ["Troll Face", "😈"], ["Salt Bae", "🧂"], ["Ugandan Knuckles", "🔴"], ["67", "🔢"]]
+    }
+  },
+  {
+    "id": "clash-royale",
+    "name": "Clash Royale",
+    "nameEn": "Clash Royale",
+    "emoji": "👑",
+    "tiers": {
+      "5": [["P.E.K.K.A", "⚔️"], ["Mega Cavaliere", "🏍️"], ["Drago Infernale", "🔥"], ["Golem", "🪨"], ["Principessa", "🏹"], ["Torre Infernale", "🗼"]],
+      "4": [["Strega", "🧙"], ["Valchiria", "🪓"], ["Palloncino", "🎈"], ["Gigante", "🗿"], ["Fireball", "☄️"], ["Mago", "🧙‍♂️"]],
+      "3": [["Cavaliere", "🛡️"], ["Frecce", "🏹"], ["Mini P.E.K.K.A", "🤖"], ["Barile di Barbari", "🛢️"], ["Tronco", "🪵"], ["Zap", "⚡"]],
+      "2": [["Arcieri", "🏹"], ["Scheletri", "💀"], ["Goblin", "👺"], ["Barbari", "🪓"], ["Mongolfiera", "🎈"], ["Sgherri", "🦇"]],
+      "1": [["Mini Sgherri", "🦇"], ["Barile Goblin", "🛢️"], ["Specchio", "🪞"], ["Lancieri", "🔱"], ["Tomba degli Scheletri", "⚰️"], ["Cannone", "🎯"]]
+    }
+  },
+  {
+    "id": "us-cities",
+    "name": "Città Americane",
+    "nameEn": "US Cities",
+    "emoji": "🗽",
+    "tiers": {
+      "5": [["New York", "🗽"], ["Los Angeles", "🌴"], ["Las Vegas", "🎰"], ["Miami", "🌊"], ["Chicago", "🌆"], ["San Francisco", "🌉"]],
+      "4": [["Boston", "⚾"], ["Seattle", "☕"], ["New Orleans", "🎷"], ["Washington DC", "🏛️"], ["San Diego", "🏄"], ["Austin", "🎸"]],
+      "3": [["Denver", "🏔️"], ["Nashville", "🎸"], ["Philadelphia", "🔔"], ["Atlanta", "🍑"], ["Dallas", "🤠"], ["Portland", "🌲"]],
+      "2": [["Houston", "🚀"], ["Phoenix", "🌵"], ["Minneapolis", "❄️"], ["San Antonio", "🌮"], ["Detroit", "🚗"], ["Baltimore", "⚓"]],
+      "1": [["Cleveland", "🏭"], ["Buffalo", "🐃"], ["Toledo", "🔧"], ["Fresno", "🍇"], ["Bakersfield", "🛢️"], ["Stockton", "🚧"]]
+    }
+  }
+]

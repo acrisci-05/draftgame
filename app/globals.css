@@ -1,47 +1,60 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #09090b;
-  --color-surface: #101014;
-  --color-surface-2: #17171d;
-  --color-line: #26262e;
-  --color-neon: #22c55e;
-  --color-neon-soft: #4ade80;
-  --color-violet: #a855f7;
-  --color-violet-soft: #c084fc;
+  --color-ink: var(--pp-ink);
+  --color-surface: var(--pp-surface);
+  --color-surface-2: var(--pp-surface-2);
+  --color-line: var(--pp-line);
+  --color-fg: var(--pp-fg);
+  --color-muted: var(--pp-muted);
+  --color-faint: var(--pp-faint);
+  --color-neon: var(--pp-neon);
+  --color-neon-soft: var(--pp-neon-soft);
+  --color-violet: var(--pp-violet);
+  --color-violet-soft: var(--pp-violet-soft);
+  --color-gold: var(--pp-gold);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
 
-  --animate-pop: pop 0.25s ease-out;
-  --animate-flash: flash 0.6s ease-out;
+:root,
+:root[data-theme="dark"] {
+  --pp-ink: #09090b;
+  --pp-surface: #101014;
+  --pp-surface-2: #17171d;
+  --pp-line: #26262e;
+  --pp-fg: #f4f4f5;
+  --pp-muted: #a1a1aa;
+  --pp-faint: #71717a;
+  --pp-neon: #22c55e;
+  --pp-neon-soft: #4ade80;
+  --pp-violet: #a855f7;
+  --pp-violet-soft: #c084fc;
+  --pp-gold: #fbbf24;
+  color-scheme: dark;
+}
 
-  @keyframes pop {
-    0% {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-  @keyframes flash {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.35;
-    }
-  }
+:root[data-theme="light"] {
+  --pp-ink: #f4f4f6;
+  --pp-surface: #ffffff;
+  --pp-surface-2: #f1f1f5;
+  --pp-line: #dedee6;
+  --pp-fg: #18181b;
+  --pp-muted: #52525b;
+  --pp-faint: #71717a;
+  --pp-neon: #15a34a;
+  --pp-neon-soft: #16b356;
+  --pp-violet: #7c3aed;
+  --pp-violet-soft: #8b5cf6;
+  --pp-gold: #b45309;
+  color-scheme: light;
 }
 
 html,
 body {
-  background-color: var(--color-ink);
-  color: #f4f4f5;
+  background-color: var(--pp-ink);
+  color: var(--pp-fg);
 }
 
 body {
@@ -50,27 +63,39 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Superficie sempre scura (drawer, card social) anche con tema chiaro attivo. */
+.glass-dark {
+  --pp-surface: #17171d;
+  --pp-surface-2: #1f1f27;
+  --pp-line: #33333f;
+  --pp-fg: #f4f4f5;
+  --pp-muted: #a1a1aa;
+  --pp-faint: #8b8b95;
+  --pp-neon: #22c55e;
+  --pp-neon-soft: #4ade80;
+  --pp-violet: #a855f7;
+  --pp-violet-soft: #c084fc;
+  color-scheme: dark;
+  color: var(--pp-fg);
+}
+
 @layer utilities {
   .glow-neon {
-    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-neon) 70%, transparent);
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--pp-neon) 70%, transparent);
   }
 
   .glow-violet {
-    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--color-violet) 70%, transparent);
+    box-shadow: 0 0 24px -6px color-mix(in srgb, var(--pp-violet) 70%, transparent);
   }
 
   .text-glow {
-    text-shadow: 0 0 18px color-mix(in srgb, var(--color-neon) 55%, transparent);
-  }
-
-  .text-glow-violet {
-    text-shadow: 0 0 18px color-mix(in srgb, var(--color-violet) 55%, transparent);
+    text-shadow: 0 0 18px color-mix(in srgb, var(--pp-neon) 45%, transparent);
   }
 
   .grid-noise {
     background-image:
-      radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--color-violet) 16%, transparent), transparent 45%),
-      radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--color-neon) 14%, transparent), transparent 40%);
+      radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--pp-violet) 16%, transparent), transparent 45%),
+      radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--pp-neon) 14%, transparent), transparent 40%);
   }
 
   .no-scrollbar {

@@ -1,21 +1,26 @@
 "use client";
 
-import { ArrowLeft, Pencil, Play, Plus } from "lucide-react";
+import { ArrowLeft, Pencil, Play, Plus, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { BUILTIN_CATEGORIES } from "@/lib/catalog";
+import { OFFICIAL_CATEGORIES, categoryName } from "@/lib/catalog";
 import { useClientValue } from "@/lib/client-store";
-import { ensureProfile, listCustomCategories, saveSession } from "@/lib/storage";
-import type { Category } from "@/lib/types";
-import { TIER_ORDER, TIER_STYLES, cn, roomCode } from "@/lib/utils";
+import { useSettings } from "@/lib/settings";
+import { ensureProfile, listCustomCategories, officialCategories, readConfig, saveSession } from "@/lib/storage";
+import type { Category, Locale } from "@/lib/types";
+import { roomCode } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
+import { ItemCover } from "@/components/game/ItemCover";
+import { TierStrip } from "@/components/game/TierChip";
 
 const NO_CATEGORIES: Category[] = [];
 
 export default function CategoriesPage() {
   const router = useRouter();
+  const { locale, t } = useSettings();
   const custom = useClientValue<Category[]>(listCustomCategories, NO_CATEGORIES);
+  const official = useClientValue<Category[]>(officialCategories, OFFICIAL_CATEGORIES);
 
   const playWith = (category: Category) => {
     const profile = ensureProfile();
@@ -28,6 +33,7 @@ export default function CategoriesPage() {
       name: profile.name || "Player",
       emoji: profile.emoji,
       categoryId: category.id,
+      config: readConfig(),
     });
     router.push(`/room/${code}`);
   };
@@ -38,36 +44,39 @@ export default function CategoriesPage() {
         <button
           type="button"
           onClick={() => router.push("/")}
-          className="flex items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-100"
+          className="flex items-center gap-1.5 text-sm text-faint transition-colors hover:text-fg"
         >
           <ArrowLeft className="size-4" />
-          Home
+          {t("common.home")}
         </button>
-        <Button size="sm" onClick={() => router.push("/categories/new")}>
-          <Plus className="size-4" />
-          Nuova
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => router.push("/studio")}>
+            <SlidersHorizontal className="size-4" />
+            {t("studio.open")}
+          </Button>
+          <Button size="sm" onClick={() => router.push("/categories/new")}>
+            <Plus className="size-4" />
+            {t("categories.new")}
+          </Button>
+        </div>
       </header>
 
       <div>
-        <h1 className="text-3xl font-black tracking-tight">Categorie</h1>
-        <p className="mt-1 text-sm text-zinc-500">
-          Ogni tier list ha 25 elementi: 5 per ogni fascia da $5 a $1.
-        </p>
+        <h1 className="text-3xl font-black tracking-tight">{t("categories.title")}</h1>
+        <p className="mt-1 text-sm text-faint">{t("categories.subtitle")}</p>
       </div>
 
       <Panel>
-        <PanelTitle>Le tue categorie</PanelTitle>
+        <PanelTitle>{t("categories.mine")}</PanelTitle>
         {custom.length === 0 ? (
-          <p className="text-sm text-zinc-500">
-            Non hai ancora creato nulla. Con l&apos;editor costruisci una tier list in due minuti.
-          </p>
+          <p className="text-sm text-faint">{t("categories.none")}</p>
         ) : (
           <div className="flex flex-col gap-2">
             {custom.map((category) => (
               <CategoryRow
                 key={category.id}
                 category={category}
+                locale={locale}
                 onPlay={() => playWith(category)}
                 onEdit={() => router.push(`/categories/edit/${category.id}`)}
               />
@@ -77,10 +86,15 @@ export default function CategoriesPage() {
       </Panel>
 
       <Panel>
-        <PanelTitle>Tier list incluse</PanelTitle>
+        <PanelTitle>{t("categories.official")}</PanelTitle>
         <div className="flex flex-col gap-2">
-          {BUILTIN_CATEGORIES.map((category) => (
-            <CategoryRow key={category.id} category={category} onPlay={() => playWith(category)} />
+          {official.map((category) => (
+            <CategoryRow
+              key={category.id}
+              category={category}
+              locale={locale}
+              onPlay={() => playWith(category)}
+            />
           ))}
         </div>
       </Panel>
@@ -90,47 +104,47 @@ export default function CategoriesPage() {
 
 function CategoryRow({
   category,
+  locale,
   onPlay,
   onEdit,
 }: {
   category: Category;
+  locale: Locale;
   onPlay: () => void;
   onEdit?: () => void;
 }) {
+  const { t } = useSettings();
+
   return (
     <div className="rounded-xl border border-line bg-surface-2 p-3">
       <div className="flex items-center gap-3">
         <span className="text-2xl">{category.emoji}</span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-bold">{category.name}</p>
-          <p className="text-xs text-zinc-500">{category.items.length} elementi</p>
+          <p className="truncate font-bold">{categoryName(category, locale)}</p>
+          <p className="text-xs text-faint">
+            {category.items.length} {t("common.items")}
+          </p>
         </div>
-        {category.shareId ? <Badge tone="violet">condivisa</Badge> : null}
+        {category.shareId ? <Badge tone="violet">{t("categories.shared")}</Badge> : null}
       </div>
 
-      <div className="mt-2.5 flex flex-wrap gap-1">
-        {TIER_ORDER.map((tier) => (
-          <span
-            key={tier}
-            className={cn(
-              "rounded-md border px-1.5 py-0.5 text-[10px] font-bold",
-              TIER_STYLES[tier].chip,
-            )}
-          >
-            ${tier} × {category.items.filter((item) => item.tier === tier).length}
-          </span>
+      <TierStrip items={category.items} className="mt-2.5" />
+
+      <div className="no-scrollbar mt-2.5 flex gap-1 overflow-x-auto">
+        {category.items.slice(0, 8).map((item) => (
+          <ItemCover key={item.id} item={item} size="xs" />
         ))}
       </div>
 
       <div className="mt-3 flex gap-2">
         <Button size="sm" onClick={onPlay}>
           <Play className="size-4" />
-          Gioca
+          {t("categories.play")}
         </Button>
         {onEdit ? (
           <Button size="sm" variant="outline" onClick={onEdit}>
             <Pencil className="size-4" />
-            Modifica
+            {t("categories.edit")}
           </Button>
         ) : null}
       </div>

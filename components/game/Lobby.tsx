@@ -3,15 +3,23 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, LayoutGrid, Play, Share2, UserPlus, Users, X } from "lucide-react";
 import { useState } from "react";
-import { MAX_PLAYERS, MIN_PLAYERS, START_BUDGET, type GameAction } from "@/lib/game";
-import type { Category, GameState } from "@/lib/types";
-import { TIER_ORDER, copyText, uid } from "@/lib/utils";
+import { playSfx } from "@/lib/audio";
+import { categoryName } from "@/lib/catalog";
+import { useIsClient } from "@/lib/client-store";
+import { MIN_PLAYERS, type GameAction } from "@/lib/game";
+import { useSettings } from "@/lib/settings";
+import { saveConfig } from "@/lib/storage";
+import type { Category, GameState, RoomConfig } from "@/lib/types";
+import { TIER_ORDER, copyText, money, uid } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
+import { QrCode } from "@/components/ui/QrCode";
+import { RoomCode } from "@/components/ui/RoomCode";
 import { CategoryPicker } from "./CategoryPicker";
+import { LobbyConfig } from "./LobbyConfig";
 
 interface LobbyProps {
   state: GameState;
@@ -21,18 +29,21 @@ interface LobbyProps {
 }
 
 export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
+  const { locale, sound, t } = useSettings();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [newPlayer, setNewPlayer] = useState("");
   const [copied, setCopied] = useState(false);
 
   const isLocal = state.mode === "local";
   const canStart = isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0;
+  const isClient = useIsClient();
+  const joinUrl = isClient ? `${window.location.origin}/room/${state.code}` : null;
 
   const shareRoom = async () => {
     const url = `${window.location.origin}/room/${state.code}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "$20 Draft Game", text: `Codice stanza: ${state.code}`, url });
+        await navigator.share({ title: "Pick & Pay", text: state.code, url });
         return;
       } catch {
         /* condivisione annullata: si continua con la copia negli appunti */
@@ -51,25 +62,44 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
     setNewPlayer("");
   };
 
+  const updateConfig = (patch: Partial<RoomConfig>) => {
+    dispatch({ type: "set_config", config: patch });
+    saveConfig({ ...state.config, ...patch });
+  };
+
+  const start = () => {
+    playSfx("start", sound);
+    dispatch({ type: "start", now: Date.now() });
+  };
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-3xl border border-line bg-surface grid-noise p-5 text-center">
-        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-          {isLocal ? "Stanza locale" : "Codice stanza"}
-        </p>
-        <p className="mt-2 font-mono text-5xl font-black tracking-[0.35em] text-neon text-glow">
-          {state.code}
-        </p>
-        {!isLocal ? (
-          <Button variant="outline" size="sm" className="mt-4" onClick={shareRoom}>
-            {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-            {copied ? "Link copiato" : "Invita i giocatori"}
-          </Button>
-        ) : (
-          <p className="mt-3 text-sm text-zinc-500">
-            Tutti giocano da questo dispositivo, a turno sullo stesso schermo.
-          </p>
-        )}
+      <div className="rounded-3xl border border-line bg-surface grid-noise p-5">
+        <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-center sm:text-start">
+            <p className="text-xs uppercase tracking-[0.24em] text-faint">
+              {isLocal ? t("lobby.localRoom") : t("lobby.roomCode")}
+            </p>
+            <RoomCode code={state.code} size="lg" className="mt-2" />
+            {isLocal ? (
+              <p className="mt-3 text-sm text-faint">{t("lobby.localHint")}</p>
+            ) : (
+              <Button variant="outline" size="sm" className="mt-4" onClick={shareRoom}>
+                {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
+                {copied ? t("common.copied") : t("lobby.invite")}
+              </Button>
+            )}
+          </div>
+
+          {!isLocal && joinUrl ? (
+            <div className="flex flex-col items-center gap-1.5">
+              <QrCode value={joinUrl} size={116} />
+              <span className="max-w-[9rem] text-center text-[10px] leading-tight text-faint">
+                {t("lobby.qrHint")}
+              </span>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <Panel>
@@ -78,36 +108,54 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
           action={
             isHost ? (
               <Button variant="ghost" size="sm" onClick={() => setPickerOpen(true)}>
-                Cambia
+                {t("common.change")}
               </Button>
             ) : null
           }
         >
-          Categoria
+          {t("common.category")}
         </PanelTitle>
         <div className="flex items-center gap-3">
           <span className="text-3xl">{state.category.emoji}</span>
           <div>
-            <p className="font-bold">{state.category.name}</p>
-            <p className="text-xs text-zinc-500">
-              {state.items.length} elementi ·{" "}
-              {TIER_ORDER.map((tier) => state.items.filter((i) => i.tier === tier).length).join("/")}{" "}
-              per fascia
+            <p className="font-bold">{categoryName(state.category, locale)}</p>
+            <p className="text-xs text-faint">
+              {state.items.length} {t("common.items")} ·{" "}
+              {TIER_ORDER.map((tier) => state.items.filter((i) => i.tier === tier).length).join("/")}
             </p>
           </div>
         </div>
       </Panel>
 
+      {isHost ? (
+        <LobbyConfig config={state.config} onChange={updateConfig} />
+      ) : (
+        <Panel>
+          <PanelTitle>{t("lobby.settings")}</PanelTitle>
+          <div className="flex flex-wrap gap-1.5">
+            <Badge tone="neon">{money(state.config.budget, state.config.currency)}</Badge>
+            <Badge>
+              {state.config.slots} {t("common.items")}
+            </Badge>
+            <Badge>
+              {t("common.players")} {state.config.maxPlayers}
+            </Badge>
+            {state.config.blindDraft ? <Badge tone="violet">{t("lobby.blind")}</Badge> : null}
+            {state.config.mysteryBox ? <Badge tone="violet">{t("lobby.mystery")}</Badge> : null}
+          </div>
+        </Panel>
+      )}
+
       <Panel>
         <PanelTitle
           icon={<Users className="size-3.5" />}
           action={
-            <span className="text-xs text-zinc-500">
-              {state.players.length}/{MAX_PLAYERS}
+            <span className="text-xs text-faint">
+              {state.players.length}/{state.config.maxPlayers}
             </span>
           }
         >
-          Giocatori
+          {t("common.players")}
         </PanelTitle>
 
         <div className="flex flex-col gap-2">
@@ -123,15 +171,19 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
               >
                 <span className="text-xl">{player.emoji}</span>
                 <span className="min-w-0 flex-1 truncate font-semibold">{player.name}</span>
-                {player.id === state.hostId ? <Badge tone="violet">host</Badge> : null}
-                {player.id === selfId && !isLocal ? <Badge tone="neon">tu</Badge> : null}
-                <span className="font-mono text-sm text-zinc-500">${START_BUDGET}</span>
+                {player.id === state.hostId ? <Badge tone="violet">{t("lobby.host")}</Badge> : null}
+                {player.id === selfId && !isLocal ? (
+                  <Badge tone="neon">{t("lobby.you")}</Badge>
+                ) : null}
+                <span className="font-mono text-sm text-faint">
+                  {money(state.config.budget, state.config.currency)}
+                </span>
                 {isHost && isLocal && player.id !== state.hostId ? (
                   <button
                     type="button"
-                    aria-label={`Rimuovi ${player.name}`}
+                    aria-label={`Remove ${player.name}`}
                     onClick={() => dispatch({ type: "remove_player", playerId: player.id })}
-                    className="rounded-lg p-1 text-zinc-600 transition-colors hover:text-red-400"
+                    className="rounded-lg p-1 text-faint transition-colors hover:text-red-500"
                   >
                     <X className="size-4" />
                   </button>
@@ -141,15 +193,15 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
           </AnimatePresence>
 
           {state.players.length === 0 ? (
-            <p className="text-sm text-zinc-500">Nessun giocatore in stanza.</p>
+            <p className="text-sm text-faint">{t("lobby.noPlayers")}</p>
           ) : null}
         </div>
 
-        {isLocal && isHost && state.players.length < MAX_PLAYERS ? (
+        {isLocal && isHost && state.players.length < state.config.maxPlayers ? (
           <div className="mt-3 flex gap-2">
             <Input
               value={newPlayer}
-              placeholder="Nome giocatore"
+              placeholder={t("lobby.addPlayer")}
               maxLength={16}
               onChange={(event) => setNewPlayer(event.target.value)}
               onKeyDown={(event) => {
@@ -157,45 +209,42 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
               }}
               className="h-11"
             />
-            <Button onClick={addLocalPlayer} className="shrink-0" aria-label="Aggiungi giocatore">
+            <Button onClick={addLocalPlayer} className="shrink-0" aria-label={t("lobby.addPlayer")}>
               <UserPlus className="size-4" />
             </Button>
           </div>
         ) : null}
 
         {!isLocal && state.players.length < MIN_PLAYERS ? (
-          <p className="mt-3 text-sm text-zinc-500">
-            Servono almeno {MIN_PLAYERS} giocatori: condividi il codice {state.code}.
+          <p className="mt-3 text-sm text-faint">
+            {t("lobby.shareCode", { n: MIN_PLAYERS, code: state.code })}
           </p>
         ) : null}
       </Panel>
 
-      <Panel className="text-sm text-zinc-400">
-        <PanelTitle>Regole</PanelTitle>
+      <Panel className="text-sm text-muted">
+        <PanelTitle>{t("lobby.rulesTitle")}</PanelTitle>
         <ul className="flex flex-col gap-1.5">
-          <li>Ogni giocatore parte con ${START_BUDGET}.</li>
-          <li>Gli elementi escono a caso: 15 secondi a lotto, 10 dopo ogni rilancio.</li>
-          <li>Rilanci da +$1, +$2, +$5 solo se il saldo li copre.</li>
-          <li>Chi passa esce dal lotto corrente; l&apos;ultimo rimasto se lo aggiudica.</li>
+          <li>{t("lobby.rule1", { budget: money(state.config.budget, state.config.currency) })}</li>
+          <li>{t("lobby.rule2")}</li>
+          <li>{t("lobby.rule3")}</li>
+          <li>{t("lobby.rule4")}</li>
+          <li>{t("lobby.rule5", { slots: state.config.slots })}</li>
         </ul>
       </Panel>
 
       {isHost ? (
-        <Button
-          size="lg"
-          disabled={!canStart}
-          onClick={() => dispatch({ type: "start", now: Date.now() })}
-        >
+        <Button size="lg" disabled={!canStart} onClick={start}>
           <Play className="size-5" />
-          {canStart ? "Avvia il draft" : `Servono almeno ${MIN_PLAYERS} giocatori`}
+          {canStart ? t("lobby.start") : t("lobby.needPlayers", { n: MIN_PLAYERS })}
         </Button>
       ) : (
-        <p className="rounded-2xl border border-line bg-surface p-4 text-center text-sm text-zinc-500">
-          In attesa che l&apos;host avvii il draft...
+        <p className="rounded-2xl border border-line bg-surface p-4 text-center text-sm text-faint">
+          {t("lobby.waitingHost")}
         </p>
       )}
 
-      <Modal open={pickerOpen} title="Scegli la categoria" onClose={() => setPickerOpen(false)}>
+      <Modal open={pickerOpen} title={t("common.category")} onClose={() => setPickerOpen(false)}>
         <CategoryPicker
           selectedId={state.category.id}
           onSelect={(category: Category) => {

@@ -24,9 +24,8 @@
 .DS_Store
 *.pem
 
-# file di istruzioni per tool esterni rigenerati in locale da `next dev`
+# file di istruzioni rigenerati in locale dagli strumenti di sviluppo
 AGENTS.md
-CLAUDE.md
 
 # debug
 npm-debug.log*
@@ -40,6 +39,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# output dei controlli sul motore di gioco
+/.tmp-check
 
 # typescript
 *.tsbuildinfo

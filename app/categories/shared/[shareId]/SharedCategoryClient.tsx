@@ -3,8 +3,9 @@
 import { ArrowLeft, Check, Download, Loader2, Play, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/settings";
+import { ensureProfile, readConfig, saveCustomCategory, saveSession } from "@/lib/storage";
 import { fetchSharedCategory } from "@/lib/supabase";
-import { ensureProfile, saveCustomCategory, saveSession } from "@/lib/storage";
 import type { Category } from "@/lib/types";
 import { TIER_ORDER, TIER_STYLES, cn, roomCode, uid } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -12,8 +13,9 @@ import { Panel, PanelTitle } from "@/components/ui/Panel";
 
 export function SharedCategoryClient({ shareId }: { shareId: string }) {
   const router = useRouter();
+  const t = useT();
   const [category, setCategory] = useState<Category | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const [imported, setImported] = useState(false);
 
   useEffect(() => {
@@ -22,10 +24,8 @@ export function SharedCategoryClient({ shareId }: { shareId: string }) {
       .then((result) => {
         if (active) setCategory(result);
       })
-      .catch((cause: unknown) => {
-        if (active) {
-          setError(cause instanceof Error ? cause.message : "Categoria non trovata.");
-        }
+      .catch(() => {
+        if (active) setFailed(true);
       });
     return () => {
       active = false;
@@ -53,6 +53,7 @@ export function SharedCategoryClient({ shareId }: { shareId: string }) {
       name: profile.name || "Player",
       emoji: profile.emoji,
       categoryId: local.id,
+      config: readConfig(),
     });
     router.push(`/room/${code}`);
   };
@@ -62,19 +63,19 @@ export function SharedCategoryClient({ shareId }: { shareId: string }) {
       <button
         type="button"
         onClick={() => router.push("/categories")}
-        className="flex items-center gap-1.5 self-start text-sm text-zinc-500 transition-colors hover:text-zinc-100"
+        className="flex items-center gap-1.5 self-start text-sm text-faint transition-colors hover:text-fg"
       >
         <ArrowLeft className="size-4" />
-        Categorie
+        {t("common.categories")}
       </button>
 
-      {error ? (
-        <p className="flex items-start gap-2 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
+      {failed ? (
+        <p className="flex items-start gap-2 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-400">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" />
-          {error}
+          {t("shared.notFound")}
         </p>
       ) : !category ? (
-        <div className="flex flex-1 items-center justify-center text-zinc-500">
+        <div className="flex flex-1 items-center justify-center text-faint">
           <Loader2 className="size-6 animate-spin" />
         </div>
       ) : (
@@ -82,7 +83,7 @@ export function SharedCategoryClient({ shareId }: { shareId: string }) {
           <div className="flex items-center gap-3">
             <span className="text-4xl">{category.emoji}</span>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Categoria condivisa</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-faint">{t("shared.title")}</p>
               <h1 className="text-2xl font-black tracking-tight">{category.name}</h1>
             </div>
           </div>
@@ -96,7 +97,7 @@ export function SharedCategoryClient({ shareId }: { shareId: string }) {
                     TIER_STYLES[tier].chip,
                   )}
                 >
-                  ${tier}
+                  {tier}
                 </span>
               </PanelTitle>
               <div className="flex flex-wrap gap-1.5">
@@ -117,11 +118,11 @@ export function SharedCategoryClient({ shareId }: { shareId: string }) {
           <div className="grid grid-cols-2 gap-2">
             <Button variant="outline" onClick={importCategory}>
               {imported ? <Check className="size-4" /> : <Download className="size-4" />}
-              {imported ? "Importata" : "Importa"}
+              {imported ? t("shared.imported") : t("shared.import")}
             </Button>
             <Button onClick={playNow}>
               <Play className="size-4" />
-              Gioca ora
+              {t("shared.playNow")}
             </Button>
           </div>
         </>

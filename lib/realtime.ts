@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { createGame, reducer, type GameAction } from "./game";
+import type { TranslationKey } from "./i18n";
 import { getSupabase } from "./supabase";
-import type { Category, GameState, RoomMode } from "./types";
+import type { Category, GameState, RoomConfig, RoomMode } from "./types";
 
 export type RoomStatus = "connecting" | "waiting" | "live" | "error";
 
@@ -21,12 +22,15 @@ interface UseRoomArgs {
   self: SelfPlayer;
   /** Catalogo iniziale, usato solo dal dispositivo che ospita la stanza. */
   category: Category | null;
+  /** Regole scelte in configurazione, usate solo da chi ospita la stanza. */
+  config?: RoomConfig;
 }
 
 export interface RoomApi {
   state: GameState | null;
   status: RoomStatus;
-  error: string | null;
+  /** Chiave di traduzione dell'errore da mostrare, null se va tutto bene. */
+  errorKey: TranslationKey | null;
   online: string[];
   isHost: boolean;
   dispatch: (action: GameAction) => void;
@@ -37,13 +41,12 @@ export interface RoomApi {
 const CHANNEL_PREFIX = "dg-room-";
 const TICK_MS = 250;
 const HELLO_RETRY_MS = 1500;
-const MISSING_KEYS =
-  "Le stanze online richiedono le chiavi Supabase in .env.local. Puoi comunque giocare in locale.";
 
-export function useRoom({ code, mode, isHost, self, category }: UseRoomArgs): RoomApi {
+
+export function useRoom({ code, mode, isHost, self, category, config }: UseRoomArgs): RoomApi {
   const [state, setState] = useState<GameState | null>(null);
   const [channelStatus, setChannelStatus] = useState<RoomStatus>("connecting");
-  const [channelError, setChannelError] = useState<string | null>(null);
+  const [channelError, setChannelError] = useState<TranslationKey | null>(null);
   const [online, setOnline] = useState<string[]>([]);
   const supabase = useMemo(() => getSupabase(), []);
 
@@ -52,11 +55,13 @@ export function useRoom({ code, mode, isHost, self, category }: UseRoomArgs): Ro
   const offsetRef = useRef(0);
   const selfRef = useRef(self);
   const categoryRef = useRef(category);
+  const configRef = useRef(config);
 
   useEffect(() => {
     selfRef.current = self;
     categoryRef.current = category;
-  }, [self, category]);
+    configRef.current = config;
+  }, [self, category, config]);
 
   const broadcastState = useCallback((next: GameState) => {
     channelRef.current?.send({
@@ -94,7 +99,13 @@ export function useRoom({ code, mode, isHost, self, category }: UseRoomArgs): Ro
     if (!isHost || stateRef.current) return;
     const cat = categoryRef.current;
     if (!cat) return;
-    const base = createGame({ code, mode, hostId: selfRef.current.id, category: cat });
+    const base = createGame({
+      code,
+      mode,
+      hostId: selfRef.current.id,
+      category: cat,
+      config: configRef.current,
+    });
     const withHost = reducer(base, { type: "add_player", player: selfRef.current });
     stateRef.current = withHost;
     setState(withHost);
@@ -164,7 +175,7 @@ export function useRoom({ code, mode, isHost, self, category }: UseRoomArgs): Ro
       }
       if (subscription === "CHANNEL_ERROR" || subscription === "TIMED_OUT") {
         setChannelStatus("error");
-        setChannelError("Connessione alla stanza non riuscita. Controlla la rete e riprova.");
+        setChannelError("room.errConnection");
       }
     });
 
@@ -202,7 +213,7 @@ export function useRoom({ code, mode, isHost, self, category }: UseRoomArgs): Ro
   const now = useCallback(() => Date.now() + offsetRef.current, []);
 
   const status: RoomStatus = mode !== "online" ? "live" : supabase ? channelStatus : "error";
-  const error = mode === "online" && !supabase ? MISSING_KEYS : channelError;
+  const errorKey = mode === "online" && !supabase ? "room.errKeys" : channelError;
 
-  return { state, status, error, online, isHost, dispatch, now };
+  return { state, status, errorKey, online, isHost, dispatch, now };
 }

@@ -62,8 +62,10 @@
 6. NOTE IMPLEMENTATIVE (DECISIONI PRESE IN FASE DI BUILD)
 ======================================================================
 - Distribuzione dei tier: la specifica indica 25 elementi totali ma elenca "Tier 2: 2 elementi".
-  Il totale coerente con 25 elementi è 5 per ogni tier, quindi il catalogo e il validatore
-  dell'editor richiedono 5 elementi per ciascuna delle 5 fasce (5x5 = 25).
+  Per avere fasce simmetriche e liste più ricche ogni categoria usa 6 elementi per fascia
+  (6x5 = 30): il catalogo ufficiale e il validatore dell'editor richiedono questo conteggio.
+- Budget e valuta sono configurabili in lobby (default 20, EUR/USD/GBP/JPY): il valore delle fasce
+  resta 5/4/3/2/1 e l'offerta di apertura resta 1.
 - Apertura dell'asta: finché nessuno ha offerto, i tre pulsanti valgono come offerta secca
   di $1 / $2 / $5 (l'asta parte da $1). Dopo la prima offerta diventano rilanci +$1 / +$2 / +$5
   sul prezzo corrente.
@@ -71,5 +73,41 @@
 - Un giocatore il cui saldo non copre la prossima offerta minima è considerato fuori dal round
   e non viene conteggiato nella condizione "tutti tranne uno hanno passato".
 - Modalità stanza locale: partita su singolo dispositivo (pass-and-play), non richiede Supabase.
-  Modalità online: stanza con codice di 4 lettere sincronizzata via Supabase Realtime Channels,
-  con il dispositivo che ha creato la stanza come autorità sullo stato e sul timer.
+  Modalità online: stanza con codice di 5 caratteri (lettere e numeri, senza O/0/I/1/L)
+  sincronizzata via Supabase Realtime Channels, con il dispositivo che ha creato la stanza come
+  autorità sullo stato e sul timer. Il codice si copia con un tocco e ha il QR di accesso rapido.
+- Varianti opzionali attivabili in lobby: Blind Draft (cover sfocata fino all'aggiudicazione) e
+  Mystery Box (ogni 5 lotti una box a prezzo fisso con elemento casuale).
+- Fine partita: oltre alla card 9:16 si può pubblicare il risultato e ottenere un link di voto
+  (un voto per dispositivo, nessuna registrazione). Richiede Supabase.
+- Interfaccia disponibile in 10 lingue (it, en, fr, es, de, pt, ru, zh, ja, ar) con selettore in
+  home e nel menu; la preferenza resta sul dispositivo e l'arabo attiva il layout RTL.
+  Le categorie ufficiali hanno nome italiano e inglese: le altre lingue usano quello inglese.
+- Sostegno al progetto: sezione dedicata nel menu con importi predefiniti (5, 10, 20, 30, 40, 50,
+  100 euro) o importo libero e rimando a Revolut; lo spazio per PayPal si attiva impostando
+  NEXT_PUBLIC_PAYPAL_USER. Nessun dato di pagamento viene gestito dall'app.
+
+======================================================================
+7. NOME UFFICIALE, INTERFACCIA E GESTIONE DELLE LISTE
+======================================================================
+- Nome ufficiale: "Pick & Pay - The Draft Game". Marchio in `public/logo.svg` (versione vettoriale
+  del logo al neon): sostituendo quel file cambia il logo in navbar, home e scheda del browser.
+- Home: una sola macro-card con logo, titolo in gradiente verde-ciano, profilo giocatore e due sole
+  azioni, "Crea partita" (verde) e "Unisciti con codice" (viola, modal con input a 5 caratteri).
+  "Come funziona" e il sostegno al progetto restano in fondo come sezioni discrete.
+- Configurazione stanza su pagina dedicata (/create): modalità Locale (1 dispositivo) oppure Online
+  (più dispositivi), categoria, budget con preset rapidi, valuta, giocatori, slot, Blind Draft,
+  Mystery Box. Le stesse regole restano modificabili in lobby da chi ospita.
+- Navbar: bandiera della lingua (modal a pillole con le 10 lingue), tema, audio e menu hamburger.
+  Il drawer usa effetto vetro, voci con freccia e un solo box donazioni con badge "Sostieni con €2".
+- Fasce mostrate come tier visivi con badge colorati (S/A/B/C/D più il valore) al posto dei
+  conteggi tipo "1/6".
+- Asta: immagine grande dell'elemento al centro, titolo sotto, prezzo e ultimo rilancio in evidenza,
+  clessidra animata con ticchettio sotto i 5 secondi, feed delle offerte, pannello per giocatore con
+  Rilancia/Passa, budget, slot e inventario in miniatura. Vibrazione a ogni offerta dove supportata.
+- Anti-sniping: ogni rilancio riporta il timer a 10 secondi, quindi un'offerta all'ultimo istante
+  lascia sempre tempo di rispondere; quando succede compare l'avviso dedicato.
+- Liste ufficiali: 22 categorie a nomi corti con emoji di copertina per ogni elemento, definite in
+  `data/categories.json`. Si modificano a mano nel file oppure dallo Studio (/studio), che salva le
+  modifiche sul dispositivo ed esporta il JSON pronto da incollare nel file dati.
+- Ogni elemento accetta anche l'URL di un'immagine: se presente sostituisce la copertina generata.

@@ -2,12 +2,15 @@
 
 import { Check, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { BUILTIN_CATEGORIES } from "@/lib/catalog";
+import { OFFICIAL_CATEGORIES, categoryName } from "@/lib/catalog";
 import { useClientValue } from "@/lib/client-store";
+import { useSettings } from "@/lib/settings";
 import { allCategories } from "@/lib/storage";
 import type { Category } from "@/lib/types";
-import { TIER_ORDER, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { TierStrip } from "./TierChip";
 
 interface CategoryPickerProps {
   selectedId: string;
@@ -16,7 +19,8 @@ interface CategoryPickerProps {
 
 export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
   const router = useRouter();
-  const categories = useClientValue<Category[]>(allCategories, BUILTIN_CATEGORIES);
+  const { locale, t } = useSettings();
+  const categories = useClientValue<Category[]>(allCategories, OFFICIAL_CATEGORIES);
 
   return (
     <div className="flex flex-col gap-2">
@@ -28,23 +32,21 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
             type="button"
             onClick={() => onSelect(category)}
             className={cn(
-              "flex items-center gap-3 rounded-xl border p-3 text-left transition-colors",
-              selected
-                ? "border-neon/60 bg-neon/10"
-                : "border-line bg-surface-2 hover:border-zinc-600",
+              "flex items-center gap-3 rounded-xl border p-3 text-start transition-colors",
+              selected ? "border-neon/60 bg-neon/10" : "border-line bg-surface-2 hover:border-neon/40",
             )}
           >
             <span className="text-2xl">{category.emoji}</span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-bold">{category.name}</span>
-              <span className="block text-xs text-zinc-500">
-                {category.items.length} elementi ·{" "}
-                {TIER_ORDER.map((tier) => category.items.filter((i) => i.tier === tier).length).join(
-                  "/",
-                )}
-                {category.source !== "builtin" ? " · personalizzata" : ""}
+              <span className="block truncate font-bold">{categoryName(category, locale)}</span>
+              <span className="mt-1 block text-xs text-faint">
+                {category.items.length} {t("common.items")}
               </span>
+              <TierStrip items={category.items} className="mt-1.5" />
             </span>
+            {category.source === "official" ? (
+              <Badge tone="violet">{t("categories.officialBadge")}</Badge>
+            ) : null}
             {selected ? <Check className="size-5 shrink-0 text-neon" /> : null}
           </button>
         );
@@ -52,7 +54,7 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
 
       <Button variant="outline" onClick={() => router.push("/categories/new")}>
         <Plus className="size-4" />
-        Crea una categoria
+        {t("editor.newTitle")}
       </Button>
     </div>
   );

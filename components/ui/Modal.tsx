@@ -26,7 +26,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+          className="fixed inset-0 z-60 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -45,8 +45,8 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Chiudi"
-                className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-surface-2 hover:text-zinc-100"
+                aria-label="Close"
+                className="rounded-lg p-1.5 text-faint transition-colors hover:bg-surface-2 hover:text-fg"
               >
                 <X className="size-5" />
               </button>
