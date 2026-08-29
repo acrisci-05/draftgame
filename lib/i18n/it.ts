@@ -354,6 +354,8 @@ export const it = {
   "admin.lock": "Esci dalla modalità creatore",
   "admin.devNote": "Nessuna chiave configurata: in sviluppo basta un valore qualsiasi.",
   "admin.locked": "Solo il creatore può aggiungere o modificare le liste.",
+  "admin.devOpen":
+    "Sul tuo computer resta aperta senza chiave. Per proteggerla online imposta NEXT_PUBLIC_ADMIN_KEY in .env.local.",
   "admin.sql": "Copia SQL per il database",
   "admin.sqlCopied": "SQL copiato: incollalo nell'SQL editor di Supabase.",
 
@@ -370,7 +372,9 @@ export const it = {
   "rate.error": "Invio non riuscito. Riprova più tardi.",
 
   "tier.legend": "Fasce di valore",
-  "tier.tooltip": "Tier {letter}: prezzo base {price}",
+  "tier.legendHint":
+    "Il prezzo è quanto costa aprire l'asta su quell'elemento: i più forti partono da 5, quelli di nicchia da 1.",
+  "tier.tooltip": "Prezzo base {price}",
   "tier.name5": "Top / Leggendario",
   "tier.name4": "Ottimo",
   "tier.name3": "Buono",

@@ -32,6 +32,9 @@ export function AdminModal({ open, onClose }: { open: boolean; onClose: () => vo
             <ShieldCheck className="size-5 shrink-0" />
             {t("admin.active")}
           </p>
+          {!isAdminConfigured ? (
+            <p className="text-xs text-faint">{t("admin.devOpen")}</p>
+          ) : null}
           <Button
             variant="danger"
             onClick={() => {

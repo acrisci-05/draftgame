@@ -93,7 +93,9 @@ un uso vero e continuativo.
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
-| `npm run images:fetch` | riempie le liste con le foto di Wikipedia (si può interrompere e riprendere) |
+| `npm run images:fetch` | riempie le liste con le foto di Wikimedia (si può interrompere e riprendere) |
+| `node scripts/fetch-images.js <categoria> --hinted` | rifà solo gli elementi con abbinamento in `data/image-hints.json` |
+| `node scripts/probe-images.js "commons:<ricerca>"` | prova una ricerca prima di metterla fra gli abbinamenti |
 | `npm run share` | apre un indirizzo pubblico temporaneo per provare da rete dati |
 
 ---
@@ -131,8 +133,9 @@ migliore.
 ### Regolamento applicato dal motore
 
 - **Budget**: uguale per tutti, configurabile (10, 20, 50, 100 o valore libero) in €, $, £ o ¥.
-- **Fasce di valore**: ogni lista ha 30 elementi divisi in 5 fasce da 5 a 1 crediti,
-  mostrate come tier **S, A, B, C, D** con badge colorati e prezzo base.
+- **Fasce di valore**: ogni lista ha 30 elementi divisi in 5 fasce da 5 a 1 crediti. La fascia è
+  il **prezzo di partenza** dell'asta su quell'elemento: i più forti si aprono a 5 crediti, quelli
+  di nicchia a 1. Sul badge c'è direttamente il prezzo, colorato per fascia.
 - **Asta**: 15 secondi per lotto, riportati a 10 dopo ogni rilancio. Rilanci +1, +2, +5 e
   pulsante Max.
 - **Anti-sniping**: siccome ogni rilancio riporta il timer a 10 secondi, un'offerta all'ultimo
@@ -180,9 +183,14 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Le liste ufficiali hanno le **foto già fissate** dentro `data/categories.json`: arrivano da
   Wikipedia e non dipendono da alcuna ricerca durante la partita. Si aggiornano con
   `npm run images:fetch`, che riprende da dove si era interrotto.
-- Gli elementi dal nome descrittivo, che su Wikipedia non hanno una voce propria
-  ("Doppia carne", "Insalata moscia"), restano con la loro icona: meglio l'icona di una foto
-  generica sbagliata.
+- **Abbinamenti a mano** in `data/image-hints.json`: gli elementi che Wikipedia non conosce
+  ("Doccia calda", "Cetriolini", "Pizza wurstel e patatine") hanno una ricerca scelta da noi su
+  **Wikimedia Commons**, l'archivio di foto libere. Il file si legge e si corregge a mano: dopo
+  averlo modificato basta `node scripts/fetch-images.js <categoria> --hinted` per rifare solo
+  quegli elementi.
+- Restano senza foto solo gli elementi il cui unico ritratto è protetto da copyright: le carte di
+  Clash Royale, i loghi di certi videogiochi, le immagini dei meme. Wikimedia ospita solo materiale
+  libero, quindi lì mostriamo l'icona (o si incolla un indirizzo dallo Studio).
 - **Filtro di pertinenza**: una foto trovata online viene accettata solo se il titolo della pagina
   corrisponde davvero al nome cercato. "Up" prende *Up (film 2009)* e non *Upload*, "Snake" non
   diventa *Snake River*, "Smash Burger" non diventa *Hamburger*. Se nessun risultato è pertinente
@@ -218,7 +226,9 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   giapponese, arabo con layout da destra a sinistra), tema chiaro/scuro, audio attivabile.
 - **Voto del gioco** da 1 a 5 stelle con commento facoltativo, anonimo.
 - Sezione **sostegno al progetto** con rimando a Revolut. Nessun dato di pagamento passa dall'app.
-- **Modalità creatore** protetta da chiave: solo chi la possiede vede Studio ed editor.
+- **Modalità creatore**: sul proprio computer è già aperta, non serve inventarsi nulla. La chiave
+  la si sceglie solo quando il sito va online, scrivendola in `NEXT_PUBLIC_ADMIN_KEY`: da quel
+  momento Studio ed editor li vede solo chi la conosce.
 - **Avatar a icone**: i profili usano icone vettoriali (fiamma, fulmine, corona, scudo, joypad,
   teschio, coppa, fantasma, gemma) al posto delle emoji, così non esiste alcun rischio di
   caratteri corrotti fra dispositivi e file di dati.
@@ -272,7 +282,7 @@ pubblicate.
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 NEXT_PUBLIC_SITE_URL=https://iltuodominio
-NEXT_PUBLIC_ADMIN_KEY=una-chiave-a-scelta
+NEXT_PUBLIC_ADMIN_KEY=la-parola-che-scegli-tu
 NEXT_PUBLIC_INSTAGRAM_URL=https://instagram.com/tuoprofilo
 NEXT_PUBLIC_REVOLUT_USER=tuoutente
 ```

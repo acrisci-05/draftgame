@@ -419,7 +419,7 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                                 justifyContent: "center",
                               }}
                             >
-                              {TIER_STYLES[tier].letter}
+                              {money(tier, currency)}
                             </span>
                             <div
                               style={{

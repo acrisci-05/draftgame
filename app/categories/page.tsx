@@ -261,7 +261,7 @@ function CategoryCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <TierStrip items={category.items} interactive />
+        <TierStrip items={category.items} />
         <span className="no-scrollbar flex gap-1 overflow-x-auto">
           {category.items
             .filter((item) => item.tier === 5)

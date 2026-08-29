@@ -74,8 +74,6 @@ export function clamp(value: number, min: number, max: number): number {
 }
 
 export interface TierStyle {
-  /** Lettera del tier visivo: S, A, B, C, D. */
-  letter: string;
   label: string;
   labelEn: string;
   hex: string;
@@ -85,7 +83,6 @@ export interface TierStyle {
 
 export const TIER_STYLES: Record<Tier, TierStyle> = {
   5: {
-    letter: "S",
     label: "Top",
     labelEn: "Top",
     hex: "#22c55e",
@@ -93,7 +90,6 @@ export const TIER_STYLES: Record<Tier, TierStyle> = {
     text: "text-neon",
   },
   4: {
-    letter: "A",
     label: "Elite",
     labelEn: "Elite",
     hex: "#a855f7",
@@ -101,7 +97,6 @@ export const TIER_STYLES: Record<Tier, TierStyle> = {
     text: "text-violet",
   },
   3: {
-    letter: "B",
     label: "Solido",
     labelEn: "Solid",
     hex: "#38bdf8",
@@ -109,7 +104,6 @@ export const TIER_STYLES: Record<Tier, TierStyle> = {
     text: "text-sky-500",
   },
   2: {
-    letter: "C",
     label: "Rotazione",
     labelEn: "Rotation",
     hex: "#f59e0b",
@@ -117,7 +111,6 @@ export const TIER_STYLES: Record<Tier, TierStyle> = {
     text: "text-amber-500",
   },
   1: {
-    letter: "D",
     label: "Economy",
     labelEn: "Economy",
     hex: "#94a3b8",

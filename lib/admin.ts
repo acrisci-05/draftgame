@@ -50,6 +50,14 @@ export function lockAdmin() {
   notifyClientStore();
 }
 
+/**
+ * In sviluppo, finché non è stata scelta una chiave, la modalità creatore è già
+ * attiva: sul proprio computer non ha senso chiedere una password inventata.
+ * Appena NEXT_PUBLIC_ADMIN_KEY viene impostata, vale solo quella.
+ */
+const OPEN_IN_DEVELOPMENT = !isAdminConfigured && process.env.NODE_ENV !== "production";
+
 export function useAdmin(): boolean {
-  return useClientValue(readAdmin, false);
+  const unlocked = useClientValue(readAdmin, false);
+  return OPEN_IN_DEVELOPMENT || unlocked;
 }

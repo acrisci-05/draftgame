@@ -9,7 +9,11 @@
  * Lo script è ripetibile: salta gli elementi che hanno già una foto e salva mano a
  * mano, così può essere interrotto e ripreso.
  *
- * Uso:  node scripts/fetch-images.js [idCategoria ...]
+ * Uso:  node scripts/fetch-images.js [idCategoria ...] [--refresh] [--hinted]
+ *
+ * --refresh  rifà anche le foto già presenti
+ * --hinted   rifà solo gli elementi con un abbinamento in data/image-hints.json,
+ *            utile dopo aver corretto un abbinamento sbagliato
  */
 const fs = require("fs");
 const path = require("path");
@@ -34,6 +38,7 @@ function byExactness(name, pages) {
 }
 
 const DATA = path.resolve(process.cwd(), "data/categories.json");
+const HINTS = path.resolve(process.cwd(), "data/image-hints.json");
 const TIERS = ["5", "4", "3", "2", "1"];
 const PAUSE_MS = 180;
 const THUMB = 600;
@@ -47,6 +52,8 @@ const HEADERS = {
 const args = process.argv.slice(2);
 /** Con --refresh le foto già presenti vengono ricalcolate da capo. */
 const refresh = args.includes("--refresh");
+/** Con --hinted si rifanno solo gli elementi elencati in data/image-hints.json. */
+const hintedOnly = args.includes("--hinted");
 const only = args.filter((value) => !value.startsWith("--"));
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -97,6 +104,81 @@ async function byTitle(lang, title) {
 }
 
 /**
+ * Cerca un file su Wikimedia Commons.
+ *
+ * Wikipedia ha una voce per le cose che hanno un nome; le foto delle cose comuni
+ * — una doccia calda, un cetriolino, una pizza wurstel e patatine — stanno su
+ * Commons, che è un archivio di immagini e non un'enciclopedia.
+ */
+async function commonsSearch(query) {
+  const params = new URLSearchParams({
+    action: "query",
+    generator: "search",
+    gsrsearch: `filetype:bitmap ${query}`,
+    gsrnamespace: "6",
+    gsrlimit: "10",
+    prop: "imageinfo",
+    iiprop: "url",
+    iiurlwidth: String(THUMB),
+    format: "json",
+    origin: "*",
+  });
+  const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {
+    headers: HEADERS,
+  });
+  if (!response.ok) return [];
+  const pages = Object.values((await response.json()).query?.pages ?? {}).sort(
+    (a, b) => (a.index ?? 0) - (b.index ?? 0),
+  );
+  return pages
+    .map((page) => ({ title: page.title ?? "", url: page.imageinfo?.[0]?.thumburl }))
+    .filter((entry) => entry.url);
+}
+
+const words = (value) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 2);
+
+/** Il file va preso solo se il suo nome contiene tutte le parole cercate. */
+function matchesQuery(query, title) {
+  const target = words(title);
+  return words(query).every((word) => target.some((candidate) => candidate.startsWith(word)));
+}
+
+/**
+ * Abbinamenti scelti a mano (data/image-hints.json). Quando ci sono valgono più
+ * di qualsiasi ricerca automatica: sono stati verificati uno per uno.
+ */
+const hints = JSON.parse(fs.readFileSync(HINTS, "utf8"));
+
+async function fromHint(hint) {
+  const separator = hint.indexOf(":");
+  const source = hint.slice(0, separator);
+  const query = hint.slice(separator + 1).trim();
+
+  if (source === "commons") {
+    // La ricerca parte dalla descrizione completa e, se nessun file la soddisfa
+    // tutta, lascia cadere l'ultima parola: "person sleeping bed morning" diventa
+    // "person sleeping bed" e poi "person sleeping". Le parole più importanti
+    // stanno all'inizio, quindi la foto resta pertinente.
+    const terms = query.split(/\s+/).filter(Boolean);
+    for (let length = terms.length; length > 0; length -= 1) {
+      const attempt = terms.slice(0, length).join(" ");
+      const files = await commonsSearch(attempt);
+      const file = files.find((entry) => matchesQuery(attempt, entry.title));
+      if (file) return { url: file.url, title: file.title, lang: "commons" };
+      await wait(PAUSE_MS);
+    }
+    return null;
+  }
+  return byTitle(source, query);
+}
+
+/**
  * Titoli alternativi tipici di certe categorie: su Wikipedia la voce di una pizza
  * si chiama "Pizza margherita" e quella di un meme porta il chiarimento "(meme)".
  */
@@ -129,6 +211,17 @@ function isHeraldic(url) {
 async function findPhoto(name, categoryName, categoryId) {
   const aliases = ALIASES[categoryId]?.(name) ?? [];
   let fallback = null;
+
+  const hint = hints[categoryId]?.[name];
+  if (hint) {
+    try {
+      const chosen = await fromHint(hint);
+      if (chosen) return chosen;
+    } catch {
+      /* rete instabile: si prosegue con la ricerca automatica */
+    }
+    await wait(PAUSE_MS);
+  }
 
   const consider = (url, title, lang) => {
     if (!url) return null;
@@ -240,7 +333,8 @@ function serialize(categories) {
         const [name, emoji, image] = rows[index];
         total += 1;
 
-        if (image && !refresh) {
+        const hinted = hints[category.id]?.[name] !== undefined;
+        if (image && !refresh && !(hintedOnly && hinted)) {
           already += 1;
           inCategory += 1;
           continue;

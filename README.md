@@ -26,7 +26,8 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
   tiene in cache; ripiego su Unsplash e, in ultima istanza, sulla copertina con emoji.
 - **26 liste ufficiali** a nomi corti con emoji di copertina, definite in `data/categories.json`,
   con ricerca istantanea e filtri per macro-tema nella pagina Categorie.
-- **Modalità creatore**: Studio ed editor delle categorie sono protetti da `NEXT_PUBLIC_ADMIN_KEY`.
+- **Modalità creatore**: Studio ed editor delle categorie sono già aperti in sviluppo; online li
+  protegge la parola scelta in `NEXT_PUBLIC_ADMIN_KEY`.
 - **Voto del gioco** da 1 a 5 stelle, anonimo, con commento facoltativo che legge solo il creatore.
 - **Accesso senza password**: email con link (o codice a 6 cifre) e nickname pubblico.
 - **Pickpockets** (`/pickpockets`): amici per nickname, richieste da accettare e draft mandati agli

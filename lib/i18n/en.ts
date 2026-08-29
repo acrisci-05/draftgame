@@ -352,6 +352,8 @@ export const en: Dictionary = {
   "admin.lock": "Leave creator mode",
   "admin.devNote": "No key configured: in development any value works.",
   "admin.locked": "Only the creator can add or edit lists.",
+  "admin.devOpen":
+    "On your own computer it stays open without a key. To protect it online set NEXT_PUBLIC_ADMIN_KEY in .env.local.",
   "admin.sql": "Copy SQL for the database",
   "admin.sqlCopied": "SQL copied: paste it in the Supabase SQL editor.",
 
@@ -368,7 +370,9 @@ export const en: Dictionary = {
   "rate.error": "Sending failed. Try again later.",
 
   "tier.legend": "Value tiers",
-  "tier.tooltip": "Tier {letter}: base price {price}",
+  "tier.legendHint":
+    "The price is what it costs to open the bidding on that item: the strongest start at 5, the niche ones at 1.",
+  "tier.tooltip": "Base price {price}",
   "tier.name5": "Top / Legendary",
   "tier.name4": "Great",
   "tier.name3": "Good",
