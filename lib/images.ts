@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useSettings } from "./settings";
 import type { CatalogItem, Locale, RosterEntry } from "./types";
-import { isRelevant } from "./image-match";
+import { isExactTitle, isRelevant } from "./image-match";
 
-export { isRelevant };
+export { isExactTitle, isRelevant };
 
 /**
  * Foto reali per gli elementi del catalogo.
@@ -135,7 +135,11 @@ export async function searchImages(
     }
   }
 
-  return found.sort((a, b) => Number(b.relevant) - Number(a.relevant));
+  // Prima le corrispondenze piene, poi quelle per suffisso, infine il resto.
+  return found.sort((a, b) => {
+    const exact = Number(isExactTitle(name, b.title)) - Number(isExactTitle(name, a.title));
+    return exact !== 0 ? exact : Number(b.relevant) - Number(a.relevant);
+  });
 }
 
 /**

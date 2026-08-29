@@ -208,6 +208,12 @@
   ridotto togliendo il chiarimento fra parentesi e accettato solo se coincide col nome cercato o
   vi termina, come per i nomi di persona. Senza un risultato pertinente resta la copertina con
   l'icona. Nello Studio la ricerca propone fino a sei candidati fra cui scegliere.
+- Le foto delle liste ufficiali sono fissate dentro `data/categories.json` da
+  `npm run images:fetch`, che per ogni elemento prova prima la pagina con quel titolo esatto
+  seguendo i rimandi, poi la ricerca per parole col filtro di pertinenza, in italiano e in inglese.
+  Lo script salta gli elementi già completi e salva a ogni fascia, quindi si può interrompere e
+  riprendere. Gli elementi dal nome descrittivo, che non hanno una voce propria, restano con la
+  loro icona: è la scelta corretta rispetto a una foto generica fuorviante.
 
 ======================================================================
 12. FUNZIONAMENTO SENZA DATABASE

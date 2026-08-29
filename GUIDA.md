@@ -93,6 +93,7 @@ un uso vero e continuativo.
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
+| `npm run images:fetch` | riempie le liste con le foto di Wikipedia (si può interrompere e riprendere) |
 | `npm run share` | apre un indirizzo pubblico temporaneo per provare da rete dati |
 
 ---
@@ -176,7 +177,12 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   per elemento, salva sul dispositivo ed esporta il JSON o la query SQL già pronta.
 
 ### Immagini
-- Ogni elemento mostra una copertina con la sua icona: sempre giusta, sempre disponibile.
+- Le liste ufficiali hanno le **foto già fissate** dentro `data/categories.json`: arrivano da
+  Wikipedia e non dipendono da alcuna ricerca durante la partita. Si aggiornano con
+  `npm run images:fetch`, che riprende da dove si era interrotto.
+- Gli elementi dal nome descrittivo, che su Wikipedia non hanno una voce propria
+  ("Doppia carne", "Insalata moscia"), restano con la loro icona: meglio l'icona di una foto
+  generica sbagliata.
 - **Filtro di pertinenza**: una foto trovata online viene accettata solo se il titolo della pagina
   corrisponde davvero al nome cercato. "Up" prende *Up (film 2009)* e non *Upload*, "Snake" non
   diventa *Snake River*, "Smash Burger" non diventa *Hamburger*. Se nessun risultato è pertinente

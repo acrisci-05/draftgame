@@ -12,7 +12,7 @@ Module._resolveFilename = function (request, ...rest) {
   return resolveFilename.call(this, target, ...rest);
 };
 
-const { isRelevant } = require(path.join(OUT, "image-match.js"));
+const { isRelevant, isExactTitle } = require(path.join(OUT, "image-match.js"));
 
 let failures = 0;
 function check(label, condition, detail) {
@@ -34,6 +34,8 @@ const accepted = [
   ["Reggia di Caserta", "Reggia di Caserta"],
   ["Messi", "Lionel Messi"],
   ["Iron Man", "Iron Man (film 2008)"],
+  ["Toy Story", "Toy Story - Il mondo dei giocattoli"],
+  ["Spider-Man", "Spider-Man (film 2002)"],
 ];
 const rejected = [
   ["Up", "Upload (serie televisiva)"],
@@ -49,6 +51,23 @@ accepted.forEach(([name, title]) =>
 );
 rejected.forEach(([name, title]) =>
   check(`scarta "${title}" per "${name}"`, !isRelevant(name, title)),
+);
+
+console.log("\nPriorità alla corrispondenza piena\n");
+
+const exactCases = [
+  ["Friends", "Friends", true],
+  ["Friends", "Smiling Friends", false],
+  ["Messi", "Lionel Messi", false],
+  ["Up", "Up (film 2009)", true],
+  ["Roma", "Roma", true],
+];
+
+exactCases.forEach(([name, title, expected]) =>
+  check(
+    `"${title}" ${expected ? "è" : "non è"} corrispondenza piena di "${name}"`,
+    isExactTitle(name, title) === expected,
+  ),
 );
 
 /* Prova sul campo, saltata se non c'è rete. */

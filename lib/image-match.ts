@@ -16,9 +16,17 @@ function words(value: string): string[] {
   return slugify(value).split("-").filter(Boolean);
 }
 
-/** Toglie il chiarimento fra parentesi, che serve solo a disambiguare. */
+/**
+ * Riduce il titolo alla sua parte identificativa: via il chiarimento fra parentesi
+ * e via il sottotitolo dopo trattino o due punti, che su Wikipedia è frequente
+ * ("Toy Story - Il mondo dei giocattoli" resta "Toy Story").
+ * Il trattino attaccato alle parole non si tocca, per non spezzare "Spider-Man".
+ */
 function mainTitle(title: string): string {
-  return title.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  return title
+    .replace(/\s*\([^)]*\)\s*/g, " ")
+    .split(/\s+[-–—:]\s+|:\s+/)[0]
+    .trim();
 }
 
 function endsWith(target: string[], needle: string[]): boolean {
@@ -32,4 +40,16 @@ export function isRelevant(name: string, title: string): boolean {
   const needle = words(name);
   if (needle.length === 0 || target.length === 0) return false;
   return endsWith(target, needle);
+}
+
+/**
+ * Corrispondenza piena fra nome e titolo, senza parole in più.
+ * Va preferita a quella per suffisso: cercando "Friends" si vuole la voce
+ * "Friends" e non "Smiling Friends", mentre "Messi" ha solo "Lionel Messi".
+ */
+export function isExactTitle(name: string, title: string): boolean {
+  const target = words(mainTitle(title));
+  const needle = words(name);
+  if (needle.length !== target.length) return false;
+  return needle.every((word, index) => target[index] === word);
 }
