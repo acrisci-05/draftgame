@@ -5,8 +5,9 @@ import { Gavel, Heart, LayoutGrid, LogIn, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClientValue } from "@/lib/client-store";
-import { APP_TAGLINE } from "@/lib/config";
+import { APP_FULL_NAME, APP_TAGLINE, APP_VERSION } from "@/lib/config";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
+import { openPanel } from "@/lib/panels";
 import { useSettings } from "@/lib/settings";
 import { ensureProfile, readProfile, saveProfile, saveSession } from "@/lib/storage";
 import type { Profile } from "@/lib/types";
@@ -142,6 +143,14 @@ export default function HomePage() {
         </button>
         <button
           type="button"
+          onClick={() => openPanel("creator")}
+          className="flex items-center gap-1.5 transition-colors hover:text-gold"
+        >
+          <span aria-hidden>👑</span>
+          {t("nav.creator")}
+        </button>
+        <button
+          type="button"
           onClick={() => setSupportOpen(true)}
           className="flex items-center gap-1.5 transition-colors hover:text-violet"
         >
@@ -149,6 +158,10 @@ export default function HomePage() {
           {t("support.title")}
         </button>
       </div>
+
+      <p className="text-center text-[11px] text-faint">
+        {APP_FULL_NAME} · v{APP_VERSION}
+      </p>
 
       <JoinModal open={joinOpen} onClose={() => setJoinOpen(false)} onJoin={joinRoom} />
       <SupportModal open={supportOpen} onClose={() => setSupportOpen(false)} />

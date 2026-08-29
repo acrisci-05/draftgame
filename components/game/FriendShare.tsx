@@ -3,17 +3,17 @@
 import { Check, Loader2, Send, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { listFriends, shareResultWithFriends, type Friend } from "@/lib/friends";
+import { listPickmates, shareResultWithPickmates, type Pickmate } from "@/lib/pickmates";
 import { useT } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 
-/** Manda il draft appena concluso agli amici Pickpockets perché lo votino. */
+/** Manda il draft appena concluso ai Pickmates perché lo votino. */
 export function FriendShare({ resultId }: { resultId: string | null }) {
   const t = useT();
   const { account } = useAuth();
-  const [friends, setFriends] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<Pickmate[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
@@ -22,7 +22,7 @@ export function FriendShare({ resultId }: { resultId: string | null }) {
   useEffect(() => {
     if (!userId) return;
     let active = true;
-    listFriends(userId).then((all) => {
+    listPickmates(userId).then((all) => {
       if (active) setFriends(all.filter((friend) => friend.status === "accepted"));
     });
     return () => {
@@ -41,7 +41,7 @@ export function FriendShare({ resultId }: { resultId: string | null }) {
     if (!resultId || selected.length === 0) return;
     setStatus("sending");
     try {
-      await shareResultWithFriends(resultId, account.id, selected);
+      await shareResultWithPickmates(resultId, account.id, selected);
       setStatus("sent");
     } catch {
       setStatus("error");

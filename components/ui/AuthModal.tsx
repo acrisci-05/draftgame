@@ -1,13 +1,16 @@
 "use client";
 
-import { Check, KeyRound, Loader2, LogIn, LogOut, Smartphone, UserPlus } from "lucide-react";
+import { Check, Circle, KeyRound, Loader2, LogIn, LogOut, Smartphone, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   AuthFailure,
   MIN_PASSWORD,
+  PASSWORD_SPECIALS,
   createAccount,
   isNicknameAvailable,
+  isStrongPassword,
   normalizeNickname,
+  passwordChecks,
   requestPasswordReset,
   saveLocalAccount,
   signInWithPassword,
@@ -15,6 +18,7 @@ import {
   signUpWithPassword,
   useAuth,
   type AuthError,
+  type PasswordChecks,
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
 import type { TranslationKey } from "@/lib/i18n";
@@ -30,6 +34,7 @@ const ERROR_KEYS: Record<AuthError, TranslationKey> = {
   "nickname-invalid": "auth.errNicknameInvalid",
   "email-invalid": "auth.errEmailInvalid",
   "password-short": "auth.errPasswordShort",
+  "password-weak": "auth.errPasswordWeak",
   "wrong-credentials": "auth.errWrongCredentials",
   "email-taken": "auth.errEmailTaken",
   "confirm-email": "auth.confirmSent",
@@ -176,10 +181,13 @@ function CredentialsForm({ onDone }: { onDone?: () => void }) {
     }
   };
 
+  // In accesso basta che la password ci sia: la giudica il servizio. In
+  // registrazione devono essere soddisfatti tutti e quattro i requisiti.
   const ready =
     email.includes("@") &&
-    password.length >= MIN_PASSWORD &&
-    (tab === "in" || (cleanNick.length >= 3 && nickFree !== false));
+    (tab === "in"
+      ? password.length > 0
+      : isStrongPassword(password) && cleanNick.length >= 3 && nickFree !== false);
 
   return (
     <div className="flex flex-col gap-4">
@@ -252,17 +260,19 @@ function CredentialsForm({ onDone }: { onDone?: () => void }) {
         onChange={(event) => setEmail(event.target.value)}
       />
 
-      <Input
-        label={t("auth.password")}
-        hint={tab === "up" ? t("auth.passwordHint", { n: MIN_PASSWORD }) : undefined}
-        type="password"
-        autoComplete={tab === "in" ? "current-password" : "new-password"}
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && ready) void submit();
-        }}
-      />
+      <div>
+        <Input
+          label={t("auth.password")}
+          type="password"
+          autoComplete={tab === "in" ? "current-password" : "new-password"}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && ready) void submit();
+          }}
+        />
+        {tab === "up" ? <PasswordRules password={password} /> : null}
+      </div>
 
       {error ? (
         <p className="text-sm text-red-500">{t(error, { n: MIN_PASSWORD })}</p>
@@ -291,6 +301,47 @@ function CredentialsForm({ onDone }: { onDone?: () => void }) {
         </button>
       ) : null}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * Le quattro condizioni della password, che si accendono di verde mentre si
+ * scrive. Finché una resta grigia il pulsante "Registrati" non si attiva.
+ */
+function PasswordRules({ password }: { password: string }) {
+  const t = useT();
+  const checks = passwordChecks(password);
+  const rules: { key: keyof PasswordChecks; label: string }[] = [
+    { key: "length", label: t("auth.ruleLength", { n: MIN_PASSWORD }) },
+    { key: "upper", label: t("auth.ruleUpper") },
+    { key: "digit", label: t("auth.ruleDigit") },
+    { key: "special", label: t("auth.ruleSpecial", { chars: PASSWORD_SPECIALS }) },
+  ];
+
+  return (
+    <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
+      {rules.map(({ key, label }) => {
+        const done = checks[key];
+        return (
+          <li
+            key={key}
+            className={cn(
+              "flex items-center gap-1.5 text-xs transition-colors",
+              done ? "text-neon" : "text-faint",
+            )}
+          >
+            {done ? (
+              <Check className="size-3.5 shrink-0" />
+            ) : (
+              <Circle className="size-3.5 shrink-0" />
+            )}
+            {label}
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

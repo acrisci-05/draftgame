@@ -103,7 +103,7 @@
 - Fasce mostrate come tier visivi con badge colorati (S/A/B/C/D più il valore) al posto dei
   conteggi tipo "1/6".
 - Asta: immagine grande dell'elemento al centro, titolo sotto, prezzo e ultimo rilancio in evidenza,
-  clessidra animata con ticchettio sotto i 5 secondi, feed delle offerte, pannello per giocatore con
+  clessidra animata con ticchettio sotto i 5 secondi, pannello per giocatore con
   Rilancia/Passa, budget, slot e inventario in miniatura. Vibrazione a ogni offerta dove supportata.
 - Anti-sniping: ogni rilancio riporta il timer a 10 secondi, quindi un'offerta all'ultimo istante
   lascia sempre tempo di rispondere; quando succede compare l'avviso dedicato.
@@ -158,7 +158,7 @@
 - Voto del gioco: sezione dedicata nel menu, da 1 a 5 stelle più commento facoltativo, anonimo e
   con un voto per dispositivo. I commenti li legge solo il creatore dalla console: la vista
   pubblica `ratings_summary` espone soltanto media e numero di voti.
-- Sezione amici "Pickpockets": vedi il capitolo 10.
+- Sezione amici "Pickmates": vedi il capitolo 10.
 
 ======================================================================
 10. ACCESSO E SEZIONE PICKPOCKETS
@@ -168,14 +168,30 @@
   L'app non vede né gestisce password.
 - Al primo accesso si sceglie un nickname pubblico (lettere, numeri e underscore) e un avatar:
   il nickname è l'indirizzo con cui gli amici ti aggiungono. Vive nella tabella `profiles`.
-- Pickpockets (/pickpockets): profilo con nickname da copiare, invio richieste di amicizia per
-  nickname, richieste ricevute da accettare, elenco amici e draft ricevuti da votare.
-- Amicizie: una riga per coppia in `friendships`. Chi invita è `user_id`, chi accetta è `friend_id`
+- Registrazione con email e password: quattro requisiti obbligatori (8 caratteri, una maiuscola, un
+  numero, un carattere speciale fra !@#$%^&*), mostrati come spunte che si accendono mentre si
+  scrive; il pulsante resta spento finché non sono tutti soddisfatti e il controllo viene ripetuto
+  in `signUpWithPassword` prima di chiamare il servizio di autenticazione.
+- Pickmates (/pickmates): due schede, "I miei Pickmates" e "Draft ricevuti". Ricerca in tre modi:
+  nickname (ricerca parziale), email (corrispondenza esatta) e avversari delle ultime partite.
+  Accanto a ogni Pickmate compare il numero di sfide giocate insieme.
+- Amicizie: una riga per coppia in `pickmates`. Chi invita è `user_id`, chi accetta è `friend_id`
   e porta lo stato da `pending` ad `accepted`. Le policy permettono di leggere e modificare solo le
-  righe in cui compare il proprio id.
+  righe in cui compare il proprio id. La vecchia tabella `friendships` viene travasata una tantum
+  dallo schema.
+- Avversari recenti: `recent_opponents` tiene per ogni coppia il numero di partite e l'ultima data.
+  Ogni giocatore scrive solo le proprie righe, tramite una funzione del database chiamata a fine
+  partita per ciascun avversario che aveva fatto l'accesso.
+- Email di ricerca: stanno in `profile_emails`, leggibile solo dal proprietario. La ricerca passa
+  dalla funzione `find_pickmate_by_email`, che accetta solo l'indirizzo esatto e restituisce i soli
+  campi pubblici del profilo: nessuno può ottenere l'elenco degli indirizzi.
+- Sfide e notifiche: una sfida è una riga in `challenges` (mittente, destinatario, codice stanza e
+  numero della battuta, fra otto). `pickmates` e `challenges` sono pubblicate sul canale realtime,
+  quindi la campanella in navbar si aggiorna senza ricaricare. Le richieste si accettano o
+  rifiutano, le sfide portano dentro la stanza o si ignorano.
 - Condivisione dei draft: a fine partita, generato il link di voto, si scelgono gli amici a cui
   mandarlo. Ogni invio è una riga in `shared_results`, leggibile solo da mittente e destinatario.
-  Chi riceve trova il draft nella sua sezione Pickpockets e vota dalla pagina di voto.
+  Chi riceve trova il draft nella sua sezione Pickmates e vota dalla pagina di voto.
 - I suggerimenti di categoria richiedono l'accesso: la policy accetta solo utenti autenticati e
   salva l'autore, così i doppioni e gli abusi restano tracciabili.
 - Restano anonimi e senza account: partite locali, stanze online, voto del gioco a stelle e
@@ -231,7 +247,7 @@
   intenzioni.
 - Voto del gioco e suggerimenti: senza database restano salvati sul dispositivo, con un messaggio
   che lo dice; con il database arrivano al creatore.
-- Amici Pickpockets e link di voto richiedono il database, perché per definizione mettono in
+- Amici Pickmates e link di voto richiedono il database, perché per definizione mettono in
   comunicazione persone diverse: l'interfaccia lo spiega invece di mostrare un errore.
 - `supabase/schema.sql` include anche le tabelle `games` e `game_players` per conservare l'ultimo
   stato di una stanza online, utile a chi ricarica la pagina o rientra.

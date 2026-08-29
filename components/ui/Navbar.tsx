@@ -2,8 +2,8 @@
 
 import {
   BookOpen,
-  Camera,
   ChevronRight,
+  Crown,
   Heart,
   Lightbulb,
   Menu,
@@ -14,7 +14,6 @@ import {
   UserRound,
   Users,
   Sun,
-  User,
   Volume2,
   VolumeX,
 } from "lucide-react";
@@ -23,34 +22,27 @@ import { useEffect, useState } from "react";
 import { INSTAGRAM_URL } from "@/lib/config";
 import { primeAudio } from "@/lib/audio";
 import { languageOption } from "@/lib/i18n";
+import { onPanelRequest, type PanelName } from "@/lib/panels";
 import { syncRemoteLists } from "@/lib/remote-lists";
 import { useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { AdminModal } from "./AdminModal";
 import { AuthModal } from "./AuthModal";
+import { InstagramGlyph } from "./BrandGlyphs";
 import { InstallPwaModal } from "./InstallPwaModal";
 import { Drawer } from "./Drawer";
 import { CreatorModal } from "./CreatorModal";
 import { LanguagePicker } from "./LanguagePicker";
 import { Logo } from "./Logo";
 import { Modal } from "./Modal";
+import { NotificationBell } from "./NotificationBell";
 import { RatingModal } from "./RatingModal";
 import { RulesModal } from "./RulesModal";
 import { SuggestModal } from "./SuggestModal";
 import { SupportModal } from "./SupportModal";
 import { Switch } from "./Switch";
 
-type Panel =
-  | "rules"
-  | "suggest"
-  | "creator"
-  | "support"
-  | "language"
-  | "rate"
-  | "admin"
-  | "account"
-  | "install"
-  | null;
+type Panel = PanelName | null;
 
 /** Importo del badge rapido nel menu. */
 const QUICK_DONATION = 2;
@@ -65,6 +57,9 @@ export function Navbar() {
   useEffect(() => {
     void syncRemoteLists();
   }, []);
+
+  // Pannelli aperti da altre parti del sito (piè di pagina, notifiche).
+  useEffect(() => onPanelRequest((name) => setPanel(name)), []);
 
   const language = languageOption(locale);
 
@@ -81,7 +76,7 @@ export function Navbar() {
   const entries: { key: Exclude<Panel, null>; icon: typeof BookOpen; label: string }[] = [
     { key: "rules", icon: BookOpen, label: t("nav.rules") },
     { key: "suggest", icon: Lightbulb, label: t("nav.suggest") },
-    { key: "creator", icon: User, label: t("nav.creator") },
+    { key: "creator", icon: Crown, label: t("nav.creator") },
     { key: "account", icon: UserRound, label: t("nav.account") },
     { key: "rate", icon: Star, label: t("nav.rate") },
     { key: "admin", icon: ShieldCheck, label: t("nav.admin") },
@@ -108,6 +103,8 @@ export function Navbar() {
             {sound ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
           </IconButton>
 
+          <NotificationBell />
+
           <IconButton label={t("nav.menu")} onClick={() => setMenuOpen(true)}>
             <Menu className="size-5" />
           </IconButton>
@@ -130,12 +127,12 @@ export function Navbar() {
           ))}
 
           <Link
-            href="/pickpockets"
+            href="/pickmates"
             onClick={() => setMenuOpen(false)}
             className="flex items-center gap-3 rounded-2xl border border-line bg-surface-2 p-4 text-start transition-colors hover:border-neon/50"
           >
             <Users className="size-5 shrink-0 text-neon" />
-            <span className="flex-1 font-semibold">{t("nav.pickpockets")}</span>
+            <span className="flex-1 font-semibold">{t("nav.pickmates")}</span>
             <ChevronRight className="size-4 shrink-0 text-faint" />
           </Link>
 
@@ -182,14 +179,19 @@ export function Navbar() {
           rel="noreferrer noopener"
           className="mt-auto flex items-center justify-center gap-2 rounded-full border border-violet/40 bg-violet/10 p-3 font-semibold text-violet transition-colors hover:bg-violet/20"
         >
-          <Camera className="size-5" />
+          <InstagramGlyph className="size-5" />
           {t("creator.instagram")}
         </a>
       </Drawer>
 
       <RulesModal open={panel === "rules"} onClose={() => setPanel(null)} />
       <SuggestModal open={panel === "suggest"} onClose={() => setPanel(null)} />
-      <CreatorModal open={panel === "creator"} onClose={() => setPanel(null)} />
+      <CreatorModal
+        open={panel === "creator"}
+        onClose={() => setPanel(null)}
+        onFeedback={() => setPanel("suggest")}
+        onSupport={() => setPanel("support")}
+      />
       <SupportModal open={panel === "support"} onClose={() => setPanel(null)} />
       <RatingModal open={panel === "rate"} onClose={() => setPanel(null)} />
       <AdminModal open={panel === "admin"} onClose={() => setPanel(null)} />

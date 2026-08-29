@@ -158,6 +158,22 @@ export function clearSession(code: string) {
   notifyClientStore();
 }
 
+/**
+ * Codice dell'ultima stanza online aperta su questo dispositivo: è quello che si
+ * propone quando si vuole sfidare un Pickmate.
+ */
+export function lastOnlineRoomCode(): string | null {
+  if (typeof window === "undefined") return null;
+  let latest: RoomSession | null = null;
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index);
+    if (!key?.startsWith(SESSION_PREFIX)) continue;
+    const session = read<RoomSession | null>(key, null);
+    if (session?.mode === "online") latest = session;
+  }
+  return latest?.code ?? null;
+}
+
 /* ---------------------------------------------------------------- */
 /* Voti e suggerimenti senza database                                */
 /* ---------------------------------------------------------------- */

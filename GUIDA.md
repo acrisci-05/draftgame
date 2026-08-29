@@ -111,7 +111,7 @@ app/                        pagine e rotte
   room/[code]/                stanza di gioco
   categories/                 elenco, editor e categorie condivise
   studio/                     gestione liste (solo creatore)
-  pickpockets/                amici e draft ricevuti
+  pickmates/                  Pickmates, sfide e draft ricevuti
   vote/[id]/                  votazione pubblica dei draft
 components/ui/              bottoni, badge, input, modali, navbar, menu
 components/game/            asta, timer, controlli offerta, card finale, editor liste
@@ -167,7 +167,8 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   evidenza, clessidra animata con ticchettio negli ultimi 5 secondi.
 - Pannello per ogni giocatore con budget, slot occupati, inventario in miniatura, e i comandi
   Rilancia / Max / Passa fissati in basso sul telefono.
-- Cronologia delle offerte richiudibile sotto il lotto e alone verde pulsante su chi sta vincendo.
+- Alone verde pulsante su chi sta vincendo il lotto. Sotto l'immagine non c'è più la cronologia
+  delle offerte: rubava spazio all'elemento in asta senza aggiungere niente di utile.
 - Effetti sonori sintetizzati (nessun file audio da scaricare) e vibrazione dove supportata.
 
 ### Categorie
@@ -242,12 +243,43 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   In registrazione si scelgono nickname e avatar, con il controllo di disponibilità mentre si
   scrive; c'è anche il recupero password. Le password vanno al servizio di autenticazione, che le
   conserva cifrate: l'app non le salva né le vede mai in chiaro.
+- **Password con quattro requisiti obbligatori**, controllati mentre si scrive: almeno 8 caratteri,
+  una maiuscola, un numero e un carattere speciale fra `!@#$%^&*`. Sotto il campo ci sono le quattro
+  spunte che si accendono di verde una alla volta, e finché non sono tutte verdi il pulsante
+  "Registrati" resta spento. Lo stesso controllo viene rifatto prima dell'invio, così una password
+  debole non parte nemmeno.
 - Il **nickname è unico**: lo garantiscono il controllo prima dell'invio e un vincolo del
   database che accetta solo minuscole, cifre e underscore, così "Marco" e "marco" non convivono.
 - Senza database si può comunque creare un **profilo su questo dispositivo** e giocare subito.
-- **Pickpockets**: rubrica amici per nickname, richieste da accettare, e invio dei propri draft
-  agli amici perché li votino.
+
+### Pickmates
+La rubrica degli amici con cui si gioca, in `/pickmates`, divisa in due schede: *I miei Pickmates*
+e *Draft ricevuti*.
+
+- **Tre modi per trovare qualcuno**: per **nickname** (basta un pezzo del nome), per **email**
+  esatta, oppure scegliendo fra i **Pickmates recenti**, cioè chi si è incontrato nelle ultime
+  partite: lì si aggiungono con un tocco.
+- Accanto a ogni Pickmate c'è **quante sfide avete giocato insieme**: il conteggio cresce da solo a
+  fine partita, per chi in stanza aveva fatto l'accesso.
+- **Sfida**: dalla lista si manda l'invito a entrare nella stanza aperta. Arriva all'altro come
+  notifica, con una battuta a sorte fra otto.
+- Si continuano a mandare i propri draft agli amici perché li votino.
 - I **suggerimenti di categoria** arrivano solo da chi ha fatto l'accesso.
+
+### Notifiche dal vivo
+La campanella in navbar compare a chi ha fatto l'accesso e ascolta il canale realtime del database:
+quando qualcuno scrive una riga che ti riguarda, l'avviso arriva senza ricaricare la pagina.
+
+| Notifica | Cosa mostra | Pulsanti |
+| --- | --- | --- |
+| Richiesta Pickmate | chi ti ha invitato | Accetta · Rifiuta |
+| Sfida in arrivo | chi ti sfida, il codice stanza e una battuta a sorte | Entra nella stanza · Ignora |
+
+### Scheda del creatore
+Dal menu (voce con la corona) e dal piè di pagina della home: avatar con il badge "Creatore",
+nome e qualifica, la visione del progetto, i collegamenti social (Instagram con i suoi colori, X,
+GitHub, donazioni), la versione dell'app con le ultime novità e il pulsante per mandare un
+suggerimento, che legge solo il creatore.
 
 ### Contorno
 - **10 lingue** (italiano, inglese, francese, spagnolo, tedesco, portoghese, russo, cinese,
@@ -275,7 +307,7 @@ L'app non si blocca mai: quando le chiavi del database mancano, ogni funzione ha
 | Partita locale | completa | completa |
 | Stanza online fra dispositivi | dal server dell'app | dai canali del database |
 | Profilo | nickname e avatar su questo dispositivo | account con email e password |
-| Amici Pickpockets | non disponibile | completa |
+| Amici Pickmates | non disponibile | completa |
 | Voto del gioco | salvato sul dispositivo | arriva al creatore |
 | Suggerimenti | salvati sul dispositivo | arrivano al creatore |
 | Link di voto dei draft | non disponibile | link e QR condivisibili |
@@ -317,9 +349,17 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
 
 3. Apri l'**SQL editor** di Supabase ed esegui tutto il contenuto di `supabase/schema.sql`:
    crea le tabelle `categories`, `suggestions`, `results`, `votes`, `feedback`, `official_lists`,
-   `profiles`, `friendships`, `shared_results` con le rispettive regole di accesso.
+   `profiles`, `pickmates`, `recent_opponents`, `challenges`, `profile_emails`, `shared_results`
+   con le rispettive regole di accesso. Lo script si può rieseguire quando serve: aggiorna quello
+   che manca e travasa da solo la vecchia tabella `friendships` in `pickmates`.
+   Due note sul perché è fatto così:
+   - le **email** non stanno in `profiles` ma in una tabella a parte che legge solo il proprietario;
+     la ricerca passa da una funzione che accetta solo l'indirizzo esatto, quindi nessuno può
+     scorrere l'elenco degli iscritti;
+   - `pickmates` e `challenges` vengono aggiunte alla pubblicazione realtime: è da lì che arrivano
+     le notifiche senza ricaricare la pagina.
 4. **Authentication → URL Configuration**: metti il dominio in *Site URL* e aggiungi
-   `http://localhost:3000/pickpockets` e `https://iltuodominio/pickpockets` fra le *Redirect URLs*.
+   `http://localhost:3000/pickmates` e `https://iltuodominio/pickmates` fra le *Redirect URLs*.
 5. Facoltativo: in **Authentication → Email Templates → Magic Link** aggiungi `{{ .Token }}` per
    far arrivare anche il codice a 6 cifre.
 
@@ -351,7 +391,7 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 **Funziona senza configurazione**: partita locale, tutte le 26 categorie, regole complete, card
 9:16 scaricabile, lingue, temi, audio.
 
-**Richiede Supabase**: stanze online, accesso, Pickpockets, votazioni, suggerimenti, voto a stelle,
+**Richiede Supabase**: stanze online, accesso, Pickmates, votazioni, suggerimenti, voto a stelle,
 liste pubblicate sul database.
 
 Da sapere:

@@ -253,7 +253,7 @@ export function totalSlots(state: GameState): number {
 /* ------------------------------------------------------------------ */
 
 export type GameAction =
-  | { type: "add_player"; player: { id: string; name: string; emoji?: string } }
+  | { type: "add_player"; player: { id: string; name: string; emoji?: string; accountId?: string } }
   | { type: "remove_player"; playerId: string }
   | { type: "set_category"; category: Category }
   | { type: "set_config"; config: Partial<RoomConfig> }
@@ -535,6 +535,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
         id: action.player.id,
         name: action.player.name.trim().slice(0, 16) || `Player ${index + 1}`,
         emoji: action.player.emoji || avatarForIndex(index),
+        accountId: action.player.accountId,
         budget: state.config.budget,
         roster: [],
       };

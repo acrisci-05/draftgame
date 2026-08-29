@@ -92,6 +92,7 @@ export type AuthError =
   | "nickname-invalid"
   | "email-invalid"
   | "password-short"
+  | "password-weak"
   | "wrong-credentials"
   | "email-taken"
   | "confirm-email"
@@ -106,6 +107,35 @@ export class AuthFailure extends Error {
 }
 
 export const MIN_PASSWORD = 8;
+
+/**
+ * Requisiti della password, controllati mentre si scrive e di nuovo prima di
+ * mandare la registrazione: una password debole non deve poter arrivare al
+ * servizio di autenticazione.
+ */
+export const PASSWORD_SPECIALS = "!@#$%^&*";
+
+export interface PasswordChecks {
+  length: boolean;
+  upper: boolean;
+  digit: boolean;
+  special: boolean;
+}
+
+export function passwordChecks(password: string): PasswordChecks {
+  return {
+    length: password.length >= MIN_PASSWORD,
+    upper: /[A-Z]/.test(password),
+    digit: /[0-9]/.test(password),
+    special: /[!@#$%^&*]/.test(password),
+  };
+}
+
+export function isStrongPassword(password: string): boolean {
+  const checks = passwordChecks(password);
+  return checks.length && checks.upper && checks.digit && checks.special;
+}
+
 const PENDING_PROFILE_KEY = "pp:pending-profile";
 
 /** Nickname e avatar scelti in registrazione, in attesa della conferma via email. */
@@ -159,7 +189,7 @@ export async function signUpWithPassword(input: {
 
   const nickname = normalizeNickname(input.nickname);
   if (nickname.length < 3) throw new AuthFailure("nickname-invalid");
-  if (input.password.length < MIN_PASSWORD) throw new AuthFailure("password-short");
+  if (!isStrongPassword(input.password)) throw new AuthFailure("password-weak");
   if (!input.email.includes("@")) throw new AuthFailure("email-invalid");
   if (!(await isNicknameAvailable(nickname))) throw new AuthFailure("nickname-taken");
 
@@ -199,7 +229,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
   const supabase = getSupabase();
   if (!supabase) throw new AuthFailure("offline");
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-    redirectTo: typeof window === "undefined" ? undefined : `${window.location.origin}/pickpockets`,
+    redirectTo: typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
   });
   if (error) throw new AuthFailure("unknown");
 }
@@ -211,7 +241,7 @@ export async function signInWithEmail(email: string): Promise<void> {
     options: {
       shouldCreateUser: true,
       emailRedirectTo:
-        typeof window === "undefined" ? undefined : `${window.location.origin}/pickpockets`,
+        typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
     },
   });
   if (error) throw new Error(error.message);

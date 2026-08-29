@@ -30,9 +30,12 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
 - **Modalità creatore**: Studio ed editor delle categorie sono già aperti in sviluppo; online li
   protegge la parola scelta in `NEXT_PUBLIC_ADMIN_KEY`.
 - **Voto del gioco** da 1 a 5 stelle, anonimo, con commento facoltativo che legge solo il creatore.
-- **Accesso senza password**: email con link (o codice a 6 cifre) e nickname pubblico.
-- **Pickpockets** (`/pickpockets`): amici per nickname, richieste da accettare e draft mandati agli
-  amici perché li votino.
+- **Registrazione con email e password** verificata su quattro requisiti (8 caratteri, maiuscola,
+  numero, carattere speciale) con le spunte che si accendono mentre si scrive.
+- **Pickmates** (`/pickmates`): rubrica amici con ricerca per nickname, per email esatta o fra gli
+  avversari delle ultime partite, conteggio delle sfide giocate insieme e invito a entrare in stanza.
+- **Notifiche dal vivo**: campanella in navbar con richieste di Pickmate e sfide in arrivo.
+- **Scheda del creatore** con biografia, collegamenti social, versione e ultime novità.
 - **Studio categorie** (`/studio`): vedi e modifica ogni lista elemento per elemento, cerca le foto
   reali su Wikipedia ed esporta il JSON pronto da incollare nel file dati.
 - **Editor di categorie** no-code: 30 elementi divisi in 5 fasce, emoji e immagine per elemento,
@@ -63,11 +66,11 @@ Serve per le stanze online, la condivisione delle categorie, i suggerimenti e la
 2. Copia `.env.example` in `.env.local` e inserisci URL e chiave anon del progetto.
 3. Esegui [`supabase/schema.sql`](./supabase/schema.sql) nell'SQL editor.
 
-Per l'accesso e la sezione Pickpockets servono due impostazioni in più:
+Per l'accesso e la sezione Pickmates servono due impostazioni in più:
 
 4. **Authentication → Providers → Email**: lascia attivo il provider (niente password, solo link).
 5. **Authentication → URL Configuration**: metti il dominio del sito in *Site URL* e aggiungi
-   `http://localhost:3000/pickpockets` e `https://iltuodominio/pickpockets` fra le *Redirect URLs*.
+   `http://localhost:3000/pickmates` e `https://iltuodominio/pickmates` fra le *Redirect URLs*.
 6. Facoltativo: in **Authentication → Email Templates → Magic Link** aggiungi `{{ .Token }}` al
    testo per far arrivare anche il codice a 6 cifre, più comodo da telefono.
 

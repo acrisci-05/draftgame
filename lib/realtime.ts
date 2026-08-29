@@ -19,6 +19,8 @@ interface SelfPlayer {
   id: string;
   name: string;
   emoji: string;
+  /** Profilo di chi ha fatto l'accesso, per ritrovarsi fra i Pickmates. */
+  accountId?: string;
 }
 
 interface UseRoomArgs {

@@ -24,7 +24,6 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { RoomCode } from "@/components/ui/RoomCode";
 import { BidControls } from "./BidControls";
-import { BidFeed } from "./BidFeed";
 import { ItemCover } from "./ItemCover";
 import { PlayerRail } from "./PlayerRail";
 import { TierChip } from "./TierChip";
@@ -260,8 +259,6 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
           ) : null}
         </AnimatePresence>
       </div>
-
-      <BidFeed feed={state.feed} currency={currency} />
 
       {turnId && state.mode === "local" ? (
         <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-violet">

@@ -3,10 +3,12 @@
 import { motion } from "framer-motion";
 import { Check, Home, Link2, Loader2, RotateCcw, Trash2, Vote } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth";
 import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
 import { itemById, rosterValue, standings, type GameAction } from "@/lib/game";
+import { recordOpponent } from "@/lib/pickmates";
 import { useSettings } from "@/lib/settings";
 import { isSupabaseConfigured, publishResult } from "@/lib/supabase";
 import type { CatalogItem, GameState } from "@/lib/types";
@@ -28,11 +30,27 @@ interface ResultsProps {
 export function Results({ state, isHost, dispatch }: ResultsProps) {
   const router = useRouter();
   const { locale, t } = useSettings();
+  const { account } = useAuth();
   const [voteUrl, setVoteUrl] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
   const [voteBusy, setVoteBusy] = useState(false);
   const [voteError, setVoteError] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const myAccountId = account && !account.local ? account.id : null;
+
+  /**
+   * A partita finita gli avversari con un profilo finiscono fra i "recenti":
+   * è la lista da cui si aggiungono i Pickmates con un tocco, e da cui esce il
+   * conteggio delle sfide giocate insieme. Ognuno scrive solo le proprie righe.
+   */
+  useEffect(() => {
+    if (!myAccountId) return;
+    const opponents = state.players
+      .map((player) => player.accountId)
+      .filter((id): id is string => Boolean(id) && id !== myAccountId);
+    for (const opponentId of new Set(opponents)) void recordOpponent(opponentId);
+  }, [myAccountId, state.players]);
 
   const currency = state.config.currency;
   const ordered = standings(state);

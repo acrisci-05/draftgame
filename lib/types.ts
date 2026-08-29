@@ -48,6 +48,8 @@ export interface Player {
   id: string;
   name: string;
   emoji: string;
+  /** Profilo collegato, quando chi gioca ha fatto l'accesso: serve per i Pickmates. */
+  accountId?: string;
   budget: number;
   roster: RosterEntry[];
 }

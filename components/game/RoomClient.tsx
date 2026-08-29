@@ -3,6 +3,7 @@
 import { ArrowLeft, Loader2, Radio, Smartphone, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { useAuth } from "@/lib/auth";
 import { DEFAULT_CATEGORY } from "@/lib/catalog";
 import { useClientValue, useIsClient } from "@/lib/client-store";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
@@ -31,6 +32,7 @@ export function RoomClient({ code }: { code: string }) {
   const router = useRouter();
   const { t } = useSettings();
   const isClient = useIsClient();
+  const { account } = useAuth();
 
   const readSession = useCallback(() => getSession(code), [code]);
   const session = useClientValue<RoomSession | null>(readSession, null);
@@ -45,13 +47,18 @@ export function RoomClient({ code }: { code: string }) {
     return session.config ?? readConfig();
   }, [session]);
 
+  // Il profilo, quando c'è, viaggia con il giocatore: serve a ritrovarsi fra i
+  // Pickmates dopo la partita.
+  const accountId = account && !account.local ? account.id : undefined;
+
   const self = useMemo(
     () => ({
       id: session?.playerId ?? "",
       name: session?.name ?? "",
       emoji: session?.emoji ?? DEFAULT_AVATAR,
+      accountId,
     }),
-    [session?.playerId, session?.name, session?.emoji],
+    [session?.playerId, session?.name, session?.emoji, accountId],
   );
 
   const room = useRoom({
