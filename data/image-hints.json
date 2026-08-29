@@ -4,7 +4,8 @@
     "Valori: \"commons:<ricerca>\" cerca un file su Wikimedia Commons,",
     "\"it:<Titolo>\" o \"en:<Titolo>\" prendono la foto di quella voce di Wikipedia.",
     "Servono per gli elementi astratti (una sensazione, un superpotere) e per",
-    "quelli il cui nome italiano non porta alla voce giusta."
+    "quelli il cui nome italiano non porta alla voce giusta.",
+    "\"none\" lascia di proposito l'elemento senza foto."
   ],
   "burger": {
     "Insalata Moscia": "commons:wilted lettuce leaves",
@@ -13,14 +14,15 @@
     "Cetriolini": "commons:pickled cucumber slices",
     "Cipolla Croccante": "commons:crispy onion rings",
     "Pane Brioche": "commons:brioche bun",
-    "Doppia Carne": "commons:double cheeseburger"
+    "Doppia Carne": "commons:double cheeseburger",
+    "Uovo": "commons:fried egg"
   },
   "best-feelings": {
     "Primo giorno di vacanza": "commons:tropical beach vacation",
     "Riaddormentarsi dopo la sveglia": "commons:person sleeping bed morning",
     "Risata a crepapelle": "commons:laughing woman",
     "Tuffo in piscina": "commons:diving into swimming pool",
-    "Dormire con la pioggia fuori": "commons:rain on window",
+    "Dormire con la pioggia fuori": "commons:rain drops on window glass",
     "Abbraccio lungo": "commons:couple hugging",
     "Doccia calda": "commons:shower head water",
     "Venerdì sera": "commons:city night lights street",
@@ -36,12 +38,12 @@
     "Sole d'inverno": "commons:winter sun snow trees",
     "Wi-Fi che torna": "commons:wifi router",
     "Trovare 10 euro in tasca": "commons:10 euro banknote",
-    "Pacco consegnato": "commons:parcel delivery box door",
+    "Pacco consegnato": "commons:cardboard box parcel doorstep",
     "Togliersi le scarpe": "commons:bare feet shoes off",
     "Grattarsi la schiena": "commons:back scratcher",
-    "Bibita ghiacciata": "commons:cold drink ice glass",
+    "Bibita ghiacciata": "commons:glass of cola with ice cubes",
     "Semaforo verde": "commons:green traffic light",
-    "Parcheggio libero": "commons:empty parking space",
+    "Parcheggio libero": "commons:empty parking lot",
     "Starnuto liberatorio": "commons:sneeze",
     "Batteria al 100%": "commons:smartphone charging",
     "Bicchiere d'acqua fresca": "commons:glass of water",
@@ -51,14 +53,14 @@
     "Parlare con le piante": "commons:potted houseplant",
     "Prevedere la pioggia": "commons:rain clouds sky",
     "Cambiare colore": "commons:chameleon",
-    "Fischiare fortissimo": "commons:whistling man",
+    "Fischiare fortissimo": "commons:referee whistle",
     "Non sudare mai": "commons:desert sun heat",
     "Trattenere il respiro": "commons:freediver underwater",
     "Super salto": "commons:high jump athlete",
     "Arrampicarsi sui muri": "commons:climbing wall climber",
     "Vista notturna": "commons:night vision goggles",
     "Rimpicciolirsi": "commons:ant macro",
-    "Duplicarsi": "commons:identical twins",
+    "Duplicarsi": "commons:twin sisters",
     "Raggi X": "commons:x-ray hand radiograph",
     "Respirare sott'acqua": "commons:scuba diver underwater",
     "Parlare con gli animali": "commons:parrot on shoulder",
@@ -67,50 +69,61 @@
     "Scudo di energia": "commons:plasma globe",
     "Super velocità": "commons:runners in a race",
     "Guarigione": "commons:first aid bandage",
-    "Telecinesi": "commons:levitating dancers",
+    "Telecinesi": "commons:Psychonauts Telekinesis attack",
     "Controllo del fuoco": "commons:fire flames",
     "Super forza": "commons:weightlifter lifting barbell",
     "Fermare il tempo": "commons:pocket watch clock",
     "Leggere la mente": "commons:human brain model",
     "Volare": "commons:bird flying sky",
-    "Invisibilità": "commons:The Invisible Man 1933 poster"
+    "Invisibilità": "commons:The Invisible Man 1933 poster",
+    "Viaggio nel tempo": "commons:DeLorean time machine"
   },
   "drinks": {
-    "Acqua del rubinetto": "commons:tap water glass",
+    "Acqua del rubinetto": "commons:water running from tap",
     "Cola sgasata": "commons:glass of cola",
     "Sciroppo per la tosse": "commons:cough syrup bottle",
     "Tè caldo": "commons:cup of hot tea",
-    "Acqua tiepida": "commons:glass of water table"
+    "Acqua tiepida": "commons:glass of water table",
+    "Latte": "commons:glass of milk",
+    "Birra": "commons:glass of beer"
   },
   "snack": {
     "Crackers scaduti": "commons:saltine crackers",
     "Caramelle della nonna": "commons:hard candy assortment",
     "Wafer secco": "commons:wafer biscuit",
     "Gelatine dure": "commons:gummy candy jelly",
-    "Torrone di marzo": "commons:torrone nougat",
+    "Torrone di marzo": "commons:torrone slice",
     "Gommose Haribo": "commons:Haribo gummy bears",
     "Nutella B-Ready": "commons:Nutella jar",
     "Pocket Coffee": "commons:Pocket coffee bonbon",
     "Baci Perugina": "commons:Baci perugina",
-    "Grissini": "commons:grissini"
+    "Grissini": "commons:grissini",
+    "Ringo": "commons:Ringo biscotti",
+    "Liquirizia": "commons:liquorice candy",
+    "Pan di Stelle": "commons:Pan di Stelle"
   },
   "pizze": {
     "Pizza al taglio fredda": "commons:pizza al taglio",
     "Pizza con ananas": "commons:Hawaiian pizza pineapple",
     "Pizza surgelata": "commons:frozen pizza",
-    "Pizza scondita": "commons:pizza bianca",
+    "Pizza scondita": "commons:pizza dough baked plain",
     "Pizza bruciata": "commons:overcooked pizza",
-    "Pizza del distributore": "commons:pizza vending machine",
+    "Pizza del distributore": "commons:Pizza vending machine",
     "Patatine e Cotto": "commons:pizza with potatoes",
     "Crudo e Rucola": "commons:pizza prosciutto crudo rucola",
     "Tonno e Cipolla": "commons:pizza tonno cipolla",
-    "Ortolana": "commons:pizza vegetariana verdure",
+    "Ortolana": "commons:pizza melanzane zucchine",
     "Prosciutto e Funghi": "commons:pizza prosciutto funghi",
     "Salsiccia e Friarielli": "commons:pizza broccoli e salsiccia",
     "Wurstel e Patatine": "commons:pizza wurstel patatine",
     "Diavola": "commons:pizza diavola",
     "Bufalina": "commons:pizza bufala mozzarella",
-    "Pistacchio e Mortadella": "commons:pizza mortadella pistacchio"
+    "Pistacchio e Mortadella": "commons:pizza mortadella pistacchio",
+    "Boscaiola": "commons:pizza funghi salsiccia",
+    "Mimosa": "commons:pizza mais prosciutto cotto",
+    "Napoli": "commons:pizza acciughe capperi",
+    "Rossa": "commons:pizza rossa al taglio",
+    "Bianca": "commons:pizza bianca rosmarino"
   },
   "giochi-tavolo": {
     "RisiKo!": "commons:Partie de Risk",
@@ -119,7 +132,14 @@
     "Puzzle": "commons:jigsaw puzzle pieces",
     "Cubo di Rubik": "commons:Rubik's Cube",
     "Memory": "commons:Memory Reloaded Cards",
-    "Dama cinese": "commons:Chinese checkers board"
+    "Dama cinese": "commons:Chinese checkers board",
+    "Monopoli": "commons:Monopoly board game",
+    "Cluedo": "commons:Cluedo board",
+    "Indovina Chi": "commons:Guess Who game",
+    "Scarabeo": "commons:Scrabble board game",
+    "Twister": "commons:Twister game mat",
+    "Scopa": "commons:carte da gioco napoletane",
+    "Mikado": "commons:Mikado game sticks"
   },
   "beach": {
     "Sassi al posto della sabbia": "commons:pebble beach stones",
@@ -129,72 +149,206 @@
     "Radio a pile": "commons:portable transistor radio",
     "Telo grande": "commons:beach towel sand",
     "Doccia fresca": "commons:beach shower",
-    "Musica lounge": "commons:beach bar loudspeaker",
-    "Sabbia bianca": "commons:white sand beach",
-    "Materassino": "commons:inflatable pool float",
+    "Musica lounge": "commons:beach party dj",
+    "Sabbia bianca": "commons:white sand tropical beach",
+    "Materassino": "commons:air mattress swimming pool",
     "Acqua cristallina": "commons:crystal clear sea water",
-    "Tempo perfetto": "commons:blue sky sunny beach"
+    "Tempo perfetto": "commons:blue sky sunny beach",
+    "Delfini": "commons:dolphins swimming",
+    "Ombrellone": "commons:beach umbrella sand",
+    "Palme": "commons:palm trees beach",
+    "Secchiello": "commons:child sand bucket spade",
+    "Cocco": "commons:coconut fruit",
+    "Meduse": "commons:jellyfish underwater"
   },
   "breakfast": {
     "Acqua e limone": "commons:lemon water glass",
-    "Caffè di ieri": "commons:cold coffee cup",
-    "Barretta dietetica": "commons:cereal bar",
-    "Uova": "commons:fried eggs breakfast"
+    "Caffè di ieri": "commons:cold coffee leftover cup",
+    "Barretta dietetica": "commons:granola bar",
+    "Uova": "commons:fried eggs breakfast",
+    "Hashbrown": "commons:hash browns",
+    "Niente": "none"
   },
   "fastfood": {
     "Kebab dubbio": "commons:doner kebab sandwich",
     "Distributore automatico": "commons:vending machine snacks",
     "Panino della stazione": "commons:tramezzino sandwich",
-    "Hot dog freddo": "commons:hot dog sausage bun",
-    "Piadineria chiusa": "commons:piadina romagnola",
-    "Wok d'asporto": "commons:takeaway noodles box",
-    "All you can eat": "commons:buffet restaurant food",
-    "Alice Pizza": "commons:Alice Pizza"
+    "Hot dog freddo": "commons:hot dog mustard",
+    "Piadineria chiusa": "commons:piadina",
+    "Wok d'asporto": "commons:chinese food takeout container",
+    "All you can eat": "commons:buffet restaurant",
+    "Alice Pizza": "commons:Alice Pizza",
+    "Chipotle": "commons:Chipotle Mexican Grill",
+    "Starbucks": "commons:Starbucks logo",
+    "Roadhouse": "commons:Roadhouse Restaurant",
+    "Spontini": "commons:Pizzeria Spontini"
   },
   "apps": {
-    "Registratore": "commons:voice recorder microphone",
+    "Registratore": "commons:digital voice recorder",
     "Promemoria": "commons:checklist notepad",
-    "Messaggi": "commons:text message smartphone screen"
+    "Messaggi": "commons:chat message bubbles",
+    "Spotify": "itunes:Spotify",
+    "YouTube": "itunes:YouTube",
+    "Instagram": "itunes:Instagram",
+    "Netflix": "itunes:Netflix",
+    "Amazon": "itunes:Amazon Shopping",
+    "Chrome": "itunes:Google Chrome",
+    "WhatsApp": "itunes:WhatsApp Messenger",
+    "Safari": "commons:Safari browser logo",
+    "Fotocamera": "commons:smartphone camera photo",
+    "Note": "commons:sticky note paper",
+    "Galleria": "commons:photo thumbnails grid",
+    "Torcia": "commons:flashlight torch",
+    "Salute": "commons:smartwatch heart rate",
+    "Borsa": "commons:stock market chart screen",
+    "Contatti": "commons:address book",
+    "Casa": "commons:smart home speaker",
+    "Radio": "commons:portable radio receiver",
+    "Calendario": "commons:wall calendar",
+    "Podcast": "commons:podcast microphone headphones"
   },
   "calcio": {
-    "Ronaldo Fenomeno": "it:Ronaldo Luís Nazário de Lima"
+    "Ronaldo Fenomeno": "it:Ronaldo Luís Nazário de Lima",
+    "Luca Toni": "commons:Luca Toni"
   },
   "sport": {
-    "Atletica": "it:Atletica leggera"
+    "Atletica": "it:Atletica leggera",
+    "Formula 1": "commons:Formula One racing car"
   },
   "artisti": {
-    "Rick Astley": "en:Rick Astley"
+    "Rick Astley": "en:Rick Astley",
+    "Bad Bunny": "commons:Bad Bunny concert",
+    "Beyoncé": "en:Beyoncé",
+    "Charlie Puth": "commons:Charlie Puth performing",
+    "Post Malone": "commons:Post Malone performing"
   },
   "social": {
     "MySpace": "commons:Myspace logo",
     "Ask.fm": "commons:Ask.fm logo",
     "Tumblr": "commons:Tumblr logo",
-    "Quora": "commons:Quora logo",
-    "Pinterest": "commons:Pinterest logo"
+    "Quora": "itunes:Quora",
+    "Pinterest": "itunes:Pinterest",
+    "TikTok": "itunes:TikTok",
+    "Instagram": "itunes:Instagram",
+    "WhatsApp": "itunes:WhatsApp Messenger",
+    "Facebook": "itunes:Facebook",
+    "Snapchat": "itunes:Snapchat",
+    "Reddit": "itunes:Reddit",
+    "Telegram": "itunes:Telegram Messenger",
+    "Discord": "itunes:Discord",
+    "LinkedIn": "itunes:LinkedIn",
+    "Threads": "itunes:Threads",
+    "Spotify": "itunes:Spotify",
+    "Flickr": "itunes:Flickr",
+    "Google+": "commons:Google Plus logo",
+    "VK": "itunes:VK"
   },
   "meme": {
-    "Gigachad": "commons:Gigachad",
-    "Nyan Cat": "commons:Nyan Cat",
-    "Pop Cat": "commons:Popcat",
-    "Pedro Raccoon": "commons:raccoon dancing",
-    "Hide the Pain Harold": "commons:Arató András",
-    "Drake Hotline Bling": "commons:Drake rapper",
-    "One Does Not Simply": "commons:Sean Bean",
-    "Ugandan Knuckles": "commons:Do U No De Wei"
+    "Sad Pablo Escobar": "imgflip:Sad Pablo Escobar",
+    "Yo Dawg": "imgflip:Yo Dawg Heard You",
+    "Ancient Aliens": "imgflip:Ancient Aliens",
+    "Waiting Skeleton": "imgflip:Waiting Skeleton",
+    "Two Buttons": "imgflip:Two Buttons",
+    "Evil Kermit": "imgflip:Evil Kermit",
+    "Spiderman Pointing": "imgflip:spiderman pointing at spiderman",
+    "Trade Offer": "imgflip:Trade Offer",
+    "Panik Kalm Panik": "imgflip:Panik Kalm Panik",
+    "Mocking SpongeBob": "imgflip:Mocking Spongebob",
+    "Expanding Brain": "imgflip:Expanding Brain",
+    "Roll Safe": "imgflip:Roll Safe Think About It",
+    "Woman Yelling at a Cat": "imgflip:Woman Yelling At Cat",
+    "Disaster Girl": "imgflip:Disaster Girl",
+    "This Is Fine": "imgflip:This Is Fine",
+    "Surprised Pikachu": "imgflip:Surprised Pikachu",
+    "Distracted Boyfriend": "imgflip:Distracted Boyfriend",
+    "Drake Hotline Bling": "imgflip:Drake Hotline Bling",
+    "Change My Mind": "imgflip:Change My Mind",
+    "One Does Not Simply": "imgflip:One Does Not Simply",
+    "Harambe": "commons:Cincinnati Zoo Gorilla"
   },
   "marvel": {
     "Vedova Nera": "it:Natasha Romanoff",
     "Falcon": "it:Falcon (Marvel Comics)",
-    "Stilt-Man": "it:Stilt-Man"
+    "Stilt-Man": "it:Stilt-Man",
+    "Mr. Immortale": "fandom:marvel/Craig Hollis (Earth-616)",
+    "Forbush Man": "fandom:marvel/Irving Forbush (Earth-665)",
+    "Uomo Ape": "fandom:marvel/Ape-Man (Earth-616)"
   },
   "videogiochi": {
-    "Candy Crush": "it:Candy Crush Saga"
+    "Candy Crush": "it:Candy Crush Saga",
+    "Fortnite": "itunes:Fortnite",
+    "Brawl Stars": "itunes:Brawl Stars",
+    "Chess.com": "itunes:Chess.com",
+    "Fall Guys": "steam:1097150",
+    "Elden Ring": "steam:1245620"
   },
   "anime": {
     "Haikyuu": "it:Haikyū!!"
   },
   "pixar": {
     "Vita da insetto": "it:A Bug's Life - Megaminimondo",
-    "La Luna": "it:La luna (film 2011)"
+    "La Luna": "it:La luna (film 2011)",
+    "Lifted": "fandom:pixar/Lifted"
+  },
+  "clash-royale": {
+    "Scheletri": "fandom:clashroyale/Skeletons",
+    "Goblin": "fandom:clashroyale/Goblins",
+    "Goblin con Lancia": "fandom:clashroyale/Spear Goblins",
+    "Specchio": "fandom:clashroyale/Mirror",
+    "Zap": "fandom:clashroyale/Zap",
+    "Cannone": "fandom:clashroyale/Cannon",
+    "Arcieri": "fandom:clashroyale/Archers",
+    "Sgherri": "fandom:clashroyale/Minions",
+    "Orda di Sgherri": "fandom:clashroyale/Minion Horde",
+    "Barbari": "fandom:clashroyale/Barbarians",
+    "Frecce": "fandom:clashroyale/Arrows",
+    "Barile Goblin": "fandom:clashroyale/Goblin Barrel",
+    "Cavaliere": "fandom:clashroyale/Knight",
+    "Mini P.E.K.K.A": "fandom:clashroyale/Mini P.E.K.K.A",
+    "Palla di Fuoco": "fandom:clashroyale/Fireball",
+    "Barile di Barbari": "fandom:clashroyale/Barbarian Barrel",
+    "Tronco": "fandom:clashroyale/The Log",
+    "Cimitero": "fandom:clashroyale/Graveyard",
+    "Principe": "fandom:clashroyale/Prince",
+    "Strega": "fandom:clashroyale/Witch",
+    "Valchiria": "fandom:clashroyale/Valkyrie",
+    "Palloncino": "fandom:clashroyale/Balloon",
+    "Gigante": "fandom:clashroyale/Giant",
+    "Mago": "fandom:clashroyale/Wizard",
+    "P.E.K.K.A": "fandom:clashroyale/P.E.K.K.A",
+    "Mega Cavaliere": "fandom:clashroyale/Mega Knight",
+    "Drago Infernale": "fandom:clashroyale/Inferno Dragon",
+    "Golem": "fandom:clashroyale/Golem",
+    "Principessa": "fandom:clashroyale/Princess",
+    "Torre Infernale": "fandom:clashroyale/Inferno Tower"
+  },
+  "tvshows": {
+    "Friends": "tvmaze:Friends",
+    "Suits": "tvmaze:Suits",
+    "Grey's Anatomy": "tvmaze:Grey's Anatomy",
+    "Il Segreto": "tvmaze:El secreto de Puente Viejo",
+    "Elite": "tvmaze:Élite",
+    "La Casa di Carta": "tvmaze:Money Heist",
+    "Beverly Hills": "tvmaze:Beverly Hills, 90210",
+    "Baywatch": "tvmaze:Baywatch"
+  },
+  "cartoons": {
+    "Bananas in Pigiama": "tvmaze:Bananas in Pyjamas",
+    "Codice Lyoko": "tvmaze:Code Lyoko",
+    "Yakari": "tvmaze:Yakari",
+    "Masha e Orso": "tvmaze:Masha and the Bear"
+  },
+  "capitali": {
+    "Roma": "commons:Colosseum Rome"
+  },
+  "citta-italiane": {
+    "Bari": "commons:Bari lungomare",
+    "Crotone": "commons:Crotone panorama",
+    "Cagliari": "commons:Cagliari panorama",
+    "Salerno": "commons:Salerno lungomare",
+    "Genova": "commons:Genova porto antico"
+  },
+  "us-cities": {
+    "Seattle": "commons:Seattle skyline"
   }
 }

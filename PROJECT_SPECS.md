@@ -138,12 +138,14 @@
 ======================================================================
 9. FOTO REALI, MODALITÀ CREATORE E VOTO DEL GIOCO
 ======================================================================
-- Ogni elemento ha il campo facoltativo `image`. `getItemImage(item)` restituisce quell'URL oppure
-  l'indirizzo generico di Unsplash costruito sul nome dell'elemento.
+- Ogni elemento ha il campo `image`, e nelle 26 liste ufficiali ce l'hanno tutti e 780.
+  `getItemImage(item)` restituisce quell'URL, oppure null se manca.
 - In gioco la foto passa da `useItemImage`, che prova nell'ordine: URL salvato sull'elemento,
-  ricerca automatica su Wikipedia (risultato messo in cache sul dispositivo), URL generico di
-  Unsplash, infine la copertina con emoji dentro un badge. Il tag immagine usa `loading="lazy"`,
-  `crossOrigin` per poter finire nella card PNG e `onError` per scalare al ripiego successivo.
+  ricerca automatica su Wikipedia per le liste fatte in casa (risultato messo in cache sul
+  dispositivo), infine la copertina con emoji dentro un badge. Il ripiego generico su Unsplash è
+  stato tolto: quell'indirizzo è stato dismesso e le foto per parola chiave sbagliavano troppo.
+  Il tag immagine usa `loading="lazy"`, `crossOrigin` per poter finire nella card PNG e `onError`
+  per passare alla copertina.
 - La card centrale dell'asta mostra l'immagine grande su fondo nero, con
   `w-full h-full object-contain p-6 drop-shadow-2xl transition-all duration-300 hover:scale-105`.
 - Le liste ufficiali le aggiunge solo il creatore: Studio ed editor sono protetti dalla chiave

@@ -22,8 +22,9 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
   caratteri (copia rapida e QR) sincronizzata via Supabase Realtime Channels.
 - **Card 9:16** esportabile in PNG (1080x1920) con roster, budget residuo e QR del voto.
 - **Votazione** senza registrazione: un voto per dispositivo sul link generato a fine partita.
-- **Foto reali automatiche**: se l'elemento non ha un URL, l'app cerca la foto su Wikipedia e la
-  tiene in cache; ripiego su Unsplash e, in ultima istanza, sulla copertina con emoji.
+- **Foto per tutti i 780 elementi**, fissate in `data/categories.json` e prese dall'archivio giusto
+  per ognuno (Wikipedia, Wikimedia Commons, Fandom, App Store, Steam, TVmaze, Imgflip) secondo gli
+  abbinamenti di `data/image-hints.json`. In partita non si cerca niente: gli indirizzi sono già lì.
 - **26 liste ufficiali** a nomi corti con emoji di copertina, definite in `data/categories.json`,
   con ricerca istantanea e filtri per macro-tema nella pagina Categorie.
 - **Modalità creatore**: Studio ed editor delle categorie sono già aperti in sviluppo; online li

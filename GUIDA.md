@@ -93,7 +93,9 @@ un uso vero e continuativo.
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
-| `npm run images:fetch` | riempie le liste con le foto di Wikimedia (si può interrompere e riprendere) |
+| `npm run check:photos` | controlla che tutte le foto del catalogo rispondano ancora |
+| `npm run images:fetch` | riempie le liste con le foto (si può interrompere e riprendere) |
+| `npm run images:sheet` | crea `public/_review.html`: tutte le foto in griglia per guardarle a occhio |
 | `node scripts/fetch-images.js <categoria> --hinted` | rifà solo gli elementi con abbinamento in `data/image-hints.json` |
 | `node scripts/probe-images.js "commons:<ricerca>"` | prova una ricerca prima di metterla fra gli abbinamenti |
 | `npm run share` | apre un indirizzo pubblico temporaneo per provare da rete dati |
@@ -183,14 +185,40 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Le liste ufficiali hanno le **foto già fissate** dentro `data/categories.json`: arrivano da
   Wikipedia e non dipendono da alcuna ricerca durante la partita. Si aggiornano con
   `npm run images:fetch`, che riprende da dove si era interrotto.
-- **Abbinamenti a mano** in `data/image-hints.json`: gli elementi che Wikipedia non conosce
-  ("Doccia calda", "Cetriolini", "Pizza wurstel e patatine") hanno una ricerca scelta da noi su
-  **Wikimedia Commons**, l'archivio di foto libere. Il file si legge e si corregge a mano: dopo
-  averlo modificato basta `node scripts/fetch-images.js <categoria> --hinted` per rifare solo
-  quegli elementi.
-- Restano senza foto solo gli elementi il cui unico ritratto è protetto da copyright: le carte di
-  Clash Royale, i loghi di certi videogiochi, le immagini dei meme. Wikimedia ospita solo materiale
-  libero, quindi lì mostriamo l'icona (o si incolla un indirizzo dallo Studio).
+- **Abbinamenti a mano** in `data/image-hints.json`: ogni elemento che la ricerca automatica non
+  trova ha una fonte scelta da noi, e ognuna è l'archivio ufficiale del suo mondo.
+
+  | Come si scrive | Da dove prende la foto |
+  | --- | --- |
+  | `commons:doccia calda` | Wikimedia Commons, per le cose comuni senza voce enciclopedica |
+  | `it:Atletica leggera` / `en:Rick Astley` | la voce di Wikipedia con quel titolo esatto |
+  | `fandom:clashroyale/Mega Knight` | il wiki dei fan: carte di un gioco, personaggi dei fumetti |
+  | `itunes:Fortnite` | l'icona ufficiale dall'App Store (prima il negozio italiano, poi quello USA) |
+  | `steam:1245620` | la copertina del gioco su Steam (il numero è quello nell'indirizzo) |
+  | `tvmaze:Suits` | la locandina della serie televisiva |
+  | `imgflip:Distracted Boyfriend` | il template originale del meme |
+
+  Il file si legge e si corregge a mano: dopo averlo modificato basta
+  `node scripts/fetch-images.js <categoria> --hinted` per rifare solo quegli elementi.
+- **Tutti gli elementi hanno la foto** tranne uno, "Niente" a colazione, che di proposito mostra la
+  sua icona. `npm run check:photos` le interroga una per una, segnala quelle che non rispondono più
+  e quelle usate da due elementi; `npm run images:sheet` le mette tutte in griglia su una pagina,
+  per controllare a occhio che l'immagine sia davvero quella giusta.
+- Tre regole imparate controllando le foto una per una, e ora applicate dallo script:
+  - **niente stemmi, cartine e firme**: per una città vogliamo il panorama, non il puntino sulla
+    mappa d'Italia o lo stemma della squadra di calcio; per un cantante la foto, non l'autografo;
+  - **niente foto ripetute** dentro la stessa categoria: quando la ricerca non trova la variante
+    ("pizza ortolana") e ripiegherebbe su una foto generica già usata, passa al candidato dopo;
+  - **il nome del file deve contenere le parole cercate**, altrimenti la foto viene scartata: è così
+    che si evitano gli scambi di persona ("Monopoli" la città, "Scarabeo" lo scooter).
+- Le foto non stanno nel progetto: sono indirizzi verso gli archivi di origine. Se un giorno una
+  sparisce, la scheda torna a mostrare la propria icona e il gioco non si rompe.
+- **Da sapere prima di pubblicare**: le foto di Wikipedia e Wikimedia Commons hanno licenze libere
+  (spesso con obbligo di citare l'autore), mentre le carte di Clash Royale, le icone delle app, le
+  copertine dei giochi, le locandine delle serie e i template dei meme restano dei rispettivi
+  proprietari: qui sono richiamate dal loro sito, come fa un qualsiasi collegamento. Per un gioco
+  fra amici va bene; se un domani il sito diventa un prodotto a pagamento, quelle immagini vanno
+  sostituite o autorizzate.
 - **Filtro di pertinenza**: una foto trovata online viene accettata solo se il titolo della pagina
   corrisponde davvero al nome cercato. "Up" prende *Up (film 2009)* e non *Upload*, "Snake" non
   diventa *Snake River*, "Smash Burger" non diventa *Hamburger*. Se nessun risultato è pertinente

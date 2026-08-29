@@ -1,10 +1,15 @@
 /**
- * Riempie data/categories.json con le foto di Wikipedia.
+ * Riempie data/categories.json con le foto degli elementi.
  *
  * Per ogni elemento cerca prima con il nome della categoria come contesto, poi con
  * il solo nome, prima in italiano e poi in inglese. Accetta una foto solo se il
  * titolo della pagina è pertinente (vedi lib/image-match.ts): se nessun risultato
  * lo è, l'elemento resta senza foto e in gioco mostra la propria icona.
+ *
+ * Oltre a Wikipedia si attinge, tramite gli abbinamenti di data/image-hints.json,
+ * agli archivi di quei mondi: Wikimedia Commons per le cose comuni, Fandom per le
+ * carte di un gioco e i personaggi dei fumetti, l'App Store e Steam per i
+ * videogiochi, TVmaze per le serie, Imgflip per i meme.
  *
  * Lo script è ripetibile: salta gli elementi che hanno già una foto e salva mano a
  * mano, così può essere interrotto e ripreso.
@@ -114,7 +119,9 @@ async function commonsSearch(query) {
   const params = new URLSearchParams({
     action: "query",
     generator: "search",
-    gsrsearch: `filetype:bitmap ${query}`,
+    // bitmap = fotografie, drawing = disegni e loghi vettoriali (di cui Commons
+    // restituisce comunque un'anteprima PNG pronta da mostrare).
+    gsrsearch: `filetype:bitmap|drawing ${query}`,
     gsrnamespace: "6",
     gsrlimit: "10",
     prop: "imageinfo",
@@ -150,15 +157,129 @@ function matchesQuery(query, title) {
 }
 
 /**
+ * Le altre fonti, per le cose che su Wikimedia non ci sono e non ci saranno:
+ * i template dei meme, le carte di un gioco, l'icona di un'app, la locandina di
+ * una serie. Sono gli archivi ufficiali di quei mondi.
+ */
+
+/** Template dei meme (api.imgflip.com), scaricati una volta sola. */
+let memeTemplates = null;
+async function fromImgflip(name) {
+  if (!memeTemplates) {
+    const response = await fetch("https://api.imgflip.com/get_memes", { headers: HEADERS });
+    memeTemplates = (await response.json()).data?.memes ?? [];
+  }
+  const wanted = words(name).join(" ");
+  const exact = memeTemplates.find((meme) => words(meme.name).join(" ") === wanted);
+  const partial = memeTemplates.find((meme) => matchesQuery(name, meme.name));
+  const meme = exact ?? partial;
+  return meme ? { url: meme.url, title: meme.name, lang: "imgflip" } : null;
+}
+
+/**
+ * Icona ufficiale di un'app o di un gioco (ricerca dell'App Store). Si prova
+ * prima il negozio italiano e poi quello americano: certe app da noi hanno il
+ * nome tradotto ("Chess.com" diventa "Scacchi") e non si riconoscerebbero.
+ */
+async function fromItunes(term) {
+  for (const country of ["it", "us"]) {
+    const params = new URLSearchParams({ term, entity: "software", limit: "5", country });
+    const response = await fetch(`https://itunes.apple.com/search?${params}`, { headers: HEADERS });
+    if (!response.ok) continue;
+    const results = (await response.json()).results ?? [];
+    const app = results.find((entry) => matchesQuery(term, entry.trackName ?? ""));
+    if (app) {
+      const url = (app.artworkUrl512 ?? app.artworkUrl100 ?? "").replace(
+        /\/\d+x\d+bb\.jpg$/,
+        "/512x512bb.jpg",
+      );
+      if (url) return { url, title: app.trackName, lang: "app store" };
+    }
+    await wait(PAUSE_MS);
+  }
+  return null;
+}
+
+/** Copertina di un gioco su Steam. Formato: "steam:1245620" (numero del gioco). */
+async function fromSteam(appId) {
+  const response = await fetch(`https://store.steampowered.com/api/appdetails?appids=${appId}`, {
+    headers: HEADERS,
+  });
+  if (!response.ok) return null;
+  const entry = (await response.json())[appId];
+  if (!entry?.success || !entry.data?.header_image) return null;
+  return { url: entry.data.header_image, title: entry.data.name, lang: "steam" };
+}
+
+/** Locandina di una serie televisiva (api.tvmaze.com). */
+async function fromTvmaze(show) {
+  const response = await fetch(
+    `https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(show)}`,
+    { headers: HEADERS },
+  );
+  if (!response.ok) return null;
+  const data = await response.json();
+  const title = data.name ?? "";
+  // Il titolo torna nella lingua originale: "Masha and the Bear" diventa
+  // "Маша и медведь", che non si può confrontare parola per parola. Se è scritto
+  // in un altro alfabeto ci si fida della ricerca, altrimenti si verifica.
+  const otherAlphabet = title.length > 0 && !/[a-z]/i.test(title);
+  if (!otherAlphabet && !matchesQuery(show, title)) return null;
+  const url = data.image?.original ?? data.image?.medium;
+  return url ? { url, title, lang: "tvmaze" } : null;
+}
+
+/**
+ * Immagine principale di una voce su Fandom, l'enciclopedia dei fan: è lì che
+ * stanno le carte di Clash Royale e i personaggi minori dei fumetti.
+ * Formato dell'abbinamento: "fandom:clashroyale/Mega Knight".
+ */
+async function fromFandom(reference) {
+  const slash = reference.indexOf("/");
+  const wiki = reference.slice(0, slash).trim();
+  const page = reference.slice(slash + 1).trim();
+  const params = new URLSearchParams({
+    action: "query",
+    titles: page,
+    redirects: "1",
+    prop: "pageimages",
+    piprop: "original|thumbnail",
+    pithumbsize: String(THUMB),
+    format: "json",
+  });
+  const response = await fetch(`https://${wiki}.fandom.com/api.php?${params}`, { headers: HEADERS });
+  if (!response.ok) return null;
+  const found = Object.values((await response.json()).query?.pages ?? {})[0];
+  if (!found || found.missing !== undefined) return null;
+  const url = found.thumbnail?.source ?? found.original?.source;
+  return url ? { url, title: found.title, lang: `fandom/${wiki}` } : null;
+}
+
+/**
  * Abbinamenti scelti a mano (data/image-hints.json). Quando ci sono valgono più
  * di qualsiasi ricerca automatica: sono stati verificati uno per uno.
  */
 const hints = JSON.parse(fs.readFileSync(HINTS, "utf8"));
 
+/**
+ * Foto già assegnate agli altri elementi della stessa categoria. Due schede con
+ * la stessa identica immagine sembrano un errore, e infatti lo sono: succede
+ * quando la ricerca non trova la variante ("pizza ortolana") e ripiega su una
+ * foto generica ("pizza vegetariana"). In quel caso si passa al candidato dopo.
+ */
+let usedInCategory = new Set();
+const isFree = (url) => !usedInCategory.has(url);
+
 async function fromHint(hint) {
   const separator = hint.indexOf(":");
   const source = hint.slice(0, separator);
   const query = hint.slice(separator + 1).trim();
+
+  if (source === "imgflip") return fromImgflip(query);
+  if (source === "itunes") return fromItunes(query);
+  if (source === "steam") return fromSteam(query);
+  if (source === "tvmaze") return fromTvmaze(query);
+  if (source === "fandom") return fromFandom(query);
 
   if (source === "commons") {
     // La ricerca parte dalla descrizione completa e, se nessun file la soddisfa
@@ -169,7 +290,7 @@ async function fromHint(hint) {
     for (let length = terms.length; length > 0; length -= 1) {
       const attempt = terms.slice(0, length).join(" ");
       const files = await commonsSearch(attempt);
-      const file = files.find((entry) => matchesQuery(attempt, entry.title));
+      const file = files.find((entry) => matchesQuery(attempt, entry.title) && isFree(entry.url));
       if (file) return { url: file.url, title: file.title, lang: "commons" };
       await wait(PAUSE_MS);
     }
@@ -190,11 +311,13 @@ const ALIASES = {
 };
 
 /**
- * Immagini che rappresentano un ente, non la cosa: stemmi, gonfaloni e bandiere.
- * Vanno bene come ripiego, ma se c'è una foto vera è meglio quella.
+ * Immagini che rappresentano un ente o una posizione, non la cosa: stemmi,
+ * gonfaloni, bandiere e cartine. Vanno bene come ripiego, ma se c'è una foto
+ * vera è meglio quella: per una città vogliamo il panorama, non il puntino
+ * sulla mappa d'Italia.
  */
 const HERALDIC =
-  /(gonfalone|stemma|coat[_-]?of[_-]?arms|blason|wappen|escudo|bandiera|flag[_-]?of|drapeau|seal[_-]?of)/i;
+  /(gonfalone|stemma|coat[_-]?of[_-]?arms|blason|wappen|escudo|bandiera|flag[_-]?of|drapeau|seal[_-]?of|location[_-]?map|locator[_-]?map|_map_|map\.svg|signature|autograph)/i;
 
 function isHeraldic(url) {
   return HERALDIC.test(decodeURIComponent(url.split("/").pop() ?? ""));
@@ -213,7 +336,7 @@ async function findPhoto(name, categoryName, categoryId) {
   let fallback = null;
 
   const hint = hints[categoryId]?.[name];
-  if (hint) {
+  if (hint && hint !== "none") {
     try {
       const chosen = await fromHint(hint);
       if (chosen) return chosen;
@@ -224,7 +347,7 @@ async function findPhoto(name, categoryName, categoryId) {
   }
 
   const consider = (url, title, lang) => {
-    if (!url) return null;
+    if (!url || !isFree(url)) return null;
     if (isHeraldic(url)) {
       fallback = fallback ?? { url, title, lang };
       return null;
@@ -280,8 +403,8 @@ async function findPhoto(name, categoryName, categoryId) {
     await wait(PAUSE_MS);
   }
 
-  // Nessuna foto vera: meglio lo stemma che l'assenza.
-  return fallback;
+  // Nessuna foto vera: meglio lo stemma che l'assenza, purché non sia già di un altro.
+  return fallback && isFree(fallback.url) ? fallback : null;
 }
 
 /** Serializzatore su misura: una riga per elemento, file leggibile e modificabile. */
@@ -327,26 +450,47 @@ function serialize(categories) {
     let inCategory = 0;
     let total = 0;
 
+    // Le foto già presenti nella categoria sono "occupate": nessun altro
+    // elemento può prendersi la stessa.
+    usedInCategory = new Set(
+      Object.values(category.tiers)
+        .flat()
+        .map((row) => row[2])
+        .filter(Boolean),
+    );
+
     for (const tier of TIERS) {
       const rows = category.tiers[tier] ?? [];
       for (let index = 0; index < rows.length; index += 1) {
         const [name, emoji, image] = rows[index];
         total += 1;
 
-        const hinted = hints[category.id]?.[name] !== undefined;
+        const hint = hints[category.id]?.[name];
+
+        // "none" tiene di proposito l'elemento senza foto: "Niente" a colazione
+        // è più chiaro con la sua icona che con una fotografia qualsiasi.
+        if (hint === "none") {
+          if (image) rows[index] = [name, emoji ?? ""];
+          continue;
+        }
+
+        const hinted = hint !== undefined;
         if (image && !refresh && !(hintedOnly && hinted)) {
           already += 1;
           inCategory += 1;
           continue;
         }
 
+        if (image) usedInCategory.delete(image);
         const photo = await findPhoto(name, category.name, category.id);
         if (photo) {
           rows[index] = [name, emoji ?? "", photo.url];
+          usedInCategory.add(photo.url);
           found += 1;
           inCategory += 1;
         } else if (image) {
           // Ricalcolo senza esito: si tiene la foto che c'era, mai un passo indietro.
+          usedInCategory.add(image);
           inCategory += 1;
         } else {
           missing.push(`${category.id}/${name}`);

@@ -11,12 +11,13 @@ export { isExactTitle, isRelevant };
  * Foto reali per gli elementi del catalogo.
  *
  * Ordine di risoluzione:
- * 1. `item.image`, se il creatore ha già salvato un URL;
- * 2. ricerca automatica su Wikipedia/Wikimedia (CORS aperto, foto pertinenti al nome);
- * 3. URL generico di Unsplash come ultima spiaggia;
- * 4. copertina con emoji, se anche l'immagine remota non carica.
+ * 1. `item.image`, l'indirizzo salvato nella lista: le 26 liste ufficiali ce l'hanno
+ *    per tutti e 30 gli elementi, quindi in partita non si cerca nulla;
+ * 2. ricerca automatica su Wikipedia/Wikimedia, solo per le liste fatte in casa e
+ *    solo se l'interruttore "Foto automatiche" è acceso;
+ * 3. copertina con emoji, se l'immagine non carica.
  *
- * Le licenze Wikimedia variano: prima di pubblicare vanno verificate.
+ * Le licenze delle immagini variano: prima di pubblicare vanno verificate.
  */
 
 const CACHE_KEY = "pp:item-images";
@@ -47,18 +48,14 @@ function writeCache(name: string, url: string) {
   }
 }
 
-/** Ultima spiaggia: immagine generica per parola chiave. */
-export function unsplashUrl(name: string): string {
-  return `https://source.unsplash.com/featured/600x600/?${encodeURIComponent(name)}`;
-}
-
 /**
- * URL da usare subito per un elemento: quello salvato oppure la ricerca per parola chiave.
- * Per la foto pertinente conviene passare da `useItemImage`, che interroga Wikipedia.
+ * URL salvato per un elemento, oppure null se non ne ha uno: in quel caso la
+ * scheda mostra la copertina con emoji.
+ * Per cercarne una al volo c'è `useItemImage`, che interroga Wikipedia.
  */
-export function getItemImage(item: { name: string; image?: string }): string {
+export function getItemImage(item: { name: string; image?: string }): string | null {
   const explicit = item.image?.trim();
-  return explicit && explicit.length > 0 ? explicit : unsplashUrl(item.name);
+  return explicit && explicit.length > 0 ? explicit : null;
 }
 
 interface WikiPage {
@@ -197,7 +194,7 @@ export function useItemImage(
   const name = item?.name ?? "";
   const explicit = item?.image?.trim() ?? "";
   const [found, setFound] = useState<string | null>(null);
-  const [stage, setStage] = useState<"primary" | "generic" | "emoji">("primary");
+  const [stage, setStage] = useState<"primary" | "emoji">("primary");
   const [stageFor, setStageFor] = useState<string>("");
 
   useEffect(() => {
@@ -218,14 +215,15 @@ export function useItemImage(
   let src: string | null = null;
   if (enabled) {
     if (currentStage === "primary") src = primary ?? null;
-    else if (currentStage === "generic" && name) src = unsplashUrl(name);
   } else {
     src = explicit || null;
   }
 
+  // Se la foto non si carica si passa direttamente alla copertina con emoji:
+  // una foto generica presa per parola chiave sbagliava troppo spesso.
   const onError = () => {
     setStageFor(name);
-    setStage(currentStage === "primary" && !explicit ? "generic" : "emoji");
+    setStage("emoji");
   };
 
   return { src, onError };
