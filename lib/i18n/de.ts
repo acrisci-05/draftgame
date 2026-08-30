@@ -433,7 +433,7 @@ export const de: PartialDictionary = {
   "studio.imageNotFound": "Kein Bild gefunden",
   "studio.imageSource": "Bilder von Wikipedia/Wikimedia: Lizenz und Nennung vor der Veröffentlichung prüfen.",
   "rules.nobid.title": "Wenn niemand bietet",
-  "rules.nobid.body": "Mit Aussortieren wird das Los beiseitegelegt und niemand bekommt es. Schaltet der Host es aus, geht das Los zum Grundpreis an den mit den wenigsten Einträgen.",
+  "rules.nobid.body": "Passen schenkt das Los nie den anderen: hat niemand geboten, dürfen alle passen. Mit aktiven Resten wird das Los beiseitegelegt und niemand bekommt es; schaltet der Host sie ab, geht es zum Grundpreis an den Spieler mit den wenigsten Elementen.",
   "rules.reserve.title": "Niemand bleibt stecken",
   "rules.reserve.body": "Du behältst immer einen Credit pro freiem Platz: fehlen drei Einträge, kannst du nicht unter 3. Bist du der Letzte, der noch auffüllen muss, gehen die restlichen Lose zum Grundpreis an dich.",
   "support.quick": "Mit {amount} unterstützen",
@@ -496,4 +496,6 @@ export const de: PartialDictionary = {
   "auction.revealed": "Aufgedeckt",
   "lobby.changeAvatar": "Avatar wechseln",
   "lobby.avatarHint": "Jeder Spieler braucht einen anderen Avatar: die ausgegrauten sind schon vergeben.",
+  "auction.nobodyYet": "Noch kein Gebot: passen alle, wandert das Los zu den Resten",
+  "auction.nobodyYetForced": "Noch kein Gebot: passen alle, geht es an den mit den wenigsten Elementen",
 };

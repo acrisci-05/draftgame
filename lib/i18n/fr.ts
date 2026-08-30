@@ -434,7 +434,7 @@ export const fr: PartialDictionary = {
   "studio.imageNotFound": "Aucune image trouvée",
   "studio.imageSource": "Images de Wikipédia/Wikimedia : vérifie licence et attribution avant publication.",
   "rules.nobid.title": "Quand personne n'enchérit",
-  "rules.nobid.body": "Avec les rebuts activés le lot est mis de côté et personne ne l'obtient. Si l'hôte les désactive, le lot revient à celui qui a le moins d'éléments, au prix de base.",
+  "rules.nobid.body": "Passer n'offre jamais le lot aux autres : si personne n'a enchéri, tout le monde peut passer. Avec les rebuts activés le lot est mis de côté et personne ne le prend ; si l'hôte les désactive, il revient d'office à celui qui a le moins d'éléments, au prix de base.",
   "rules.reserve.title": "Personne ne reste bloqué",
   "rules.reserve.body": "Tu gardes toujours un crédit par place vide : s'il te manque trois éléments tu ne peux pas descendre sous 3. Si tu es le dernier à compléter, les lots restants te sont attribués au prix de base.",
   "support.quick": "Soutenir avec {amount}",
@@ -497,4 +497,6 @@ export const fr: PartialDictionary = {
   "auction.revealed": "Révélé",
   "lobby.changeAvatar": "Changer d'avatar",
   "lobby.avatarHint": "Chaque joueur doit avoir un avatar différent : ceux qui sont éteints sont déjà pris.",
+  "auction.nobodyYet": "Aucune enchère : si tout le monde passe, le lot part aux rebuts",
+  "auction.nobodyYetForced": "Aucune enchère : si tout le monde passe, il va à celui qui a le moins d'éléments",
 };

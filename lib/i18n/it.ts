@@ -156,6 +156,8 @@ export const it = {
   "auction.awarded": "Aggiudicato",
   "auction.noOffers": "Nessuna offerta",
   "auction.toDiscards": "Finisce negli scarti",
+  "auction.nobodyYet": "Nessuno ha offerto: se passate tutti il lotto va agli scarti",
+  "auction.nobodyYetForced": "Nessuno ha offerto: se passate tutti va a chi ha meno elementi",
   "auction.mysteryLost": "Nessuno ha aperto la box",
   "auction.nextLot": "Prossimo lotto",
   "auction.endGame": "Chiudi la partita e genera la card",
@@ -471,7 +473,7 @@ export const it = {
 
   "rules.nobid.title": "Se nessuno offre",
   "rules.nobid.body":
-    "Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno. Se l'host li disattiva, il lotto va d'ufficio a chi ha meno elementi al prezzo base.",
+    "Passare non regala il lotto agli altri: se nessuno ha offerto possono passare tutti. Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno; se l'host li disattiva va d'ufficio a chi ha meno elementi, al prezzo base.",
   "rules.reserve.title": "Nessuno resta a secco",
   "rules.reserve.body":
     "Devi sempre tenere un credito per ogni slot ancora vuoto: se ti mancano 3 elementi non puoi scendere sotto 3. Se resti l'unico da completare, gli ultimi lotti ti vengono assegnati al prezzo base.",

@@ -433,7 +433,7 @@ export const pt: PartialDictionary = {
   "studio.imageNotFound": "Nenhuma imagem encontrada",
   "studio.imageSource": "Imagens da Wikipédia/Wikimedia: verifica licença e atribuição antes de publicar.",
   "rules.nobid.title": "Quando ninguém licita",
-  "rules.nobid.body": "Com os descartes ligados o lote fica de parte e ninguém o leva. Se o anfitrião os desligar, o lote vai para quem tem menos elementos, ao preço base.",
+  "rules.nobid.body": "Passar nunca oferece o lote aos outros: se ninguém licitou, podem passar todos. Com os descartes ativos o lote fica de parte e ninguém o leva; se o anfitrião os desativar, vai por atribuição a quem tem menos elementos, pelo preço base.",
   "rules.reserve.title": "Ninguém fica preso",
   "rules.reserve.body": "Guardas sempre um crédito por lugar vazio: se te faltam três elementos não podes descer abaixo de 3. Se és o último a completar, os lotes restantes são-te atribuídos ao preço base.",
   "support.quick": "Apoia com {amount}",
@@ -496,4 +496,6 @@ export const pt: PartialDictionary = {
   "auction.revealed": "Revelado",
   "lobby.changeAvatar": "Mudar avatar",
   "lobby.avatarHint": "Cada jogador precisa de um avatar diferente: os apagados já estão ocupados.",
+  "auction.nobodyYet": "Ninguém licitou: se passarem todos, o lote vai para os descartes",
+  "auction.nobodyYetForced": "Ninguém licitou: se passarem todos, fica com quem tem menos elementos",
 };

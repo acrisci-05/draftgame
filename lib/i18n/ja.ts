@@ -431,7 +431,7 @@ export const ja: PartialDictionary = {
   "studio.imageNotFound": "画像が見つかりません",
   "studio.imageSource": "画像は Wikipedia / Wikimedia から：公開前にライセンスと表示を確認してください。",
   "rules.nobid.title": "誰も入札しないとき",
-  "rules.nobid.body": "見送りありならロットは脇に置かれ、誰の物にもなりません。ホストが見送りを切ると、項目が一番少ない人に基本価格で渡ります。",
+  "rules.nobid.body": "パスしても相手にロットを渡すことにはなりません。誰も入札していなければ全員がパスできます。廃棄がオンならロットは脇に置かれて誰のものにもならず、ホストがオフにしていれば所持数の最も少ない人に基本価格で渡ります。",
   "rules.reserve.title": "行き詰まる人は出ません",
   "rules.reserve.body": "空き枠1つにつき1クレジットは必ず残ります：3つ足りなければ3より下には行けません。埋めるのが自分だけになったら、残りのロットは基本価格で自動的に手に入ります。",
   "support.quick": "{amount} で応援",
@@ -494,4 +494,6 @@ export const ja: PartialDictionary = {
   "auction.revealed": "公開",
   "lobby.changeAvatar": "アバターを変更",
   "lobby.avatarHint": "プレイヤーごとに別のアバターが必要です。薄いものは使用済みです。",
+  "auction.nobodyYet": "まだ入札なし：全員がパスするとこのロットは廃棄へ",
+  "auction.nobodyYetForced": "まだ入札なし：全員がパスすると所持数が最も少ない人のものに",
 };

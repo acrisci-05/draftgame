@@ -468,8 +468,7 @@ export const en: Dictionary = {
   "studio.imageSource": "Images from Wikipedia/Wikimedia: check licence and attribution before publishing.",
 
   "rules.nobid.title": "When nobody bids",
-  "rules.nobid.body":
-    "With discards on the lot is set aside and nobody gets it. If the host switches them off, the lot goes to whoever has fewest items at the base price.",
+  "rules.nobid.body": "Passing never hands the lot to someone else: if nobody has bid, everyone can pass. With discards on the lot is set aside and no one takes it; if the host turns them off it goes to whoever has fewest items, at the base price.",
   "rules.reserve.title": "Nobody ends up stuck",
   "rules.reserve.body":
     "You always keep one credit per empty slot: three items missing means you cannot go below 3. If you are the last one left to complete, the remaining lots are assigned to you at the base price.",
@@ -537,4 +536,6 @@ export const en: Dictionary = {
   "rules.modes.title": "Modes",
   "rules.modes.body":
     "Local on a single device or online with a 5-character code. You can also switch on Blind Draft (cover hidden until the lot is assigned) and Mystery Box (fixed-price lot with a random item).",
+  "auction.nobodyYet": "No bids yet: if everyone passes the lot goes to the discards",
+  "auction.nobodyYetForced": "No bids yet: if everyone passes it goes to whoever has fewest items",
 };

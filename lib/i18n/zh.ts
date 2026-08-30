@@ -428,7 +428,7 @@ export const zh: PartialDictionary = {
   "studio.imageNotFound": "没有找到图片",
   "studio.imageSource": "图片来自维基百科/维基共享：发布前请核对许可与署名。",
   "rules.nobid.title": "没人出价时",
-  "rules.nobid.body": "开启弃标时该拍品被搁置，谁也拿不到。房主关闭弃标后，拍品按底价给条目最少的人。",
+  "rules.nobid.body": "跳过不会把物品送给对手：只要还没有人出价，所有人都可以跳过。开启弃置时这件会被搁置，谁都拿不到；房主关闭弃置后，它会按底价判给收藏最少的玩家。",
   "rules.reserve.title": "没人会被卡住",
   "rules.reserve.body": "每个空位都留一枚筹码：还差三件时就不能低于 3。如果只剩你还没补满，余下的拍品按底价直接给你。",
   "support.quick": "用 {amount} 支持",
@@ -491,4 +491,6 @@ export const zh: PartialDictionary = {
   "auction.revealed": "揭晓",
   "lobby.changeAvatar": "更换头像",
   "lobby.avatarHint": "每位玩家的头像都要不同：变暗的已被选走。",
+  "auction.nobodyYet": "还没有人出价：如果都选择跳过，这件就进弃置区",
+  "auction.nobodyYetForced": "还没有人出价：如果都选择跳过，这件归收藏最少的玩家",
 };

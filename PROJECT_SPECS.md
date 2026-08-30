@@ -120,6 +120,9 @@
 - Pulsante Max: offre esattamente il tetto consentito dalla riserva, senza rilanci ripetuti.
 - Lotti finali: se resta un solo giocatore da completare e i lotti bastano appena, gli vengono
   assegnati d'ufficio al prezzo base, così la lista si chiude sempre.
+- Passa: possibile per chiunque non sia in testa. Con un'offerta sul piatto, quando tutti gli altri
+  passano il lotto va a chi l'aveva fatta. Senza offerte nessuno viene obbligato a prendersi il
+  lotto: possono passare tutti e si applica la regola degli scarti.
 - Scarti: interruttore in configurazione stanza. Attivi (default) un lotto senza offerte finisce
   negli scarti; disattivati viene assegnato a chi ha meno elementi al prezzo base.
 - Pagina categorie: legenda delle fasce (S/A/B/C/D con prezzo e significato), badge con tooltip al

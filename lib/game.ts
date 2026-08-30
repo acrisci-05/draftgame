@@ -450,11 +450,15 @@ function award(
 }
 
 /**
- * Aggiudica il lotto corrente.
- * - `timeout`: vince chi detiene l'offerta più alta, altrimenti il lotto va agli scarti.
- * - `lastman`: tutti tranne uno hanno passato, quindi il superstite si aggiudica il lotto.
+ * Chiude il lotto corrente: vince chi detiene l'offerta più alta.
+ *
+ * Se un'offerta non c'è — tempo scaduto senza rilanci, oppure tutti hanno
+ * passato — non vince nessuno: il lotto finisce negli scarti, e solo se l'host
+ * li ha disattivati viene assegnato d'ufficio al prezzo base a chi ha la lista
+ * più corta. Nessuno si ritrova un elemento in mano solo perché gli altri hanno
+ * premuto "passa" per primi.
  */
-function resolve(state: GameState, now: number, reason: "timeout" | "lastman"): GameState {
+function resolve(state: GameState, now: number): GameState {
   if (isMysteryLot(state)) {
     const result: AuctionResult = {
       itemId: `mystery-${state.lotNumber}`,
@@ -481,17 +485,8 @@ function resolve(state: GameState, now: number, reason: "timeout" | "lastman"): 
   const item = currentItem(state);
   if (!item) return state;
 
-  const holder = playerById(state, state.highBidderId);
-  const survivors = activePlayers(state);
-  let winner: Player | undefined = holder;
-  let price = state.currentBid;
-
-  if (!winner && reason === "lastman" && survivors.length === 1) {
-    winner = survivors[0];
-    price = OPENING_BID;
-  }
-
-  if (winner) return award(state, now, winner, item, price);
+  const winner = playerById(state, state.highBidderId);
+  if (winner) return award(state, now, winner, item, state.currentBid);
 
   // Con gli scarti disattivati il lotto va comunque a chi deve ancora completare la lista.
   if (!state.config.allowDiscards) {
@@ -525,10 +520,20 @@ function resolve(state: GameState, now: number, reason: "timeout" | "lastman"): 
   );
 }
 
-/** L'asta si chiude anche quando resta un solo giocatore in corsa. */
+/** Chiude in anticipo il lotto quando la gara non ha più senso. */
 function settleIfUncontested(state: GameState, now: number): GameState {
   if (state.phase !== "auction" || isMysteryLot(state)) return state;
-  if (activePlayers(state).length <= 1) return resolve(state, now, "lastman");
+  const remaining = activePlayers(state);
+
+  // Il lotto non lo vuole proprio nessuno: si chiude subito, senza aspettare il
+  // timer, e va agli scarti.
+  if (remaining.length === 0) return resolve(state, now);
+
+  // C'è un'offerta e tutti gli altri sono fuori: il lotto è di chi ha offerto.
+  // Se invece l'offerta non c'è, l'ultimo rimasto non viene obbligato a
+  // prenderselo: ha tutto il tempo del timer per offrire o passare anche lui.
+  if (remaining.length === 1 && state.highBidderId) return resolve(state, now);
+
   return state;
 }
 
@@ -677,7 +682,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
       );
       if (isMysteryLot(passed)) {
         const stillIn = passed.players.filter((p) => canClaim(passed, p.id));
-        if (stillIn.length === 0) return resolve(passed, action.now, "timeout");
+        if (stillIn.length === 0) return resolve(passed, action.now);
         return passed;
       }
       return settleIfUncontested(passed, action.now);
@@ -690,7 +695,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
 
     case "tick": {
       if (!state.deadline || action.now < state.deadline) return state;
-      if (state.phase === "auction") return resolve(state, action.now, "timeout");
+      if (state.phase === "auction") return resolve(state, action.now);
       if (state.phase === "result") return draw(state, action.now);
       return state;
     }

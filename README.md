@@ -18,8 +18,10 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
 - **Anti-sniping**: ogni rilancio riporta il timer a 10 secondi, così l'ultimo secondo non decide.
 - **Riserva di budget**: si tiene sempre un credito per ogni slot vuoto, nessuno resta a zero con la
   lista incompleta; i lotti finali vengono assegnati d'ufficio a chi deve ancora completare.
-- **Scarti opzionali**: l'host decide se un lotto senza offerte finisce negli scarti o viene
-  comunque assegnato.
+- **Nessun regalo forzato**: passare non assegna il lotto agli altri. Se non ha offerto nessuno,
+  possono passare tutti e decidono gli scarti.
+- **Scarti opzionali**: l'host decide se un lotto che non vuole nessuno finisce negli scarti
+  (default) o viene comunque assegnato al prezzo base a chi ha la lista più corta.
 - **Due modalità**: stanza locale sullo stesso dispositivo oppure stanza online con codice di 5
   caratteri (copia rapida e QR) sincronizzata via Supabase Realtime Channels.
 - **Card 9:16** esportabile in PNG (1080x1920) con roster, budget residuo e QR del voto.

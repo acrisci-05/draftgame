@@ -1,7 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Eye, EyeOff, Flame, Gavel, PackageOpen, Trash2, Trophy, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Ban,
+  Eye,
+  EyeOff,
+  Flame,
+  Gavel,
+  PackageOpen,
+  Trash2,
+  Trophy,
+  Zap,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
@@ -52,6 +63,12 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
   ).length;
   /** Asta al buio in corso: nome e immagine restano coperti per tutti. */
   const covered = state.config.blindDraft && state.phase === "auction" && !mystery;
+  /**
+   * Qualcuno ha già passato ma sul lotto non c'è ancora nessuna offerta: qui
+   * conviene ricordare che passare non regala niente a nessuno.
+   */
+  const nobodyYet =
+    state.phase === "auction" && !mystery && !state.highBidderId && state.passed.length > 0;
   const resultItem = state.lastResult ? itemById(state, state.lastResult.itemId) : undefined;
   /** Il lotto appena chiuso era al buio: merita lo svelamento. */
   const revealing =
@@ -198,6 +215,20 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
             >
               <Zap className="size-3.5" />
               {t("auction.antiSnipe", { n: RAISE_SECONDS })}
+            </motion.p>
+          ) : null}
+
+          {nobodyYet ? (
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mt-3 flex items-center justify-center gap-1.5 rounded-xl border border-line bg-surface-2 px-3 py-2 text-center text-[11px] font-bold text-balance text-muted"
+            >
+              <Ban className="size-3.5 shrink-0" />
+              {state.config.allowDiscards
+                ? t("auction.nobodyYet")
+                : t("auction.nobodyYetForced")}
             </motion.p>
           ) : null}
         </AnimatePresence>

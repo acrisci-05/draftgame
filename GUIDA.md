@@ -145,14 +145,19 @@ migliore.
   pulsante Max.
 - **Anti-sniping**: siccome ogni rilancio riporta il timer a 10 secondi, un'offerta all'ultimo
   istante lascia sempre agli altri il tempo di rispondere; quando succede compare l'avviso.
-- **Passa**: chi passa esce da quel lotto e non può rientrarci. Se resta un solo giocatore in
-  corsa, il lotto è suo.
+- **Passa**: chi passa esce da quel lotto e non può rientrarci. Se **c'è già un'offerta** e tutti
+  gli altri passano, il lotto va a chi l'aveva fatta al suo prezzo. Se invece **nessuno ha offerto**,
+  passare non regala niente a nessuno: anche l'ultimo rimasto può passare a sua volta, e allora si
+  applica la regola degli scarti qui sotto. Chi è in testa non può passare: ha già impegnato la
+  propria offerta.
 - **Riserva obbligatoria**: si tiene sempre un credito per ogni slot ancora vuoto. Con 3 elementi
   mancanti non si può scendere sotto 3 crediti, quindi nessuno resta bloccato con la lista a metà.
 - **Lotti finali**: se rimane un solo giocatore da completare e i lotti bastano appena, gli
   vengono assegnati d'ufficio al prezzo base.
-- **Scarti**: l'host decide prima di iniziare. Attivi, un lotto senza offerte viene messo da parte;
-  disattivati, viene assegnato a chi ha meno elementi.
+- **Scarti**: l'host decide prima di iniziare, e di default sono attivi. Attivi, il lotto che non
+  vuole nessuno viene messo da parte e non lo prende né lo paga nessuno. Disattivati, quello stesso
+  lotto viene assegnato d'ufficio al prezzo base a chi ha la lista più corta: serve se si vuole che
+  tutti finiscano con la lista piena, anche a costo di ricevere qualcosa di indesiderato.
 - **Varianti**: *Blind Draft* (nome e immagine nascosti fino all'assegnazione, poi lo svelamento) e *Mystery Box* (ogni 5
   lotti una scatola a prezzo fisso con elemento casuale).
 

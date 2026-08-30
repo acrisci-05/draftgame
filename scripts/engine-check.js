@@ -140,6 +140,51 @@ state = game.reducer(state, { type: "tick", now: state.deadline + 1 });
 check("nessuna offerta allo scadere: negli scarti", state.discards.length === 1);
 check("nessun vincitore", state.lastResult.winnerId === null);
 
+/* ---------------- Quando il lotto non lo vuole nessuno ---------------- */
+
+// Senza offerte sul piatto, chi passa per primo non può regalare il lotto
+// all'avversario: anche l'ultimo rimasto deve poter dire di no.
+let nobody = lobby({ budget: 20, slots: 4, allowDiscards: true });
+nobody = game.reducer(nobody, { type: "start", now: t0 });
+nobody = game.reducer(nobody, { type: "pass", playerId: "a", now: t0 + 1000 });
+check("senza offerte, chi passa non aggiudica all'altro", nobody.phase === "auction");
+check("nessuno ha ancora vinto il lotto", nobody.highBidderId === null);
+check("l'ultimo rimasto può ancora passare", game.canPass(nobody, "b"));
+check("l'ultimo rimasto può ancora offrire", game.canBid(nobody, "b", 1));
+
+// Se passa anche lui il lotto si chiude subito, senza aspettare il timer.
+const alsoPassed = game.reducer(nobody, { type: "pass", playerId: "b", now: t0 + 2000 });
+check("passano tutti: lotto chiuso subito", alsoPassed.phase === "result");
+check("passano tutti: nessun vincitore", alsoPassed.lastResult.winnerId === null);
+check("passano tutti: finisce negli scarti", alsoPassed.discards.length === 1);
+check("passano tutti: nessuno ha speso", alsoPassed.players.every((p) => p.budget === 20));
+
+// Se invece l'ultimo rimasto lo vuole, gli basta offrire: è suo, e senza rilanci.
+const lastTakes = game.reducer(nobody, { type: "bid", playerId: "b", amount: 1, now: t0 + 2000 });
+check("l'ultimo rimasto che offre si aggiudica il lotto", lastTakes.phase === "result");
+check("e lo paga il prezzo base", lastTakes.lastResult.winnerId === "b" && lastTakes.lastResult.price === 1);
+
+// Anche allo scadere del tempo, con nessuno in gara, non si assegna d'ufficio.
+const timedOut = game.reducer(nobody, { type: "tick", now: nobody.deadline + 1 });
+check("tempo scaduto senza offerte: nessun vincitore", timedOut.lastResult.winnerId === null);
+
+// Con gli scarti disattivati vale la regola opposta: il lotto va comunque a
+// qualcuno, ma a chi ha la lista più corta, non a chi ha passato per ultimo.
+let forced = lobby({ budget: 20, slots: 4, allowDiscards: false });
+forced = game.reducer(forced, { type: "start", now: t0 });
+forced = game.reducer(forced, { type: "bid", playerId: "a", amount: 1, now: t0 + 500 });
+forced = game.reducer(forced, { type: "pass", playerId: "b", now: t0 + 1000 });
+forced = game.reducer(forced, { type: "tick", now: forced.deadline + 1 });
+forced = game.reducer(forced, { type: "pass", playerId: "a", now: t0 + 60_000 });
+forced = game.reducer(forced, { type: "pass", playerId: "b", now: t0 + 61_000 });
+check("senza scarti: il lotto rifiutato da tutti viene assegnato", forced.lastResult.winnerId !== null);
+check(
+  "senza scarti: lo prende chi ha la lista più corta",
+  forced.lastResult.winnerId === "b",
+  forced.lastResult.winnerId,
+);
+check("senza scarti: al prezzo base", forced.lastResult.price === 1);
+
 /* ---------------- Slot del roster ---------------- */
 
 let slotState = lobby({ slots: 3, budget: 20 });
