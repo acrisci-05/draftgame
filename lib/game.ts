@@ -278,12 +278,95 @@ export function tierPoints(player: Player): number {
   return player.roster.reduce((sum, entry) => sum + entry.tier, 0);
 }
 
+/** Secondi per votare, prima che si chiuda da sola. */
+export const VOTE_SECONDS = 30;
+
+/** Quanti voti ha preso ciascuno. */
+export function voteTally(state: GameState): Record<string, number> {
+  const tally: Record<string, number> = {};
+  for (const player of state.players) tally[player.id] = 0;
+  for (const target of Object.values(state.votes ?? {})) {
+    if (target in tally) tally[target] += 1;
+  }
+  return tally;
+}
+
+/** Chi ha ancora il voto in mano. */
+export function pendingVoters(state: GameState): Player[] {
+  const votes = state.votes ?? {};
+  return state.players.filter((player) => !(player.id in votes));
+}
+
+export function hasVoted(state: GameState, playerId: string): boolean {
+  return playerId in (state.votes ?? {});
+}
+
+/** Si vota la rosa di un altro, una volta sola. */
+export function canVote(state: GameState, voterId: string, targetId: string): boolean {
+  if (state.phase !== "voting") return false;
+  if (voterId === targetId) return false;
+  if (!playerById(state, voterId) || !playerById(state, targetId)) return false;
+  return !hasVoted(state, voterId);
+}
+
+/** Il colpo piu' caro di una rosa: l'ultimo criterio prima del sorteggio. */
+function bestBuy(player: Player): number {
+  return player.roster.reduce((top, entry) => Math.max(top, entry.price), 0);
+}
+
+/** Perche' quel giocatore sta davanti a quello dopo di lui. */
+export type WinReason = "votes" | "credits" | "bestBuy" | "order";
+
+export interface Standing {
+  player: Player;
+  votes: number;
+  /** Come e' stato deciso il sorpasso su chi viene dopo. */
+  reason: WinReason;
+}
+
+/**
+ * La classifica finale.
+ *
+ * A decidere sono i voti degli avversari, non il valore dei lotti: e' un gioco
+ * di gusto, non di aritmetica. Se due prendono gli stessi voti vince chi ha
+ * speso meno, cioe' chi ha ottenuto lo stesso consenso con meno soldi; se anche
+ * il budget e' pari, vince chi ha piazzato il colpo piu' caro. L'ultimo criterio
+ * e' l'ordine di ingresso, uguale su tutti i dispositivi: serve solo perche' un
+ * vincitore ci deve essere sempre, e la vittoria va segnata sul suo profilo.
+ */
 export function standings(state: GameState): Player[] {
-  return [...state.players].sort((a, b) => {
-    const diff = tierPoints(b) - tierPoints(a);
-    if (diff !== 0) return diff;
-    return b.roster.length - a.roster.length;
+  return finalStandings(state).map((entry) => entry.player);
+}
+
+export function finalStandings(state: GameState): Standing[] {
+  const tally = voteTally(state);
+  const order = new Map(state.players.map((player, index) => [player.id, index]));
+
+  const sorted = [...state.players].sort((a, b) => {
+    const byVotes = (tally[b.id] ?? 0) - (tally[a.id] ?? 0);
+    if (byVotes !== 0) return byVotes;
+    const byCredits = b.budget - a.budget;
+    if (byCredits !== 0) return byCredits;
+    const byBest = bestBuy(b) - bestBuy(a);
+    if (byBest !== 0) return byBest;
+    return (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0);
   });
+
+  return sorted.map((player, index) => {
+    const next = sorted[index + 1];
+    let reason: WinReason = "order";
+    if (next) {
+      if ((tally[player.id] ?? 0) !== (tally[next.id] ?? 0)) reason = "votes";
+      else if (player.budget !== next.budget) reason = "credits";
+      else if (bestBuy(player) !== bestBuy(next)) reason = "bestBuy";
+    }
+    return { player, votes: tally[player.id] ?? 0, reason };
+  });
+}
+
+/** Il vincitore, sempre uno solo. */
+export function winnerOf(state: GameState): Standing | null {
+  return finalStandings(state)[0] ?? null;
 }
 
 export function drawnCount(state: GameState): number {
@@ -310,6 +393,7 @@ export type GameAction =
   | { type: "bid"; playerId: string; amount: number; now: number }
   | { type: "claim"; playerId: string; now: number }
   | { type: "pass"; playerId: string; now: number }
+  | { type: "vote"; voterId: string; targetId: string; now: number }
   | { type: "next"; now: number }
   | { type: "tick"; now: number }
   | { type: "restart" }
@@ -338,17 +422,38 @@ function everyoneDone(state: GameState): boolean {
   return allFull || allBroke;
 }
 
+/**
+ * Chiude l'asta e apre il voto.
+ *
+ * Con un solo giocatore non c'e' niente da votare: si va dritti in fondo.
+ */
+function closeAuction(state: GameState, now: number): GameState {
+  const base = {
+    ...state,
+    currentItemId: null,
+    highBidderId: null,
+    passed: [],
+  };
+  if (state.players.length < 2) {
+    return touch({ ...base, phase: "ended" as const, deadline: 0 });
+  }
+  return touch({
+    ...base,
+    phase: "voting" as const,
+    votes: {},
+    deadline: now + VOTE_SECONDS * 1000,
+  });
+}
+
+/** Chiude il voto e proclama il vincitore. */
+function closeVoting(state: GameState): GameState {
+  return touch({ ...state, phase: "ended", deadline: 0 });
+}
+
 /** Estrae il prossimo lotto oppure chiude la partita. */
 function draw(state: GameState, now: number): GameState {
   if (state.queue.length === 0 || everyoneDone(state)) {
-    return touch({
-      ...state,
-      phase: "ended",
-      currentItemId: null,
-      highBidderId: null,
-      passed: [],
-      deadline: 0,
-    });
+    return closeAuction(state, now);
   }
 
   const lotNumber = state.lotNumber + 1;
@@ -758,6 +863,27 @@ export function reducer(state: GameState, action: GameAction): GameState {
       return settleIfUncontested(passed, action.now);
     }
 
+    /**
+     * Un voto: si sceglie la rosa di un altro, una volta sola. Quando hanno
+     * votato tutti non c'e' motivo di aspettare lo scadere del tempo.
+     */
+    case "vote": {
+      if (!canVote(state, action.voterId, action.targetId)) return state;
+      const voter = playerById(state, action.voterId);
+      const target = playerById(state, action.targetId);
+      const voted = touch(
+        pushFeed(
+          { ...state, votes: { ...(state.votes ?? {}), [action.voterId]: action.targetId } },
+          feedEntry("vote", action.now, {
+            playerName: voter?.name,
+            playerEmoji: voter?.emoji,
+            itemName: target?.name,
+          }),
+        ),
+      );
+      return pendingVoters(voted).length === 0 ? closeVoting(voted) : voted;
+    }
+
     case "next": {
       if (state.phase !== "result") return state;
       return draw(state, action.now);
@@ -767,6 +893,8 @@ export function reducer(state: GameState, action: GameAction): GameState {
       if (!state.deadline || action.now < state.deadline) return state;
       if (state.phase === "auction") return resolve(state, action.now);
       if (state.phase === "result") return draw(state, action.now);
+      // Chi non ha votato entro il tempo non vota: si proclama lo stesso.
+      if (state.phase === "voting") return closeVoting(state);
       return state;
     }
 
@@ -788,13 +916,17 @@ export function reducer(state: GameState, action: GameAction): GameState {
         feed: [],
         lotNumber: 0,
         sniped: false,
+        votes: {},
         players: state.players.map((p) => ({ ...p, budget: state.config.budget, roster: [] })),
       });
     }
 
     case "end": {
-      if (state.phase === "lobby") return state;
-      return touch({ ...state, phase: "ended", currentItemId: null, deadline: 0 });
+      if (state.phase === "lobby" || state.phase === "ended") return state;
+      // Anche chiudendo a mano si passa dal voto: il vincitore lo decidono
+      // i giocatori, non chi ha in mano il pulsante.
+      if (state.phase === "voting") return closeVoting(state);
+      return closeAuction(state, Date.now());
     }
 
     default:

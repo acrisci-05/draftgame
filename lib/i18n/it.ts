@@ -615,6 +615,22 @@ export const it = {
   "lobby.timer": "Tempo per lotto",
   "lobby.timerHint": "15 secondi è lo standard. Ogni rilancio rimette il timer al massimo.",
   "studio.clearItem": "Svuota elemento",
+  "vote.phase": "Voto finale",
+  "vote.whoWins": "Chi ha fatto la rosa migliore?",
+  "vote.rules": "Vota la rosa di un avversario. Non puoi votare la tua, e si vota una volta sola.",
+  "vote.castVote": "Vota rosa 🏆",
+  "vote.notYours": "Questa è la tua rosa: non puoi votarla.",
+  "vote.waiting": "Manca il voto di {n}",
+  "vote.allVoted": "Hanno votato tutti",
+  "vote.done": "Voto registrato. Si aspettano gli altri.",
+  "vote.turnOf": "Tocca a {player} votare",
+  "vote.winVotes": "Il più votato della serata",
+  "vote.winCredits": "🏆 Vincitore per crediti rimasti",
+  "vote.winBest": "🏆 Vincitore per il colpo più caro",
+  "vote.winOrder": "🏆 Vincitore allo spareggio",
+  "vote.votesGot": "{n} voti",
+  "vote.oneVote": "1 voto",
+  "vote.noVotes": "nessun voto",
 } as const;
 
 export type TranslationKey = keyof typeof it;

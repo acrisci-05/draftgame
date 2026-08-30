@@ -249,6 +249,23 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Nel menu c'è l'interruttore **Foto automatiche**, spento di default: acceso, l'app cerca da sola
   una foto per gli elementi che non ne hanno, sempre passando dal filtro di pertinenza.
 
+### Voto finale
+Finita l'asta **non vince chi ha speso di più**: a dire chi ha fatto la rosa migliore sono i
+giocatori. La stanza entra in una fase di voto:
+
+- si vedono le rose di tutti, e sotto quella di **ogni avversario** c'è *Vota rosa 🏆*;
+- la propria non si può votare, e si vota **una volta sola**;
+- appena hanno votato tutti si proclama; chi non vota entro **30 secondi** semplicemente non vota;
+- online ognuno vota dal proprio telefono, in locale il telefono passa di mano e lo schermo dice
+  di chi è il turno.
+
+**Un vincitore c'è sempre, e uno solo**, perché la vittoria finisce sul profilo di una persona.
+I criteri, in ordine: più voti; a parità, chi ha **più crediti rimasti** (stesso consenso con meno
+soldi); ancora pari, chi ha piazzato il **colpo più caro**; e in ultimo l'ordine d'ingresso, uguale
+su tutti i dispositivi. Sotto al nome del primo c'è scritto quale criterio ha deciso, così non
+sembra arbitrario. Il pareggio non esiste: non c'è nessuna schermata di ex aequo perché non può
+verificarsi.
+
 ### Fine partita
 - **Due schermate, in quest'ordine.** Prima quella personale: "La tua rosa", con i lotti
   conquistati (`3/3`), i crediti spesi e quelli rimasti, e il pulsante *Scopri la classifica finale*

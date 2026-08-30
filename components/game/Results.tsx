@@ -19,9 +19,17 @@ import { playSfx } from "@/lib/audio";
 import { useAuth } from "@/lib/auth";
 import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
-import { itemById, playerById, rosterValue, standings, type GameAction } from "@/lib/game";
+import {
+  finalStandings,
+  itemById,
+  playerById,
+  rosterValue,
+  type GameAction,
+  type WinReason,
+} from "@/lib/game";
 import { recordMatch } from "@/lib/history";
 import { recordOpponent } from "@/lib/pickmates";
+import type { TranslationKey } from "@/lib/i18n";
 import { useSettings, useT } from "@/lib/settings";
 import { isSupabaseConfigured, publishResult } from "@/lib/supabase";
 import type { CatalogItem, GameState, Player } from "@/lib/types";
@@ -100,10 +108,12 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    */
   useEffect(() => {
     if (!myAccountId) return;
-    const ranking = standings(state);
-    const mine = ranking.findIndex((player) => player.accountId === myAccountId);
+    // La posizione e' quella decisa dal voto: chi vince qui si prende la
+    // vittoria sul profilo, e il vincitore e' sempre uno solo.
+    const ranking = finalStandings(state);
+    const mine = ranking.findIndex((entry) => entry.player.accountId === myAccountId);
     if (mine < 0) return;
-    const me = ranking[mine];
+    const me = ranking[mine].player;
     void recordMatch(myAccountId, {
       code: state.code,
       category: state.category.name,
@@ -117,7 +127,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   }, [myAccountId, state]);
 
   const currency = state.config.currency;
-  const ordered = standings(state);
+  const ordered = finalStandings(state);
   const discarded = state.discards
     .map((id) => itemById(state, id))
     .filter((item): item is CatalogItem => Boolean(item));
@@ -223,7 +233,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
       <Panel>
         <PanelTitle>{t("results.rosters")}</PanelTitle>
         <div className="flex flex-col gap-3">
-          {ordered.map((player, index) => (
+          {ordered.map(({ player, votes, reason }, index) => (
             <motion.div
               key={player.id}
               initial={{ opacity: 0, y: 12 }}
@@ -242,26 +252,39 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
                 <p className="mb-1.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-gold">
                   <Crown className="size-3" />
                   {t("results.winner")}
+                  {/* Perche' ha vinto: i voti, oppure il criterio di spareggio. */}
+                  <span className="ms-1 font-bold normal-case text-gold/80">
+                    · {t(WIN_REASON_KEYS[reason])}
+                  </span>
                 </p>
               ) : null}
-              <div className="flex items-center justify-between gap-3">
-                <span className="flex min-w-0 items-center gap-2 font-bold">
-                  <Avatar id={player.emoji} size="sm" />
-                  <span className="truncate">{player.name}</span>
-                  {player.id === selfId ? (
-                    <span className="shrink-0 rounded-full bg-neon/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-neon">
-                      {t("lobby.you")}
-                    </span>
-                  ) : null}
-                </span>
-                <span className="flex shrink-0 items-center gap-2">
-                  <Badge tone="neutral">
-                    {t("results.spent", { amount: money(rosterValue(player), currency) })}
-                  </Badge>
-                  <Badge tone="neon">
-                    {t("results.left", { amount: money(player.budget, currency) })}
-                  </Badge>
-                </span>
+              {/*
+                Nome e cifre su due righe: su un telefono stretto i badge
+                schiacciavano il nome fino a farlo sparire.
+              */}
+              <div className="flex min-w-0 items-center gap-2 font-bold">
+                <Avatar id={player.emoji} size="sm" />
+                <span className="truncate">{player.name}</span>
+                {player.id === selfId ? (
+                  <span className="shrink-0 rounded-full bg-neon/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-neon">
+                    {t("lobby.you")}
+                  </span>
+                ) : null}
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <Badge tone={votes > 0 ? "gold" : "neutral"}>
+                  {votes === 0
+                    ? t("vote.noVotes")
+                    : votes === 1
+                      ? t("vote.oneVote")
+                      : t("vote.votesGot", { n: votes })}
+                </Badge>
+                <Badge tone="neutral">
+                  {t("results.spent", { amount: money(rosterValue(player), currency) })}
+                </Badge>
+                <Badge tone="neon">
+                  {t("results.left", { amount: money(player.budget, currency) })}
+                </Badge>
               </div>
               <div className="mt-2.5 flex flex-wrap gap-1.5">
                 {player.roster.length === 0 ? (
@@ -432,3 +455,17 @@ function TabButton({
     </button>
   );
 }
+
+/**
+ * Come ha vinto il primo.
+ *
+ * "votes" e' il caso normale: ha preso piu' voti di tutti. Gli altri tre sono i
+ * criteri di spareggio, in ordine, e servono a garantire che un vincitore ci sia
+ * sempre: la vittoria finisce sul profilo di una persona sola.
+ */
+const WIN_REASON_KEYS: Record<WinReason, TranslationKey> = {
+  votes: "vote.winVotes",
+  credits: "vote.winCredits",
+  bestBuy: "vote.winBest",
+  order: "vote.winOrder",
+};

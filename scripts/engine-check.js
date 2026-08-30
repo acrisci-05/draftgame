@@ -185,6 +185,98 @@ check(
 );
 check("senza scarti: al prezzo base", forced.lastResult.price === 1);
 
+/* ---------------- Voto finale ---------------- */
+
+/** Porta una partita fino alla fine dell'asta, con tre giocatori. */
+function playedOut() {
+  let s = game.createGame({
+    code: "VOTE1",
+    mode: "local",
+    hostId: "a",
+    category,
+    config: { maxPlayers: 3, budget: 20, slots: 1 },
+  });
+  for (const [id, name] of [["a", "Ana"], ["b", "Bea"], ["c", "Cip"]]) {
+    s = game.reducer(s, { type: "add_player", player: { id, name } });
+  }
+  s = game.reducer(s, { type: "start", now: t0 });
+  let clock = t0;
+  let guard = 0;
+  while (s.phase !== "voting" && s.phase !== "ended" && guard < 200) {
+    if (s.phase === "auction") {
+      const buyer = s.players.find((p) => game.canBid(s, p.id, 1));
+      if (buyer) s = game.reducer(s, { type: "bid", playerId: buyer.id, amount: 1, now: clock });
+      else s = game.reducer(s, { type: "tick", now: s.deadline + 1 });
+    } else {
+      s = game.reducer(s, { type: "tick", now: s.deadline + 1 });
+    }
+    clock += 1000;
+    guard += 1;
+  }
+  return s;
+}
+
+let voting = playedOut();
+check("finita l'asta si vota, non si premia", voting.phase === "voting", voting.phase);
+check("il voto ha il suo tempo", voting.deadline > 0);
+check("all'inizio non ha votato nessuno", game.pendingVoters(voting).length === 3);
+
+check("non si vota la propria rosa", !game.canVote(voting, "a", "a"));
+check("si vota quella di un altro", game.canVote(voting, "a", "b"));
+
+voting = game.reducer(voting, { type: "vote", voterId: "a", targetId: "b", now: t0 });
+check("il voto viene registrato", game.voteTally(voting)["b"] === 1);
+check("chi ha votato non vota due volte", !game.canVote(voting, "a", "c"));
+check(
+  "il secondo voto dello stesso giocatore non passa",
+  game.reducer(voting, { type: "vote", voterId: "a", targetId: "c", now: t0 }) === voting,
+);
+check("con voti in sospeso la partita non finisce", voting.phase === "voting");
+
+voting = game.reducer(voting, { type: "vote", voterId: "b", targetId: "c", now: t0 });
+voting = game.reducer(voting, { type: "vote", voterId: "c", targetId: "b", now: t0 });
+check("votato l'ultimo, si chiude subito", voting.phase === "ended", voting.phase);
+const podium = game.finalStandings(voting);
+check("vince chi ha piu' voti", podium[0].player.id === "b" && podium[0].votes === 2, podium[0].player.id);
+check("il motivo del primo posto sono i voti", podium[0].reason === "votes");
+
+// Il tempo scaduto chiude comunque: chi non ha votato, non vota.
+let silent = playedOut();
+silent = game.reducer(silent, { type: "vote", voterId: "a", targetId: "c", now: t0 });
+silent = game.reducer(silent, { type: "tick", now: silent.deadline + 1 });
+check("allo scadere si proclama lo stesso", silent.phase === "ended");
+check("vince chi aveva l'unico voto", game.winnerOf(silent).player.id === "c");
+
+// Pareggi: non devono esistere, un vincitore solo ci deve essere sempre.
+let tied = playedOut();
+tied = game.reducer(tied, { type: "vote", voterId: "a", targetId: "b", now: t0 });
+tied = game.reducer(tied, { type: "vote", voterId: "b", targetId: "a", now: t0 });
+tied = game.reducer(tied, { type: "vote", voterId: "c", targetId: "a", now: t0 });
+const tiedPodium = game.finalStandings(tied);
+check("a parita' di voti decide qualcos'altro", tiedPodium[0].votes >= tiedPodium[1].votes);
+check(
+  "il primo posto e' di uno solo",
+  tiedPodium.filter((entry) => entry.votes === tiedPodium[0].votes && entry.player.id === tiedPodium[0].player.id).length === 1,
+);
+check("c'e' sempre un vincitore", game.winnerOf(tied) !== null);
+
+// Due giocatori con gli stessi voti: decide chi ha speso meno.
+const pair = {
+  ...playedOut(),
+  players: [
+    { id: "x", name: "X", emoji: "flame", budget: 12, roster: [{ itemId: "1", name: "a", tier: 1, price: 8 }] },
+    { id: "y", name: "Y", emoji: "zap", budget: 15, roster: [{ itemId: "2", name: "b", tier: 1, price: 5 }] },
+  ],
+  votes: { x: "y", y: "x" },
+};
+const byCredits = game.finalStandings(pair);
+check(
+  "a parita' di voti vince chi ha piu' crediti rimasti",
+  byCredits[0].player.id === "y",
+  byCredits[0].player.id,
+);
+check("e il motivo lo dice", byCredits[0].reason === "credits", byCredits[0].reason);
+
 /* ---------------- Durata del lotto ---------------- */
 
 // La durata e' una sola: vale all'apertura del lotto e a ogni rilancio.
@@ -361,7 +453,9 @@ broke.players.forEach((p) => {
 });
 broke = game.reducer(broke, { type: "tick", now: broke.deadline + 1 });
 broke = game.reducer(broke, { type: "tick", now: broke.deadline + 1 });
-check("budget esauriti: partita finita", broke.phase === "ended");
+// Finiti i soldi l'asta chiude, ma la partita non e' decisa: si passa al voto.
+check("budget esauriti: si passa al voto", broke.phase === "voting", broke.phase);
+check("budget esauriti: l'asta e' chiusa", broke.currentItemId === null);
 
 /* ---------------- Riserva di budget ---------------- */
 

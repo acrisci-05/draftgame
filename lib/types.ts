@@ -56,6 +56,9 @@ export interface Player {
   roster: RosterEntry[];
 }
 
+/** Chi ha votato chi: la chiave è chi vota, il valore è la rosa votata. */
+export type VoteMap = Record<string, string>;
+
 export interface AuctionResult {
   itemId: string;
   itemName: string;
@@ -68,7 +71,12 @@ export interface AuctionResult {
 
 export type RoomMode = "local" | "online";
 
-export type Phase = "lobby" | "auction" | "result" | "ended";
+/**
+ * Le fasi della partita.
+ * "voting" sta fra l'ultimo lotto e la premiazione: a decidere il vincitore
+ * sono i giocatori, non un conteggio automatico.
+ */
+export type Phase = "lobby" | "auction" | "result" | "voting" | "ended";
 
 export type LotKind = "item" | "mystery";
 
@@ -103,7 +111,8 @@ export type FeedKind =
   | "mystery"
   | "lot"
   | "start"
-  | "auto";
+  | "auto"
+  | "vote";
 
 export interface FeedEntry {
   id: string;
@@ -142,6 +151,8 @@ export interface GameState {
   lotNumber: number;
   /** true quando l'ultimo rilancio è arrivato negli ultimi secondi del timer. */
   sniped: boolean;
+  /** Voti della fase finale. Assente sulle partite iniziate prima del voto. */
+  votes?: VoteMap;
   updatedAt: number;
 }
 

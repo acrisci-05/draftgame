@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/Input";
 import { AuctionStage } from "./AuctionStage";
 import { Lobby } from "./Lobby";
 import { Results } from "./Results";
+import { VotingStage } from "./VotingStage";
 
 export function RoomClient({ code }: { code: string }) {
   const router = useRouter();
@@ -129,6 +130,8 @@ export function RoomClient({ code }: { code: string }) {
         />
       ) : state.phase === "lobby" ? (
         <Lobby state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
+      ) : state.phase === "voting" ? (
+        <VotingStage state={state} selfId={self.id} now={now} dispatch={dispatch} />
       ) : state.phase === "ended" ? (
         <Results state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
       ) : (
