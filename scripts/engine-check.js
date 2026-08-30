@@ -185,6 +185,42 @@ check(
 );
 check("senza scarti: al prezzo base", forced.lastResult.price === 1);
 
+/* ---------------- Passaggio di host ---------------- */
+
+// Se chi ospita la stanza sparisce, il posto lo prende il primo giocatore
+// rimasto nell'ordine della lista: lo stesso ordine su tutti i dispositivi.
+let hostState = lobby({ maxPlayers: 4, budget: 20, slots: 4 });
+hostState = game.reducer(hostState, { type: "add_player", player: { id: "c", name: "Cip" } });
+
+check("host presente: nessun successore", game.nextHost(hostState, ["a", "b", "c"]) === null);
+check(
+  "host sparito: tocca al primo rimasto",
+  game.nextHost(hostState, ["b", "c"]) === "b",
+  game.nextHost(hostState, ["b", "c"]),
+);
+check(
+  "il successore e' lo stesso per tutti i dispositivi",
+  game.nextHost(hostState, ["c", "b"]) === game.nextHost(hostState, ["b", "c"]),
+);
+check("nessuno rimasto: nessun successore", game.nextHost(hostState, []) === null);
+
+const promoted = game.reducer(hostState, { type: "set_host", playerId: "b" });
+check("il nuovo host risulta nello stato", promoted.hostId === "b");
+check(
+  "promuovere l'host attuale non cambia niente",
+  game.reducer(promoted, { type: "set_host", playerId: "b" }) === promoted,
+);
+check(
+  "non si promuove chi non e' in stanza",
+  game.reducer(promoted, { type: "set_host", playerId: "zzz" }) === promoted,
+);
+// Il passaggio vale anche a partita avviata: e' li' che serve davvero.
+const running = game.reducer(game.reducer(hostState, { type: "start", now: t0 }), {
+  type: "set_host",
+  playerId: "c",
+});
+check("si cambia host anche durante l'asta", running.hostId === "c" && running.phase === "auction");
+
 /* ---------------- Slot del roster ---------------- */
 
 let slotState = lobby({ slots: 3, budget: 20 });

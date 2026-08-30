@@ -130,7 +130,7 @@ export function RoomClient({ code }: { code: string }) {
       ) : state.phase === "lobby" ? (
         <Lobby state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
       ) : state.phase === "ended" ? (
-        <Results state={state} isHost={isHost} dispatch={dispatch} />
+        <Results state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
       ) : (
         <AuctionStage state={state} selfId={self.id} isHost={isHost} now={now} dispatch={dispatch} />
       )}

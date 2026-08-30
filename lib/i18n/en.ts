@@ -42,8 +42,7 @@ export const en: Dictionary = {
   "rules.step2.body":
     "Items come up at random from the base price. You get 15 seconds per lot, back to 10 after every raise.",
   "rules.step3.title": "3. Raise or pass",
-  "rules.step3.body":
-    "Raise by +1, +2 or +5 while your balance covers it. Pass and you are out of the lot: the last one in takes it.",
+  "rules.step3.body": "Raise by +1, +2 or +5 as long as your balance covers it. Passing drops you from the lot: with a bid on the table the lot goes to that bidder, with no bids at all it goes to the discards.",
   "rules.step4.title": "4. Card and voting",
   "rules.step4.body":
     "Once rosters are full you get the vertical card to post and a voting link for your friends.",
@@ -136,7 +135,7 @@ export const en: Dictionary = {
   "lobby.rule1": "Every player starts with {budget}.",
   "lobby.rule2": "15 seconds per lot, 10 after every raise.",
   "lobby.rule3": "Raises of +1, +2, +5 only when the balance covers them.",
-  "lobby.rule4": "Pass and you are out of the lot: the last one in wins it.",
+  "lobby.rule4": "Passing drops you from the lot. If nobody bids, nobody takes it.",
   "lobby.rule5": "Each roster closes at {slots} items.",
 
   "auction.lot": "Lot {current} of {total}",
@@ -538,4 +537,17 @@ export const en: Dictionary = {
     "Local on a single device or online with a 5-character code. You can also switch on Blind Draft (cover hidden until the lot is assigned) and Mystery Box (fixed-price lot with a random item).",
   "auction.nobodyYet": "No bids yet: if everyone passes the lot goes to the discards",
   "auction.nobodyYetForced": "No bids yet: if everyone passes it goes to whoever has fewest items",
+  "results.mineTitle": "Your line-up",
+  "results.mineHeadline": "Here's what you won ({n}/{tot})",
+  "results.revealStandings": "See the final standings 🏆",
+  "results.autoOpen": "Opens on its own in {n} seconds",
+  "results.tabMine": "My line-up",
+  "results.tabAll": "All players",
+  "results.mineSpent": "Credits spent",
+  "results.mineLeft": "Credits left",
+  "results.winner": "1st place",
+  "creator.coffee": "Buy me a coffee",
+  "creator.revolut": "Donate with Revolut",
+  "creator.donateNote": "Payment happens on PayPal or Revolut: nothing goes through this app.",
+  "notify.open": "Open",
 };

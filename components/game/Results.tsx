@@ -1,18 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Home, Link2, Loader2, RotateCcw, Trash2, Vote } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Crown,
+  Home,
+  Link2,
+  Loader2,
+  RotateCcw,
+  Trash2,
+  Users,
+  Vote,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { useAuth } from "@/lib/auth";
 import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
-import { itemById, rosterValue, standings, type GameAction } from "@/lib/game";
+import { itemById, playerById, rosterValue, standings, type GameAction } from "@/lib/game";
 import { recordOpponent } from "@/lib/pickmates";
-import { useSettings } from "@/lib/settings";
+import { useSettings, useT } from "@/lib/settings";
 import { isSupabaseConfigured, publishResult } from "@/lib/supabase";
-import type { CatalogItem, GameState } from "@/lib/types";
+import type { CatalogItem, GameState, Player } from "@/lib/types";
 import { TIER_STYLES, cn, copyText, money } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
@@ -20,16 +31,22 @@ import { Button } from "@/components/ui/Button";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { QrCode } from "@/components/ui/QrCode";
 import { Confetti } from "./Confetti";
+import { ItemCover } from "./ItemCover";
 import { FriendShare } from "./FriendShare";
 import { TikTokCard } from "./TikTokCard";
 
 interface ResultsProps {
   state: GameState;
   isHost: boolean;
+  /** Chi sta guardando su questo dispositivo: da lui dipende "la tua rosa". */
+  selfId: string;
   dispatch: (action: GameAction) => void;
 }
 
-export function Results({ state, isHost, dispatch }: ResultsProps) {
+/** Secondi dopo i quali la classifica si apre da sola, se non si tocca niente. */
+const RECAP_SECONDS = 5;
+
+export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   const router = useRouter();
   const { locale, sound, t } = useSettings();
   const { account } = useAuth();
@@ -38,6 +55,22 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
   const [voteBusy, setVoteBusy] = useState(false);
   const [voteError, setVoteError] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const me = playerById(state, selfId);
+  /**
+   * Il riepilogo personale ha senso solo quando ogni dispositivo ha il suo
+   * giocatore: in una stanza locale sono tutti davanti allo stesso schermo e si
+   * va dritti alla classifica.
+   */
+  const personal = state.mode === "online" && Boolean(me);
+  const [view, setView] = useState<"recap" | "mine" | "all">(personal ? "recap" : "all");
+
+  // Il riepilogo si apre da solo sulla classifica: chi non tocca niente non resta bloccato.
+  useEffect(() => {
+    if (view !== "recap") return;
+    const timer = setTimeout(() => setView("all"), RECAP_SECONDS * 1000);
+    return () => clearTimeout(timer);
+  }, [view]);
 
   const myAccountId = account && !account.local ? account.id : null;
 
@@ -91,6 +124,38 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  /* Fase 1: quello che interessa davvero a chi guarda, cioe' la propria rosa. */
+  if (view === "recap" && me) {
+    return (
+      <div className="flex flex-1 flex-col justify-center gap-5 py-6">
+        <Confetti />
+        <div className="text-center">
+          <p className="text-xs uppercase tracking-[0.24em] text-faint">{t("results.title")}</p>
+          <h1 className="mt-1 text-3xl font-black tracking-tight">{t("results.mineTitle")}</h1>
+          <p className="mt-2 text-sm text-muted">
+            {t("results.mineHeadline", { n: me.roster.length, tot: state.config.slots })}
+          </p>
+        </div>
+
+        <MyRoster player={me} currency={currency} />
+
+        <div className="flex flex-col items-center gap-2">
+          <motion.button
+            type="button"
+            onClick={() => setView("all")}
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 1.6, repeat: Infinity }}
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-neon text-lg font-black text-ink shadow-lg transition-opacity hover:opacity-90"
+          >
+            {t("results.revealStandings")}
+            <ArrowRight className="size-5" />
+          </motion.button>
+          <p className="text-xs text-faint">{t("results.autoOpen", { n: RECAP_SECONDS })}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <Confetti />
@@ -107,6 +172,30 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
         </p>
       </div>
 
+      {/* Si passa da "la mia rosa" a "tutti" in qualsiasi momento. */}
+      {personal && me ? (
+        <div className="grid grid-cols-2 gap-1.5 rounded-2xl border border-line bg-surface p-1.5">
+          <TabButton active={view === "mine"} onClick={() => setView("mine")}>
+            <Avatar id={me.emoji} size="xs" />
+            {t("results.tabMine")}
+          </TabButton>
+          <TabButton active={view === "all"} onClick={() => setView("all")}>
+            <Users className="size-4" />
+            {t("results.tabAll")}
+          </TabButton>
+        </div>
+      ) : null}
+
+      {view === "mine" && me ? (
+        <Panel>
+          <PanelTitle>{t("results.mineTitle")}</PanelTitle>
+          <p className="mb-3 text-sm text-muted">
+            {t("results.mineHeadline", { n: me.roster.length, tot: state.config.slots })}
+          </p>
+          <MyRoster player={me} currency={currency} />
+        </Panel>
+      ) : (
+        <>
       <Panel>
         <PanelTitle>{t("results.rosters")}</PanelTitle>
         <div className="flex flex-col gap-3">
@@ -116,12 +205,30 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="rounded-xl border border-line bg-surface-2 p-3"
+              className={cn(
+                "rounded-xl border p-3",
+                index === 0
+                  ? "border-gold/60 bg-gold/10"
+                  : "border-line bg-surface-2",
+              )}
             >
+              {/* Il primo classificato si annuncia su una riga sua: in fondo
+                  allo schermo di un telefono, accanto al nome, lo mangerebbe. */}
+              {index === 0 ? (
+                <p className="mb-1.5 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-gold">
+                  <Crown className="size-3" />
+                  {t("results.winner")}
+                </p>
+              ) : null}
               <div className="flex items-center justify-between gap-3">
                 <span className="flex min-w-0 items-center gap-2 font-bold">
                   <Avatar id={player.emoji} size="sm" />
                   <span className="truncate">{player.name}</span>
+                  {player.id === selfId ? (
+                    <span className="shrink-0 rounded-full bg-neon/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-neon">
+                      {t("lobby.you")}
+                    </span>
+                  ) : null}
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
                   <Badge tone="neutral">
@@ -206,6 +313,8 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
           </div>
         </Panel>
       ) : null}
+        </>
+      )}
 
       <div className="grid grid-cols-2 gap-2 pb-8">
         {isHost ? (
@@ -222,5 +331,80 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * La rosa di un singolo giocatore: quanti lotti ha preso, quanto ha speso e
+ * quanto gli e' rimasto. E' il riquadro della prima fase e della scheda
+ * "la mia rosa", quindi vive per conto suo.
+ */
+function MyRoster({
+  player,
+  currency,
+}: {
+  player: Player;
+  currency: GameState["config"]["currency"];
+}) {
+  const t = useT();
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-xl border border-line bg-surface-2 p-3 text-center">
+          <p className="text-[11px] uppercase tracking-wider text-faint">{t("results.mineSpent")}</p>
+          <p className="font-mono text-2xl font-black">{money(rosterValue(player), currency)}</p>
+        </div>
+        <div className="rounded-xl border border-neon/40 bg-neon/10 p-3 text-center">
+          <p className="text-[11px] uppercase tracking-wider text-faint">{t("results.mineLeft")}</p>
+          <p className="font-mono text-2xl font-black text-neon">{money(player.budget, currency)}</p>
+        </div>
+      </div>
+
+      {player.roster.length === 0 ? (
+        <p className="rounded-xl border border-line bg-surface-2 p-4 text-center text-sm text-faint">
+          {t("results.empty")}
+        </p>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          {player.roster.map((entry) => (
+            <div
+              key={entry.itemId}
+              className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-2 px-3 py-2"
+            >
+              <span className="flex min-w-0 items-center gap-2">
+                <ItemCover item={entry} size="xs" />
+                <span className="truncate text-sm font-semibold">{entry.name}</span>
+              </span>
+              <span className="shrink-0 font-mono text-sm font-black text-gold">
+                {money(entry.price, currency)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex h-11 items-center justify-center gap-2 rounded-xl text-sm font-bold transition-colors",
+        active ? "bg-neon/15 text-neon" : "text-muted hover:text-fg",
+      )}
+    >
+      {children}
+    </button>
   );
 }

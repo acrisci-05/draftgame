@@ -136,6 +136,11 @@ body {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
+  /* Avvisi ancorati in alto: sotto la tacca, non dietro. */
+  .safe-top {
+    margin-top: env(safe-area-inset-top);
+  }
+
   /* Un coriandolo: cade, deriva di lato e gira su sé stesso. */
   .confetti-piece {
     position: absolute;

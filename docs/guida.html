@@ -523,7 +523,9 @@ Pickmates</em> e <em>Draft ricevuti</em>.</p>
 
 <h3>Notifiche dal vivo</h3>
 <p>La campanella in alto compare a chi ha fatto l'accesso e ascolta il database: l'avviso arriva
-senza ricaricare la pagina.</p>
+senza ricaricare la pagina. La barra c'e' su ogni pagina, quindi l'avviso compare anche mentre stai
+facendo altro: scende dall'alto un riquadro con chi ti scrive, resta sei secondi e si tocca per
+aprire il pannello.</p>
 <table>
   <tr><th>Notifica</th><th>Cosa mostra</th><th>Pulsanti</th></tr>
   <tr><td>Richiesta Pickmate</td><td>chi ti ha invitato</td><td>Accetta · Rifiuta</td></tr>
@@ -535,6 +537,17 @@ senza ricaricare la pagina.</p>
      circola su WhatsApp e Instagram.
      ================================================================== -->
 <h2>10. Fine partita: card e votazione</h2>
+
+<h3>Prima la tua rosa, poi la classifica</h3>
+<p>Quando l'ultimo lotto e' assegnato non parte subito la classifica: ogni dispositivo mostra prima
+<strong>la propria</strong> rosa &mdash; "Ecco i tuoi lotti conquistati (3/3)", i crediti spesi e
+quelli rimasti, gli elementi con il prezzo pagato &mdash; e un pulsante che pulsa, <em>Scopri la
+classifica finale</em>. Chi non lo tocca la vede aprirsi da sola dopo 5 secondi.</p>
+<p>Poi arriva la classifica di tutti, con il primo evidenziato in oro, e in alto restano due schede
+(<em>La mia rosa</em> e <em>Tutti i giocatori</em>) per tornare avanti e indietro quando si vuole.
+In una stanza da otto persone ognuno vede la sua: il giocatore si riconosce dalla sessione salvata
+su quel dispositivo. Nelle stanze locali la prima schermata non compare, perche' sono tutti davanti
+allo stesso schermo.</p>
 
 <h3>La card 9:16</h3>
 <ul>
@@ -571,6 +584,11 @@ nessuna registrazione. È il modo per far decidere agli amici chi ha vinto davve
   <li><strong>Installabile sulla schermata Home</strong> come un'app, con istruzioni separate per
     iPhone/iPad e Android; dove il browser lo permette parte con un solo tocco. Una volta
     installata si apre a schermo intero, senza barre del browser.</li>
+  <li><strong>Donazioni</strong>: nella scheda del creatore ci sono i due pulsanti diretti,
+    <em>Offrimi un caff&egrave;</em> (PayPal) e <em>Dona con Revolut</em>, e sotto il collegamento
+    al pannello degli importi. Il pagamento avviene sul servizio esterno: dall'app non passa nessun
+    dato. Gli utenti si cambiano con <code>NEXT_PUBLIC_PAYPAL_USER</code> e
+    <code>NEXT_PUBLIC_REVOLUT_USER</code>.</li>
   <li><strong>Foto automatiche</strong>: interruttore nel menu, spento di default. Acceso, l'app
     cerca da sola una foto per gli elementi che non ne hanno — utile nelle liste create da te.</li>
 </ul>
@@ -618,6 +636,31 @@ sempre scritto quale sta usando.</p>
      13. SUPABASE. Passi in ordine, tabelle create, e le due scelte di
      sicurezza che vale la pena capire.
      ================================================================== -->
+<h3>Quando qualcosa va storto</h3>
+<table>
+  <tr><th>Situazione</th><th>Cosa fa l'app</th></tr>
+  <tr>
+    <td>L'app va in secondo piano (schermo bloccato, cambio scheda)</td>
+    <td>al ritorno si riaggancia da sola: chi partecipa si ripresenta e riceve lo stato aggiornato, chi ospita lo ritrasmette. Niente ricariche, niente crediti o lotti disallineati</td>
+  </tr>
+  <tr>
+    <td>Chi ospita la stanza sparisce</td>
+    <td>dopo 6 secondi di assenza il posto lo prende il primo giocatore rimasto nell'ordine della lista. Quell'ordine e' identico su tutti i dispositivi, quindi si promuove uno solo e l'asta riprende da dove era</td>
+  </tr>
+  <tr>
+    <td>L'host rientra dopo il passaggio</td>
+    <td>si adegua: comanda chi risulta host nello stato che circola, non chi ha aperto la stanza</td>
+  </tr>
+  <tr>
+    <td>Doppio tocco su un rilancio</td>
+    <td>il secondo tocco identico entro 400 millisecondi non parte. E se partisse, il motore lo scarterebbe comunque: chi e' in testa non rilancia su se' stesso</td>
+  </tr>
+  <tr>
+    <td>Un giocatore perde la linea durante l'asta</td>
+    <td>resta in partita con i suoi acquisti e il suo budget; il timer continua e i lotti si assegnano lo stesso</td>
+  </tr>
+</table>
+
 <h2>13. Configurare il database</h2>
 
 <p>Il database è <strong>Supabase</strong>, gratuito per questo uso. Serve per: stanze online

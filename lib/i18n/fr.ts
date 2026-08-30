@@ -42,8 +42,7 @@ export const fr: PartialDictionary = {
   "rules.step2.body":
     "Les éléments sortent au hasard et partent du prix de base. Tu as 15 secondes par lot, remises à 10 après chaque relance.",
   "rules.step3.title": "3. Relance ou passe",
-  "rules.step3.body":
-    "Relances de +1, +2 et +5 tant que ton solde le permet. Qui passe quitte le lot : s'il n'en reste qu'un, le lot est pour lui.",
+  "rules.step3.body": "Enchères de +1, +2 et +5 tant que le solde le permet. Passer, c'est quitter le lot : s'il y a une enchère le lot revient à celui qui l'a faite, s'il n'y en a aucune il part aux rebuts.",
   "rules.step4.title": "4. Carte et vote",
   "rules.step4.body":
     "Une fois les rosters complets, tu obtiens la carte verticale à poster et le lien de vote pour tes amis.",
@@ -121,7 +120,7 @@ export const fr: PartialDictionary = {
   "lobby.rule1": "Chaque joueur commence avec {budget}.",
   "lobby.rule2": "15 secondes par lot, 10 après chaque relance.",
   "lobby.rule3": "Relances de +1, +2, +5 seulement si le solde le permet.",
-  "lobby.rule4": "Qui passe quitte le lot : le dernier restant le remporte.",
+  "lobby.rule4": "Passer, c'est quitter le lot. Si personne n'enchérit, personne ne le prend.",
   "lobby.rule5": "Chaque roster se ferme à {slots} éléments.",
 
   "auction.lot": "Lot {current} sur {total}",
@@ -499,4 +498,17 @@ export const fr: PartialDictionary = {
   "lobby.avatarHint": "Chaque joueur doit avoir un avatar différent : ceux qui sont éteints sont déjà pris.",
   "auction.nobodyYet": "Aucune enchère : si tout le monde passe, le lot part aux rebuts",
   "auction.nobodyYetForced": "Aucune enchère : si tout le monde passe, il va à celui qui a le moins d'éléments",
+  "results.mineTitle": "Ta sélection",
+  "results.mineHeadline": "Voici tes lots remportés ({n}/{tot})",
+  "results.revealStandings": "Voir le classement final 🏆",
+  "results.autoOpen": "S'ouvre tout seul dans {n} secondes",
+  "results.tabMine": "Ma sélection",
+  "results.tabAll": "Tous les joueurs",
+  "results.mineSpent": "Crédits dépensés",
+  "results.mineLeft": "Crédits restants",
+  "results.winner": "1er",
+  "creator.coffee": "Offre-moi un café",
+  "creator.revolut": "Faire un don avec Revolut",
+  "creator.donateNote": "Le paiement se fait sur PayPal ou Revolut : rien ne passe par cette app.",
+  "notify.open": "Ouvrir",
 };

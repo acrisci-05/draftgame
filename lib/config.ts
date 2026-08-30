@@ -18,7 +18,7 @@ export const SITE_URL = RAW_SITE_URL && RAW_SITE_URL.length > 0 ? RAW_SITE_URL :
 export const SITE_DOMAIN = SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 export const INSTAGRAM_URL =
-  process.env.NEXT_PUBLIC_INSTAGRAM_URL?.trim() || "https://instagram.com/pickandpay.game";
+  process.env.NEXT_PUBLIC_INSTAGRAM_URL?.trim() || "https://www.instagram.com/acrisci05";
 
 /** Profilo X e repository: lasciando vuota la variabile il collegamento sparisce. */
 export const X_URL = process.env.NEXT_PUBLIC_X_URL?.trim() ?? "";

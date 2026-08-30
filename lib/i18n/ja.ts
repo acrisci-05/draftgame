@@ -42,8 +42,7 @@ export const ja: PartialDictionary = {
   "rules.step2.body":
     "アイテムはランダムに出題され、ベース価格からスタート。1ロットにつき15秒、入札のたびに10秒へ戻ります。",
   "rules.step3.title": "3. 入札かパス",
-  "rules.step3.body":
-    "残高が足りる限り +1、+2、+5 で入札。パスするとそのロットから抜け、最後の1人が落札します。",
+  "rules.step3.body": "残高が許すかぎり+1、+2、+5で入札できます。パスするとそのロットから抜けます。入札があればその人のものになり、誰も入札していなければ廃棄へ回ります。",
   "rules.step4.title": "4. カードと投票",
   "rules.step4.body":
     "ロスターが埋まると、投稿用の縦型カードと友だちが選ぶ投票リンクが生成されます。",
@@ -119,7 +118,7 @@ export const ja: PartialDictionary = {
   "lobby.rule1": "各プレイヤーは {budget} からスタート。",
   "lobby.rule2": "1ロット15秒、入札のたびに10秒。",
   "lobby.rule3": "残高が足りる場合のみ +1、+2、+5 で入札。",
-  "lobby.rule4": "パスするとロットから離脱。最後に残った人が落札します。",
+  "lobby.rule4": "パスするとそのロットから抜けます。誰も入札しなければ誰のものにもなりません。",
   "lobby.rule5": "各ロスターは {slots} アイテムで締め切りです。",
 
   "auction.lot": "ロット {current} / {total}",
@@ -496,4 +495,17 @@ export const ja: PartialDictionary = {
   "lobby.avatarHint": "プレイヤーごとに別のアバターが必要です。薄いものは使用済みです。",
   "auction.nobodyYet": "まだ入札なし：全員がパスするとこのロットは廃棄へ",
   "auction.nobodyYetForced": "まだ入札なし：全員がパスすると所持数が最も少ない人のものに",
+  "results.mineTitle": "あなたのロスター",
+  "results.mineHeadline": "獲得したロットはこちら（{n}/{tot}）",
+  "results.revealStandings": "最終順位を見る 🏆",
+  "results.autoOpen": "{n}秒後に自動で開きます",
+  "results.tabMine": "自分のロスター",
+  "results.tabAll": "全プレイヤー",
+  "results.mineSpent": "使ったクレジット",
+  "results.mineLeft": "残りクレジット",
+  "results.winner": "1位",
+  "creator.coffee": "コーヒーを一杯おごる",
+  "creator.revolut": "Revolutで支援する",
+  "creator.donateNote": "支払いはPayPalかRevolutで行われます。このアプリは何も扱いません。",
+  "notify.open": "開く",
 };

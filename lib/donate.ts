@@ -13,8 +13,10 @@ export const REVOLUT_USER =
 
 export const REVOLUT_URL = `https://revolut.me/${REVOLUT_USER}`;
 
-/** Impostare NEXT_PUBLIC_PAYPAL_USER per attivare il pulsante PayPal. */
-export const PAYPAL_USER = process.env.NEXT_PUBLIC_PAYPAL_USER?.trim() || "";
+/** Utente PayPal.me: si cambia con NEXT_PUBLIC_PAYPAL_USER senza toccare il codice. */
+export const PAYPAL_USER = process.env.NEXT_PUBLIC_PAYPAL_USER?.trim() || "acrisci05";
+
+export const PAYPAL_URL = `https://paypal.me/${PAYPAL_USER}`;
 
 export const isPaypalConfigured = PAYPAL_USER.length > 0;
 

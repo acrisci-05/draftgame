@@ -84,8 +84,10 @@
   home e nel menu; la preferenza resta sul dispositivo e l'arabo attiva il layout RTL.
   Le categorie ufficiali hanno nome italiano e inglese: le altre lingue usano quello inglese.
 - Sostegno al progetto: sezione dedicata nel menu con importi predefiniti (5, 10, 20, 30, 40, 50,
-  100 euro) o importo libero e rimando a Revolut; lo spazio per PayPal si attiva impostando
-  NEXT_PUBLIC_PAYPAL_USER. Nessun dato di pagamento viene gestito dall'app.
+  100 euro) o importo libero. Nella scheda del creatore ci sono anche i due pulsanti diretti,
+  "Offrimi un caffe'" (PayPal, colori del marchio) e "Dona con Revolut", entrambi verso il profilo
+  esterno con target blank. Gli utenti si cambiano con NEXT_PUBLIC_PAYPAL_USER e
+  NEXT_PUBLIC_REVOLUT_USER. Nessun dato di pagamento viene gestito dall'app.
 
 ======================================================================
 7. NOME UFFICIALE, INTERFACCIA E GESTIONE DELLE LISTE
@@ -120,6 +122,14 @@
 - Pulsante Max: offre esattamente il tetto consentito dalla riserva, senza rilanci ripetuti.
 - Lotti finali: se resta un solo giocatore da completare e i lotti bastano appena, gli vengono
   assegnati d'ufficio al prezzo base, così la lista si chiude sempre.
+- Fine partita in due schermate: prima la propria rosa (lotti conquistati, crediti spesi e
+  rimasti, pulsante per proseguire, apertura automatica dopo 5 secondi), poi la classifica di tutti
+  con il primo in oro; due schede in alto per passare dall'una all'altra. Solo nelle stanze online:
+  in locale si va dritti alla classifica.
+- Multi-dispositivo: riaggancio automatico al rientro dell'app in primo piano; se chi ospita la
+  stanza sparisce per piu' di 6 secondi il posto lo prende il primo giocatore rimasto nell'ordine
+  della lista (stesso calcolo su tutti i dispositivi, quindi uno solo si promuove); l'host che
+  rientra si adegua allo stato che circola.
 - Passa: possibile per chiunque non sia in testa. Con un'offerta sul piatto, quando tutti gli altri
   passano il lotto va a chi l'aveva fatta. Senza offerte nessuno viene obbligato a prendersi il
   lotto: possono passare tutti e si applica la regola degli scarti.

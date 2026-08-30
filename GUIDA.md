@@ -242,6 +242,14 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   una foto per gli elementi che non ne hanno, sempre passando dal filtro di pertinenza.
 
 ### Fine partita
+- **Due schermate, in quest'ordine.** Prima quella personale: "La tua rosa", con i lotti
+  conquistati (`3/3`), i crediti spesi e quelli rimasti, e il pulsante *Scopri la classifica finale*
+  che pulsa; se non lo si tocca, dopo 5 secondi si apre da sola. Poi la classifica di tutti, con il
+  primo evidenziato in oro. Da lì due schede in alto (*La mia rosa* · *Tutti i giocatori*) per
+  passare dall'una all'altra quando si vuole. Nelle stanze locali la prima schermata non compare:
+  sono tutti davanti allo stesso schermo, si va dritti alla classifica.
+- Ogni dispositivo mostra **la propria** rosa: il giocatore si riconosce dall'identificativo della
+  sessione salvata su quel dispositivo, quindi in una stanza da otto ognuno vede la sua.
 - Card verticale **1080x1920** con roster raggruppato per fascia, badge dorato del prezzo pagato
   su ogni miniatura, budget residuo e QR del voto. Si scarica in PNG o si condivide con il menu
   nativo del telefono.
@@ -278,7 +286,10 @@ e *Draft ricevuti*.
 
 ### Notifiche dal vivo
 La campanella in navbar compare a chi ha fatto l'accesso e ascolta il canale realtime del database:
-quando qualcuno scrive una riga che ti riguarda, l'avviso arriva senza ricaricare la pagina.
+quando qualcuno scrive una riga che ti riguarda, l'avviso arriva senza ricaricare la pagina. La
+campanella sta nella barra in alto, che è su ogni pagina, quindi **l'avviso compare anche mentre
+stai facendo altro**: scende dall'alto un riquadro con chi ti scrive, resta sei secondi e si tocca
+per aprire il pannello. Quello che c'era prima di aprire l'app non viene riproposto come novità.
 
 | Notifica | Cosa mostra | Pulsanti |
 | --- | --- | --- |
@@ -295,7 +306,12 @@ suggerimento, che legge solo il creatore.
 - **10 lingue** (italiano, inglese, francese, spagnolo, tedesco, portoghese, russo, cinese,
   giapponese, arabo con layout da destra a sinistra), tema chiaro/scuro, audio attivabile.
 - **Voto del gioco** da 1 a 5 stelle con commento facoltativo, anonimo.
-- Sezione **sostegno al progetto** con rimando a Revolut. Nessun dato di pagamento passa dall'app.
+- **Donazioni**: nella scheda del creatore ci sono i due pulsanti diretti, *Offrimi un caffè*
+  (PayPal, con i colori del marchio) e *Dona con Revolut*; sotto, il collegamento al pannello degli
+  importi predefiniti (5, 10, 20, 30, 40, 50, 100 e importo libero). Gli utenti si cambiano con
+  `NEXT_PUBLIC_PAYPAL_USER` e `NEXT_PUBLIC_REVOLUT_USER` senza toccare il codice. Il pagamento
+  avviene sul servizio esterno: **nessun dato di pagamento passa dall'app**, che si limita ad
+  aprire il collegamento.
 - **Modalità creatore**: sul proprio computer è già aperta, non serve inventarsi nulla. La chiave
   la si sceglie solo quando il sito va online, scrivendola in `NEXT_PUBLIC_ADMIN_KEY`: da quel
   momento Studio ed editor li vede solo chi la conosce.
@@ -335,6 +351,16 @@ L'app sceglie da sola il canale migliore fra i tre disponibili:
 3. **Solo browser**: ultimo ripiego, sincronizza schede e finestre dello stesso computer.
 
 In alto nella stanza c'è sempre scritto quale canale è in uso.
+
+### Cosa succede quando qualcosa va storto
+
+| Situazione | Cosa fa l'app |
+| --- | --- |
+| **L'app va in secondo piano** (telefono bloccato, cambio scheda) | al ritorno si riaggancia da sola: chi partecipa si ripresenta e riceve lo stato aggiornato, chi ospita lo ritrasmette. Nessuna ricarica, nessun disallineamento di crediti o lotti |
+| **Chi ospita la stanza sparisce** | dopo 6 secondi di assenza il posto lo prende il primo giocatore rimasto nell'ordine della lista. Quell'ordine è identico su tutti i dispositivi, quindi si promuove uno solo. L'asta riprende da dove era, senza ricominciare |
+| **L'host rientra dopo il passaggio** | si adegua: comanda chi risulta host nello stato che circola, non chi ha aperto la stanza |
+| **Doppio tocco su un rilancio** | il secondo tocco identico entro 400 millisecondi non parte nemmeno. E se partisse, il motore lo scarterebbe: chi è in testa non rilancia su sé stesso |
+| **Un giocatore perde la linea in asta** | resta in partita con i suoi acquisti e il suo budget. Il timer continua e i lotti si assegnano lo stesso |
 
 > Una nota per la pubblicazione: il canale del server ha bisogno di un processo sempre attivo
 > (Railway, Render, Fly, un server proprio). Su hosting a funzioni separate come Vercel le stanze
@@ -380,6 +406,12 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
 - I commenti del voto non sono leggibili pubblicamente: la vista `ratings_summary` espone solo
   media e numero di voti.
 - Amicizie e draft condivisi sono visibili solo alle persone coinvolte.
+- **Un'amicizia la accetta solo chi la riceve.** Prima la regola di aggiornamento valeva per
+  entrambi, quindi chi invitava poteva segnare da solo la richiesta come accettata e comparire in
+  rubrica senza il consenso dell'altro. Ora l'aggiornamento è riservato al destinatario; per
+  sciogliere l'amicizia restano buone le regole di cancellazione, valide per tutti e due.
+- Invitare qualcuno che ti aveva già invitato **accetta il suo invito** invece di creare una
+  seconda riga al contrario, che in rubrica lo avrebbe fatto comparire due volte.
 - La modalità creatore protegge l'interfaccia; la vera protezione dei dati sta nelle regole del
   database.
 

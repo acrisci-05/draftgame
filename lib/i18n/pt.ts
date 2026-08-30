@@ -42,8 +42,7 @@ export const pt: PartialDictionary = {
   "rules.step2.body":
     "Os elementos saem ao acaso e partem do preço base. Tens 15 segundos por lote, que voltam a 10 após cada licitação.",
   "rules.step3.title": "3. Licita ou passa",
-  "rules.step3.body":
-    "Licitas +1, +2 e +5 enquanto o saldo aguentar. Quem passa sai do lote: se sobrar um só, o lote é dele.",
+  "rules.step3.body": "Licitações de +1, +2 e +5 enquanto o saldo aguentar. Quem passa sai do lote: havendo uma licitação o lote vai para quem a fez, não havendo nenhuma vai para os descartes.",
   "rules.step4.title": "4. Card e votação",
   "rules.step4.body":
     "Com os planteis cheios geras o card vertical para publicar e o link de votação para os amigos decidirem.",
@@ -120,7 +119,7 @@ export const pt: PartialDictionary = {
   "lobby.rule1": "Cada jogador começa com {budget}.",
   "lobby.rule2": "15 segundos por lote, 10 após cada licitação.",
   "lobby.rule3": "Licitações de +1, +2, +5 só se o saldo permitir.",
-  "lobby.rule4": "Quem passa sai do lote: o último que fica arremata-o.",
+  "lobby.rule4": "Quem passa sai do lote. Se ninguém licitar, ninguém o leva.",
   "lobby.rule5": "Cada plantel fecha com {slots} elementos.",
 
   "auction.lot": "Lote {current} de {total}",
@@ -498,4 +497,17 @@ export const pt: PartialDictionary = {
   "lobby.avatarHint": "Cada jogador precisa de um avatar diferente: os apagados já estão ocupados.",
   "auction.nobodyYet": "Ninguém licitou: se passarem todos, o lote vai para os descartes",
   "auction.nobodyYetForced": "Ninguém licitou: se passarem todos, fica com quem tem menos elementos",
+  "results.mineTitle": "A tua lista",
+  "results.mineHeadline": "Aqui estão os lotes que ganhaste ({n}/{tot})",
+  "results.revealStandings": "Ver a classificação final 🏆",
+  "results.autoOpen": "Abre sozinha dentro de {n} segundos",
+  "results.tabMine": "A minha lista",
+  "results.tabAll": "Todos os jogadores",
+  "results.mineSpent": "Créditos gastos",
+  "results.mineLeft": "Créditos restantes",
+  "results.winner": "1.º classificado",
+  "creator.coffee": "Paga-me um café",
+  "creator.revolut": "Doar com Revolut",
+  "creator.donateNote": "O pagamento acontece no PayPal ou no Revolut: nada passa por esta app.",
+  "notify.open": "Abrir",
 };

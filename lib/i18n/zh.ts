@@ -41,8 +41,7 @@ export const zh: PartialDictionary = {
   "rules.step2.body":
     "条目随机出现并从底价起拍。每个拍品有 15 秒，每次加价后重置为 10 秒。",
   "rules.step3.title": "3. 加价或放弃",
-  "rules.step3.body":
-    "余额足够时可以加价 +1、+2、+5。放弃就退出该拍品：只剩一人时，拍品归他所有。",
+  "rules.step3.body": "只要余额够，就能 +1、+2、+5 加价。跳过即退出该件：已有出价时归出价的人，完全没人出价时进弃置区。",
   "rules.step4.title": "4. 卡片与投票",
   "rules.step4.body": "名单满员后会生成可发布的竖版卡片，以及让朋友们投票的链接。",
 
@@ -117,7 +116,7 @@ export const zh: PartialDictionary = {
   "lobby.rule1": "每位玩家从 {budget} 开始。",
   "lobby.rule2": "每个拍品 15 秒，每次加价后回到 10 秒。",
   "lobby.rule3": "只有余额足够时才能加价 +1、+2、+5。",
-  "lobby.rule4": "放弃就退出该拍品：最后留下的人拿下它。",
+  "lobby.rule4": "跳过就退出该件。没有人出价，就没有人拿到。",
   "lobby.rule5": "每份名单在 {slots} 个条目时截止。",
 
   "auction.lot": "第 {current} / {total} 个拍品",
@@ -493,4 +492,17 @@ export const zh: PartialDictionary = {
   "lobby.avatarHint": "每位玩家的头像都要不同：变暗的已被选走。",
   "auction.nobodyYet": "还没有人出价：如果都选择跳过，这件就进弃置区",
   "auction.nobodyYetForced": "还没有人出价：如果都选择跳过，这件归收藏最少的玩家",
+  "results.mineTitle": "你的阵容",
+  "results.mineHeadline": "这是你拿下的物品（{n}/{tot}）",
+  "results.revealStandings": "查看最终排名 🏆",
+  "results.autoOpen": "{n} 秒后自动打开",
+  "results.tabMine": "我的阵容",
+  "results.tabAll": "所有玩家",
+  "results.mineSpent": "已花费",
+  "results.mineLeft": "剩余",
+  "results.winner": "第一名",
+  "creator.coffee": "请我喝杯咖啡",
+  "creator.revolut": "用 Revolut 捐赠",
+  "creator.donateNote": "付款在 PayPal 或 Revolut 完成：本应用不经手任何数据。",
+  "notify.open": "打开",
 };

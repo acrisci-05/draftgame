@@ -42,8 +42,7 @@ export const es: PartialDictionary = {
   "rules.step2.body":
     "Los elementos salen al azar y parten del precio base. Tienes 15 segundos por lote, que vuelven a 10 tras cada puja.",
   "rules.step3.title": "3. Puja o pasa",
-  "rules.step3.body":
-    "Pujas de +1, +2 y +5 mientras el saldo lo permita. Quien pasa sale del lote: si queda uno solo, el lote es suyo.",
+  "rules.step3.body": "Pujas de +1, +2 y +5 mientras el saldo lo cubra. Quien pasa sale del lote: si hay una puja el lote va a quien la hizo, si no ha pujado nadie acaba en los descartes.",
   "rules.step4.title": "4. Tarjeta y votación",
   "rules.step4.body":
     "Con los rósteres llenos se genera la tarjeta vertical para publicar y el enlace de votación para tus amigos.",
@@ -120,7 +119,7 @@ export const es: PartialDictionary = {
   "lobby.rule1": "Cada jugador empieza con {budget}.",
   "lobby.rule2": "15 segundos por lote, 10 tras cada puja.",
   "lobby.rule3": "Pujas de +1, +2, +5 solo si el saldo lo permite.",
-  "lobby.rule4": "Quien pasa sale del lote: el último que queda se lo lleva.",
+  "lobby.rule4": "Quien pasa sale del lote. Si nadie puja, no se lo queda nadie.",
   "lobby.rule5": "Cada róster se cierra con {slots} elementos.",
 
   "auction.lot": "Lote {current} de {total}",
@@ -498,4 +497,17 @@ export const es: PartialDictionary = {
   "lobby.avatarHint": "Cada jugador debe tener un avatar distinto: los apagados ya están cogidos.",
   "auction.nobodyYet": "Nadie ha pujado: si pasáis todos, el lote va a los descartes",
   "auction.nobodyYetForced": "Nadie ha pujado: si pasáis todos, va a quien tenga menos elementos",
+  "results.mineTitle": "Tu plantilla",
+  "results.mineHeadline": "Estos son tus lotes conseguidos ({n}/{tot})",
+  "results.revealStandings": "Descubre la clasificación final 🏆",
+  "results.autoOpen": "Se abre sola en {n} segundos",
+  "results.tabMine": "Mi plantilla",
+  "results.tabAll": "Todos los jugadores",
+  "results.mineSpent": "Créditos gastados",
+  "results.mineLeft": "Créditos restantes",
+  "results.winner": "1.º clasificado",
+  "creator.coffee": "Invítame a un café",
+  "creator.revolut": "Dona con Revolut",
+  "creator.donateNote": "El pago se hace en PayPal o Revolut: por esta app no pasa ningún dato.",
+  "notify.open": "Abrir",
 };

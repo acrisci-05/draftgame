@@ -13,7 +13,7 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import {
@@ -38,6 +38,9 @@ import { BidControls } from "./BidControls";
 import { ItemCover } from "./ItemCover";
 import { PlayerRail } from "./PlayerRail";
 import { Timer } from "./Timer";
+
+/** Finestra entro cui un secondo tocco identico viene ignorato. */
+const DOUBLE_TAP_MS = 400;
 
 interface AuctionStageProps {
   state: GameState;
@@ -89,15 +92,37 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
     else if (latest.kind === "discard") playSfx("timeup", sound);
   }, [state.feed, sound]);
 
+  /**
+   * Doppio tocco sullo stesso pulsante.
+   *
+   * Chi partecipa da un altro dispositivo non vede subito l'effetto della
+   * propria offerta: passa dal dispositivo che ospita la stanza e torna
+   * indietro. Nel frattempo un secondo tocco partirebbe uguale. Il motore
+   * scarterebbe comunque il doppione (chi e' in testa non rilancia su se
+   * stesso), ma e' inutile mandarlo: qui si blocca sul nascere, per la stessa
+   * mossa dello stesso giocatore.
+   */
+  const lastSentRef = useRef<{ key: string; at: number } | null>(null);
+  const once = useCallback((key: string) => {
+    const at = Date.now();
+    const last = lastSentRef.current;
+    if (last && last.key === key && at - last.at < DOUBLE_TAP_MS) return false;
+    lastSentRef.current = { key, at };
+    return true;
+  }, []);
+
   const bid = (playerId: string, amount: number) => {
+    if (!once(`bid:${playerId}:${amount}`)) return;
     vibrate(HAPTIC_BID);
     dispatch({ type: "bid", playerId, amount, now: now() });
   };
   const pass = (playerId: string) => {
+    if (!once(`pass:${playerId}`)) return;
     vibrate(HAPTIC_PASS);
     dispatch({ type: "pass", playerId, now: now() });
   };
   const claim = (playerId: string) => {
+    if (!once(`claim:${playerId}`)) return;
     vibrate(HAPTIC_BID);
     dispatch({ type: "claim", playerId, now: now() });
   };

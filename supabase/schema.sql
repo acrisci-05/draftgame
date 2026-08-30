@@ -348,12 +348,17 @@ create policy "pickmates_own_write"
   on public.pickmates for insert
   with check (auth.uid() = user_id);
 
--- Accetta chi ha ricevuto l'invito.
+-- Accetta solo chi ha ricevuto l'invito.
+-- Prima la regola valeva per entrambi: chi invitava poteva segnare da solo la
+-- propria richiesta come accettata, e comparire in rubrica senza il consenso
+-- dell'altro. L'aggiornamento adesso e' riservato al destinatario; per sciogliere
+-- l'amicizia restano buone le regole di cancellazione, valide per tutti e due.
 drop policy if exists "pickmates_own_update" on public.pickmates;
-create policy "pickmates_own_update"
+drop policy if exists "pickmates_accept_incoming" on public.pickmates;
+create policy "pickmates_accept_incoming"
   on public.pickmates for update
-  using (auth.uid() = user_id or auth.uid() = friend_id)
-  with check (auth.uid() = user_id or auth.uid() = friend_id);
+  using (auth.uid() = friend_id)
+  with check (auth.uid() = friend_id);
 
 drop policy if exists "pickmates_own_delete" on public.pickmates;
 create policy "pickmates_own_delete"

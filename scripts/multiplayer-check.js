@@ -212,6 +212,46 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 40));
   // dispositivi contano lo stesso tempo anche se il loro orologio è sfasato.
   check("la scadenza è la stessa per tutti", guestState.deadline === hostState.deadline);
 
+  /* ---------------------------------------------------------------- */
+  /* Rientro dall'app in secondo piano                                 */
+  /* ---------------------------------------------------------------- */
+
+  // Al ritorno lo stato in mano può essere vecchio: chi partecipa si ripresenta
+  // e l'host gli rimanda lo stato buono. È quello che fa il riaggancio quando
+  // la scheda torna in primo piano.
+  guestState = { ...guestState, currentBid: 999, phase: "lobby" };
+  guestChannel.postMessage({ type: "hello", player: { id: "guest", name: "Bea" } });
+  await wait();
+  check(
+    "al rientro lo stato torna allineato",
+    guestState.currentBid === hostState.currentBid && guestState.phase === hostState.phase,
+    `${guestState.currentBid}/${hostState.currentBid}`,
+  );
+  check(
+    "il riaggancio non duplica il giocatore",
+    hostState.players.filter((p) => p.id === "guest").length === 1,
+  );
+
+  /* ---------------------------------------------------------------- */
+  /* Passaggio di host                                                 */
+  /* ---------------------------------------------------------------- */
+
+  // Se il dispositivo che ospita sparisce, il successore è il primo giocatore
+  // rimasto: lo calcolano tutti allo stesso modo, quindi uno solo si promuove.
+  const presentWithoutHost = hostState.players.filter((p) => p.id !== "host").map((p) => p.id);
+  const heir = game.nextHost(hostState, presentWithoutHost);
+  check("con l'host sparito c'è un successore", heir === "guest", heir);
+  check(
+    "tutti calcolano lo stesso successore",
+    game.nextHost(hostState, [...presentWithoutHost].reverse()) === heir,
+  );
+  const migrated = game.reducer(hostState, { type: "set_host", playerId: heir });
+  check("il nuovo host comanda la stanza", migrated.hostId === "guest");
+  check(
+    "la partita non riparte da capo",
+    migrated.phase === hostState.phase && migrated.lotNumber === hostState.lotNumber,
+  );
+
   hostChannel.close();
   guestChannel.close();
 

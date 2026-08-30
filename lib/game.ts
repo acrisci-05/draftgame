@@ -215,6 +215,22 @@ export function canPass(state: GameState, playerId: string): boolean {
   return !state.passed.includes(playerId);
 }
 
+/**
+ * Chi prende il posto di chi ospita la stanza, se il suo dispositivo sparisce.
+ *
+ * Si sceglie il primo giocatore ancora presente **nell'ordine della lista**:
+ * quell'ordine e' identico su tutti i dispositivi, quindi il successore lo
+ * calcolano tutti allo stesso modo e uno solo si riconosce come tale. Torna
+ * null se l'host c'e' ancora o se non e' rimasto nessun altro.
+ */
+export function nextHost(state: GameState, present: readonly string[]): string | null {
+  if (present.includes(state.hostId)) return null;
+  const heir = state.players.find(
+    (player) => player.id !== state.hostId && present.includes(player.id),
+  );
+  return heir?.id ?? null;
+}
+
 /** Suggerimento su chi dovrebbe agire adesso, per evitare clic sbagliati. */
 export function nextToAct(state: GameState): string | null {
   if (state.phase !== "auction") return null;
@@ -263,6 +279,7 @@ export type GameAction =
   | { type: "add_player"; player: { id: string; name: string; emoji?: string; accountId?: string } }
   | { type: "remove_player"; playerId: string }
   | { type: "set_avatar"; playerId: string; emoji: string }
+  | { type: "set_host"; playerId: string }
   | { type: "set_category"; category: Category }
   | { type: "set_config"; config: Partial<RoomConfig> }
   | { type: "start"; now: number }
@@ -557,6 +574,18 @@ export function reducer(state: GameState, action: GameAction): GameState {
         roster: [],
       };
       return touch({ ...state, players: [...state.players, player] });
+    }
+
+    /**
+     * Passaggio di consegne: se chi ospita la stanza sparisce, la partita
+     * andrebbe in stallo perche' nessuno fa girare il timer. Il primo giocatore
+     * rimasto prende il posto, e da quel momento e' lui l'autorita' sullo stato.
+     * Si accetta solo verso un giocatore presente e diverso da quello attuale.
+     */
+    case "set_host": {
+      if (action.playerId === state.hostId) return state;
+      if (!playerById(state, action.playerId)) return state;
+      return touch({ ...state, hostId: action.playerId });
     }
 
     /** Cambio avatar dalla lobby: l'icona deve essere ancora libera. */

@@ -190,6 +190,30 @@ export type AddPickmateResult = "sent" | "not-found" | "self" | "duplicate";
 export async function invitePickmate(userId: string, targetId: string): Promise<AddPickmateResult> {
   const supabase = requireClient();
   if (targetId === userId) return "self";
+
+  /*
+   * L'amicizia e' una riga sola, ma la chiave e' la coppia ordinata: senza
+   * questo controllo, invitare qualcuno che ti aveva gia' invitato creerebbe
+   * una seconda riga al contrario, e in rubrica comparirebbe due volte.
+   * Se l'invito in sospeso e' il suo, lo si accetta e basta.
+   */
+  const { data: existing } = await supabase
+    .from(PICKMATES_TABLE)
+    .select("user_id, friend_id, status")
+    .or(
+      `and(user_id.eq.${userId},friend_id.eq.${targetId}),and(user_id.eq.${targetId},friend_id.eq.${userId})`,
+    )
+    .limit(1);
+
+  const row = (existing ?? [])[0] as PickmateRow | undefined;
+  if (row) {
+    if (row.status === "pending" && row.friend_id === userId) {
+      await acceptPickmate(userId, targetId);
+      return "sent";
+    }
+    return "duplicate";
+  }
+
   const { error } = await supabase
     .from(PICKMATES_TABLE)
     .insert({ user_id: userId, friend_id: targetId, status: "pending" });

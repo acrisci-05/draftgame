@@ -42,8 +42,7 @@ export const ar: PartialDictionary = {
   "rules.step2.body":
     "تظهر العناصر عشوائيًا وتبدأ من السعر الأساسي. لديك ١٥ ثانية لكل عنصر، وتعود إلى ١٠ بعد كل مزايدة.",
   "rules.step3.title": "٣. زايد أو مرّر",
-  "rules.step3.body":
-    "زايد بـ +١ أو +٢ أو +٥ ما دام رصيدك يسمح. من يمرّر يخرج من العنصر، ومن يبقى وحيدًا يفوز به.",
+  "rules.step3.body": "زيادات ‎+1‎ و‎+2‎ و‎+5‎ ما دام الرصيد يسمح. من يمرّر يخرج من القطعة: إن وُجد عرض تذهب لصاحبه، وإن لم يعرض أحد تذهب إلى المستبعدات.",
   "rules.step4.title": "٤. البطاقة والتصويت",
   "rules.step4.body":
     "عند اكتمال القوائم تُنشأ البطاقة العمودية للنشر ورابط التصويت ليقرر أصدقاؤك.",
@@ -119,7 +118,7 @@ export const ar: PartialDictionary = {
   "lobby.rule1": "يبدأ كل لاعب بـ {budget}.",
   "lobby.rule2": "١٥ ثانية لكل عنصر، و١٠ بعد كل مزايدة.",
   "lobby.rule3": "المزايدات +١ و+٢ و+٥ فقط إذا سمح الرصيد.",
-  "lobby.rule4": "من يمرّر يخرج من العنصر: آخر من يبقى يفوز به.",
+  "lobby.rule4": "من يمرّر يخرج من القطعة. وإن لم يعرض أحد، لا يأخذها أحد.",
   "lobby.rule5": "تُغلق كل قائمة عند {slots} عناصر.",
 
   "auction.lot": "العنصر {current} من {total}",
@@ -496,4 +495,17 @@ export const ar: PartialDictionary = {
   "lobby.avatarHint": "لكل لاعب صورة مختلفة: الباهتة مأخوذة بالفعل.",
   "auction.nobodyYet": "لا عروض بعد: إذا مرّر الجميع تذهب القطعة إلى المستبعدات",
   "auction.nobodyYetForced": "لا عروض بعد: إذا مرّر الجميع تذهب لمن يملك أقل عدد",
+  "results.mineTitle": "قائمتك",
+  "results.mineHeadline": "هذه القطع التي فزت بها ({n}/{tot})",
+  "results.revealStandings": "اكشف الترتيب النهائي 🏆",
+  "results.autoOpen": "تُفتح وحدها بعد {n} ثوانٍ",
+  "results.tabMine": "قائمتي",
+  "results.tabAll": "كل اللاعبين",
+  "results.mineSpent": "الرصيد المنفَق",
+  "results.mineLeft": "الرصيد المتبقي",
+  "results.winner": "المركز الأول",
+  "creator.coffee": "اشترِ لي قهوة",
+  "creator.revolut": "تبرّع عبر Revolut",
+  "creator.donateNote": "الدفع يتم على PayPal أو Revolut: لا يمر أي شيء عبر هذا التطبيق.",
+  "notify.open": "فتح",
 };

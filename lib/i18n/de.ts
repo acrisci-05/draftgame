@@ -42,8 +42,7 @@ export const de: PartialDictionary = {
   "rules.step2.body":
     "Die Elemente kommen zufällig und starten beim Grundpreis. Du hast 15 Sekunden pro Los, nach jedem Gebot wieder 10.",
   "rules.step3.title": "3. Bieten oder passen",
-  "rules.step3.body":
-    "Erhöhe um +1, +2 oder +5, solange dein Guthaben reicht. Wer passt, ist raus: bleibt nur einer, gehört ihm das Los.",
+  "rules.step3.body": "Erhöhungen um +1, +2 und +5, solange das Guthaben reicht. Wer passt, ist raus aus dem Los: liegt ein Gebot vor, geht das Los an den Bietenden, gibt es keins, wandert es zu den Resten.",
   "rules.step4.title": "4. Card und Abstimmung",
   "rules.step4.body":
     "Sind die Kader voll, entsteht die vertikale Card zum Posten und der Abstimmungslink für deine Freunde.",
@@ -120,7 +119,7 @@ export const de: PartialDictionary = {
   "lobby.rule1": "Jeder Spieler startet mit {budget}.",
   "lobby.rule2": "15 Sekunden pro Los, 10 nach jedem Gebot.",
   "lobby.rule3": "Erhöhungen um +1, +2, +5 nur, wenn das Guthaben reicht.",
-  "lobby.rule4": "Wer passt, ist raus: der Letzte im Rennen bekommt das Los.",
+  "lobby.rule4": "Wer passt, ist raus aus dem Los. Bietet niemand, bekommt es auch niemand.",
   "lobby.rule5": "Jeder Kader schließt bei {slots} Elementen.",
 
   "auction.lot": "Los {current} von {total}",
@@ -498,4 +497,17 @@ export const de: PartialDictionary = {
   "lobby.avatarHint": "Jeder Spieler braucht einen anderen Avatar: die ausgegrauten sind schon vergeben.",
   "auction.nobodyYet": "Noch kein Gebot: passen alle, wandert das Los zu den Resten",
   "auction.nobodyYetForced": "Noch kein Gebot: passen alle, geht es an den mit den wenigsten Elementen",
+  "results.mineTitle": "Deine Auswahl",
+  "results.mineHeadline": "Das hast du geholt ({n}/{tot})",
+  "results.revealStandings": "Endstand ansehen 🏆",
+  "results.autoOpen": "Öffnet sich in {n} Sekunden von selbst",
+  "results.tabMine": "Meine Auswahl",
+  "results.tabAll": "Alle Spieler",
+  "results.mineSpent": "Ausgegebene Credits",
+  "results.mineLeft": "Übrige Credits",
+  "results.winner": "1. Platz",
+  "creator.coffee": "Spendier mir einen Kaffee",
+  "creator.revolut": "Mit Revolut spenden",
+  "creator.donateNote": "Bezahlt wird bei PayPal oder Revolut: über diese App läuft nichts.",
+  "notify.open": "Öffnen",
 };

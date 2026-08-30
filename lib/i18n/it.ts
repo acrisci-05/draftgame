@@ -40,8 +40,7 @@ export const it = {
   "rules.step2.body":
     "Gli elementi escono a caso e partono dal prezzo base. Hai 15 secondi per lotto, che tornano a 10 dopo ogni rilancio.",
   "rules.step3.title": "3. Rilancia o passa",
-  "rules.step3.body":
-    "Rilanci da +1, +2 e +5 finché il saldo li copre. Chi passa esce dal lotto: se resta uno solo, il lotto è suo.",
+  "rules.step3.body": "Rilanci da +1, +2 e +5 finché il saldo li copre. Chi passa esce dal lotto: se c'è un'offerta il lotto va a chi l'ha fatta, se non ha offerto nessuno finisce negli scarti.",
   "rules.step4.title": "4. Card e votazione",
   "rules.step4.body":
     "A roster pieni si genera la card verticale da postare e il link di voto per far decidere agli amici.",
@@ -54,6 +53,9 @@ export const it = {
     "Pick & Pay è un progetto personale nato dalla mia passione per la programmazione e i giochi d'asta tra amici. Ho creato questo sito per offrire un'esperienza rapida, moderna e competitiva per ogni gruppo di rivali.",
   "creator.instagram": "Seguimi su Instagram",
   "creator.donate": "Offrimi un caffè",
+  "creator.coffee": "Offrimi un caffè",
+  "creator.revolut": "Dona con Revolut",
+  "creator.donateNote": "Il pagamento avviene su PayPal o Revolut: da qui non passa nessun dato.",
   "creator.independent": "Progetto indipendente",
   "creator.changelog": "Ultime novità",
   "creator.log0": "Card finale su misura da 1 a 8 giocatori, con corona al vincitore e pegno in palio.",
@@ -135,7 +137,7 @@ export const it = {
   "lobby.rule1": "Ogni giocatore parte con {budget}.",
   "lobby.rule2": "15 secondi per lotto, 10 dopo ogni rilancio.",
   "lobby.rule3": "Rilanci da +1, +2, +5 solo se il saldo li copre.",
-  "lobby.rule4": "Chi passa esce dal lotto: l'ultimo rimasto se lo aggiudica.",
+  "lobby.rule4": "Chi passa esce dal lotto. Se non offre nessuno, non lo prende nessuno.",
   "lobby.rule5": "Ogni roster si chiude a {slots} elementi.",
 
   "auction.lot": "Lotto {current} di {total}",
@@ -398,6 +400,7 @@ export const it = {
   "notify.refuse": "Rifiuta",
   "notify.enterRoom": "Entra nella stanza",
   "notify.ignore": "Ignora",
+  "notify.open": "Apri",
 
   "challenge.taunt1": "{name} dice che ti batte anche a occhi chiusi.",
   "challenge.taunt2": "{name} ha già scelto il roster. Tu che fai?",
@@ -541,6 +544,15 @@ export const it = {
   "rules.modes.title": "Modalità",
   "rules.modes.body":
     "Locale su un solo dispositivo o online con codice a 5 caratteri. Attivabili anche Blind Draft (immagine coperta fino all'assegnazione) e Mystery Box (lotto a prezzo fisso con elemento casuale).",
+  "results.mineTitle": "La tua rosa",
+  "results.mineHeadline": "Ecco i tuoi lotti conquistati ({n}/{tot})",
+  "results.revealStandings": "Scopri la classifica finale 🏆",
+  "results.autoOpen": "Si apre da sola fra {n} secondi",
+  "results.tabMine": "La mia rosa",
+  "results.tabAll": "Tutti i giocatori",
+  "results.mineSpent": "Crediti spesi",
+  "results.mineLeft": "Crediti rimasti",
+  "results.winner": "1° classificato",
 } as const;
 
 export type TranslationKey = keyof typeof it;
