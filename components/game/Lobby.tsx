@@ -6,17 +6,26 @@ import { useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
-import { MIN_PLAYERS, playerById, takenAvatars, type GameAction } from "@/lib/game";
+import {
+  MIN_PLAYERS,
+  PLAYER_COLORS,
+  colorLook,
+  playerById,
+  takenAvatars,
+  takenColors,
+  type GameAction,
+} from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import { saveConfig } from "@/lib/storage";
 import type { Category, GameState, RoomConfig } from "@/lib/types";
-import { copyText, money, uid } from "@/lib/utils";
+import { cn, copyText, money, uid } from "@/lib/utils";
 import { Avatar, AvatarPicker } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
+import { WhatsappGlyph } from "@/components/ui/BrandGlyphs";
 import { QrCode } from "@/components/ui/QrCode";
 import { RoomCode } from "@/components/ui/RoomCode";
 import { CategoryPicker } from "./CategoryPicker";
@@ -42,6 +51,14 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const canStart = isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0;
   const isClient = useIsClient();
   const joinUrl = isClient ? `${window.location.origin}/room/${state.code}` : null;
+
+  /**
+   * Il messaggio pronto per WhatsApp: codice ben visibile e link diretto, cosi'
+   * chi lo riceve entra col tocco senza digitare niente.
+   */
+  const whatsappUrl = joinUrl
+    ? `https://wa.me/?text=${encodeURIComponent(t("lobby.whatsappText", { code: state.code, url: joinUrl }))}`
+    : "";
 
   const shareRoom = async () => {
     const url = `${window.location.origin}/room/${state.code}`;
@@ -88,10 +105,26 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             {isLocal ? (
               <p className="mt-3 text-sm text-faint">{t("lobby.localHint")}</p>
             ) : (
-              <Button variant="outline" size="sm" className="mt-4" onClick={shareRoom}>
-                {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-                {copied ? t("common.copied") : t("lobby.invite")}
-              </Button>
+              <div className="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
+                <Button variant="outline" size="sm" onClick={shareRoom}>
+                  {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
+                  {copied ? t("common.copied") : t("lobby.invite")}
+                </Button>
+                {/*
+                  Invito su WhatsApp: e' li' che si organizzano le partite. Il
+                  messaggio parte gia' scritto, con codice e link; l'indirizzo
+                  wa.me funziona sia sul telefono che sul computer.
+                */}
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 items-center gap-1.5 rounded-xl bg-[#25D366] px-3 text-sm font-bold text-[#052e16] transition-opacity hover:opacity-90"
+                >
+                  <WhatsappGlyph className="size-4" />
+                  WhatsApp
+                </a>
+              </div>
             )}
           </div>
 
@@ -177,7 +210,10 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                 initial={{ opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 12 }}
-                className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-2.5"
+                className={cn(
+                  "flex items-center gap-3 rounded-xl border p-2.5",
+                  colorLook(player.color).soft,
+                )}
               >
                 {/* In locale l'host cambia l'avatar di chiunque, perché tutti
                     giocano dal suo schermo; online ognuno cambia il proprio. */}
@@ -189,15 +225,23 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                     onClick={() => setAvatarFor(player.id)}
                     className="relative rounded-full transition-transform hover:scale-105"
                   >
-                    <Avatar id={player.emoji} size="sm" />
+                    <Avatar
+                      id={player.emoji}
+                      size="sm"
+                      className={colorLook(player.color).ring}
+                    />
                     <span className="absolute -bottom-0.5 -end-0.5 grid size-4 place-items-center rounded-full border border-line bg-ink text-neon">
                       <Pencil className="size-2.5" />
                     </span>
                   </button>
                 ) : (
-                  <Avatar id={player.emoji} size="sm" />
+                  <Avatar id={player.emoji} size="sm" className={colorLook(player.color).ring} />
                 )}
-                <span className="min-w-0 flex-1 truncate font-semibold">{player.name}</span>
+                <span
+                  className={cn("min-w-0 flex-1 truncate font-semibold", colorLook(player.color).text)}
+                >
+                  {player.name}
+                </span>
                 {player.id === state.hostId ? <Badge tone="violet">{t("lobby.host")}</Badge> : null}
                 {player.id === selfId && !isLocal ? (
                   <Badge tone="neon">{t("lobby.you")}</Badge>
@@ -283,7 +327,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
 
       <Modal
         open={avatarFor !== null}
-        title={t("lobby.changeAvatar")}
+        title={t("lobby.changeLook")}
         onClose={() => setAvatarFor(null)}
       >
         {avatarFor ? (
@@ -292,11 +336,42 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             <AvatarPicker
               value={playerById(state, avatarFor)?.emoji ?? ""}
               taken={takenAvatars(state, avatarFor)}
-              onChange={(emoji) => {
-                dispatch({ type: "set_avatar", playerId: avatarFor, emoji });
-                setAvatarFor(null);
-              }}
+              onChange={(emoji) => dispatch({ type: "set_avatar", playerId: avatarFor, emoji })}
             />
+
+            {/* Il colore dell'alone: si sceglie qui, insieme all'icona. */}
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
+                {t("lobby.color")}
+              </p>
+              <div className="flex gap-2">
+                {PLAYER_COLORS.map((color) => {
+                  const used = takenColors(state, avatarFor).includes(color);
+                  const active = playerById(state, avatarFor)?.color === color;
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      disabled={used}
+                      aria-label={color}
+                      aria-pressed={active}
+                      onClick={() => dispatch({ type: "set_color", playerId: avatarFor, color })}
+                      className={cn(
+                        "size-10 rounded-full transition-transform",
+                        colorLook(color).dot,
+                        active ? "scale-110 ring-2 ring-fg ring-offset-2 ring-offset-surface" : "",
+                        used ? "cursor-not-allowed opacity-25" : "hover:scale-105",
+                      )}
+                    />
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-xs text-faint">{t("lobby.colorHint")}</p>
+            </div>
+
+            <Button variant="outline" onClick={() => setAvatarFor(null)}>
+              {t("common.close")}
+            </Button>
           </div>
         ) : null}
       </Modal>

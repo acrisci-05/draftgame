@@ -48,6 +48,8 @@ export interface Player {
   id: string;
   name: string;
   emoji: string;
+  /** Colore dell'alone nella lista giocatori. Assente sulle partite vecchie. */
+  color?: string;
   /** Profilo collegato, quando chi gioca ha fatto l'accesso: serve per i Pickmates. */
   accountId?: string;
   budget: number;

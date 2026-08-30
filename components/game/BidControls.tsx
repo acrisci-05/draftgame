@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Ban, Gavel, PackageOpen, Zap } from "lucide-react";
 import {
   bidOptions,
+  colorLook,
   canBid,
   canClaim,
   canPass,
@@ -73,9 +74,15 @@ export function BidControls({
             id={player.emoji}
             size="sm"
             selected={isLeader}
-            className={isLeader ? "leader-pulse" : undefined}
+            className={cn(isLeader ? "leader-pulse" : colorLook(player.color).ring)}
           />
-          <span className={cn("truncate font-bold", compact ? "text-sm" : "text-base")}>
+          <span
+            className={cn(
+              "truncate font-bold",
+              compact ? "text-sm" : "text-base",
+              isLeader ? "" : colorLook(player.color).text,
+            )}
+          >
             {player.name}
           </span>
         </div>

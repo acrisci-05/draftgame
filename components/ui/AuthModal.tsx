@@ -4,13 +4,19 @@ import {
   Check,
   Circle,
   Code,
+  Crown,
   KeyRound,
   Loader2,
   LogIn,
   LogOut,
+  Rocket,
   Smartphone,
+  Target,
+  Trophy,
   UserPlus,
+  Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   AuthFailure,
@@ -35,7 +41,17 @@ import {
   type OAuthProvider,
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
-import { fetchStats, type PlayerStats } from "@/lib/history";
+import { fetchStats } from "@/lib/history";
+import {
+  NO_PROGRESS,
+  levelFor,
+  trophiesFor,
+  winRate,
+  type PlayerProgress,
+  type Trophy as TrophyData,
+  type TrophyId,
+} from "@/lib/levels";
+import { listPickmates } from "@/lib/pickmates";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import { cn } from "@/lib/utils";
@@ -72,7 +88,7 @@ export function AuthModal({
   const auth = useAuth();
 
   return (
-    <Modal open={open} title={t("auth.title")} onClose={onClose}>
+    <Modal open={open} title={t(auth.account ? "auth.myProfile" : "auth.title")} onClose={onClose}>
       <AuthPanel
         onDone={onClose}
         initialTab={initialTab}
@@ -113,22 +129,90 @@ export function AuthPanel({
 
 function AccountCard({ onDone }: { onDone?: () => void }) {
   const t = useT();
+  const router = useRouter();
   const { account, email } = useAuth();
+  const [progress, setProgress] = useState<PlayerProgress | null>(null);
+
+  const userId = account?.id ?? null;
+
+  /* Statistiche e Pickmates: due letture, una sola attesa. */
+  useEffect(() => {
+    if (!userId) return;
+    let active = true;
+    Promise.all([fetchStats(userId), listPickmates(userId)]).then(([stats, mates]) => {
+      if (!active) return;
+      setProgress({
+        played: stats.played,
+        won: stats.won,
+        mates: mates.filter((mate) => mate.status === "accepted").length,
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
   if (!account) return null;
+
+  const numbers = progress ?? NO_PROGRESS;
+  const level = levelFor(numbers.played);
+  const trophies = trophiesFor(numbers);
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Chi sei, e a che punto sei. */}
       <div className="flex items-center gap-3 rounded-2xl border border-neon/40 bg-neon/10 p-4">
         <Avatar id={account.emoji} size="lg" selected />
         <span className="min-w-0">
           <span className="block truncate font-black">@{account.nickname}</span>
-          <span className="block truncate text-xs text-muted">
+          <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-[11px] font-black text-gold">
+            <Crown className="size-3" />
+            {t("level.badge", { rank: level.rank })} · {t(level.name)}
+          </span>
+          <span className="mt-1 block truncate text-xs text-muted">
             {email ?? t("auth.localProfile")}
           </span>
         </span>
       </div>
 
-      <PlayerStatsBlock userId={account.id} />
+      {/* Le quattro cifre che contano. */}
+      <div className="grid grid-cols-2 gap-2">
+        <StatCard emoji="🎮" value={numbers.played} label={t("stats.played")} />
+        <StatCard emoji="🏆" value={numbers.won} label={t("stats.won")} tone="gold" />
+        <StatCard emoji="📈" value={`${winRate(numbers)}%`} label={t("stats.rate")} tone="neon" />
+        <StatCard emoji="👥" value={numbers.mates} label={t("nav.pickmates")} tone="violet" />
+      </div>
+
+      {/* Trofei: spenti finche' non si sbloccano. */}
+      <div className="rounded-2xl border border-line bg-surface-2 p-3">
+        <p className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-faint">
+          {t("trophy.title")}
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {trophies.map((trophy) => (
+            <TrophyBadge key={trophy.id} trophy={trophy} />
+          ))}
+        </div>
+      </div>
+
+      {/* Chi non ha ancora giocato non ha statistiche da guardare: ha una partita da fare. */}
+      {numbers.played === 0 ? (
+        <div className="rounded-2xl border border-violet/40 bg-violet/10 p-4 text-center">
+          <p className="text-sm font-bold">{t("profile.firstDraft")}</p>
+          <p className="mt-1 text-xs text-muted">{t("profile.firstDraftHint")}</p>
+          <Button
+            variant="violet"
+            className="mt-3 w-full"
+            onClick={() => {
+              onDone?.();
+              router.push("/create");
+            }}
+          >
+            <Rocket className="size-4" />
+            {t("profile.firstDraftCta")}
+          </Button>
+        </div>
+      ) : null}
 
       <Button
         variant="danger"
@@ -144,75 +228,68 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
   );
 }
 
-/**
- * Le statistiche di chi guarda, dalle sue partite.
- *
- * Finche' non si e' giocata una partita da registrati non c'e' niente da
- * mostrare: al posto dei numeri a zero compare la riga che spiega quando
- * cominceranno a riempirsi.
- */
-function PlayerStatsBlock({ userId }: { userId: string }) {
-  const t = useT();
-  const [stats, setStats] = useState<PlayerStats | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    fetchStats(userId).then((result) => {
-      if (active) setStats(result);
-    });
-    return () => {
-      active = false;
-    };
-  }, [userId]);
-
-  if (!stats) return null;
-
-  if (stats.played === 0) {
-    return (
-      <p className="rounded-2xl border border-line bg-surface-2 p-3 text-center text-xs text-faint">
-        {t("stats.empty")}
-      </p>
-    );
-  }
-
-  return (
-    <div className="rounded-2xl border border-line bg-surface-2 p-3">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-faint">
-        {t("stats.title")}
-      </p>
-      <div className="grid grid-cols-4 gap-2 text-center">
-        <Stat value={stats.played} label={t("stats.played")} />
-        <Stat value={stats.won} label={t("stats.won")} tone="gold" />
-        <Stat value={`${stats.winRate}%`} label={t("stats.rate")} tone="neon" />
-        <Stat value={stats.items} label={t("stats.items")} />
-      </div>
-    </div>
-  );
-}
-
-function Stat({
+/** Una cifra del profilo, con la sua icona. */
+function StatCard({
+  emoji,
   value,
   label,
   tone,
 }: {
+  emoji: string;
   value: number | string;
   label: string;
-  tone?: "gold" | "neon";
+  tone?: "gold" | "neon" | "violet";
 }) {
   return (
-    <span className="flex flex-col">
-      <span
+    <div className="rounded-2xl border border-line bg-surface-2 p-3">
+      <span className="text-lg leading-none">{emoji}</span>
+      <p
         className={cn(
-          "font-mono text-xl font-black",
-          tone === "gold" ? "text-gold" : tone === "neon" ? "text-neon" : "text-fg",
+          "mt-1 font-mono text-2xl font-black leading-none",
+          tone === "gold"
+            ? "text-gold"
+            : tone === "neon"
+              ? "text-neon"
+              : tone === "violet"
+                ? "text-violet"
+                : "text-fg",
         )}
       >
         {value}
-      </span>
-      <span className="text-[10px] uppercase tracking-wider text-faint">{label}</span>
-    </span>
+      </p>
+      <p className="mt-1 text-[10px] uppercase tracking-wider text-faint">{label}</p>
+    </div>
   );
 }
+
+/** Un trofeo: acceso quando e' stato conquistato, spento con il conto alla mano. */
+function TrophyBadge({ trophy }: { trophy: TrophyData }) {
+  const t = useT();
+  const Icon = TROPHY_ICONS[trophy.id];
+  return (
+    <div
+      title={t(trophy.hint)}
+      className={cn(
+        "flex flex-col items-center gap-1 rounded-xl border p-2 text-center transition-colors",
+        trophy.unlocked
+          ? "border-gold/50 bg-gold/10 text-gold"
+          : "border-line bg-surface text-faint/60",
+      )}
+    >
+      <Icon className={cn("size-6", trophy.unlocked ? "" : "opacity-50")} />
+      <span className="text-[10px] font-bold leading-tight">{t(trophy.name)}</span>
+      <span className="font-mono text-[10px] text-faint">
+        {trophy.progress}/{trophy.target}
+      </span>
+    </div>
+  );
+}
+
+const TROPHY_ICONS: Record<TrophyId, typeof Target> = {
+  first: Target,
+  win: Trophy,
+  pack: Users,
+};
 
 /* ------------------------------------------------------------------ */
 

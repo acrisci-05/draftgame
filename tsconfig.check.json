@@ -11,6 +11,7 @@
   },
   "include": [
     "lib/game.ts",
+    "lib/levels.ts",
     "lib/catalog.ts",
     "lib/utils.ts",
     "lib/types.ts",

@@ -185,6 +185,47 @@ check(
 );
 check("senza scarti: al prezzo base", forced.lastResult.price === 1);
 
+/* ---------------- Livelli, trofei e colori ---------------- */
+
+const levels = require(path.join(OUT, "levels.js"));
+
+check("livello 1 fino a 3 draft", levels.levelFor(0).rank === 1 && levels.levelFor(3).rank === 1);
+check("livello 2 da 4 a 10", levels.levelFor(4).rank === 2 && levels.levelFor(10).rank === 2);
+check("livello 3 oltre i 10", levels.levelFor(11).rank === 3 && levels.levelFor(80).rank === 3);
+check("quanto manca al livello dopo", levels.levelFor(2).toNext === 2, levels.levelFor(2).toNext);
+check("all'ultimo livello non manca niente", levels.levelFor(50).toNext === null);
+
+const nothing = levels.trophiesFor({ played: 0, won: 0, mates: 0 });
+check("a zero i tre trofei sono spenti", nothing.every((t) => !t.unlocked));
+const some = levels.trophiesFor({ played: 5, won: 1, mates: 3 });
+check("con partite, vittoria e amici sono accesi", some.every((t) => t.unlocked));
+const partial = levels.trophiesFor({ played: 5, won: 0, mates: 2 });
+check(
+  "il trofeo mostra a che punto si e'",
+  partial[2].progress === 2 && partial[2].target === 3 && !partial[2].unlocked,
+);
+check("percentuale senza partite: zero", levels.winRate({ played: 0, won: 0, mates: 0 }) === 0);
+check("percentuale su 4 partite e 2 vittorie", levels.winRate({ played: 4, won: 2, mates: 0 }) === 50);
+
+// Colori: come gli avatar, uno per giocatore.
+let palette = lobby({ maxPlayers: 4 });
+check(
+  "chi entra riceve un colore diverso",
+  palette.players[0].color !== palette.players[1].color,
+  palette.players.map((p) => p.color).join(","),
+);
+const recolored = game.reducer(palette, { type: "set_color", playerId: "b", color: "gold" });
+check("dalla lobby si cambia colore", game.playerById(recolored, "b").color === "gold");
+check(
+  "non si prende il colore di un altro",
+  game.reducer(recolored, { type: "set_color", playerId: "a", color: "gold" }) === recolored,
+);
+const colorLocked = game.reducer(recolored, { type: "start", now: t0 });
+check(
+  "a partita avviata il colore non si cambia piu'",
+  game.reducer(colorLocked, { type: "set_color", playerId: "b", color: "cyan" }) === colorLocked,
+);
+
 /* ---------------- Passaggio di host ---------------- */
 
 // Se chi ospita la stanza sparisce, il posto lo prende il primo giocatore

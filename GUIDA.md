@@ -298,9 +298,14 @@ e *Draft ricevuti*.
   dove la pagina viene ricaricata da capo, e non si ripete al caricamento successivo.
 - **Micro-profilo in barra**: al posto del pulsante *Accedi* compaiono avatar con il pallino verde
   e nickname. Al tocco si apre la tendina con *Il mio profilo*, *I miei Pickmates* ed *Esci*.
-- **Statistiche**: nella scheda del profilo ci sono partite giocate, vinte, percentuale di successo
-  ed elementi conquistati. Vengono dalla tabella `match_history`, dove ogni giocatore scrive la
-  propria riga a fine partita e legge soltanto le proprie.
+- **La scheda del profilo** si intitola *Il mio profilo*, e sotto il nickname c'è il **livello**:
+  Novizio fino a 3 draft, Picker da 4 a 10, Lupo d'asta oltre. Poi quattro riquadri — draft giocati,
+  vittorie, percentuale di successo, Pickmates — e i **tre trofei** (*Primo colpo*, *Prima vittoria*,
+  *Branco*), spenti finché non si sbloccano, ognuno col proprio conto alla mano. Chi non ha ancora
+  giocato, al posto delle cifre a zero trova l'invito a fare la prima partita.
+- I numeri vengono dalla tabella `match_history`, dove ogni giocatore scrive la propria riga a fine
+  partita e legge soltanto le proprie. Livelli e trofei sono regole pure in `lib/levels.ts`, coperte
+  dai test.
 - **In home il nome è già compilato** con nickname e avatar dell'account, invece di chiederli una
   seconda volta. Resta modificabile: il nome in partita può essere diverso.
 
@@ -342,6 +347,13 @@ suggerimento, che legge solo il creatore.
 - **Modalità creatore**: sul proprio computer è già aperta, non serve inventarsi nulla. La chiave
   la si sceglie solo quando il sito va online, scrivendola in `NEXT_PUBLIC_ADMIN_KEY`: da quel
   momento Studio ed editor li vede solo chi la conosce.
+- **Colore personale**: oltre all'avatar ogni giocatore sceglie il proprio colore fra cinque (verde
+  neon, azzurro, viola, ciano, oro). Due giocatori non possono avere lo stesso, e l'alone colorato
+  segue il giocatore nella lista durante l'asta: con otto persone in stanza è così che ci si
+  riconosce senza leggere i nomi. Chi è in testa resta verde, perché quello vuol dire un'altra cosa.
+- **Invito su WhatsApp**: accanto al codice stanza, un pulsante apre WhatsApp con il messaggio già
+  scritto — codice e link diretto. Accanto c'è il QR, che si ingrandisce con un tocco per farlo
+  inquadrare da chi è al tavolo.
 - **Avatar a icone**: i profili usano icone vettoriali (fiamma, fulmine, corona, scudo, joypad,
   teschio, coppa, fantasma, gemma) al posto delle emoji, così non esiste alcun rischio di
   caratteri corrotti fra dispositivi e file di dati.

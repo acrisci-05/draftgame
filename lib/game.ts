@@ -1,4 +1,5 @@
 import { firstFreeAvatar, isAvatarId } from "./avatars";
+import { firstFreeColor, isPlayerColor } from "./colors";
 import type {
   AuctionResult,
   CatalogItem,
@@ -34,6 +35,14 @@ export const FEED_LIMIT = 24;
 
 /** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
 export { AVATAR_IDS, DEFAULT_AVATAR, firstFreeAvatar, randomAvatar } from "./avatars";
+export { PLAYER_COLORS, DEFAULT_COLOR, colorLook, firstFreeColor } from "./colors";
+
+/** Colori già usati nella stanza: gli altri giocatori non possono prenderli. */
+export function takenColors(state: GameState, exceptPlayerId?: string): string[] {
+  return state.players
+    .filter((player) => player.id !== exceptPlayerId)
+    .map((player) => player.color ?? "");
+}
 
 /** Avatar già usati nella stanza: gli altri giocatori non possono prenderli. */
 export function takenAvatars(state: GameState, exceptPlayerId?: string): string[] {
@@ -279,6 +288,7 @@ export type GameAction =
   | { type: "add_player"; player: { id: string; name: string; emoji?: string; accountId?: string } }
   | { type: "remove_player"; playerId: string }
   | { type: "set_avatar"; playerId: string; emoji: string }
+  | { type: "set_color"; playerId: string; color: string }
   | { type: "set_host"; playerId: string }
   | { type: "set_category"; category: Category }
   | { type: "set_config"; config: Partial<RoomConfig> }
@@ -569,6 +579,8 @@ export function reducer(state: GameState, action: GameAction): GameState {
         id: action.player.id,
         name: action.player.name.trim().slice(0, 16) || `Player ${index + 1}`,
         emoji: wanted && !taken.includes(wanted) ? wanted : firstFreeAvatar(taken),
+        // Anche il colore parte diverso da quello degli altri.
+        color: firstFreeColor(state.players.map((p) => p.color ?? "")),
         accountId: action.player.accountId,
         budget: state.config.budget,
         roster: [],
@@ -586,6 +598,21 @@ export function reducer(state: GameState, action: GameAction): GameState {
       if (action.playerId === state.hostId) return state;
       if (!playerById(state, action.playerId)) return state;
       return touch({ ...state, hostId: action.playerId });
+    }
+
+    /** Colore dell'alone: si cambia dalla lobby, e due giocatori non lo condividono. */
+    case "set_color": {
+      if (state.phase !== "lobby") return state;
+      if (!isPlayerColor(action.color)) return state;
+      const target = playerById(state, action.playerId);
+      if (!target || target.color === action.color) return state;
+      if (state.players.some((p) => p.color === action.color)) return state;
+      return touch({
+        ...state,
+        players: state.players.map((p) =>
+          p.id === action.playerId ? { ...p, color: action.color } : p,
+        ),
+      });
     }
 
     /** Cambio avatar dalla lobby: l'icona deve essere ancora libera. */

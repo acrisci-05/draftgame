@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Gavel } from "lucide-react";
 import type { GameState } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
+import { colorLook } from "@/lib/game";
 import { Avatar } from "@/components/ui/Avatar";
 
 export function PlayerRail({
@@ -38,13 +39,23 @@ export function PlayerRail({
             )}
           >
             <div className="flex items-center gap-1.5">
+              {/* L'alone col colore scelto: e' come ci si riconosce al volo
+                  mentre l'asta corre. Chi e' in testa resta verde, perche' quello
+                  vuol dire un'altra cosa. */}
               <Avatar
                 id={player.emoji}
                 size="xs"
                 selected={isLeader}
-                className={isLeader ? "leader-pulse" : undefined}
+                className={cn(isLeader ? "leader-pulse" : colorLook(player.color).ring)}
               />
-              <span className="truncate text-sm font-semibold">{player.name}</span>
+              <span
+                className={cn(
+                  "truncate text-sm font-semibold",
+                  isLeader ? "" : colorLook(player.color).text,
+                )}
+              >
+                {player.name}
+              </span>
               {isLeader ? <Gavel className="ms-auto size-3.5 shrink-0 text-neon" /> : null}
               {player.id === selfId && !isLeader ? (
                 <span className="ms-auto text-[9px] font-bold uppercase text-violet">•</span>

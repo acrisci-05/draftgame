@@ -1,11 +1,10 @@
 "use client";
 
-import { Code, Coffee, Crown, Lightbulb, Sparkles } from "lucide-react";
+import { Coffee, Crown, Lightbulb, Sparkles } from "lucide-react";
 import {
   APP_VERSION,
   CHANGELOG,
   CREATOR_NAME,
-  GITHUB_URL,
   INSTAGRAM_URL,
   KOFI_URL,
   X_URL,
@@ -74,22 +73,24 @@ export function CreatorModal({
           {t("creator.instagram")}
         </a>
 
-        {/* Dove trovarmi: i profili, non le donazioni. */}
-        <div className="flex gap-2">
-          {X_URL ? (
-            <SocialLink href={X_URL} label="X">
-              <XGlyph className="size-4" />
-            </SocialLink>
-          ) : null}
-          <SocialLink href={GITHUB_URL} label="GitHub">
-            <Code className="size-4" />
-          </SocialLink>
-          {KOFI_URL ? (
-            <SocialLink href={KOFI_URL} label="Ko-fi">
-              <Coffee className="size-4" />
-            </SocialLink>
-          ) : null}
-        </div>
+        {/*
+          Dove trovarmi. Il repository non compare piu': qui ci sta chi vuole
+          seguire il progetto, non chi vuole leggerne il codice.
+        */}
+        {X_URL || KOFI_URL ? (
+          <div className="flex gap-2">
+            {X_URL ? (
+              <SocialLink href={X_URL} label="X">
+                <XGlyph className="size-4" />
+              </SocialLink>
+            ) : null}
+            {KOFI_URL ? (
+              <SocialLink href={KOFI_URL} label="Ko-fi">
+                <Coffee className="size-4" />
+              </SocialLink>
+            ) : null}
+          </div>
+        ) : null}
 
         {/*
           Donazione diretta, senza passare dal pannello degli importi: un tocco e
