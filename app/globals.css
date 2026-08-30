@@ -136,6 +136,16 @@ body {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
+  /*
+   * Nessun pulsante del gioco deve far ingrandire la pagina al doppio tocco.
+   * In asta si tocca in fretta e due volte di fila e' normale: senza questo, il
+   * browser interpreta il secondo tocco come "zoom" e il rilancio si perde.
+   */
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
   /* Avvisi ancorati in alto: sotto la tacca, non dietro. */
   .safe-top {
     margin-top: env(safe-area-inset-top);

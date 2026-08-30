@@ -608,4 +608,10 @@ export const ja: PartialDictionary = {
   "maintenance.body": "オークションに新しい機能を追加しています。少ししたらまた来てください。",
   "maintenance.hint": "まもなく再開します。",
   "maintenance.adminNotice": "クリエイターモード：ほかの人にはメンテナンス中と表示されています。",
+  "lobby.copyLink": "部屋のリンクをコピー 📋",
+  "room.badCodeTitle": "部屋コードが正しくありません",
+  "room.badCodeBody": "このアドレスに対応する部屋はありません。コードは5文字で、O・0・I・1・L は含みません。全部コピーできているか確認してください。",
+  "room.goneTitle": "部屋につながりません",
+  "room.goneBody": "主催者が閉じたか、コードが無効になった可能性があります。新しい招待をもらうか、自分で開いてください。",
+  "room.backHome": "ホームへ戻る",
 };

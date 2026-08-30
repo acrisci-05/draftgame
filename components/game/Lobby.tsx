@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, LayoutGrid, Pencil, Play, Share2, UserPlus, Users, X } from "lucide-react";
+import { Check, LayoutGrid, Link2, Pencil, Play, Share2, UserPlus, Users, X } from "lucide-react";
 import { useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
@@ -45,6 +45,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const [newPlayer, setNewPlayer] = useState("");
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   /** Giocatore a cui stiamo scegliendo l'avatar, se il pannello è aperto. */
   const [avatarFor, setAvatarFor] = useState<string | null>(null);
 
@@ -60,6 +61,12 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const whatsappUrl = joinUrl
     ? `https://wa.me/?text=${encodeURIComponent(t("lobby.whatsappText", { code: state.code, url: joinUrl }))}`
     : "";
+
+  const copyLink = async () => {
+    if (!joinUrl || !(await copyText(joinUrl))) return;
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   const shareRoom = async () => {
     const url = `${window.location.origin}/room/${state.code}`;
@@ -110,6 +117,16 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                 <Button variant="outline" size="sm" onClick={shareRoom}>
                   {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
                   {copied ? t("common.copied") : t("lobby.invite")}
+                </Button>
+                {/*
+                  Copia e basta. Il pulsante qui sopra apre il menu di
+                  condivisione del telefono, che sul computer non c'e' e sul
+                  telefono a volte si vuole saltare: qui il link finisce negli
+                  appunti e lo si incolla dove si vuole.
+                */}
+                <Button variant="outline" size="sm" onClick={copyLink}>
+                  {linkCopied ? <Check className="size-4" /> : <Link2 className="size-4" />}
+                  {linkCopied ? t("common.copied") : t("lobby.copyLink")}
                 </Button>
                 {/*
                   Invito su WhatsApp: e' li' che si organizzano le partite. Il

@@ -653,6 +653,12 @@ export const it = {
   "maintenance.body": "Stiamo aggiungendo nuove funzioni per le aste! Torna a trovarci tra pochissimo.",
   "maintenance.hint": "La partita riprende a breve.",
   "maintenance.adminNotice": "Modalità creatore: per tutti gli altri il sito è in manutenzione.",
+  "lobby.copyLink": "Copia link stanza 📋",
+  "room.badCodeTitle": "Codice stanza non valido",
+  "room.badCodeBody": "Questo indirizzo non corrisponde a nessuna stanza: il codice ha cinque caratteri e non contiene O, 0, I, 1 o L. Controlla di averlo copiato per intero.",
+  "room.goneTitle": "Stanza non raggiungibile",
+  "room.goneBody": "Chi la ospitava potrebbe aver chiuso, oppure il codice non è più valido. Chiedi un invito nuovo, o aprine una tu.",
+  "room.backHome": "Torna alla home",
 } as const;
 
 export type TranslationKey = keyof typeof it;

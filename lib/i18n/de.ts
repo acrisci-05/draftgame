@@ -610,4 +610,10 @@ export const de: PartialDictionary = {
   "maintenance.body": "Wir bauen neue Funktionen für die Auktionen ein! Schau gleich wieder vorbei.",
   "maintenance.hint": "Die Partie geht bald weiter.",
   "maintenance.adminNotice": "Creator-Modus: für alle anderen ist die Seite in Wartung.",
+  "lobby.copyLink": "Raumlink kopieren 📋",
+  "room.badCodeTitle": "Ungültiger Raumcode",
+  "room.badCodeBody": "Diese Adresse gehört zu keinem Raum: der Code hat fünf Zeichen und enthält nie O, 0, I, 1 oder L. Prüfe, ob du ihn ganz kopiert hast.",
+  "room.goneTitle": "Raum nicht erreichbar",
+  "room.goneBody": "Der Gastgeber hat vielleicht geschlossen, oder der Code gilt nicht mehr. Bitte um eine neue Einladung oder mach selbst einen auf.",
+  "room.backHome": "Zurück zur Startseite",
 };

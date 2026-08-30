@@ -122,7 +122,7 @@ export function BidControls({
             disabled={!canClaim(state, player.id)}
             onClick={onClaim}
             className={cn(
-              "flex items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
+              "flex touch-manipulation items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
               buttonHeight,
               canClaim(state, player.id)
                 ? "border-violet/60 bg-violet/15 text-violet hover:bg-violet/25"
@@ -151,7 +151,7 @@ export function BidControls({
                   disabled={!enabled}
                   onClick={() => onBid(amount)}
                   className={cn(
-                    "flex flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
+                    "flex touch-manipulation flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
                     buttonHeight,
                     enabled
                       ? "border-neon/50 bg-neon/10 text-neon hover:bg-neon/20"
@@ -176,7 +176,7 @@ export function BidControls({
                 disabled={!canBid(state, player.id, max)}
                 onClick={() => onBid(max)}
                 className={cn(
-                  "flex flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
+                  "flex touch-manipulation flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
                   buttonHeight,
                   canBid(state, player.id, max)
                     ? "border-gold/60 bg-gold/10 text-gold hover:bg-gold/20"
@@ -257,7 +257,7 @@ function PassButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
+        "flex touch-manipulation items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
         height,
         full ? "w-full" : "",
         disabled

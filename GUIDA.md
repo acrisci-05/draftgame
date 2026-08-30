@@ -92,7 +92,7 @@ un uso vero e continuativo.
 | `npm run check:engine` | esegue le verifiche automatiche su regole d'asta e cataloghi |
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
-| `npm run check:supabase` | dice se il database e' collegato, se le tabelle ci sono tutte e se le regole di accesso reggono |
+| `npm run check:supabase` | dice se il database è collegato, se le tabelle ci sono tutte, se le sei tabelle private restano illeggibili da fuori e se un estraneo riesce a scriverci |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
 | `npm run check:photos` | controlla che tutte le foto del catalogo rispondano ancora |
 | `npm run check:layout` | verifica che nessuna pagina sbordi in orizzontale su telefono |
@@ -498,6 +498,19 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
   database.
 
 ---
+
+### Se il codice della stanza è sbagliato
+Un indirizzo tipo `/room/OOOOO` non fa girare una rotella all'infinito: il codice si riconosce dalla
+forma (cinque caratteri, senza O, 0, I, 1 e L), quindi un codice storto viene rifiutato subito con
+una schermata che spiega cos'è successo e due vie d'uscita — *Torna alla home* e *Crea partita*.
+Stessa schermata quando una stanza esiste come indirizzo ma non risponde più: chi la ospitava ha
+chiuso, o il codice non è più valido.
+
+### Anteprima dei link
+Il sito ha i suoi meta tag Open Graph e Twitter Card, con `public/og.png` come immagine. Il **link
+della stanza** ha un'anteprima sua: il titolo diventa *"Entra nella stanza ABCDE"*, perché è quello
+l'indirizzo che si manda su WhatsApp, e chi lo riceve deve capire dove sta entrando prima di
+toccarlo.
 
 ### Modalità manutenzione
 

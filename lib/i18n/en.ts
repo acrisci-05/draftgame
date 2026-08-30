@@ -650,4 +650,10 @@ export const en: Dictionary = {
   "maintenance.body": "We are adding new features to the auctions! Come back in a moment.",
   "maintenance.hint": "The game resumes shortly.",
   "maintenance.adminNotice": "Creator mode: for everyone else the site is under maintenance.",
+  "lobby.copyLink": "Copy room link 📋",
+  "room.badCodeTitle": "Invalid room code",
+  "room.badCodeBody": "This address matches no room: the code is five characters and never contains O, 0, I, 1 or L. Check you copied all of it.",
+  "room.goneTitle": "Room unreachable",
+  "room.goneBody": "Whoever was hosting may have closed it, or the code is no longer valid. Ask for a new invite, or open your own.",
+  "room.backHome": "Back to home",
 };

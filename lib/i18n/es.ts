@@ -610,4 +610,10 @@ export const es: PartialDictionary = {
   "maintenance.body": "¡Estamos añadiendo funciones nuevas a las subastas! Vuelve dentro de un momento.",
   "maintenance.hint": "La partida se reanuda enseguida.",
   "maintenance.adminNotice": "Modo creador: para el resto el sitio está en mantenimiento.",
+  "lobby.copyLink": "Copiar enlace 📋",
+  "room.badCodeTitle": "Código de sala no válido",
+  "room.badCodeBody": "Esta dirección no corresponde a ninguna sala: el código tiene cinco caracteres y nunca lleva O, 0, I, 1 ni L. Comprueba haberlo copiado entero.",
+  "room.goneTitle": "Sala inalcanzable",
+  "room.goneBody": "Quien la alojaba puede haber cerrado, o el código ya no vale. Pide otra invitación, o abre la tuya.",
+  "room.backHome": "Volver al inicio",
 };

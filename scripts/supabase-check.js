@@ -87,6 +87,39 @@ const FUNCTIONS = [
   ["bump_recent_opponent", { opponent: "00000000-0000-0000-0000-000000000000" }, "conteggio delle sfide"],
 ];
 
+/**
+ * Tabelle che non devono farsi leggere da un estraneo.
+ *
+ * Il controllo e' sul comportamento, non sull'interruttore: si prova a leggerle
+ * senza aver fatto l'accesso e non deve tornare niente.
+ */
+const PRIVATE_TABLES = [
+  ["profile_emails", "le email restano private", "gli indirizzi degli iscritti sarebbero elencabili"],
+  ["pickmates", "le amicizie restano private", "si vedrebbe chi e' amico di chi"],
+  ["match_history", "lo storico resta privato", "si vedrebbero le partite altrui"],
+  ["recent_opponents", "gli avversari recenti restano privati", "si ricostruirebbe con chi giochi"],
+  ["challenges", "le sfide restano private", "si leggerebbero gli inviti altrui"],
+  ["shared_results", "i draft condivisi restano fra i diretti interessati", "sarebbero pubblici"],
+];
+
+/** Inserimenti che un visitatore non deve poter fare. */
+const FORBIDDEN_WRITES = [
+  ["profiles", { id: "00000000-0000-0000-0000-000000000000", nickname: "controllo_rls", emoji: "flame" }],
+  ["match_history", {
+    user_id: "00000000-0000-0000-0000-000000000000",
+    code: "RLSCK",
+    category: "controllo",
+    players: 2,
+    position: 1,
+    spent: 0,
+    items: 0,
+  }],
+  ["pickmates", {
+    user_id: "00000000-0000-0000-0000-000000000000",
+    friend_id: "11111111-1111-1111-1111-111111111111",
+  }],
+];
+
 const headers = { apikey: key, Authorization: `Bearer ${key}` };
 
 async function tableExists(name) {
@@ -170,28 +203,32 @@ async function functionExists(name, args) {
      leggere ne' l'elenco degli iscritti ne' gli indirizzi email. */
   console.log("\nRegole di accesso\n");
 
-  const emails = await fetch(`${url}/rest/v1/profile_emails?select=email&limit=5`, { headers });
-  const emailRows = emails.ok ? await emails.json() : null;
-  if (!emails.ok || (Array.isArray(emailRows) && emailRows.length === 0)) {
-    ok("le email non sono leggibili da fuori");
-  } else {
-    fail("le email sono esposte", "riesegui supabase/schema.sql");
+  for (const [name, expectation, why] of PRIVATE_TABLES) {
+    const response = await fetch(`${url}/rest/v1/${name}?select=*&limit=3`, { headers });
+    const rows = response.ok ? await response.json() : null;
+    const leaks = Array.isArray(rows) && rows.length > 0;
+    if (leaks) fail(`${name}: ${expectation}`, `${why} — riesegui supabase/schema.sql`);
+    else ok(`${name}: ${expectation}`);
   }
 
-  const history = await fetch(`${url}/rest/v1/match_history?select=user_id&limit=5`, { headers });
-  const historyRows = history.ok ? await history.json() : null;
-  if (!history.ok || (Array.isArray(historyRows) && historyRows.length === 0)) {
-    ok("lo storico delle partite non e' leggibile da fuori");
-  } else {
-    fail("lo storico e' esposto", "riesegui supabase/schema.sql");
-  }
-
-  const mates = await fetch(`${url}/rest/v1/pickmates?select=user_id&limit=5`, { headers });
-  const mateRows = mates.ok ? await mates.json() : null;
-  if (!mates.ok || (Array.isArray(mateRows) && mateRows.length === 0)) {
-    ok("le amicizie non sono leggibili da fuori");
-  } else {
-    fail("le amicizie sono esposte", "riesegui supabase/schema.sql");
+  /*
+   * Scrittura. Un visitatore non deve poter inserire righe a nome d'altri: si
+   * prova sul serio, con tre inserimenti che devono essere rifiutati. Se uno
+   * riesce, la riga resta nel database e va tolta a mano: e' il problema piu'
+   * grave che questo controllo possa trovare, e viene detto chiaramente.
+   */
+  console.log("");
+  for (const [name, row] of FORBIDDEN_WRITES) {
+    const response = await fetch(`${url}/rest/v1/${name}`, {
+      method: "POST",
+      headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify(row),
+    });
+    if (response.ok) {
+      fail(`${name}: scrittura da estraneo RIUSCITA`, "riga da rimuovere a mano dal pannello");
+    } else {
+      ok(`${name}: nessuno puo' scriverci senza accesso`);
+    }
   }
 
   console.log(

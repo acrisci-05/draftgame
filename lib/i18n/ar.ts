@@ -608,4 +608,10 @@ export const ar: PartialDictionary = {
   "maintenance.body": "نضيف ميزات جديدة للمزادات! عد بعد قليل.",
   "maintenance.hint": "المباراة تستأنف قريباً.",
   "maintenance.adminNotice": "وضع المُنشئ: بالنسبة للبقية الموقع في الصيانة.",
+  "lobby.copyLink": "نسخ رابط الغرفة 📋",
+  "room.badCodeTitle": "رمز غرفة غير صالح",
+  "room.badCodeBody": "هذا العنوان لا يطابق أي غرفة: الرمز من خمسة أحرف ولا يحتوي O أو 0 أو I أو 1 أو L. تأكد من نسخه كاملاً.",
+  "room.goneTitle": "الغرفة غير متاحة",
+  "room.goneBody": "ربما أغلقها المضيف، أو لم يعد الرمز صالحاً. اطلب دعوة جديدة أو افتح غرفتك.",
+  "room.backHome": "العودة إلى الرئيسية",
 };

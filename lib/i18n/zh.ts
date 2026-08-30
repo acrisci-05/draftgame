@@ -605,4 +605,10 @@ export const zh: PartialDictionary = {
   "maintenance.body": "我们在给拍卖加新功能！稍后再来看看。",
   "maintenance.hint": "很快就能继续开局。",
   "maintenance.adminNotice": "创作者模式：对其他人来说网站正在维护。",
+  "lobby.copyLink": "复制房间链接 📋",
+  "room.badCodeTitle": "房号无效",
+  "room.badCodeBody": "这个地址没有对应的房间：房号是五位，且不含 O、0、I、1 或 L。检查是否复制完整。",
+  "room.goneTitle": "房间无法连接",
+  "room.goneBody": "房主可能已经关闭，或者房号已失效。找他要个新邀请，或者自己开一间。",
+  "room.backHome": "回到首页",
 };

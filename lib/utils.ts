@@ -20,6 +20,19 @@ export function roomCode(length = ROOM_CODE_LENGTH): string {
   return out;
 }
 
+/**
+ * Un codice stanza ben formato.
+ *
+ * Serve a distinguere "stanza che non esiste" da "indirizzo scritto male": un
+ * codice storto si riconosce subito, senza aspettare che la connessione vada in
+ * timeout, e si puo' dire alla persona cos'e' successo.
+ */
+export function isRoomCode(value: string): boolean {
+  const code = value.trim().toUpperCase();
+  if (code.length !== ROOM_CODE_LENGTH) return false;
+  return [...code].every((letter) => CODE_ALPHABET.includes(letter));
+}
+
 export function uid(prefix = "id"): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
 }

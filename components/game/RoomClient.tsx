@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Loader2, Radio, Smartphone, TriangleAlert } from "lucide-react";
+import { ArrowLeft, Home, Loader2, Plus, Radio, SearchX, Smartphone, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -19,7 +19,7 @@ import {
   saveSession,
 } from "@/lib/storage";
 import type { Profile, RoomSession } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, isRoomCode } from "@/lib/utils";
 import { AvatarPicker } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -77,6 +77,15 @@ export function RoomClient({ code }: { code: string }) {
     );
   }
 
+  /*
+   * Indirizzo scritto male: un codice storto si riconosce dalla forma, senza
+   * aspettare che la connessione vada in timeout. Meglio dirlo subito che
+   * lasciare qualcuno davanti a una rotella che gira.
+   */
+  if (!isRoomCode(code)) {
+    return <RoomNotFound code={code} />;
+  }
+
   if (!session) {
     return <JoinRoom code={code} />;
   }
@@ -124,10 +133,14 @@ export function RoomClient({ code }: { code: string }) {
       ) : null}
 
       {!state ? (
-        <CenteredNotice
-          icon={<Loader2 className="size-6 animate-spin" />}
-          text={status === "error" ? t("room.unreachable") : t("room.waitingState")}
-        />
+        status === "error" ? (
+          <RoomNotFound code={code} reason="unreachable" />
+        ) : (
+          <CenteredNotice
+            icon={<Loader2 className="size-6 animate-spin" />}
+            text={t("room.waitingState")}
+          />
+        )
       ) : state.phase === "lobby" ? (
         <Lobby state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
       ) : state.phase === "voting" ? (
@@ -202,6 +215,50 @@ function JoinRoom({ code }: { code: string }) {
       <Button size="lg" onClick={join}>
         {t("room.join")}
       </Button>
+    </div>
+  );
+}
+
+/**
+ * Stanza che non c'e'.
+ *
+ * Due casi diversi con la stessa via d'uscita: un codice scritto male, oppure
+ * una stanza che non risponde piu' — chi la ospitava ha chiuso, o il codice e'
+ * scaduto. In entrambi i casi la cosa utile e' un pulsante per tornare indietro,
+ * non un messaggio d'errore e basta.
+ */
+function RoomNotFound({ code, reason = "invalid" }: { code: string; reason?: "invalid" | "unreachable" }) {
+  const router = useRouter();
+  const { t } = useSettings();
+
+  return (
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-5 px-4 py-12 text-center">
+      <span className="grid size-20 place-items-center rounded-3xl border border-amber-500/40 bg-amber-500/10">
+        <SearchX className="size-9 text-amber-400" />
+      </span>
+
+      <div>
+        <h1 className="text-2xl font-black tracking-tight text-balance">
+          {t(reason === "invalid" ? "room.badCodeTitle" : "room.goneTitle")}
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-muted text-balance">
+          {t(reason === "invalid" ? "room.badCodeBody" : "room.goneBody")}
+        </p>
+        {code ? (
+          <p className="mt-3 font-mono text-lg font-black tracking-[0.3em] text-faint">{code}</p>
+        ) : null}
+      </div>
+
+      <div className="flex w-full flex-col gap-2">
+        <Button size="lg" onClick={() => router.push("/")}>
+          <Home className="size-5" />
+          {t("room.backHome")}
+        </Button>
+        <Button variant="outline" onClick={() => router.push("/create")}>
+          <Plus className="size-4" />
+          {t("home.create")}
+        </Button>
+      </div>
     </div>
   );
 }
