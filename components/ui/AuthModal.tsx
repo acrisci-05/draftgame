@@ -41,7 +41,7 @@ import {
   type OAuthProvider,
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
-import { fetchStats } from "@/lib/history";
+import { fetchHistory, fetchStats, type PastMatch } from "@/lib/history";
 import {
   NO_PROGRESS,
   levelFor,
@@ -54,7 +54,8 @@ import {
 import { listPickmates } from "@/lib/pickmates";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
-import { cn } from "@/lib/utils";
+import type { CurrencyCode } from "@/lib/types";
+import { cn, money } from "@/lib/utils";
 import { AppleGlyph, FacebookGlyph, GoogleGlyph } from "./BrandGlyphs";
 import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
@@ -132,6 +133,7 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
   const router = useRouter();
   const { account, email } = useAuth();
   const [progress, setProgress] = useState<PlayerProgress | null>(null);
+  const [history, setHistory] = useState<PastMatch[] | null>(null);
 
   const userId = account?.id ?? null;
 
@@ -139,14 +141,17 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
   useEffect(() => {
     if (!userId) return;
     let active = true;
-    Promise.all([fetchStats(userId), listPickmates(userId)]).then(([stats, mates]) => {
-      if (!active) return;
-      setProgress({
-        played: stats.played,
-        won: stats.won,
-        mates: mates.filter((mate) => mate.status === "accepted").length,
-      });
-    });
+    Promise.all([fetchStats(userId), listPickmates(userId), fetchHistory(userId, 6)]).then(
+      ([stats, mates, past]) => {
+        if (!active) return;
+        setProgress({
+          played: stats.played,
+          won: stats.won,
+          mates: mates.filter((mate) => mate.status === "accepted").length,
+        });
+        setHistory(past);
+      },
+    );
     return () => {
       active = false;
     };
@@ -194,6 +199,39 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
           ))}
         </div>
       </div>
+
+      {/*
+        Le ultime partite. E' la parte che rende vera la frase "l'altra
+        settimana ti ho battuto": i totali da soli non raccontano niente.
+      */}
+      {history && history.length > 0 ? (
+        <div className="rounded-2xl border border-line bg-surface-2 p-3">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-faint">
+            {t("history.title")}
+          </p>
+          <div className="flex flex-col gap-1.5">
+            {history.map((match) => (
+              <div key={match.id} className="flex items-center gap-2 text-sm">
+                <span
+                  className={cn(
+                    "grid size-6 shrink-0 place-items-center rounded-md font-mono text-[11px] font-black",
+                    match.position === 1 ? "bg-gold/20 text-gold" : "bg-surface text-faint",
+                  )}
+                >
+                  {match.position}
+                </span>
+                <span className="min-w-0 flex-1 truncate">{match.category}</span>
+                <span className="shrink-0 font-mono text-xs text-faint">
+                  {money(match.spent, match.currency as CurrencyCode)}
+                </span>
+                <span className="shrink-0 text-[11px] text-faint">
+                  {formatDay(match.playedAt)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {/* Chi non ha ancora giocato non ha statistiche da guardare: ha una partita da fare. */}
       {numbers.played === 0 ? (
@@ -765,3 +803,10 @@ const PROVIDER_LOOK: Record<
     className: "bg-surface-2 text-fg ring-1 ring-line hover:ring-neon/50",
   },
 };
+
+/** Giorno e mese, senza l'anno: serve a collocare, non a datare. */
+function formatDay(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getDate()}/${date.getMonth() + 1}`;
+}

@@ -334,11 +334,27 @@ e *Draft ricevuti*.
   seconda volta. Resta modificabile: il nome in partita può essere diverso.
 
 ### Perché diventare un Picker
-Chi gioca da ospite trova in home un invito che apre una finestra con tre motivi per farsi un
-profilo — rete Pickmates e sfide dirette, storico e statistiche, card firmata col proprio nickname —
-e un pulsante che porta dritto alla registrazione. Sparisce da solo appena il profilo esiste, e non
-compare affatto dove il database non è collegato: lì quelle funzioni non ci sono e prometterle
-sarebbe falso.
+Chi gioca da ospite trova in home un invito che apre il confronto fra le due condizioni, riga per
+riga: cosa succede da ospite e cosa cambia con un profilo.
+
+| | Ospite | Con profilo |
+| --- | --- | --- |
+| **Pickmates** | ogni volta copi il codice, apri WhatsApp, incolli e aspetti | gli amici restano in rubrica: li inviti dalla lista e la sfida arriva sul loro telefono |
+| **Statistiche** | finita la serata la vittoria sparisce | resta la carriera: aste vinte, percentuale e l'elenco delle ultime partite |
+| **Trofei** | nessun riconoscimento | tre trofei da sbloccare e tre livelli da salire |
+| **Identità** | un nome che vale per quella partita | un `@nickname` che nessun altro può prendere, avatar, colore, e la card firmata |
+
+Ogni riga dice una cosa che l'app fa davvero. In particolare **non** si promette di vedere quali
+amici sono online — quella presenza non esiste — e l'elenco delle partite si può scrivere solo
+adesso che c'è una schermata che lo mostra.
+
+**I ganci.** L'invito non sta solo in home: a fine partita, a chi gioca da ospite, compare in fondo
+alla premiazione. Chi ha vinto legge che quella vittoria si può salvare; agli altri si propone di
+tenersi gli avversari nei Pickmates. È l'unico momento in cui un profilo ha un senso evidente,
+perché c'è qualcosa da salvare. Non blocca niente: da ospiti si continua a giocare tutto.
+
+Tutto questo sparisce appena il profilo esiste, e non compare affatto dove il database non è
+collegato: lì quelle funzioni non ci sono e prometterle sarebbe falso.
 
 ### Notifiche dal vivo
 La campanella in navbar compare a chi ha fatto l'accesso e ascolta il canale realtime del database:

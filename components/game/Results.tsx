@@ -10,6 +10,7 @@ import {
   Loader2,
   RotateCcw,
   Trash2,
+  UserPlus,
   Users,
   Vote,
 } from "lucide-react";
@@ -28,6 +29,7 @@ import {
   type WinReason,
 } from "@/lib/game";
 import { recordMatch } from "@/lib/history";
+import { openPanel } from "@/lib/panels";
 import { recordOpponent } from "@/lib/pickmates";
 import type { TranslationKey } from "@/lib/i18n";
 import { useSettings, useT } from "@/lib/settings";
@@ -128,6 +130,13 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
 
   const currency = state.config.currency;
   const ordered = finalStandings(state);
+
+  /*
+   * L'invito a farsi un profilo si mostra solo a chi non ce l'ha e ha davvero
+   * giocato questa partita: a uno spettatore non serve.
+   */
+  const showHook = !account && Boolean(me);
+  const iWon = ordered[0]?.player.id === selfId;
   const discarded = state.discards
     .map((id) => itemById(state, id))
     .filter((item): item is CatalogItem => Boolean(item));
@@ -205,6 +214,30 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
           })}
         </p>
       </div>
+
+      {/*
+        Il gancio, a caldo.
+
+        Chi gioca da ospite ha appena finito una partita: e' l'unico momento in
+        cui un profilo ha un senso evidente, perche' c'e' qualcosa da salvare.
+        Se ha vinto glielo si dice; altrimenti si punta sugli avversari da
+        ritrovare. Compare una volta sola, in fondo alla premiazione, e non
+        blocca niente: si gioca benissimo da ospiti.
+      */}
+      {showHook ? (
+        <div className="rounded-2xl border border-gold/40 bg-gold/10 p-4 text-center">
+          <p className="text-sm font-black text-gold">
+            {iWon ? t("hook.wonTitle") : t("hook.matesTitle")}
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            {iWon ? t("hook.wonBody") : t("hook.matesBody")}
+          </p>
+          <Button className="mt-3 w-full" onClick={() => openPanel("register")}>
+            <UserPlus className="size-4" />
+            {t("hook.cta")}
+          </Button>
+        </div>
+      ) : null}
 
       {/* Si passa da "la mia rosa" a "tutti" in qualsiasi momento. */}
       {personal && me ? (

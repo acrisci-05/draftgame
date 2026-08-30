@@ -51,6 +51,47 @@ interface HistoryRow {
   items: number;
 }
 
+export interface PastMatch {
+  id: string;
+  code: string;
+  category: string;
+  players: number;
+  position: number;
+  spent: number;
+  currency: string;
+  playedAt: string;
+}
+
+/**
+ * Le ultime partite giocate, dalla più recente.
+ *
+ * È la parte che rende vera la frase "l'altra settimana ti ho battuto": senza
+ * un elenco da guardare, i totali non raccontano niente.
+ */
+export async function fetchHistory(userId: string, limit = 10): Promise<PastMatch[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from(MATCH_HISTORY_TABLE)
+    .select("id, code, category, players, position, spent, currency, played_at")
+    .eq("user_id", userId)
+    .order("played_at", { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+
+  return (data as Record<string, unknown>[]).map((row) => ({
+    id: String(row.id),
+    code: String(row.code),
+    category: String(row.category),
+    players: Number(row.players),
+    position: Number(row.position),
+    spent: Number(row.spent),
+    currency: String(row.currency ?? "EUR"),
+    playedAt: String(row.played_at),
+  }));
+}
+
 /** Le statistiche di chi ha fatto l'accesso, calcolate sulle proprie righe. */
 export async function fetchStats(userId: string): Promise<PlayerStats> {
   const supabase = getSupabase();
