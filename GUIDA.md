@@ -66,8 +66,10 @@ più rapida alla più solida.
 secondo terminale:
 
 ```bash
-npx cloudflared tunnel --url http://localhost:3000
+npm run share
 ```
+
+Scarica l'attrezzo la prima volta e non richiede di installare niente a mano.
 
 Stampa un indirizzo `https://qualcosa.trycloudflare.com` che funziona da qualsiasi rete, anche in
 4G. Vive finché il comando resta aperto, e mentre è attivo il computer è raggiungibile da
