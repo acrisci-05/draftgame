@@ -601,4 +601,12 @@ export const en: Dictionary = {
   "lobby.color": "Colour",
   "lobby.colorHint": "This is the halo that marks you in the list during the auction.",
   "lobby.whatsappText": "Join my auction on Pick & Pay! Code: {code} — or jump straight in: {url}",
+  "color.green": "Green",
+  "color.blue": "Blue",
+  "color.purple": "Purple",
+  "color.pink": "Pink",
+  "color.red": "Red",
+  "color.orange": "Orange",
+  "color.gold": "Gold",
+  "color.silver": "Silver",
 };

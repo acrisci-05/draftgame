@@ -559,4 +559,12 @@ export const ja: PartialDictionary = {
   "lobby.color": "色",
   "lobby.colorHint": "競りの最中、この色の輪で自分を見分けます。",
   "lobby.whatsappText": "Pick & Payのオークションにおいでよ！コード：{code} — ここから直接：{url}",
+  "color.green": "グリーン",
+  "color.blue": "ブルー",
+  "color.purple": "パープル",
+  "color.pink": "ピンク",
+  "color.red": "レッド",
+  "color.orange": "オレンジ",
+  "color.gold": "ゴールド",
+  "color.silver": "シルバー",
 };

@@ -561,4 +561,12 @@ export const ru: PartialDictionary = {
   "lobby.color": "Цвет",
   "lobby.colorHint": "По этому ободку тебя видно в списке во время торгов.",
   "lobby.whatsappText": "Заходи на мой аукцион в Pick & Pay! Код: {code} — или сразу сюда: {url}",
+  "color.green": "Зелёный",
+  "color.blue": "Голубой",
+  "color.purple": "Фиолетовый",
+  "color.pink": "Розовый",
+  "color.red": "Красный",
+  "color.orange": "Оранжевый",
+  "color.gold": "Золотой",
+  "color.silver": "Серебряный",
 };

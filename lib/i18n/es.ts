@@ -561,4 +561,12 @@ export const es: PartialDictionary = {
   "lobby.color": "Color",
   "lobby.colorHint": "Es el halo que te identifica en la lista durante la subasta.",
   "lobby.whatsappText": "¡Entra en mi subasta de Pick & Pay! Código: {code} — o entra directo: {url}",
+  "color.green": "Verde",
+  "color.blue": "Azul",
+  "color.purple": "Morado",
+  "color.pink": "Rosa",
+  "color.red": "Rojo",
+  "color.orange": "Naranja",
+  "color.gold": "Oro",
+  "color.silver": "Plata",
 };

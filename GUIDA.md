@@ -347,8 +347,10 @@ suggerimento, che legge solo il creatore.
 - **Modalità creatore**: sul proprio computer è già aperta, non serve inventarsi nulla. La chiave
   la si sceglie solo quando il sito va online, scrivendola in `NEXT_PUBLIC_ADMIN_KEY`: da quel
   momento Studio ed editor li vede solo chi la conosce.
-- **Colore personale**: oltre all'avatar ogni giocatore sceglie il proprio colore fra cinque (verde
-  neon, azzurro, viola, ciano, oro). Due giocatori non possono avere lo stesso, e l'alone colorato
+- **Colore personale**: oltre all'avatar ogni giocatore sceglie il proprio colore fra otto (verde,
+  azzurro, viola, rosa, rosso, arancio, oro, argento) — uno per ogni posto in stanza, così con otto
+  giocatori nessuno resta senza. Sono presi a distanza sulla ruota dei colori, perché due tinte
+  vicine viste piccole e in movimento si confondono. Due giocatori non possono avere lo stesso, e l'alone colorato
   segue il giocatore nella lista durante l'asta: con otto persone in stanza è così che ci si
   riconosce senza leggere i nomi. Chi è in testa resta verde, perché quello vuol dire un'altra cosa.
 - **Invito su WhatsApp**: accanto al codice stanza, un pulsante apre WhatsApp con il messaggio già

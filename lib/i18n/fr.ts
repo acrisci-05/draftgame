@@ -562,4 +562,12 @@ export const fr: PartialDictionary = {
   "lobby.color": "Couleur",
   "lobby.colorHint": "C'est le halo qui te repère dans la liste pendant l'enchère.",
   "lobby.whatsappText": "Rejoins mon enchère sur Pick & Pay ! Code : {code} — ou entre directement : {url}",
+  "color.green": "Vert",
+  "color.blue": "Bleu",
+  "color.purple": "Violet",
+  "color.pink": "Rose",
+  "color.red": "Rouge",
+  "color.orange": "Orange",
+  "color.gold": "Or",
+  "color.silver": "Argent",
 };

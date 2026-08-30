@@ -559,4 +559,12 @@ export const ar: PartialDictionary = {
   "lobby.color": "اللون",
   "lobby.colorHint": "هذه الهالة هي التي تميّزك في القائمة أثناء المزاد.",
   "lobby.whatsappText": "انضم إلى مزادي على Pick & Pay! الرمز: {code} — أو ادخل من هنا: {url}",
+  "color.green": "أخضر",
+  "color.blue": "أزرق",
+  "color.purple": "بنفسجي",
+  "color.pink": "وردي",
+  "color.red": "أحمر",
+  "color.orange": "برتقالي",
+  "color.gold": "ذهبي",
+  "color.silver": "فضي",
 };

@@ -353,7 +353,8 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                       key={color}
                       type="button"
                       disabled={used}
-                      aria-label={color}
+                      aria-label={t(`color.${color}`)}
+                      title={t(`color.${color}`)}
                       aria-pressed={active}
                       onClick={() => dispatch({ type: "set_color", playerId: avatarFor, color })}
                       className={cn(

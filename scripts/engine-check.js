@@ -223,7 +223,7 @@ check(
 const colorLocked = game.reducer(recolored, { type: "start", now: t0 });
 check(
   "a partita avviata il colore non si cambia piu'",
-  game.reducer(colorLocked, { type: "set_color", playerId: "b", color: "cyan" }) === colorLocked,
+  game.reducer(colorLocked, { type: "set_color", playerId: "b", color: "pink" }) === colorLocked,
 );
 
 /* ---------------- Passaggio di host ---------------- */

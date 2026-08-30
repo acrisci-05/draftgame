@@ -604,6 +604,14 @@ export const it = {
   "lobby.color": "Colore",
   "lobby.colorHint": "Ti riconosci da questo alone nella lista durante l'asta.",
   "lobby.whatsappText": "Entra nella mia asta su Pick & Pay! Codice: {code} — oppure entra da qui: {url}",
+  "color.green": "Verde",
+  "color.blue": "Azzurro",
+  "color.purple": "Viola",
+  "color.pink": "Rosa",
+  "color.red": "Rosso",
+  "color.orange": "Arancio",
+  "color.gold": "Oro",
+  "color.silver": "Argento",
 } as const;
 
 export type TranslationKey = keyof typeof it;

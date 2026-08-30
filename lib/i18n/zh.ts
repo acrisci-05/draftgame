@@ -556,4 +556,12 @@ export const zh: PartialDictionary = {
   "lobby.color": "颜色",
   "lobby.colorHint": "拍卖进行时，就靠这圈光认出你。",
   "lobby.whatsappText": "来玩我的 Pick & Pay 拍卖！房号：{code} — 或直接点这里：{url}",
+  "color.green": "绿色",
+  "color.blue": "蓝色",
+  "color.purple": "紫色",
+  "color.pink": "粉色",
+  "color.red": "红色",
+  "color.orange": "橙色",
+  "color.gold": "金色",
+  "color.silver": "银色",
 };

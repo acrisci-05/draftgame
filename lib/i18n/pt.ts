@@ -561,4 +561,12 @@ export const pt: PartialDictionary = {
   "lobby.color": "Cor",
   "lobby.colorHint": "É o halo que te marca na lista durante o leilão.",
   "lobby.whatsappText": "Entra no meu leilão no Pick & Pay! Código: {code} — ou entra já aqui: {url}",
+  "color.green": "Verde",
+  "color.blue": "Azul",
+  "color.purple": "Roxo",
+  "color.pink": "Rosa",
+  "color.red": "Vermelho",
+  "color.orange": "Laranja",
+  "color.gold": "Ouro",
+  "color.silver": "Prata",
 };
