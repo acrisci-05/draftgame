@@ -116,11 +116,15 @@ async function functionExists(name, args) {
 (async () => {
   console.log(`Database ${url}\n`);
 
-  /* 1. Il progetto risponde? */
+  /* 1. Il progetto risponde?
+     Basta che risponda da servizio, con un codice qualsiasi che non sia un
+     guasto: la radice dell'API rifiuta la chiave pubblica (401) ed e' normale,
+     perche' le tabelle si leggono una per una, non tutte insieme. Il vero
+     controllo di raggiungibilita' lo fanno le prove qui sotto. */
   try {
     const response = await fetch(`${url}/rest/v1/`, { headers });
-    if (response.ok || response.status === 400) ok("il progetto risponde");
-    else fail("il progetto non risponde", `codice ${response.status}`);
+    if (response.status < 500) ok("il progetto risponde");
+    else fail("il progetto ha un guasto", `codice ${response.status}`);
   } catch (error) {
     console.log(`  MANCA il progetto non e' raggiungibile — ${error.message}`);
     console.log("\n  Se il progetto e' nuovo puo' volerci qualche minuto.");

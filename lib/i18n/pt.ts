@@ -510,4 +510,10 @@ export const pt: PartialDictionary = {
   "creator.revolut": "Doar com Revolut",
   "creator.donateNote": "O pagamento acontece no PayPal ou no Revolut: nada passa por esta app.",
   "notify.open": "Abrir",
+  "auth.or": "ou",
+  "auth.google": "Continuar com Google",
+  "auth.apple": "Continuar com Apple",
+  "auth.facebook": "Continuar com Facebook",
+  "auth.github": "Continuar com GitHub",
+  "auth.socialHint": "Depois é só escolher nickname e avatar.",
 };

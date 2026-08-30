@@ -510,4 +510,10 @@ export const ru: PartialDictionary = {
   "creator.revolut": "Поддержать через Revolut",
   "creator.donateNote": "Оплата проходит на PayPal или Revolut: через приложение ничего не идёт.",
   "notify.open": "Открыть",
+  "auth.or": "или",
+  "auth.google": "Войти через Google",
+  "auth.apple": "Войти через Apple",
+  "auth.facebook": "Войти через Facebook",
+  "auth.github": "Войти через GitHub",
+  "auth.socialHint": "Дальше только ник и аватар.",
 };

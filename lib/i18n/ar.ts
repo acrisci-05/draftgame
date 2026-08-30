@@ -508,4 +508,10 @@ export const ar: PartialDictionary = {
   "creator.revolut": "تبرّع عبر Revolut",
   "creator.donateNote": "الدفع يتم على PayPal أو Revolut: لا يمر أي شيء عبر هذا التطبيق.",
   "notify.open": "فتح",
+  "auth.or": "أو",
+  "auth.google": "المتابعة عبر Google",
+  "auth.apple": "المتابعة عبر Apple",
+  "auth.facebook": "المتابعة عبر Facebook",
+  "auth.github": "المتابعة عبر GitHub",
+  "auth.socialHint": "بعدها تختار الاسم والصورة الرمزية فقط.",
 };

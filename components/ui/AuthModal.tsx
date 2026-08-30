@@ -1,6 +1,16 @@
 "use client";
 
-import { Check, Circle, KeyRound, Loader2, LogIn, LogOut, Smartphone, UserPlus } from "lucide-react";
+import {
+  Check,
+  Circle,
+  Code,
+  KeyRound,
+  Loader2,
+  LogIn,
+  LogOut,
+  Smartphone,
+  UserPlus,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   AuthFailure,
@@ -19,11 +29,15 @@ import {
   useAuth,
   type AuthError,
   type PasswordChecks,
+  enabledProviders,
+  signInWithProvider,
+  type OAuthProvider,
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import { cn } from "@/lib/utils";
+import { AppleGlyph, FacebookGlyph, GoogleGlyph } from "./BrandGlyphs";
 import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -211,6 +225,8 @@ function CredentialsForm({ onDone }: { onDone?: () => void }) {
           </button>
         ))}
       </div>
+
+      <SocialButtons onError={() => setError(ERROR_KEYS.unknown)} />
 
       {tab === "up" ? (
         <>
@@ -470,3 +486,101 @@ function LocalProfileForm({ onDone }: { onDone?: () => void }) {
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * Entrare con un profilo che si ha gia': niente email da confermare, niente
+ * password da inventare. Compaiono solo i servizi accesi sul progetto: se non
+ * ce n'e' nessuno, questo blocco non esiste proprio.
+ *
+ * Dopo il rientro la sessione c'e' ma il profilo di gioco no, quindi il
+ * pannello mostra da solo la scelta di nickname e avatar: e' l'unica cosa che
+ * resta da fare.
+ */
+function SocialButtons({ onError }: { onError: () => void }) {
+  const t = useT();
+  const [providers, setProviders] = useState<OAuthProvider[] | null>(null);
+  const [busy, setBusy] = useState<OAuthProvider | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    enabledProviders().then((list) => {
+      if (active) setProviders(list);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!providers || providers.length === 0) return null;
+
+  const start = async (provider: OAuthProvider) => {
+    setBusy(provider);
+    try {
+      await signInWithProvider(provider);
+    } catch {
+      setBusy(null);
+      onError();
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      {providers.map((provider) => {
+        const { label, icon, className } = PROVIDER_LOOK[provider];
+        return (
+          <button
+            key={provider}
+            type="button"
+            disabled={busy !== null}
+            onClick={() => start(provider)}
+            className={cn(
+              "flex h-12 items-center justify-center gap-2.5 rounded-xl font-bold transition-all disabled:opacity-60",
+              className,
+            )}
+          >
+            {busy === provider ? <Loader2 className="size-5 animate-spin" /> : icon}
+            {t(label)}
+          </button>
+        );
+      })}
+
+      {/* Separatore fra l'accesso rapido e quello con email. */}
+      <div className="my-1 flex items-center gap-3">
+        <span className="h-px flex-1 bg-line" />
+        <span className="text-[11px] font-bold uppercase tracking-wider text-faint">
+          {t("auth.or")}
+        </span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+    </div>
+  );
+}
+
+/** Aspetto di ogni servizio: colore ufficiale e simbolo. */
+const PROVIDER_LOOK: Record<
+  OAuthProvider,
+  { label: TranslationKey; icon: React.ReactNode; className: string }
+> = {
+  google: {
+    label: "auth.google",
+    icon: <GoogleGlyph className="size-5" />,
+    className: "bg-white text-[#1f1f1f] hover:bg-zinc-100",
+  },
+  apple: {
+    label: "auth.apple",
+    icon: <AppleGlyph className="size-5" />,
+    className: "bg-black text-white ring-1 ring-white/20 hover:bg-zinc-900",
+  },
+  facebook: {
+    label: "auth.facebook",
+    icon: <FacebookGlyph className="size-5" />,
+    className: "bg-[#1877F2] text-white hover:bg-[#0f5fd0]",
+  },
+  github: {
+    label: "auth.github",
+    icon: <Code className="size-5" />,
+    className: "bg-surface-2 text-fg ring-1 ring-line hover:ring-neon/50",
+  },
+};

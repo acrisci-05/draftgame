@@ -269,6 +269,12 @@ Tutte queste regole sono verificate da `npm run check:engine`.
   debole non parte nemmeno.
 - Il **nickname è unico**: lo garantiscono il controllo prima dell'invio e un vincolo del
   database che accetta solo minuscole, cifre e underscore, così "Marco" e "marco" non convivono.
+- **Accesso rapido con un profilo che si ha già** (Google, Apple, Facebook, GitHub): niente email da
+  confermare, niente password da inventare. Al ritorno resta da scegliere solo nickname e avatar,
+  che è lo stesso modulo usato dopo la conferma via email.
+  Quali pulsanti compaiono non lo decide il codice: l'app chiede al database quali servizi sono
+  accesi (`/auth/v1/settings`) e mostra solo quelli. Accenderne uno nuovo dal pannello di Supabase
+  non richiede di toccare il codice né di ripubblicare il sito.
 - Senza database si può comunque creare un **profilo su questo dispositivo** e giocare subito.
 
 ### Pickmates

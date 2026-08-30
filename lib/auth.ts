@@ -165,6 +165,65 @@ function clearPendingProfile() {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* Accesso con un profilo che si ha già (Google, Apple, Facebook...)   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * I servizi con cui si può entrare senza creare una password.
+ *
+ * Quali siano davvero disponibili non lo decide il codice: lo decide il
+ * pannello del database, dove ognuno va acceso con le sue credenziali. L'app lo
+ * chiede all'avvio e mostra solo i pulsanti che funzionano davvero, così
+ * accenderne uno nuovo non richiede di toccare il codice.
+ */
+export const OAUTH_PROVIDERS = ["google", "apple", "facebook", "github"] as const;
+
+export type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];
+
+let providersCache: Promise<OAuthProvider[]> | null = null;
+
+/** Quali accessi rapidi sono accesi sul progetto. Lista vuota se nessuno. */
+export function enabledProviders(): Promise<OAuthProvider[]> {
+  if (providersCache) return providersCache;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+  if (!url || !key) return Promise.resolve([]);
+
+  providersCache = fetch(`${url.replace(/\/$/, "")}/auth/v1/settings`, {
+    headers: { apikey: key },
+  })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((settings: { external?: Record<string, boolean> } | null) => {
+      const external = settings?.external ?? {};
+      return OAUTH_PROVIDERS.filter((provider) => external[provider] === true);
+    })
+    .catch(() => []);
+
+  return providersCache;
+}
+
+/**
+ * Manda al servizio scelto e torna indietro sulla pagina dei Pickmates.
+ *
+ * Al ritorno la sessione c'è già ma il profilo di gioco no: l'app chiede
+ * nickname e avatar, che restano l'unica cosa da scegliere.
+ */
+export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
+  const supabase = getSupabase();
+  if (!supabase) throw new AuthFailure("offline");
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo:
+        typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
+    },
+  });
+  if (error) throw new AuthFailure("unknown");
+}
+
 /** true se il nickname è libero. Il vincolo vero resta quello del database. */
 export async function isNicknameAvailable(nickname: string): Promise<boolean> {
   const clean = normalizeNickname(nickname);

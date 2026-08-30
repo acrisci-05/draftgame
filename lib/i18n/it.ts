@@ -553,6 +553,12 @@ export const it = {
   "results.mineSpent": "Crediti spesi",
   "results.mineLeft": "Crediti rimasti",
   "results.winner": "1° classificato",
+  "auth.or": "oppure",
+  "auth.google": "Accedi con Google",
+  "auth.apple": "Accedi con Apple",
+  "auth.facebook": "Accedi con Facebook",
+  "auth.github": "Accedi con GitHub",
+  "auth.socialHint": "Poi scegli solo nickname e avatar.",
 } as const;
 
 export type TranslationKey = keyof typeof it;

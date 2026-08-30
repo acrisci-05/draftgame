@@ -505,4 +505,10 @@ export const zh: PartialDictionary = {
   "creator.revolut": "用 Revolut 捐赠",
   "creator.donateNote": "付款在 PayPal 或 Revolut 完成：本应用不经手任何数据。",
   "notify.open": "打开",
+  "auth.or": "或",
+  "auth.google": "使用 Google 登录",
+  "auth.apple": "使用 Apple 登录",
+  "auth.facebook": "使用 Facebook 登录",
+  "auth.github": "使用 GitHub 登录",
+  "auth.socialHint": "之后只需选昵称和头像。",
 };

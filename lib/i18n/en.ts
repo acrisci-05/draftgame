@@ -550,4 +550,10 @@ export const en: Dictionary = {
   "creator.revolut": "Donate with Revolut",
   "creator.donateNote": "Payment happens on PayPal or Revolut: nothing goes through this app.",
   "notify.open": "Open",
+  "auth.or": "or",
+  "auth.google": "Continue with Google",
+  "auth.apple": "Continue with Apple",
+  "auth.facebook": "Continue with Facebook",
+  "auth.github": "Continue with GitHub",
+  "auth.socialHint": "Then just pick a nickname and an avatar.",
 };

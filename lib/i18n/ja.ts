@@ -508,4 +508,10 @@ export const ja: PartialDictionary = {
   "creator.revolut": "Revolutで支援する",
   "creator.donateNote": "支払いはPayPalかRevolutで行われます。このアプリは何も扱いません。",
   "notify.open": "開く",
+  "auth.or": "または",
+  "auth.google": "Googleで続ける",
+  "auth.apple": "Appleで続ける",
+  "auth.facebook": "Facebookで続ける",
+  "auth.github": "GitHubで続ける",
+  "auth.socialHint": "あとはニックネームとアバターを選ぶだけ。",
 };
