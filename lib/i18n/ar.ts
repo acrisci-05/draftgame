@@ -538,4 +538,6 @@ export const ar: PartialDictionary = {
   "picker.cardBody": "بطاقة النهاية تحمل اسمك الرسمي، ويُرسل الدرافت إلى الأصدقاء ليصوّتوا عليه.",
   "picker.cta": "أنشئ حسابك مجاناً ✨",
   "picker.free": "مجاني وبلا إعلانات. يكفي بريد إلكتروني واسم.",
+  "auth.showPassword": "إظهار كلمة المرور",
+  "auth.hidePassword": "إخفاء كلمة المرور",
 };

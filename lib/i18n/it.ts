@@ -583,6 +583,8 @@ export const it = {
   "picker.cardBody": "La card di fine partita porta il tuo nome ufficiale, e il draft si manda agli amici perché lo votino.",
   "picker.cta": "Crea il tuo account gratis ✨",
   "picker.free": "Gratis, senza pubblicità. Servono solo un'email e un nickname.",
+  "auth.showPassword": "Mostra la password",
+  "auth.hidePassword": "Nascondi la password",
 } as const;
 
 export type TranslationKey = keyof typeof it;

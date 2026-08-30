@@ -535,4 +535,6 @@ export const zh: PartialDictionary = {
   "picker.cardBody": "结算卡会印上你的正式昵称，草稿还能发给朋友投票。",
   "picker.cta": "免费创建账号 ✨",
   "picker.free": "免费、无广告。只要一个邮箱和一个昵称。",
+  "auth.showPassword": "显示密码",
+  "auth.hidePassword": "隐藏密码",
 };

@@ -540,4 +540,6 @@ export const ru: PartialDictionary = {
   "picker.cardBody": "На финальной карточке стоит твоё имя, а драфт уходит друзьям на голосование.",
   "picker.cta": "Создать бесплатный аккаунт ✨",
   "picker.free": "Бесплатно, без рекламы. Нужны только почта и ник.",
+  "auth.showPassword": "Показать пароль",
+  "auth.hidePassword": "Скрыть пароль",
 };

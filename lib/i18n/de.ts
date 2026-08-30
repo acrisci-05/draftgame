@@ -540,4 +540,6 @@ export const de: PartialDictionary = {
   "picker.cardBody": "Die Abschlusskarte trägt deinen offiziellen Namen, und der Draft geht an Freunde zum Abstimmen.",
   "picker.cta": "Kostenloses Konto erstellen ✨",
   "picker.free": "Kostenlos, ohne Werbung. Es braucht nur E-Mail und Nickname.",
+  "auth.showPassword": "Passwort anzeigen",
+  "auth.hidePassword": "Passwort verbergen",
 };

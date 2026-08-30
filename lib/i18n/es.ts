@@ -540,4 +540,6 @@ export const es: PartialDictionary = {
   "picker.cardBody": "La card final lleva tu nombre oficial, y el draft se manda a los amigos para que lo voten.",
   "picker.cta": "Crea tu cuenta gratis ✨",
   "picker.free": "Gratis y sin publicidad. Solo hacen falta un email y un apodo.",
+  "auth.showPassword": "Mostrar contraseña",
+  "auth.hidePassword": "Ocultar contraseña",
 };

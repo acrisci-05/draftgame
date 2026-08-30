@@ -538,4 +538,6 @@ export const ja: PartialDictionary = {
   "picker.cardBody": "結果カードにあなたの正式な名前が入り、ドラフトは友だちに送って投票してもらえます。",
   "picker.cta": "無料でアカウントを作る ✨",
   "picker.free": "無料、広告なし。メールとニックネームだけ。",
+  "auth.showPassword": "パスワードを表示",
+  "auth.hidePassword": "パスワードを隠す",
 };

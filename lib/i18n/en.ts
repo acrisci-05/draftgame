@@ -580,4 +580,6 @@ export const en: Dictionary = {
   "picker.cardBody": "The end-of-game card carries your official name, and the draft goes to friends so they can vote it.",
   "picker.cta": "Create your free account ✨",
   "picker.free": "Free, no ads. All it takes is an email and a nickname.",
+  "auth.showPassword": "Show password",
+  "auth.hidePassword": "Hide password",
 };
