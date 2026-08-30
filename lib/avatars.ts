@@ -15,6 +15,21 @@ export const AVATAR_IDS = [
   "trophy",
   "ghost",
   "gem",
+  "rocket",
+  "bomb",
+  "swords",
+  "dice",
+  "target",
+  "bot",
+  "brain",
+  "star",
+  "heart",
+  "cat",
+  "dog",
+  "pizza",
+  "popcorn",
+  "music",
+  "snowflake",
 ] as const;
 
 export type AvatarId = (typeof AVATAR_IDS)[number];
