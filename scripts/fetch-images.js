@@ -286,8 +286,13 @@ async function fromHint(hint) {
     // tutta, lascia cadere l'ultima parola: "person sleeping bed morning" diventa
     // "person sleeping bed" e poi "person sleeping". Le parole più importanti
     // stanno all'inizio, quindi la foto resta pertinente.
+    //
+    // Non si scende però sotto metà delle parole, e mai sotto due: con una
+    // parola sola si finisce fuori strada ("first aid kit" ridotto a "first"
+    // trovava un duo musicale che si chiama così).
     const terms = query.split(/\s+/).filter(Boolean);
-    for (let length = terms.length; length > 0; length -= 1) {
+    const floor = Math.min(terms.length, Math.max(2, Math.ceil(terms.length / 2)));
+    for (let length = terms.length; length >= floor; length -= 1) {
       const attempt = terms.slice(0, length).join(" ");
       const files = await commonsSearch(attempt);
       const file = files.find((entry) => matchesQuery(attempt, entry.title) && isFree(entry.url));

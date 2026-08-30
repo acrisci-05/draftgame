@@ -12,10 +12,12 @@
     "check:rooms": "node scripts/room-check.js http://localhost:3000",
     "check:images": "tsc -p tsconfig.check.json && node scripts/images-check.js",
     "check:photos": "node scripts/check-photos.js",
+    "check:layout": "node scripts/check-layout.js",
     "share": "cloudflared tunnel --url http://localhost:3000",
     "images:fetch": "tsc -p tsconfig.check.json && node scripts/fetch-images.js",
     "images:fix": "node scripts/fix-images.js",
-    "images:sheet": "node scripts/contact-sheet.js"
+    "images:sheet": "node scripts/contact-sheet.js",
+    "docs:pdf": "node scripts/build-guide-pdf.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

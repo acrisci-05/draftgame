@@ -80,18 +80,25 @@ export interface CategoryIssue {
   count?: number;
 }
 
-/** Una categoria è giocabile solo con 6 elementi per ciascuna delle 5 fasce. */
+/**
+ * Una categoria è giocabile quando ogni fascia ha lo stesso numero di elementi.
+ * Le liste fatte nell'editor ne hanno sei per fascia (trenta in tutto); le
+ * ufficiali possono averne meno quando il numero lo detta l'argomento — le
+ * regioni italiane sono venti e non diventano trenta per far quadrare un
+ * formato.
+ */
 export function validateCategory(
   name: string,
   emoji: string,
   items: CatalogItem[],
+  perTier: number = ITEMS_PER_TIER,
 ): CategoryIssue[] {
   const issues: CategoryIssue[] = [];
   if (!name.trim()) issues.push({ key: "name" });
   if (!emoji.trim()) issues.push({ key: "emoji" });
   TIER_ORDER.forEach((tier) => {
     const count = countByTier(items, tier);
-    if (count !== ITEMS_PER_TIER) issues.push({ key: "tier", tier, count });
+    if (count !== perTier) issues.push({ key: "tier", tier, count });
   });
   return issues;
 }

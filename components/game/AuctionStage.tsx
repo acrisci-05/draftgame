@@ -26,7 +26,6 @@ import { RoomCode } from "@/components/ui/RoomCode";
 import { BidControls } from "./BidControls";
 import { ItemCover } from "./ItemCover";
 import { PlayerRail } from "./PlayerRail";
-import { TierChip } from "./TierChip";
 import { Timer } from "./Timer";
 
 interface AuctionStageProps {
@@ -130,8 +129,6 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               <span className="inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-violet">
                 <PackageOpen className="size-3" /> {t("auction.mystery")}
               </span>
-            ) : item ? (
-              <TierChip tier={item.tier} currency={currency} />
             ) : null}
 
             <h1 className="text-2xl leading-tight font-black tracking-tight text-balance sm:text-3xl">

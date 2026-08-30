@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Pick &amp; Pay - The Draft Game — Guida</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: #18181b;
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+  h1 { font-size: 26pt; margin: 0 0 4pt; letter-spacing: -0.5pt; }
+  h2 {
+    font-size: 14pt;
+    margin: 20pt 0 6pt;
+    padding-bottom: 3pt;
+    border-bottom: 1.5pt solid #22c55e;
+    page-break-after: avoid;
+  }
+  h3 { font-size: 11.5pt; margin: 12pt 0 3pt; page-break-after: avoid; }
+  p, li { margin: 0 0 5pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  code {
+    font-family: "Cascadia Mono", Consolas, monospace;
+    background: #f4f4f5;
+    padding: 1pt 3pt;
+    border-radius: 3pt;
+    font-size: 9.5pt;
+  }
+  pre {
+    background: #18181b;
+    color: #e4e4e7;
+    padding: 8pt 10pt;
+    border-radius: 6pt;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 9pt;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 10pt; font-size: 9.5pt; }
+  th, td { border: 0.5pt solid #d4d4d8; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #f4f4f5; font-weight: 700; }
+  .lead { font-size: 11.5pt; color: #3f3f46; margin-bottom: 10pt; }
+  .cover {
+    border: 1.5pt solid #22c55e;
+    border-radius: 10pt;
+    padding: 14pt 16pt;
+    margin-bottom: 6pt;
+    background: linear-gradient(135deg, #f0fdf4, #ffffff 60%);
+  }
+  .tag {
+    display: inline-block;
+    background: #22c55e;
+    color: #052e16;
+    font-weight: 800;
+    font-size: 8.5pt;
+    letter-spacing: 1pt;
+    padding: 2pt 7pt;
+    border-radius: 20pt;
+    text-transform: uppercase;
+  }
+  .note {
+    border-left: 3pt solid #a855f7;
+    background: #faf5ff;
+    padding: 6pt 10pt;
+    border-radius: 0 5pt 5pt 0;
+    margin: 6pt 0 10pt;
+    font-size: 10pt;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 14pt; }
+  .muted { color: #52525b; }
+  .page-break { page-break-before: always; }
+  footer { margin-top: 14pt; border-top: 0.5pt solid #d4d4d8; padding-top: 5pt; font-size: 8.5pt; color: #71717a; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <span class="tag">Guida d'uso</span>
+  <h1>Pick &amp; Pay <span class="muted" style="font-weight:400">— The Draft Game</span></h1>
+  <p class="lead">
+    Asta dal vivo a budget fisso: stesso budget per tutti, gli elementi della categoria escono uno
+    alla volta e vince chi costruisce la lista migliore. A fine partita esce una card verticale
+    pronta da postare e un link per far votare gli amici.
+  </p>
+  <p class="muted" style="margin:0">
+    Versione 1.0.0 · progetto indipendente di Antonio · da 2 a 8 giocatori · 33 liste ufficiali
+  </p>
+</div>
+
+<h2>1. Come si avvia</h2>
+
+<p>Serve <strong>Node.js 24 o superiore</strong>. Dalla cartella del progetto:</p>
+
+<pre>npm install     # una volta sola: scarica le dipendenze
+npm run dev     # avvia il sito in sviluppo</pre>
+
+<p>Poi si apre <code>http://localhost:3000</code>. Senza nessuna configurazione la
+<strong>partita locale funziona subito</strong>: due o più giocatori sullo stesso telefono o
+computer, tutte le categorie, card finale scaricabile.</p>
+
+<h3>Dal telefono, sulla stessa Wi-Fi</h3>
+<p>All'avvio il terminale stampa due indirizzi: <code>Local</code> e <code>Network</code> (tipo
+<code>http://192.168.1.124:3000</code>). Basta aprire il secondo dal telefono: gli indirizzi di
+rete del computer sono già autorizzati nella configurazione.</p>
+
+<h3>Da un'altra rete o da connessione dati</h3>
+<p>Da fuori casa il telefono non raggiunge il computer: è una regola di rete, non un difetto
+dell'app. Serve un indirizzo pubblico. Il più rapido, con il sito già avviato:</p>
+<pre>npm run share   # apre un indirizzo https temporaneo, valido anche in 4G</pre>
+<p>Per un uso continuativo conviene pubblicare il sito (Vercel, Render, Railway) e collegare il
+database.</p>
+
+<h2>2. Come si gioca</h2>
+
+<ol>
+  <li><strong>Prepara la stanza</strong>: modalità, categoria, budget, valuta, quanti giocatori e
+    quanti elementi deve avere ogni lista.</li>
+  <li><strong>Parte l'asta</strong>: gli elementi escono a caso, ognuno con il suo prezzo di
+    apertura (da 1 a 5 crediti). Hai 15 secondi per lotto.</li>
+  <li><strong>Rilancia o passa</strong>: rilanci +1, +2, +5 e pulsante Max, finché il saldo li
+    copre. Ogni rilancio riporta il timer a 10 secondi.</li>
+  <li><strong>Aggiudicazione</strong>: il lotto va all'offerta più alta quando il tempo scade o
+    quando tutti gli altri hanno passato.</li>
+  <li><strong>Fine partita</strong>: a liste piene si genera la card 9:16 e il link di voto.</li>
+</ol>
+
+<div class="note">
+  <strong>Nessuno resta bloccato.</strong> Si tiene sempre un credito per ogni posto ancora vuoto:
+  se ti mancano tre elementi non puoi scendere sotto 3 crediti. E se resti l'ultimo a dover
+  completare, i lotti rimasti ti vengono assegnati al prezzo di apertura.
+</div>
+
+<h3>Le regole in breve</h3>
+<table>
+  <tr><th>Regola</th><th>Come funziona</th></tr>
+  <tr><td>Budget</td><td>Uguale per tutti: 10, 20, 50, 100 o valore libero, in €, $, £ o ¥</td></tr>
+  <tr><td>Timer</td><td>15 secondi per lotto, riportati a 10 dopo ogni rilancio</td></tr>
+  <tr><td>Anti-sniping</td><td>Un'offerta all'ultimo istante lascia sempre agli altri il tempo di rispondere</td></tr>
+  <tr><td>Passa</td><td>Chi passa esce da quel lotto e non rientra. Se resta uno solo, il lotto è suo</td></tr>
+  <tr><td>Scarti</td><td>L'host decide: un lotto senza offerte si mette da parte oppure va a chi ha meno elementi</td></tr>
+</table>
+
+<h2>3. Le modalità</h2>
+
+<table>
+  <tr><th>Modalità</th><th>Quando usarla</th></tr>
+  <tr><td><strong>Locale</strong></td><td>Tutti sullo stesso dispositivo, a turno sullo stesso schermo. Non serve internet né configurazione.</td></tr>
+  <tr><td><strong>Online</strong></td><td>Ognuno dal proprio telefono, con un codice stanza di 5 caratteri (copiabile con un tocco, con QR).</td></tr>
+  <tr><td><strong>Blind Draft</strong></td><td>Variante: l'immagine del lotto resta coperta fino all'aggiudicazione.</td></tr>
+  <tr><td><strong>Mystery Box</strong></td><td>Variante: ogni 5 lotti compare una scatola a prezzo fisso con un elemento a sorpresa.</td></tr>
+</table>
+
+<h2 class="page-break">4. Cosa c'è dentro</h2>
+
+<h3>Categorie</h3>
+<p><strong>33 liste ufficiali</strong> da 30 elementi (le Regioni Italiane ne hanno 20, quante sono
+davvero), con foto verificate una per una:</p>
+<div class="grid">
+  <p class="muted">Burger · Best Feelings · Film Pixar · Social Media · Marvel · Superpoteri ·
+    Drinks · Snack &amp; Dolci · Pizze · Giochi da Tavolo · Videogiochi · Giochi Mobile ·
+    Clash Royale · Leggende del Calcio · Sport · Artisti Musicali · App del Telefono</p>
+  <p class="muted">Capitali Europee · Città Italiane · Città Americane · Regioni Italiane ·
+    Build a Beach · Build a Breakfast · Fast Food · Dolci &amp; Dessert · Anime · Cartoni Animati ·
+    Serie TV · Meme Web · Duo Iconici · Scuse per Non Uscire · Momenti Cringe · Isola Deserta</p>
+</div>
+<p>Si cercano per nome, si filtrano per tema (Sport, Pop Culture, Gaming, Cibo, Vita quotidiana) e
+si possono creare liste proprie, da tenere sul dispositivo o da condividere con un link.</p>
+
+<h3>Account e Pickmates</h3>
+<ul>
+  <li><strong>Registrazione con email e password</strong>: quattro requisiti obbligatori (8
+    caratteri, una maiuscola, un numero, un carattere speciale) con le spunte che si accendono
+    mentre si scrive. Il nickname è unico.</li>
+  <li><strong>Pickmates</strong>: la rubrica degli amici. Si cercano per nickname, per email esatta
+    o fra gli avversari delle ultime partite. Accanto a ognuno c'è quante sfide avete giocato.</li>
+  <li><strong>Sfide e notifiche</strong>: dalla lista si invita un Pickmate nella stanza aperta;
+    a lui arriva una notifica con una battuta a sorte e i pulsanti per entrare o ignorare.</li>
+</ul>
+
+<h3>Fine partita</h3>
+<ul>
+  <li><strong>Card 9:16</strong> in PNG (1080x1920) con le liste, il budget speso e il QR del voto.</li>
+  <li><strong>Votazione</strong> senza registrazione: un voto per dispositivo, dal link o dal QR.</li>
+  <li>Il draft si può mandare ai Pickmates perché lo votino.</li>
+</ul>
+
+<h3>Il contorno</h3>
+<ul>
+  <li><strong>10 lingue</strong> complete: italiano, inglese, francese, spagnolo, tedesco,
+    portoghese, russo, cinese, giapponese e arabo (con layout da destra a sinistra).</li>
+  <li>Tema chiaro e scuro, effetti sonori, vibrazione dove supportata.</li>
+  <li><strong>Installabile</strong> sulla schermata Home come un'app, con istruzioni per
+    iPhone e Android.</li>
+  <li><strong>Modalità creatore</strong>: lo Studio per gestire le liste ufficiali. Sul proprio
+    computer è già aperta; online la protegge la chiave scelta in <code>NEXT_PUBLIC_ADMIN_KEY</code>.</li>
+</ul>
+
+<h2>5. Collegare il database (facoltativo)</h2>
+
+<p>Senza database si gioca in locale e si usa tutto ciò che vive sul dispositivo. Il database
+(Supabase, gratuito) accende: stanze online stabili, accesso, Pickmates, notifiche, votazioni,
+suggerimenti e voto del gioco.</p>
+
+<ol>
+  <li>Crea un progetto su <code>supabase.com</code>.</li>
+  <li>Copia <code>.env.example</code> in <code>.env.local</code> e inserisci URL e chiave anon.</li>
+  <li>Apri l'SQL editor ed esegui tutto <code>supabase/schema.sql</code>: crea le tabelle e le
+    regole di accesso. Si può rieseguire quando serve.</li>
+  <li>In <em>Authentication → URL Configuration</em> aggiungi il dominio e gli indirizzi
+    <code>/pickmates</code> fra le Redirect URLs.</li>
+</ol>
+
+<h2>6. Comandi utili</h2>
+
+<table>
+  <tr><th>Comando</th><th>Cosa fa</th></tr>
+  <tr><td><code>npm run dev</code></td><td>avvia in sviluppo</td></tr>
+  <tr><td><code>npm run build</code></td><td>compila la versione di produzione</td></tr>
+  <tr><td><code>npm run check:engine</code></td><td>verifiche automatiche su regole d'asta e cataloghi</td></tr>
+  <tr><td><code>npm run check:multiplayer</code></td><td>prova una stanza online completa</td></tr>
+  <tr><td><code>npm run check:photos</code></td><td>controlla che tutte le foto rispondano ancora</td></tr>
+  <tr><td><code>npm run check:layout</code></td><td>verifica che le pagine non sbordino su telefono</td></tr>
+  <tr><td><code>npm run images:fetch</code></td><td>riempie le liste con le foto</td></tr>
+  <tr><td><code>npm run images:sheet</code></td><td>mette tutte le foto in griglia per controllarle a occhio</td></tr>
+  <tr><td><code>npm run share</code></td><td>apre un indirizzo pubblico temporaneo</td></tr>
+</table>
+
+<h2>7. Da sapere</h2>
+<ul>
+  <li>Le foto arrivano dagli archivi di origine (Wikipedia, Wikimedia Commons, Fandom, App Store,
+    Steam, TVmaze, Imgflip): quelle di Wikimedia hanno licenze libere, le altre restano dei
+    rispettivi proprietari e qui sono richiamate come farebbe un collegamento. Per un uso fra amici
+    va bene; per un prodotto commerciale vanno sostituite o autorizzate.</li>
+  <li>Venti elementi (i meme più recenti e alcuni momenti della categoria Cringe) non hanno foto:
+    mostrano la loro icona, che è meglio di una fotografia sbagliata.</li>
+  <li>Senza database le stanze online passano dal server dell'app: funzionano finché quel server
+    resta acceso.</li>
+</ul>
+
+<footer>
+  Pick &amp; Pay - The Draft Game · versione 1.0.0 · guida aggiornata al 30 agosto 2026.
+  Documentazione completa in GUIDA.md e PROJECT_SPECS.md nella cartella del progetto.
+</footer>
+
+</body>
+</html>

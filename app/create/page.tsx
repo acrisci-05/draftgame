@@ -16,7 +16,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { CategoryPicker } from "@/components/game/CategoryPicker";
 import { LobbyConfig } from "@/components/game/LobbyConfig";
-import { TierStrip } from "@/components/game/TierChip";
+import { ItemCount } from "@/components/game/ItemCount";
 
 export default function CreatePage() {
   const router = useRouter();
@@ -113,10 +113,7 @@ export default function CreatePage() {
           <span className="text-3xl">{category.emoji}</span>
           <span className="min-w-0 flex-1">
             <span className="block truncate font-bold">{categoryName(category, locale)}</span>
-            <span className="mt-1 block text-xs text-faint">
-              {category.items.length} {t("common.items")}
-            </span>
-            <TierStrip items={category.items} className="mt-1.5" />
+            <ItemCount count={category.items.length} className="mt-1.5" />
           </span>
         </button>
       </Panel>

@@ -49,3 +49,6 @@ next-env.d.ts
 
 # pagina di lavoro per il controllo delle foto
 public/_review.html
+
+# scarti temporanei degli script
+.tmp-missing.json

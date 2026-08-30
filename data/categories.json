@@ -505,10 +505,10 @@
         ["Roblox","🧱","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/960px-Roblox_%282025%29_%28App_Icon%29.svg.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"]
       ],
       "4": [
-        ["Call of Duty","🔫","https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Screenshot_CoDMobile.jpg/960px-Screenshot_CoDMobile.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
-        ["Clash Royale","👑","https://upload.wikimedia.org/wikipedia/it/thumb/2/23/Screenshot_Clash_Royale_2021.jpg/960px-Screenshot_Clash_Royale_2021.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
-        ["Brawl Stars","💥","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/15/b1/d215b17b-b984-732c-0d74-41a45bbcb77d/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg"],
-        ["Among Us","🔪","https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Among_Us.png/960px-Among_Us.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
+        ["Counter-Strike","💣","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/162664aa5da85f418105350c5d67ca565f6c3713/header.jpg?t=1784564069"],
+        ["The Last of Us","🍄","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1888930/header.jpg?t=1750959031"],
+        ["God of War","🪓","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1593500/header.jpg?t=1763059412"],
+        ["Valorant","🔫","https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Valorant_logo_-_pink_color_version.svg/960px-Valorant_logo_-_pink_color_version.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
         ["Elden Ring","⚔️","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1787868578"],
         ["Zelda","🗡️","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Zelda_2017.svg/960px-Zelda_2017.svg.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"]
       ],
@@ -517,16 +517,16 @@
         ["FNAF","🐻","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Five_Nights_at_Freddy%27s.svg/960px-Five_Nights_at_Freddy%27s.svg.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
         ["Rocket League","🚀","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Rocket_League_coverart.jpg/960px-Rocket_League_coverart.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
         ["Wii Sports","🎾","https://upload.wikimedia.org/wikipedia/it/d/d0/Wii_Sports.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"],
-        ["Subway Surfers","🛹","https://upload.wikimedia.org/wikipedia/it/a/aa/Subway_Surfers.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"],
+        ["Cyberpunk 2077","🌃","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1091500/e9047d8ec47ae3d94bb8b464fb0fc9e9972b4ac7/header.jpg?t=1784714077"],
         ["Tetris","🧩","https://upload.wikimedia.org/wikipedia/it/a/a6/Tetris.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"]
       ],
       "2": [
-        ["Chess.com","♟️","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/21/25/9f/21259fd2-73f6-4f3b-ea22-facb21780381/AppIcon-0-0-1x_U007epad-0-1-0-0-85-220.png/512x512bb.jpg"],
+        ["Crash Bandicoot","🍊","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/731490/header.jpg?t=1742399696"],
         ["Pac-Man","👾","https://upload.wikimedia.org/wikipedia/it/0/00/Pac-Man.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"],
-        ["Angry Birds","🐦","https://upload.wikimedia.org/wikipedia/it/thumb/f/f6/Screenshot_Angry_Birds.png/960px-Screenshot_Angry_Birds.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
-        ["Temple Run","🏃","https://upload.wikimedia.org/wikipedia/it/thumb/9/9d/Temple_run_app.png/960px-Temple_run_app.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
-        ["Candy Crush","🍬","https://upload.wikimedia.org/wikipedia/it/thumb/a/aa/Candy_Crush_Saga_screenshot.png/960px-Candy_Crush_Saga_screenshot.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
-        ["Clash of Clans","🏰","https://upload.wikimedia.org/wikipedia/it/thumb/4/4e/Clash_of_Clans_screenshot.png/960px-Clash_of_Clans_screenshot.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"]
+        ["Overwatch","🎯","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Overwatch_2_logo.svg/960px-Overwatch_2_logo.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["League of Legends","⚔️","https://upload.wikimedia.org/wikipedia/commons/d/d2/League_of_legends_logo.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Red Dead Redemption 2","🤠","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1174180/header.jpg?t=1759502961"],
+        ["Assassin's Creed","🗡️","https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/33230/header.jpg?t=1786611094"]
       ],
       "1": [
         ["Flappy Bird","🐤","https://upload.wikimedia.org/wikipedia/it/c/c7/Flappy_Bird_gameplay.jpeg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"],
@@ -1270,6 +1270,339 @@
         ["Yo Dawg","🎧","https://i.imgflip.com/26hg.jpg"],
         ["Ancient Aliens","👽","https://i.imgflip.com/26am.jpg"],
         ["Waiting Skeleton","💀","https://i.imgflip.com/2fm6x.jpg"]
+      ]
+    }
+  },
+  {
+    "id": "regioni",
+    "name": "Regioni Italiane",
+    "nameEn": "Italian Regions",
+    "emoji": "🏞️",
+    "theme": "life",
+    "tiers": {
+      "5": [
+        ["Lombardia","🏙️","https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Milano_-_Duomo_di_Milano_-_Guglie_viste_da_Piazza_del_Duomo_%28vers._2%29_-_2025-09-29_20-38-57_001.jpg/960px-Milano_-_Duomo_di_Milano_-_Guglie_viste_da_Piazza_del_Duomo_%28vers._2%29_-_2025-09-29_20-38-57_001.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Lazio","🏛️","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Fontana_di_Trevi_by_TC.jpg/960px-Fontana_di_Trevi_by_TC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Campania","🌋","https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Vesuvio_e_nave_a_Napoli.jpg/960px-Vesuvio_e_nave_a_Napoli.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sicilia","🍋","https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Teatro_antico_di_Taormina_23-01-2023.jpg/960px-Teatro_antico_di_Taormina_23-01-2023.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "4": [
+        ["Toscana","🍷","https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/The_Piazza_Del_Campo%2C_Siena%2C_Italy.jpg/960px-The_Piazza_Del_Campo%2C_Siena%2C_Italy.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Veneto","🚤","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Appontement_Ferrovia_on_Canal_Grande_%28Venezia%29.jpg/960px-Appontement_Ferrovia_on_Canal_Grande_%28Venezia%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Piemonte","⛰️","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mole_Antonelliana_di_sera.jpg/960px-Mole_Antonelliana_di_sera.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Emilia-Romagna","🍝","https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Bologna_-_Piazza_Maggiore_from_Palazzo_Comunale.jpg/960px-Bologna_-_Piazza_Maggiore_from_Palazzo_Comunale.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "3": [
+        ["Puglia","🫒","https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Street_with_trulli_Alberobello.jpg/960px-Street_with_trulli_Alberobello.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sardegna","🏖️","https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Spiaggia_Rosa%2C_Cala_di_Roto_%28Isola_di_Budelli%29%2C_Arcipelago_di_La_Maddalena%2C_Sardegna%2C_Italia%2C_Mar_Mediterraneo.jpg/960px-Spiaggia_Rosa%2C_Cala_di_Roto_%28Isola_di_Budelli%29%2C_Arcipelago_di_La_Maddalena%2C_Sardegna%2C_Italia%2C_Mar_Mediterraneo.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Liguria","🌊","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Manarola_NW_Cinque_Terre_Sep23_A7C_07233.jpg/960px-Manarola_NW_Cinque_Terre_Sep23_A7C_07233.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Trentino-Alto Adige","🏔️","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Drei_Zinnen_Tre_Cime_di_Lavaredo_Dolomites.jpg/960px-Drei_Zinnen_Tre_Cime_di_Lavaredo_Dolomites.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "2": [
+        ["Calabria","🌶️","https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Santa_Maria_dell%27Isola_-_Tropea_-_Calabria_-_Italy_-_July_25th_2013_-_03.jpg/960px-Santa_Maria_dell%27Isola_-_Tropea_-_Calabria_-_Italy_-_July_25th_2013_-_03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Friuli-Venezia Giulia","🏰","https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/06_2023_Castello_di_Miramare_%28Trieste%29_IMG_7559.jpg/960px-06_2023_Castello_di_Miramare_%28Trieste%29_IMG_7559.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Abruzzo","🐻","https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Gran_Sasso_seen_from_East.jpg/960px-Gran_Sasso_seen_from_East.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Umbria","💚","https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Aerial_image_of_Cascata_delle_Marmore_%28view_from_the_northwest%29.jpg/960px-Aerial_image_of_Cascata_delle_Marmore_%28view_from_the_northwest%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "1": [
+        ["Marche","⛵","https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Spiaggia_di_Numana._Riviera_del_Conero._Ancona.jpg/960px-Spiaggia_di_Numana._Riviera_del_Conero._Ancona.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Basilicata","🪨","https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Sassi_Matera_panorama_Marcok_apr06.jpg/960px-Sassi_Matera_panorama_Marcok_apr06.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Molise","🤏","https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Borgo_fortificato_di_Termoli.jpg/960px-Borgo_fortificato_di_Termoli.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Valle d'Aosta","🎿","https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Aosta_Valley_in_Italy.svg/960px-Aosta_Valley_in_Italy.svg.png?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"]
+      ]
+    }
+  },
+  {
+    "id": "dolci",
+    "name": "Dolci & Dessert",
+    "nameEn": "Sweets & Desserts",
+    "emoji": "🍰",
+    "theme": "food",
+    "tiers": {
+      "5": [
+        ["Tiramisù","☕","https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Dolce_Tiramis%C3%B9_monoporzione.jpg/960px-Dolce_Tiramis%C3%B9_monoporzione.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Gelato","🍨","https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Gelato_artigianale_italiano%2C_Bertinelli.jpg/960px-Gelato_artigianale_italiano%2C_Bertinelli.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Cheesecake","🍰","https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Cheesecake_with_slice_cut_out.jpg/960px-Cheesecake_with_slice_cut_out.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Cannolo Siciliano","🥐","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Cannolo_Siciliano_-_Nanninella.jpg/960px-Cannolo_Siciliano_-_Nanninella.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Crepes","🥞","https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Nutella_%26_banana_cr%C3%AApe_and_classic_galette_-_Oui_Cr%C3%AAperie.jpg/960px-Nutella_%26_banana_cr%C3%AApe_and_classic_galette_-_Oui_Cr%C3%AAperie.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Pancake","🥞","https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Blueberry_pancakes_with_maple_syrup_%289583713785%29.jpg/960px-Blueberry_pancakes_with_maple_syrup_%289583713785%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "4": [
+        ["Millefoglie","🎂","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Mille-feuille_20100916.jpg/960px-Mille-feuille_20100916.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
+        ["Profiteroles","🍫","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Aunt_Linda%27s_profiteroles_and_chocolate_mousse%2C_with_chocolate-covered_strawberries.jpg/960px-Aunt_Linda%27s_profiteroles_and_chocolate_mousse%2C_with_chocolate-covered_strawberries.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Brownie","🍫","https://upload.wikimedia.org/wikipedia/commons/7/7c/Chocolate-brownie-hachatw.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Panna Cotta","🍮","https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Panna_Cotta_with_cream_and_garnish.jpg/960px-Panna_Cotta_with_cream_and_garnish.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Maritozzo","🥐","https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Maritozzo_con_panna.jpg/960px-Maritozzo_con_panna.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Torta Sacher","🍫","https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Sachertorte_DSC03027_retouched.jpg/960px-Sachertorte_DSC03027_retouched.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "3": [
+        ["Crostata","🍓","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Crostata_con_marmellata_amaretti_savoiardi_e_cioccolato.jpg/960px-Crostata_con_marmellata_amaretti_savoiardi_e_cioccolato.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Babà","🍹","https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/A_Rum_Baba_presented_onboard_the_MS_Queen_Anne.jpg/960px-A_Rum_Baba_presented_onboard_the_MS_Queen_Anne.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Macarons","🌈","https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Assorted_macarons_in_a_box%2C_March_2011.jpg/960px-Assorted_macarons_in_a_box%2C_March_2011.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
+        ["Donuts","🍩","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Round_Rock_Glazed_Donuts.jpg/960px-Round_Rock_Glazed_Donuts.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sfogliatella","🐚","https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Sfogliatella_riccia_napoletana.jpg/960px-Sfogliatella_riccia_napoletana.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Cornetto","🥐","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Granita_brioche_cornetto.jpg/960px-Granita_brioche_cornetto.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "2": [
+        ["Soufflé al Cioccolato","🍫","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Chocolate_souffle_at_Troquet.jpg/960px-Chocolate_souffle_at_Troquet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Biscotti Lotus","🍪","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Lotus_biscoff_vanilla_flavour_%282%29.jpg/960px-Lotus_biscoff_vanilla_flavour_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Pan di Stelle","⭐","https://upload.wikimedia.org/wikipedia/commons/7/76/Crema_pan_di_stelle.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Muffin","🧁","https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Apple_Spice_Muffins_in_a_basket_%2814888835568%29.jpg/960px-Apple_Spice_Muffins_in_a_basket_%2814888835568%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Zeppole","🍥","https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Zeppole_di_San_Giuseppe_al_Forno.jpg/960px-Zeppole_di_San_Giuseppe_al_Forno.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Bignè","🍥","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Profiterole_%28Cream_Puff%29.jpg/960px-Profiterole_%28Cream_Puff%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "1": [
+        ["Torta della Nonna","👵","https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Torta_della_nonna.jpg/960px-Torta_della_nonna.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Cassata","🍈","https://upload.wikimedia.org/wikipedia/commons/a/a6/Cassata_siciliana.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Crème Brûlée","🔥","https://upload.wikimedia.org/wikipedia/commons/9/91/Cr%C3%A8me_br%C3%BBl%C3%A9e_w._whipped_cream.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Churros","🍫","https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Churros_met_Chocoladesaus.jpg/960px-Churros_met_Chocoladesaus.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"],
+        ["Waffle","🧇","https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Waffle_with_strawberries_and_confectioner%27s_sugar.jpg/960px-Waffle_with_strawberries_and_confectioner%27s_sugar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Mousse al Cioccolato","🥄","https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Chocolate_coffee_mousse.jpg/960px-Chocolate_coffee_mousse.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ]
+    }
+  },
+  {
+    "id": "duo",
+    "name": "Duo Iconici",
+    "nameEn": "Iconic Duos",
+    "emoji": "👥",
+    "theme": "pop",
+    "tiers": {
+      "5": [
+        ["Tom & Jerry","🐱","https://static.tvmaze.com/uploads/images/original_untouched/483/1209807.jpg"],
+        ["Mario & Luigi","🍄","https://upload.wikimedia.org/wikipedia/commons/3/36/Mario_and_Luigi_cosplay_2017.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Woody & Buzz","🤠","https://static.wikia.nocookie.net/pixar/images/b/b6/Toy_Story_Remastered_and_Restored_Theatrical_Poster_1995_with_Pixar_Animation_Studios_Logo.png/revision/latest/scale-to-width-down/400?cb=20260514082713"],
+        ["Goku & Vegeta","🐉","https://static.wikia.nocookie.net/dragonball/images/9/94/Vegeta_anime_profile.png/revision/latest/scale-to-width-down/370?cb=20250723190507"],
+        ["Ash & Pikachu","⚡","https://static.tvmaze.com/uploads/images/original_untouched/630/1576025.jpg"],
+        ["SpongeBob & Patrick","🧽","https://static.tvmaze.com/uploads/images/original_untouched/594/1486607.jpg"]
+      ],
+      "4": [
+        ["Shaggy & Scooby-Doo","🐕","https://static.tvmaze.com/uploads/images/original_untouched/528/1320376.jpg"],
+        ["Batman & Robin","🦇","https://static.wikia.nocookie.net/batman/images/6/68/The_Robin_Character.jpg/revision/latest/scale-to-width-down/483?cb=20250111191936"],
+        ["Rick & Morty","🛸","https://static.tvmaze.com/uploads/images/original_untouched/626/1566363.jpg"],
+        ["Timon & Pumbaa","🦁","https://static.tvmaze.com/uploads/images/original_untouched/396/992169.jpg"],
+        ["Cosmo & Wanda","🧚","https://static.tvmaze.com/uploads/images/original_untouched/402/1006095.jpg"],
+        ["Sherlock & Watson","🔍","https://static.tvmaze.com/uploads/images/original_untouched/171/428042.jpg"]
+      ],
+      "3": [
+        ["Han Solo & Chewbacca","🚀","https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Comiccon_Brussels_2023_-_Cosplay_of_Chewbacca_2.jpg/960px-Comiccon_Brussels_2023_-_Cosplay_of_Chewbacca_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Mordecai & Rigby","🦝","https://static.tvmaze.com/uploads/images/original_untouched/599/1498208.jpg"],
+        ["Asterix & Obelix","🛡️","https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Asterix%26Obelix_Brussels.jpg/960px-Asterix%26Obelix_Brussels.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["C-3PO & R2-D2","🤖","https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Cosplay_of_R2-D2_and_C-3PO_at_Brussels_Comic_Con_2019_%2846390725585%29.jpg/960px-Cosplay_of_R2-D2_and_C-3PO_at_Brussels_Comic_Con_2019_%2846390725585%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Frodo & Sam","💍","https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Frodo_Baggins_cosplay.jpg/960px-Frodo_Baggins_cosplay.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Naruto & Sasuke","🍥","https://static.wikia.nocookie.net/naruto/images/2/21/Sasuke_Part_1.png/revision/latest/scale-to-width-down/600?cb=20170716092103"]
+      ],
+      "2": [
+        ["Luffy & Zoro","🏴‍☠️","https://static.wikia.nocookie.net/onepiece/images/5/52/Roronoa_Zoro_Anime_Post_Timeskip_Infobox.png/revision/latest/scale-to-width-down/225?cb=20241029161719"],
+        ["Tanjiro & Nezuko","⚔️","https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/0/0e/Nezuko_anime_right_face.png/revision/latest/scale-to-width-down/358?cb=20241228000758"],
+        ["Jake & Finn","🗡️","https://static.tvmaze.com/uploads/images/original_untouched/1/4898.jpg"],
+        ["Sonic & Tails","💨","https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Sonic_the_Hedgehog_logo.png/960px-Sonic_the_Hedgehog_logo.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Cip & Ciop","🐿️","https://static.tvmaze.com/uploads/images/original_untouched/22/55233.jpg"],
+        ["Pinky & The Brain","🐭","https://static.tvmaze.com/uploads/images/original_untouched/21/54340.jpg"]
+      ],
+      "1": [
+        ["Bud Spencer & Terence Hill","🥊","https://upload.wikimedia.org/wikipedia/commons/4/4c/Bud_Spencer_Terence_Hill_Szuperhekusok.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Stanlio & Ollio","🎩","https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Stan_Laurel_and_Oliver_Hardy_-_1938.jpg/960px-Stan_Laurel_and_Oliver_Hardy_-_1938.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Calvin & Hobbes","🐯","https://upload.wikimedia.org/wikipedia/commons/9/96/Calvin_and_Hobbes_title.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Bart & Milhouse","🛹","https://static.tvmaze.com/uploads/images/original_untouched/637/1594614.jpg"],
+        ["Joey & Chandler","🛋️","https://static.tvmaze.com/uploads/images/original_untouched/41/104565.jpg"],
+        ["Sheldon & Leonard","🧪","https://static.tvmaze.com/uploads/images/original_untouched/173/433868.jpg"]
+      ]
+    }
+  },
+  {
+    "id": "mobile",
+    "name": "Giochi Mobile",
+    "nameEn": "Mobile Games",
+    "emoji": "📱",
+    "theme": "gaming",
+    "tiers": {
+      "5": [
+        ["Clash Royale","👑","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/00/03/be/0003befa-32c7-172d-ce3b-2197bf10ca0f/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/512x512bb.jpg"],
+        ["Brawl Stars","💥","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/15/b1/d215b17b-b984-732c-0d74-41a45bbcb77d/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg"],
+        ["Subway Surfers","🛹","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f5/fb/d5/f5fbd5c9-0864-0494-7ab8-b0093a71c78b/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Candy Crush","🍬","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/0b/1b/35/0b1b35b6-667d-f339-9645-c83a2940e45d/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Among Us","🔪","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/a6/7e/5c/a67e5c64-65f4-bd11-edcc-087936599310/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Pokémon GO","🔴","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/dd/b8/f6/ddb8f6f8-120a-9695-2625-259418812922/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"]
+      ],
+      "4": [
+        ["Clash of Clans","⚔️","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/27/03/d3/2703d314-e10a-967b-e2dd-e07fdde4180e/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Call of Duty: Mobile","🔫","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/62/09/3c/62093c33-07fa-9c35-084e-81f717e1b16f/AppIcon-0-0-1x_U007emarketing-0-10-0-85-220.png/512x512bb.jpg"],
+        ["Free Fire","🔥","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/95/16/f3/9516f314-4151-38f7-7d61-47bbc24f5406/AppIcon-1785257489-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["PUBG Mobile","🪂","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e3/c1/54/e3c15430-c128-802a-ec17-95d0a02bc752/AppIcon-1x_U007emarketing-0-8-0-85-220-0.png/512x512bb.jpg"],
+        ["Genshin Impact","🌬️","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/8d/7c/a8/8d7ca8b3-b2b6-b321-269d-99ed904989ea/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg"],
+        ["Roblox","🟥","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/65/17/fd/6517fd14-6bfc-fa47-bb8a-29e027a3e78f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg"]
+      ],
+      "3": [
+        ["Temple Run","🏃","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/4b/66/4a/4b664a21-4259-839b-969d-3eabac0dd301/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/512x512bb.jpg"],
+        ["Geometry Dash","🔺","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2a/08/7f/2a087f71-90d8-b8a0-7f4d-97a0c35e2194/AppIcon-1x_U007emarketing-0-11-0-85-220-0.png/512x512bb.jpg"],
+        ["Jetpack Joyride","🚀","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/97/5f/b7/975fb768-0ead-faff-d690-1835ce44408e/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Angry Birds","🐦","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/cc/9c/bd/cc9cbd9b-71bf-3cc1-5f32-b5ebb86e324c/AppIcon-1x_U007emarketing-0-8-0-85-220-0.png/512x512bb.jpg"],
+        ["Fruit Ninja","🍉","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/6b/52/f2/6b52f27e-eba6-6f6e-9a7f-5ca0b6b1a9e2/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Plants vs. Zombies","🧟","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/fa/47/11/fa471191-d8bd-a520-5087-a6f7bca384b8/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"]
+      ],
+      "2": [
+        ["8 Ball Pool","🎱","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/dd/3b/4c/dd3b4ce9-5458-caf9-8413-f73525cce822/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Coin Master","🪙","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/22/c9/d3/22c9d303-7024-f02c-a497-fecdaff09748/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Monopoly GO","🎩","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/49/36/ed/4936ed40-2fad-5690-d481-f460e5ca1e82/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Hay Day","🌾","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/68/e4/de/68e4de8b-0e48-d1bc-004b-1346c3cf511b/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Stumble Guys","🏁","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/94/c5/b4/94c5b4c4-0e3a-9743-cfd9-684c372c722c/AppIcon-0-0-1x_U007emarketing-0-5-0-85-220.png/512x512bb.jpg"],
+        ["Asphalt 9","🏎️","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/02/7f/68/027f6829-5efb-e396-7857-c6dab8208bbd/AppIcon-0-0-1x_U007epad-0-1-85-220.png/512x512bb.jpg"]
+      ],
+      "1": [
+        ["Pou","🐣","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ae/b9/81/aeb981e4-c84e-0536-bd0b-4b5370d6f12c/AppIcon-0-0-1x_U007emarketing-0-5-0-85-220.png/512x512bb.jpg"],
+        ["Talking Tom","🐱","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/83/58/eb/8358ebd8-d0e1-5e92-1031-27ede372e6d0/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/512x512bb.jpg"],
+        ["Cut the Rope","🍭","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/4e/44/9f/4e449f9b-34c8-f4ac-83da-52e3a057a36b/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/512x512bb.jpg"],
+        ["Crossy Road","🐔","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/54/41/82/54418242-1b2a-46ff-cb3b-db0588da2015/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Piano Tiles","🎹","https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/0d/fd/46/0dfd4654-ba3d-7870-cb90-5fbe554cd36a/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg"],
+        ["Chess.com","♟️","https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/21/25/9f/21259fd2-73f6-4f3b-ea22-facb21780381/AppIcon-0-0-1x_U007epad-0-1-0-0-85-220.png/512x512bb.jpg"]
+      ]
+    }
+  },
+  {
+    "id": "scuse",
+    "name": "Scuse per Non Uscire",
+    "nameEn": "Excuses to Stay In",
+    "emoji": "🤥",
+    "theme": "life",
+    "tiers": {
+      "5": [
+        ["Ho già messo il pigiama","🩳","https://upload.wikimedia.org/wikipedia/commons/8/8a/Salwar_pajama_pants.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Sono già sotto le coperte","🛏️","https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Bed_with_Duvet.JPG/960px-Bed_with_Duvet.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Domani sveglia all'alba","⏰","https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Classic_alarm_clock_20180513.jpg/960px-Classic_alarm_clock_20180513.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho mal di testa","🤕","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/A_woman_with_a_headache%2C_and_the_same_woman_without_a_headac_Wellcome_L0030544.jpg/960px-A_woman_with_a_headache%2C_and_the_same_woman_without_a_headac_Wellcome_L0030544.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho ospiti a casa","🏠","https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Granit%2C_dinner_guests_my_table%2C_Kerhonkson%2C_New_York_LCCN2017712753.tif/lossy-page1-960px-Granit%2C_dinner_guests_my_table%2C_Kerhonkson%2C_New_York_LCCN2017712753.tif.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sono al verde","💸","https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Cartoon_Woman_Checking_Her_Empty_Wallet_For_Money.svg/960px-Cartoon_Woman_Checking_Her_Empty_Wallet_For_Money.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "4": [
+        ["Batteria al 3%","🪫","https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Samsung_smartphone_battery%2C_Hillegersberg%2C_Rotterdam_%282022%29_08.jpg/960px-Samsung_smartphone_battery%2C_Hillegersberg%2C_Rotterdam_%282022%29_08.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Devo portare fuori il cane","🐕","https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Dog_on_leash%2C_walking_in_the_Red_Rocks_Park%2C_Morrison%2C_Colorado_16.jpg/960px-Dog_on_leash%2C_walking_in_the_Red_Rocks_Park%2C_Morrison%2C_Colorado_16.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Aspetto un pacco","📦","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Delivery_of_parcels_to_an_Allegro_parcel_locker_AL005ETM._Tomasz%C3%B3w_Mazowiecki%2C_Poland.jpg/960px-Delivery_of_parcels_to_an_Allegro_parcel_locker_AL005ETM._Tomasz%C3%B3w_Mazowiecki%2C_Poland.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho la lavatrice in corso","🧺","https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Laundromat_Washing_Machines_%26_Laundry_Equipment.jpg/960px-Laundromat_Washing_Machines_%26_Laundry_Equipment.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Domani ho un esame","📚","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/African_student_studying_at_dormitory_from_tablet_computer%2C.jpg/960px-African_student_studying_at_dormitory_from_tablet_computer%2C.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["La macchina è dal meccanico","🔧","https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Car_mechanic_worker_repairing_suspension_of_lifted_automobile_at_auto_repair_garage_shop.jpg/960px-Car_mechanic_worker_repairing_suspension_of_lifted_automobile_at_auto_repair_garage_shop.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "3": [
+        ["Ho la maschera in faccia","🧖","https://upload.wikimedia.org/wikipedia/commons/8/8d/Mexican_woman_wearing_facial_screen_and_face_mask.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Devo sistemare l'armadio","🚪","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Wardrobe_with_clothes_hangers_and_gap_illuminated_from_window_light_01.jpg/960px-Wardrobe_with_clothes_hangers_and_gap_illuminated_from_window_light_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Il divano non mi lascia","🛋️","https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Couch-furniture-living-room-sofa_%2824300293356%29.jpg/960px-Couch-furniture-living-room-sofa_%2824300293356%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho già cenato","🍝","https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Dinner_Plate_MET_DT3778.jpg/960px-Dinner_Plate_MET_DT3778.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Fuori piove (forse)","🌧️","https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Gion_Nankai_-_Window_onto_Bamboo_on_a_Rainy_Day_-_2015.300.154_-_Metropolitan_Museum_of_Art.jpg/960px-Gion_Nankai_-_Window_onto_Bamboo_on_a_Rainy_Day_-_2015.300.154_-_Metropolitan_Museum_of_Art.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho una serie da finire","📺","https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Family_watching_television_1958.jpg/960px-Family_watching_television_1958.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "2": [
+        ["Il gatto mi dorme addosso","🐈","https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Havanese-dog-sleeping-next-to-person-with-cat-above.jpg/960px-Havanese-dog-sleeping-next-to-person-with-cat-above.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Devo innaffiare il basilico","🌿","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Basil_plant_in_a_pot_02.jpg/960px-Basil_plant_in_a_pot_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho le ciabatte comode","🩴","https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Japanese_house_slippers_for_public_bath.jpg/960px-Japanese_house_slippers_for_public_bath.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Mi si è spento il cervello","🧠","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Tired_person_sitting_in_chair_with_hands_covering_face.jpg/960px-Tired_person_sitting_in_chair_with_hands_covering_face.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho un impegno col cuscino","💤","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/44_Made_bed_with_richly_decorated_pillows_and_ornate_bedspread.jpg/960px-44_Made_bed_with_richly_decorated_pillows_and_ornate_bedspread.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sto aspettando una chiamata","📞","https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Telephone_Booths%2C_Amtrak_Waiting_Room_%28Gentlemen%27s_Lounge%29%2C_Cincinnati_Union_Terminal%2C_Queensgate%2C_Cincinnati%2C_OH_%2847531333491%29.jpg/960px-Telephone_Booths%2C_Amtrak_Waiting_Room_%28Gentlemen%27s_Lounge%29%2C_Cincinnati_Union_Terminal%2C_Queensgate%2C_Cincinnati%2C_OH_%2847531333491%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "1": [
+        ["Nuvola sospetta all'orizzonte","☁️","https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Dark_clouds_on_the_horizon_-_geograph.org.uk_-_6428520.jpg/960px-Dark_clouds_on_the_horizon_-_geograph.org.uk_-_6428520.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Devo riordinare le foto","🖼️","https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Ur_Photografiskt_Album_f%C3%B6r_%C3%A5r_1861_%C3%B6fver_f%C3%A5ngar_f%C3%B6rvarade_%C3%A5_Landskrona_f%C3%A4stning_-_NMA.0056768_%282%29.jpg/960px-Ur_Photografiskt_Album_f%C3%B6r_%C3%A5r_1861_%C3%B6fver_f%C3%A5ngar_f%C3%B6rvarade_%C3%A5_Landskrona_f%C3%A4stning_-_NMA.0056768_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho il phon ancora acceso","💨","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/HITACHI_HAIR_DRYER_HD-1650.jpg/960px-HITACHI_HAIR_DRYER_HD-1650.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sto guardando il soffitto","🔝","https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Ceiling_of_the_Room_of_the_giants_in_Palazzo_Te%2C_Mantua.jpg/960px-Ceiling_of_the_Room_of_the_giants_in_Palazzo_Te%2C_Mantua.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ho perso le chiavi di casa","🔑","https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Keys%2C_knives%2C_door_hook_-_14-17c_-_Pskov_Kremlin_Museum.jpg/960px-Keys%2C_knives%2C_door_hook_-_14-17c_-_Pskov_Kremlin_Museum.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Il pigiama è nuovo","🆕","https://upload.wikimedia.org/wikipedia/commons/d/db/The_Pyjama_Factory_and_the_Shirt_Factory_in_Abbey_Street_-_geograph.org.uk_-_5851541.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"]
+      ]
+    }
+  },
+  {
+    "id": "cringe",
+    "name": "Momenti Cringe",
+    "nameEn": "Cringe Moments",
+    "emoji": "😬",
+    "theme": "life",
+    "tiers": {
+      "5": [
+        ["Saluti chi non salutava te","👋","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Man_Waving_Hand_Cartoon_Vector.svg/960px-Man_Waving_Hand_Cartoon_Vector.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Dici \"ciao mamma\" alla prof","🎓","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/A_public_high_school_teacher_in_a_classroom_in_the_United_States_08.jpg/960px-A_public_high_school_teacher_in_a_classroom_in_the_United_States_08.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Carta rifiutata tre volte","💳","https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/LaCuCa_card_reader_-_payment_terminal_at_supermarket_register.jpg/960px-LaCuCa_card_reader_-_payment_terminal_at_supermarket_register.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Screenshot alla persona sbagliata","📱"],
+        ["Ridi a una notizia tragica","😅"],
+        ["Balletto con lo sconosciuto","🕺"]
+      ],
+      "4": [
+        ["Inciampi e fingi di correre","🏃"],
+        ["Entri nell'auto sbagliata","🚗"],
+        ["Vocale mandato per sbaglio","🎙️"],
+        ["Like alla foto del 2016","❤️"],
+        ["Chiami un amico ed è un altro","🙈"],
+        ["Tiri una porta che si spinge","🚪","https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Door_with_both_push_and_pull_signs.jpg/960px-Door_with_both_push_and_pull_signs.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "3": [
+        ["Il tuo audio parte al massimo","🔊"],
+        ["Applaudi da solo","👏"],
+        ["Nome sbagliato al primo appuntamento","💔","https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Un_couple_lisant_le_menu_d%27un_restaurant_%C3%A0_Rennes.jpg/960px-Un_couple_lisant_le_menu_d%27un_restaurant_%C3%A0_Rennes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ti presenti a chi conosci già","🤝"],
+        ["Rispondi \"anche a te\" a sproposito","🗣️"],
+        ["Cadi sulle scale mobili","🪜"]
+      ],
+      "2": [
+        ["Il telefono ti cade in faccia","📵","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Young_girl_sitting_on_bed_using_smartphone_in_cozy_indoor_setting_during_late_afternoon.jpg/960px-Young_girl_sitting_on_bed_using_smartphone_in_cozy_indoor_setting_during_late_afternoon.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Vocale di sette minuti","⏱️"],
+        ["Canti la parte sbagliata","🎤","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Blind_Bulake%C3%B1a_beggar_vocalist_with_Karaoke_microphone_in_Santa_Maria_06.jpg/960px-Blind_Bulake%C3%B1a_beggar_vocalist_with_Karaoke_microphone_in_Santa_Maria_06.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Parli da solo e ti sentono","🫢"],
+        ["Ti si strappano i pantaloni","👖"],
+        ["Rispondi a chi non parlava con te","🙋"]
+      ],
+      "1": [
+        ["Fai il video con la frontale","🤳","https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Polaroid_Selfie_5%2C5%22_Android_Smartphone_%2816241074404%29.jpg/960px-Polaroid_Selfie_5%2C5%22_Android_Smartphone_%2816241074404%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sbagli fermata dell'autobus","🚌","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Malaysia_Traffic-signs_Bus-Stop-Sign-01a.jpg/960px-Malaysia_Traffic-signs_Bus-Stop-Sign-01a.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Saluti la webcam accesa","💻"],
+        ["Ordini per due ma sei solo","🍽️","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Table_set_for_dinner_in_a_restaurant.jpg/960px-Table_set_for_dinner_in_a_restaurant.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ti chiudi fuori dal bagno","🚻"],
+        ["Chiedi \"ci conosciamo?\" a un cugino","😶","https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Duchatel_Fran%C3%A7ois_-_Family_gathering.jpg/960px-Duchatel_Fran%C3%A7ois_-_Family_gathering.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ]
+    }
+  },
+  {
+    "id": "isola",
+    "name": "Isola Deserta",
+    "nameEn": "Desert Island",
+    "emoji": "🏝️",
+    "theme": "life",
+    "tiers": {
+      "5": [
+        ["Coltellino svizzero","🔪","https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Swiss_army_knife_open_20050612_%28cropped%29.jpg/960px-Swiss_army_knife_open_20050612_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Accendino","🔥","https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Vintage_Alco_Cigarette_Lighter%2C_Made_in_Japan%2C_Engraved_%2215th_Field_Hospital%2C_Fort_Bragg%2C_North_Carolina%22_%2810253815574%29.jpg/960px-Vintage_Alco_Cigarette_Lighter%2C_Made_in_Japan%2C_Engraved_%2215th_Field_Hospital%2C_Fort_Bragg%2C_North_Carolina%22_%2810253815574%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Filtro per l'acqua","💧","https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Home_water_filters%2C_water_purifiers%2C_and_bottled_water_in_India.jpg/960px-Home_water_filters%2C_water_purifiers%2C_and_bottled_water_in_India.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Kit di pronto soccorso","🩹","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/First_aid_box_in_Nigeria.jpg/960px-First_aid_box_in_Nigeria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Powerbank solare","🔋","https://upload.wikimedia.org/wikipedia/commons/8/87/Solar_phone_charger_hawaii.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Canna da pesca","🎣","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Fisherman_in_the_lake_with_fishing_rod.jpg/960px-Fisherman_in_the_lake_with_fishing_rod.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "4": [
+        ["Machete","🌴","https://upload.wikimedia.org/wikipedia/commons/8/86/Machete_knife_blade.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Tenda da campeggio","⛺","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Zagedan_Ridge%2C_Camping_tent%2C_Caucasus_Mountains.jpg/960px-Zagedan_Ridge%2C_Camping_tent%2C_Caucasus_Mountains.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Rete da pesca","🕸️","https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Fishing_net_Karystos_Euboea_Greece.jpg/960px-Fishing_net_Karystos_Euboea_Greece.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Corda robusta","🪢","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Coiled_rope_03235.jpg/960px-Coiled_rope_03235.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Telo termico","🌡️","https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Emergency_Thermal_Blanket%2C_160x100cm%2C_Dionisis_Christofilogiannis%2C_2015.jpg/960px-Emergency_Thermal_Blanket%2C_160x100cm%2C_Dionisis_Christofilogiannis%2C_2015.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Torcia a manovella","🔦","https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/2021-03-30_Hand-crank_operated_generator_%28dynamo_torch%29_plus_backup.jpg/960px-2021-03-30_Hand-crank_operated_generator_%28dynamo_torch%29_plus_backup.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "3": [
+        ["Amaca","🌺","https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Reasons_to_travel_image_Hammock_and_palm_trees.jpg/960px-Reasons_to_travel_image_Hammock_and_palm_trees.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Pentola","🍲","https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Vintage_brass_cooking_pot%2C1.jpg/960px-Vintage_brass_cooking_pot%2C1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Borraccia","🚰","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Metal_water_bottle.jpg/960px-Metal_water_bottle.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Crema solare","🧴","https://upload.wikimedia.org/wikipedia/commons/a/a2/Suncademy_airless_bottle_sunscreen_citronella_active_ingredients.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"],
+        ["Repellente antizanzare","🦟","https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Off_and_Cutter_DEET_Insect_Repellent_-_Bug_Spray_%2827827388427%29.jpg/960px-Off_and_Cutter_DEET_Insect_Repellent_-_Bug_Spray_%2827827388427%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Specchietto per segnali","🪞","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Mirror%2C_pocket_or_daguerreotype_case_%28AM_2004.41.5-1%29.jpg/960px-Mirror%2C_pocket_or_daguerreotype_case_%28AM_2004.41.5-1%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
+      ],
+      "2": [
+        ["Cassa Bluetooth","🔈","https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/JBL_Flip_3_bluetooth_speaker_%28DSCF2653%29.jpg/960px-JBL_Flip_3_bluetooth_speaker_%28DSCF2653%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Binocolo","🔭","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Navy_binoculars.jpg/960px-Navy_binoculars.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Sacco a pelo","🛌","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sleeping_bag_for_space.JPG/960px-Sleeping_bag_for_space.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Occhiali da sole","🕶️","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/2008-07-27_Sunglasses.jpg/960px-2008-07-27_Sunglasses.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Zaino grande","🎒","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Nude_woman_hiking_in_the_desert_with_a_backpack.jpg/960px-Nude_woman_hiking_in_the_desert_with_a_backpack.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Gommone","🛟","https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Zodiac_on_the_beach.jpg/960px-Zodiac_on_the_beach.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"]
+      ],
+      "1": [
+        ["Carta igienica","🧻","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Toilet_Tissue_Paper_Roll_350_Sheet.jpg/960px-Toilet_Tissue_Paper_Roll_350_Sheet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Macchinetta del caffè","☕","https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Coffee_machine_2022.jpg/960px-Coffee_machine_2022.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Pallone da calcio","⚽","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Football_%28soccer_ball%29.svg/960px-Football_%28soccer_ball%29.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Un libro lunghissimo","📖","https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Open_Internal_Pages_of_the_Book_Detr%C3%A1s_del_espejo_08.png/960px-Open_Internal_Pages_of_the_Book_Detr%C3%A1s_del_espejo_08.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Ciabatte","🩴","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Sand_bucket_and_flip_flops.jpg/960px-Sand_bucket_and_flip_flops.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"],
+        ["Cappello di paglia","👒","https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Self-portrait_in_a_Straw_Hat_by_Elisabeth-Louise_Vig%C3%A9e-Lebrun.jpg/960px-Self-portrait_in_a_Straw_Hat_by_Elisabeth-Louise_Vig%C3%A9e-Lebrun.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"]
       ]
     }
   }

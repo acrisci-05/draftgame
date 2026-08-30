@@ -94,6 +94,8 @@ un uso vero e continuativo.
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
 | `npm run check:photos` | controlla che tutte le foto del catalogo rispondano ancora |
+| `npm run check:layout` | verifica che nessuna pagina sbordi in orizzontale su telefono |
+| `npm run docs:pdf` | rigenera `docs/Guida-Pick-and-Pay.pdf` da `docs/guida.html` |
 | `npm run images:fetch` | riempie le liste con le foto (si può interrompere e riprendere) |
 | `npm run images:sheet` | crea `public/_review.html`: tutte le foto in griglia per guardarle a occhio |
 | `node scripts/fetch-images.js <categoria> --hinted` | rifà solo gli elementi con abbinamento in `data/image-hints.json` |
@@ -117,7 +119,7 @@ components/ui/              bottoni, badge, input, modali, navbar, menu
 components/game/            asta, timer, controlli offerta, card finale, editor liste
 lib/                        motore di gioco, realtime, catalogo, immagini, accesso, amici
 lib/i18n/                   dizionari delle 10 lingue
-data/categories.json        26 liste ufficiali da 30 elementi
+data/categories.json        33 liste ufficiali (30 elementi, 20 per le regioni)
 scripts/engine-check.js     verifiche automatiche del motore
 supabase/schema.sql         schema del database con tutte le policy
 public/logo.svg             marchio dell'app
@@ -135,9 +137,10 @@ migliore.
 ### Regolamento applicato dal motore
 
 - **Budget**: uguale per tutti, configurabile (10, 20, 50, 100 o valore libero) in €, $, £ o ¥.
-- **Fasce di valore**: ogni lista ha 30 elementi divisi in 5 fasce da 5 a 1 crediti. La fascia è
-  il **prezzo di partenza** dell'asta su quell'elemento: i più forti si aprono a 5 crediti, quelli
-  di nicchia a 1. Sul badge c'è direttamente il prezzo, colorato per fascia.
+- **Prezzo di apertura**: ogni elemento parte da 1 a 5 crediti a seconda di quanto è ambito. Il
+  prezzo si vede in asta quando il lotto esce; le **fasce non compaiono più** nell'interfaccia,
+  perché sapere che una lista ha trenta elementi è utile, sapere come sono divisi per prezzo no.
+  Sotto il nome di ogni categoria c'è il numero di elementi.
 - **Asta**: 15 secondi per lotto, riportati a 10 dopo ogni rilancio. Rilanci +1, +2, +5 e
   pulsante Max.
 - **Anti-sniping**: siccome ogni rilancio riporta il timer a 10 secondi, un'offerta all'ultimo
@@ -172,11 +175,12 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Effetti sonori sintetizzati (nessun file audio da scaricare) e vibrazione dove supportata.
 
 ### Categorie
-- **26 liste ufficiali** da 30 elementi con nomi corti ed emoji: burger, best feelings, Pixar,
-  social, Marvel, superpoteri, drink, snack, pizze, giochi da tavolo, videogiochi, Clash Royale,
-  calcio, sport, artisti musicali, app, capitali europee, città italiane, città americane, beach,
-  colazione, fast food, anime, cartoni, serie TV, meme.
-- Pagina categorie con **legenda delle fasce**, badge con prezzo al tocco, **ricerca istantanea**
+- **33 liste ufficiali** da 30 elementi (le Regioni Italiane ne hanno 20, quante sono davvero):
+  burger, best feelings, Pixar, social, Marvel, superpoteri, drink, snack, pizze, giochi da tavolo,
+  videogiochi, giochi mobile, Clash Royale, calcio, sport, artisti musicali, app, capitali europee,
+  città italiane, città americane, regioni italiane, beach, colazione, fast food, dolci, anime,
+  cartoni, serie TV, meme, duo iconici, scuse per non uscire, momenti cringe, isola deserta.
+- Pagina categorie con il **numero di elementi** sotto ogni nome, **ricerca istantanea**
   (cerca anche dentro gli elementi) e **filtri per tema** (Sport, Pop Culture, Gaming, Cibo,
   Vita quotidiana).
 - **Studio** riservato al creatore: apre qualsiasi lista, modifica emoji, nomi e immagini elemento

@@ -11,7 +11,7 @@ import type { Category } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { TierStrip } from "./TierChip";
+import { ItemCount } from "./ItemCount";
 
 interface CategoryPickerProps {
   selectedId: string;
@@ -44,7 +44,7 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
               <span className="mt-1 block text-xs text-faint">
                 {category.items.length} {t("common.items")}
               </span>
-              <TierStrip items={category.items} className="mt-1.5" />
+              <ItemCount count={category.items.length} className="mt-1.5" />
             </span>
             {category.source === "official" ? (
               <Badge tone="violet">{t("categories.officialBadge")}</Badge>

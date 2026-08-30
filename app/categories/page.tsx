@@ -21,7 +21,7 @@ import { cn, roomCode, slugify } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ItemCover } from "@/components/game/ItemCover";
-import { TierLegend, TierStrip } from "@/components/game/TierChip";
+import { ItemCount } from "@/components/game/ItemCount";
 
 const NO_CATEGORIES: Category[] = [];
 
@@ -88,16 +88,18 @@ export default function CategoriesPage() {
           <ArrowLeft className="size-4" />
           {t("common.home")}
         </button>
-        <div className="flex gap-2">
+        {/* Su telefono i due pulsanti da creatore restano icone: il testo per
+            esteso non ci sta e spingeva l'intestazione fuori dallo schermo. */}
+        <div className="flex shrink-0 gap-2">
           {isAdmin ? (
             <>
               <Button size="sm" variant="outline" onClick={() => router.push("/studio")}>
                 <SlidersHorizontal className="size-4" />
-                {t("studio.open")}
+                <span className="hidden sm:inline">{t("studio.open")}</span>
               </Button>
               <Button size="sm" onClick={() => router.push("/categories/new")}>
                 <Plus className="size-4" />
-                {t("categories.new")}
+                <span className="hidden sm:inline">{t("categories.new")}</span>
               </Button>
             </>
           ) : null}
@@ -106,10 +108,10 @@ export default function CategoriesPage() {
 
       <div>
         <h1 className="text-3xl font-black tracking-tight">{t("categories.title")}</h1>
-        <p className="mt-1 text-sm text-faint">{t("categories.subtitle")}</p>
+        <p className="mt-1 text-sm text-faint">
+          {t("categories.subtitle", { n: official.length + custom.length })}
+        </p>
       </div>
-
-      <TierLegend />
 
       <div className="flex flex-col gap-2">
         <label className="relative block">
@@ -261,7 +263,7 @@ function CategoryCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-3">
-        <TierStrip items={category.items} />
+        <ItemCount count={category.items.length} />
         <span className="no-scrollbar flex gap-1 overflow-x-auto">
           {category.items
             .filter((item) => item.tier === 5)

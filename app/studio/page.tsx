@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { ListEditor } from "@/components/game/ListEditor";
-import { TierStrip } from "@/components/game/TierChip";
+import { ItemCount } from "@/components/game/ItemCount";
 
 const NO_OVERRIDES: Record<string, Category> = {};
 const NO_CATEGORIES: Category[] = [];
@@ -63,7 +63,7 @@ export default function StudioPage() {
         <span className="mt-1 block text-xs text-faint">
           {category.items.length} {t("common.items")}
         </span>
-        <TierStrip items={category.items} className="mt-1.5" />
+        <ItemCount count={category.items.length} className="mt-1.5" />
       </span>
       <Pencil className="size-4 shrink-0 text-faint" />
     </button>

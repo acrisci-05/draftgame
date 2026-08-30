@@ -4,6 +4,8 @@ Asta live a budget fisso: ogni giocatore parte con lo stesso budget, gli element
 escono a caso uno alla volta e vince chi costruisce il roster più forte. A fine partita l'app genera
 una card verticale 9:16 pronta da postare e un link di voto per far decidere agli amici.
 
+- **[Guida in PDF](./docs/Guida-Pick-and-Pay.pdf)** — come si avvia, come si gioca, modalità e
+  funzioni: il documento da stampare o da mandare a chi vuole provarlo.
 - **[GUIDA.md](./GUIDA.md)** — guida completa: tecnologie, avvio, funzioni, configurazione e limiti.
 - **[PROJECT_SPECS.md](./PROJECT_SPECS.md)** — regolamento e decisioni prese in fase di sviluppo.
 
@@ -22,11 +24,12 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
   caratteri (copia rapida e QR) sincronizzata via Supabase Realtime Channels.
 - **Card 9:16** esportabile in PNG (1080x1920) con roster, budget residuo e QR del voto.
 - **Votazione** senza registrazione: un voto per dispositivo sul link generato a fine partita.
-- **Foto per tutti i 780 elementi**, fissate in `data/categories.json` e prese dall'archivio giusto
+- **Foto per 960 dei 980 elementi**, fissate in `data/categories.json` e prese dall'archivio giusto
   per ognuno (Wikipedia, Wikimedia Commons, Fandom, App Store, Steam, TVmaze, Imgflip) secondo gli
   abbinamenti di `data/image-hints.json`. In partita non si cerca niente: gli indirizzi sono già lì.
-- **26 liste ufficiali** a nomi corti con emoji di copertina, definite in `data/categories.json`,
-  con ricerca istantanea e filtri per macro-tema nella pagina Categorie.
+- **33 liste ufficiali** con nomi corti ed emoji di copertina, definite in `data/categories.json`,
+  con ricerca istantanea e filtri per macro-tema nella pagina Categorie. Sotto ogni nome c'è il
+  numero di elementi; le fasce di valore restano solo come prezzo di apertura dell'asta.
 - **Modalità creatore**: Studio ed editor delle categorie sono già aperti in sviluppo; online li
   protegge la parola scelta in `NEXT_PUBLIC_ADMIN_KEY`.
 - **Voto del gioco** da 1 a 5 stelle, anonimo, con commento facoltativo che legge solo il creatore.
@@ -89,7 +92,7 @@ components/ui/          bottoni, badge, input, modali, pannelli, selettore lingu
 components/game/        asta, timer, controlli di offerta, card finale, editor categorie
 lib/                    motore di gioco, realtime, catalogo, storage, i18n, accesso, amici
 lib/i18n/               dizionari delle 10 lingue (italiano lingua sorgente)
-data/categories.json    liste ufficiali: 26 categorie da 30 elementi
+data/categories.json    liste ufficiali: 33 categorie (30 elementi, 20 per le regioni)
 scripts/engine-check.js controlli sul motore di gioco e sul catalogo
 public/logo.svg         marchio dell'app, sostituibile con il file originale
 supabase/               schema SQL per categorie condivise, suggerimenti, risultati e voti

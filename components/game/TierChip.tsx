@@ -3,7 +3,7 @@
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import type { CurrencyCode, Tier } from "@/lib/types";
-import { TIER_ORDER, TIER_STYLES, cn, money } from "@/lib/utils";
+import { TIER_STYLES, cn, money } from "@/lib/utils";
 
 const TIER_NAME_KEYS: Record<Tier, TranslationKey> = {
   5: "tier.name5",
@@ -56,54 +56,3 @@ export function TierChip({
   );
 }
 
-/** Striscia con le cinque fasce, usata per riassumere una categoria. */
-export function TierStrip({
-  items,
-  currency,
-  className,
-}: {
-  items: { tier: Tier }[];
-  currency?: CurrencyCode;
-  className?: string;
-}) {
-  return (
-    <span className={cn("flex flex-wrap gap-1", className)}>
-      {TIER_ORDER.map((tier) => (
-        <TierChip
-          key={tier}
-          tier={tier}
-          currency={currency}
-          count={items.filter((item) => item.tier === tier).length}
-        />
-      ))}
-    </span>
-  );
-}
-
-/** Legenda: quanto costa una fascia e che tipo di elementi contiene. */
-export function TierLegend({
-  currency = "EUR",
-  className,
-}: {
-  currency?: CurrencyCode;
-  className?: string;
-}) {
-  const t = useT();
-
-  return (
-    <div className={cn("rounded-2xl border border-line bg-surface p-3", className)}>
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
-        {t("tier.legend")}
-      </p>
-      <p className="mb-2.5 text-xs text-muted">{t("tier.legendHint")}</p>
-      <div className="flex flex-wrap gap-x-4 gap-y-2">
-        {TIER_ORDER.map((tier) => (
-          <span key={tier} className="flex items-center gap-1.5">
-            <TierChip tier={tier} currency={currency} />
-            <span className="text-xs text-muted">{t(tierNameKey(tier))}</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}

@@ -39,22 +39,32 @@ check(
     ),
   ),
 );
+// Quasi tutte le liste hanno 30 elementi. Le Regioni Italiane ne hanno 20,
+// perché venti sono: il numero lo detta la geografia, non il formato.
 check(
-  "ogni lista ha 30 elementi",
-  categories.every((c) => c.items.length === 30),
-  categories.filter((c) => c.items.length !== 30).map((c) => `${c.id}:${c.items.length}`).join(","),
+  "ogni lista ha 30 elementi (20 per le regioni)",
+  categories.every((c) => c.items.length === (c.id === "regioni" ? 20 : 30)),
+  categories
+    .filter((c) => c.items.length !== (c.id === "regioni" ? 20 : 30))
+    .map((c) => `${c.id}:${c.items.length}`)
+    .join(","),
 );
 check(
-  "ogni lista ha 6 elementi per fascia",
-  categories.every((c) => [5, 4, 3, 2, 1].every((t) => catalog.countByTier(c.items, t) === 6)),
+  "ogni lista ha lo stesso numero di elementi per fascia",
+  categories.every((c) => {
+    const perTier = c.items.length / 5;
+    return [5, 4, 3, 2, 1].every((t) => catalog.countByTier(c.items, t) === perTier);
+  }),
 );
 check(
   "tutte le liste passano il validatore",
-  categories.every((c) => catalog.validateCategory(c.name, c.emoji, c.items).length === 0),
+  categories.every(
+    (c) => catalog.validateCategory(c.name, c.emoji, c.items, c.items.length / 5).length === 0,
+  ),
 );
 check(
   "id elementi univoci",
-  categories.every((c) => new Set(c.items.map((i) => i.id)).size === 30),
+  categories.every((c) => new Set(c.items.map((i) => i.id)).size === c.items.length),
 );
 check(
   "ogni elemento ha emoji di copertina",

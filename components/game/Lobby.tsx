@@ -10,7 +10,7 @@ import { MIN_PLAYERS, type GameAction } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import { saveConfig } from "@/lib/storage";
 import type { Category, GameState, RoomConfig } from "@/lib/types";
-import { TIER_ORDER, copyText, money, uid } from "@/lib/utils";
+import { copyText, money, uid } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -121,8 +121,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
           <div>
             <p className="font-bold">{categoryName(state.category, locale)}</p>
             <p className="text-xs text-faint">
-              {state.items.length} {t("common.items")} ·{" "}
-              {TIER_ORDER.map((tier) => state.items.filter((i) => i.tier === tier).length).join("/")}
+              {state.items.length} {t("common.items")}
             </p>
           </div>
         </div>

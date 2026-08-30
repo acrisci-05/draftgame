@@ -100,7 +100,7 @@ export const it = {
   "home.supabaseHint":
     "Le stanze online si attivano aggiungendo le chiavi del database in .env.local.",
   "home.howTitle": "Come funziona",
-  "home.how1": "Scegli la categoria: 30 elementi divisi in fasce da 5 a 1.",
+  "home.how1": "Scegli la categoria: trenta elementi, uno alla volta in asta.",
   "home.how2": "Ogni lotto parte dal prezzo base: rilanci +1, +2, +5 finché il budget regge.",
   "home.how3": "Timer a zero o tutti gli altri hanno passato: il lotto è aggiudicato.",
   "home.how4": "A fine partita scarichi la card 9:16 e generi il link di voto.",
@@ -192,8 +192,9 @@ export const it = {
   "vote.notFound": "Votazione non trovata o scaduta.",
   "vote.total": "{n} voti totali",
 
+  "categories.count": "{n} elementi",
   "categories.title": "Categorie",
-  "categories.subtitle": "Ogni lista ufficiale ha 30 elementi: 6 per ogni fascia da 5 a 1.",
+  "categories.subtitle": "{n} liste pronte da giocare, più quelle che crei tu.",
   "categories.official": "Liste ufficiali",
   "categories.mine": "Le tue categorie",
   "categories.none":
