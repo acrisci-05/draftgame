@@ -70,6 +70,7 @@ const TABLES = [
   ["pickmates", "la rubrica degli amici"],
   ["recent_opponents", "avversari delle ultime partite"],
   ["challenges", "inviti a entrare in una stanza"],
+  ["match_history", "storico personale: da qui escono le statistiche del profilo"],
   ["games", "partite giocate"],
   ["game_players", "chi ha giocato a cosa"],
   ["results", "risultati pubblicati"],
@@ -175,6 +176,14 @@ async function functionExists(name, args) {
     ok("le email non sono leggibili da fuori");
   } else {
     fail("le email sono esposte", "riesegui supabase/schema.sql");
+  }
+
+  const history = await fetch(`${url}/rest/v1/match_history?select=user_id&limit=5`, { headers });
+  const historyRows = history.ok ? await history.json() : null;
+  if (!history.ok || (Array.isArray(historyRows) && historyRows.length === 0)) {
+    ok("lo storico delle partite non e' leggibile da fuori");
+  } else {
+    fail("lo storico e' esposto", "riesegui supabase/schema.sql");
   }
 
   const mates = await fetch(`${url}/rest/v1/pickmates?select=user_id&limit=5`, { headers });
