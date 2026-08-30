@@ -483,4 +483,11 @@ export const ja: PartialDictionary = {
   "rules.end.body": "ロスターが埋まると、全ピックを載せた9:16のカードができます。勝者は投票で決定：プレイヤーも観客も共有リンクから投票できます。",
   "rules.modes.title": "モード",
   "rules.modes.body": "Blind Draft は落札まで画像を隠し、Mystery Box は5ロットごとに定額の箱をランダムな中身で出します。",
+  "creator.log0": "1〜8人に合わせた最終カード。勝者に王冠、賭けも目立つ位置に。",
+  "lobby.pledge": "賭けるもの",
+  "lobby.pledgeHint": "任意：終了時のカードに大きく載ります。",
+  "lobby.pledgePlaceholder": "例: 負けた人がピザをおごる",
+  "lobby.qrZoom": "読み取って参加",
+  "card.winner": "1位",
+  "card.pledge": "賭けるもの",
 };

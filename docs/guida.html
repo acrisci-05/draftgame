@@ -88,7 +88,7 @@
     pronta da postare e un link per far votare gli amici.
   </p>
   <p class="muted" style="margin:0">
-    Versione 1.0.0 · progetto indipendente di Antonio · da 2 a 8 giocatori · 33 liste ufficiali
+    Versione 1.1.0 · progetto indipendente di Antonio · da 2 a 8 giocatori · 33 liste ufficiali
   </p>
 </div>
 
@@ -215,7 +215,41 @@ suggerimenti e voto del gioco.</p>
     <code>/pickmates</code> fra le Redirect URLs.</li>
 </ol>
 
-<h2>6. Comandi utili</h2>
+<h2>6. Pubblicare il sito</h2>
+
+<p>Il modo più semplice è <strong>Vercel</strong>: piano gratuito, riconosce Next.js da solo e
+ripubblica a ogni <code>git push</code>.</p>
+
+<h3>Prima: il database</h3>
+<ol>
+  <li>Crea un progetto gratuito su <code>supabase.com</code>.</li>
+  <li>In <em>Project Settings → API</em> copia <strong>Project URL</strong> e <strong>anon key</strong>.</li>
+  <li>Mettile in <code>.env.local</code> e riavvia <code>npm run dev</code>.</li>
+  <li>Nell'SQL editor esegui tutto <code>supabase/schema.sql</code>.</li>
+  <li><strong>Prova a registrarti</strong> dal sito in locale: se il profilo compare in
+    <code>/pickmates</code>, è tutto a posto.</li>
+</ol>
+
+<h3>Poi: la pubblicazione</h3>
+<ol>
+  <li>Su <code>vercel.com</code> accedi <strong>con GitHub</strong>.</li>
+  <li><em>Add New → Project</em> e scegli il repository: non toccare i comandi di build.</li>
+  <li>In <strong>Environment Variables</strong> incolla le stesse righe di <code>.env.local</code>,
+    più <code>NEXT_PUBLIC_SITE_URL</code> (l'indirizzo che ti dà Vercel) e
+    <code>NEXT_PUBLIC_ADMIN_KEY</code> (la parola che scegli tu per lo Studio).</li>
+  <li><strong>Deploy</strong>: in un paio di minuti hai l'indirizzo pubblico.</li>
+  <li>Su Supabase, <em>Authentication → URL Configuration</em>: metti quell'indirizzo in
+    <strong>Site URL</strong> e aggiungi <code>.../pickmates</code> fra le <strong>Redirect URLs</strong>.
+    Senza questo passaggio il link di conferma dell'email riporta a localhost.</li>
+</ol>
+
+<div class="note">
+  <strong>Cinque minuti di collaudo dopo la pubblicazione:</strong> una partita locale dal telefono,
+  una registrazione con email vera, una stanza online con due telefoni, il link mandato su WhatsApp
+  (deve uscire l'anteprima col logo) e l'installazione sulla schermata Home.
+</div>
+
+<h2>7. Comandi utili</h2>
 
 <table>
   <tr><th>Comando</th><th>Cosa fa</th></tr>
@@ -230,7 +264,7 @@ suggerimenti e voto del gioco.</p>
   <tr><td><code>npm run share</code></td><td>apre un indirizzo pubblico temporaneo</td></tr>
 </table>
 
-<h2>7. Da sapere</h2>
+<h2>8. Da sapere</h2>
 <ul>
   <li>Le foto arrivano dagli archivi di origine (Wikipedia, Wikimedia Commons, Fandom, App Store,
     Steam, TVmaze, Imgflip): quelle di Wikimedia hanno licenze libere, le altre restano dei
@@ -243,7 +277,7 @@ suggerimenti e voto del gioco.</p>
 </ul>
 
 <footer>
-  Pick &amp; Pay - The Draft Game · versione 1.0.0 · guida aggiornata al 30 agosto 2026.
+  Pick &amp; Pay - The Draft Game · versione 1.1.0 · guida aggiornata al 30 agosto 2026.
   Documentazione completa in GUIDA.md e PROJECT_SPECS.md nella cartella del progetto.
 </footer>
 

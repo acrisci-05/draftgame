@@ -104,6 +104,87 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 40));
   check("l'ospite si è preso il lotto", hostState.lastResult.winnerId === "guest");
   check("anche l'ospite vede l'aggiudicazione", guestState.lastResult.winnerId === "guest");
 
+  /* ---------------------------------------------------------------- */
+  /* Casi limite                                                       */
+  /* ---------------------------------------------------------------- */
+
+  console.log("\nCasi limite\n");
+
+  // Pulsanti bloccati: chi è già in testa non rilancia contro sé stesso e
+  // nessuno può offrire più di quanto il saldo (meno la riserva) consente.
+  hostState = game.reducer(hostState, { type: "next", now: t0 + 3000 });
+  const leader = hostState.players.find((p) => p.id === "guest");
+  hostState = game.reducer(hostState, {
+    type: "bid",
+    playerId: "guest",
+    amount: 2,
+    now: t0 + 3100,
+  });
+  check(
+    "chi è in testa non può rilanciare su sé stesso",
+    !game.canBid(hostState, "guest", 3),
+  );
+  check("chi è in testa non può nemmeno passare", !game.canPass(hostState, "guest"));
+  check(
+    "nessuno può offrire oltre il proprio tetto",
+    !game.canBid(hostState, "host", game.maxBid(hostState, hostState.players[0]) + 1),
+  );
+  check(
+    "il tetto tiene conto della riserva per gli slot vuoti",
+    game.maxBid(hostState, leader) <= leader.budget,
+  );
+
+  // Due offerte nello stesso istante: vince quella applicata per prima e la
+  // seconda viene rifiutata, perché nel frattempo il prezzo è salito.
+  const before = hostState.currentBid;
+  const first = game.reducer(hostState, {
+    type: "bid",
+    playerId: "host",
+    amount: before + 1,
+    now: t0 + 3200,
+  });
+  const second = game.reducer(first, {
+    type: "bid",
+    playerId: "host",
+    amount: before + 1,
+    now: t0 + 3200,
+  });
+  check("due offerte identiche nello stesso istante: una sola passa", second === first);
+  check("il prezzo sale una volta sola", first.currentBid === before + 1);
+
+  // Disconnessione durante l'asta: il giocatore resta in partita con il suo
+  // roster (chi perde la linea per qualche secondo non perde quanto ha vinto)
+  // e la stanza continua a vivere per gli altri.
+  const dropped = game.reducer(hostState, { type: "remove_player", playerId: "guest" });
+  check(
+    "chi cade in asta non perde posto e roster",
+    dropped.players.length === hostState.players.length && dropped.phase === hostState.phase,
+  );
+
+  // E la partita non si inchioda: allo scadere del tempo il lotto si assegna
+  // anche se il disconnesso non risponde più.
+  const expired = game.reducer(hostState, { type: "tick", now: hostState.deadline + 1 });
+  check("il timer chiude il lotto anche senza risposta", expired.phase === "result");
+
+  // In lobby invece il posto si libera davvero.
+  let lobby = game.createGame({ code: "TEST2", mode: "online", hostId: "host", category });
+  lobby = game.reducer(lobby, { type: "add_player", player: { id: "host", name: "Ana" } });
+  lobby = game.reducer(lobby, { type: "add_player", player: { id: "guest", name: "Bea" } });
+  const left = game.reducer(lobby, { type: "remove_player", playerId: "guest" });
+  check("in lobby chi esce libera il posto", left.players.length === 1);
+
+  // Riconnessione: il "hello" di chi rientra non crea un doppione.
+  guestChannel.postMessage({ type: "hello", player: { id: "guest", name: "Bea" } });
+  await wait();
+  check(
+    "chi rientra non compare due volte",
+    hostState.players.filter((p) => p.id === "guest").length === 1,
+  );
+
+  // Orologio condiviso: la scadenza viaggia nello stato, quindi tutti i
+  // dispositivi contano lo stesso tempo anche se il loro orologio è sfasato.
+  check("la scadenza è la stessa per tutti", guestState.deadline === hostState.deadline);
+
   hostChannel.close();
   guestChannel.close();
 

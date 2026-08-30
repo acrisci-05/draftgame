@@ -84,6 +84,11 @@ export interface RoomConfig {
    * false: ogni lotto viene comunque assegnato a chi ha ancora slot liberi.
    */
   allowDiscards: boolean;
+  /**
+   * La posta in palio, scritta dall'host prima di iniziare: "chi perde offre la
+   * pizza". Finisce in evidenza sulla card di fine partita. Vuota = niente pegno.
+   */
+  pledge?: string;
 }
 
 export type FeedKind =

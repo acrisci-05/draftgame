@@ -485,4 +485,11 @@ export const de: PartialDictionary = {
   "rules.end.body": "Sind die Roster voll, entsteht die 9:16-Karte mit allen Picks. Die Stimmen entscheiden: Spieler und Zuschauer stimmen über den geteilten Link ab.",
   "rules.modes.title": "Modi",
   "rules.modes.body": "Blind Draft verdeckt das Bild bis zur Vergabe, Mystery Box bringt alle 5 Lose eine Box zum Festpreis mit einem zufälligen Eintrag.",
+  "creator.log0": "Abschlusskarte für 1 bis 8 Spieler, mit Krone für den Sieger und sichtbarem Einsatz.",
+  "lobby.pledge": "Einsatz",
+  "lobby.pledgeHint": "Optional: steht gut sichtbar auf der Karte am Spielende.",
+  "lobby.pledgePlaceholder": "z. B. Verlierer zahlt die Pizza",
+  "lobby.qrZoom": "Zum Beitreten scannen",
+  "card.winner": "1. PLATZ",
+  "card.pledge": "Einsatz",
 };

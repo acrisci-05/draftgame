@@ -9,29 +9,48 @@ import { useIsClient } from "@/lib/client-store";
 import { APP_NAME, SITE_DOMAIN } from "@/lib/config";
 import { coverPalette } from "@/lib/covers";
 import { useItemImage } from "@/lib/images";
-import { rosterValue } from "@/lib/game";
+import { rosterValue, standings } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import type { CurrencyCode, GameState, RosterEntry } from "@/lib/types";
-import { TIER_ORDER, TIER_STYLES, hashString, initials, money } from "@/lib/utils";
+import { hashString, initials, money } from "@/lib/utils";
 import { AvatarGlyph } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 
-/** Tassello di un elemento vinto, con badge dorato del prezzo pagato. */
+/**
+ * Misure della card in base a quanti giocano: con otto roster da mostrare tutto
+ * si stringe, ma niente deve uscire dai 1080x1920 né mangiarsi il piede pagina.
+ */
+function layoutFor(playerCount: number) {
+  if (playerCount <= 2) {
+    return { columns: 1, tile: 150, name: 32, avatar: 44, itemName: 18, price: 20, gap: 20 };
+  }
+  if (playerCount <= 4) {
+    return { columns: 2, tile: 118, name: 28, avatar: 40, itemName: 17, price: 19, gap: 18 };
+  }
+  if (playerCount <= 6) {
+    return { columns: 2, tile: 96, name: 25, avatar: 34, itemName: 15, price: 17, gap: 14 };
+  }
+  return { columns: 3, tile: 74, name: 21, avatar: 28, itemName: 13, price: 15, gap: 12 };
+}
+
+type CardLayout = ReturnType<typeof layoutFor>;
+
+/** Tassello di un elemento vinto: foto, prezzo di aggiudicazione e nome. */
 function RosterTile({
   entry,
   currency,
-  width,
+  layout,
   hint,
   auto,
 }: {
   entry: RosterEntry;
   currency: CurrencyCode;
-  width: number;
+  layout: CardLayout;
   hint?: string;
   auto: boolean;
 }) {
   const palette = coverPalette(entry.itemId + entry.name);
-  const tint = TIER_STYLES[entry.tier].hex;
+  const width = layout.tile;
   const { src, onError } = useItemImage(entry, hint, auto);
 
   return (
@@ -42,7 +61,7 @@ function RosterTile({
           width: "100%",
           aspectRatio: "1 / 1",
           borderRadius: 16,
-          border: `2px solid ${tint}66`,
+          border: "2px solid #ffffff1f",
           backgroundImage: `linear-gradient(140deg, ${palette.from}, ${palette.to})`,
           display: "flex",
           alignItems: "center",
@@ -61,21 +80,22 @@ function RosterTile({
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
-          <span style={{ fontSize: 34, fontWeight: 900, color: "#ffffffdd" }}>
+          <span style={{ fontSize: width / 3, fontWeight: 900, color: "#ffffffdd" }}>
             {entry.emoji ?? initials(entry.name)}
           </span>
         )}
+        {/* Unico badge sulla foto: il prezzo a cui è stato aggiudicato. */}
         <span
           style={{
             position: "absolute",
-            top: 6,
-            right: 6,
+            top: 5,
+            right: 5,
             backgroundColor: GOLD,
             color: "#3f2d00",
-            fontSize: 20,
+            fontSize: layout.price,
             fontWeight: 900,
             borderRadius: 999,
-            padding: "3px 10px",
+            padding: "3px 9px",
             boxShadow: "0 2px 10px rgba(0,0,0,0.45)",
           }}
         >
@@ -84,7 +104,7 @@ function RosterTile({
       </div>
       <span
         style={{
-          fontSize: 18,
+          fontSize: layout.itemName,
           fontWeight: 600,
           lineHeight: 1.15,
           color: "#e4e4e7",
@@ -102,6 +122,9 @@ function RosterTile({
 
 export const CARD_WIDTH = 1080;
 export const CARD_HEIGHT = 1920;
+
+/** Moltiplicatore dell'esportazione: 2 = niente sgranature sui display retina. */
+const EXPORT_SCALE = 2;
 
 const NEON = "#22c55e";
 const VIOLET = "#a855f7";
@@ -146,12 +169,16 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
     };
   }, [voteUrl]);
 
+  /**
+   * L'immagine esce a 2160x3840: il doppio dei 1080x1920 di progetto, così
+   * resta nitida sugli schermi ad alta densità e quando i social la ricomprimono.
+   */
   const render = useCallback(async () => {
     if (!cardRef.current) throw new Error("card-not-ready");
     return toPng(cardRef.current, {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
-      pixelRatio: 1,
+      pixelRatio: EXPORT_SCALE,
       cacheBust: true,
       backgroundColor: INK,
       style: { transform: "none", transformOrigin: "top left", margin: "0" },
@@ -202,9 +229,11 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
   };
 
   const currency = state.config.currency;
-  const columns = state.players.length <= 3 ? 1 : 2;
-  const tileWidth = columns === 1 ? 150 : 118;
+  const layout = layoutFor(state.players.length);
   const backdrop = coverPalette(state.category.id + state.code);
+  const pledge = state.config.pledge?.trim();
+  // Il primo in classifica prende la corona, ma solo se c'è qualcuno da battere.
+  const winnerId = state.players.length > 1 ? (standings(state)[0]?.id ?? null) : null;
 
   return (
     <div className="flex flex-col gap-3">
@@ -303,28 +332,52 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
               minHeight: 0,
               marginTop: 26,
               display: "grid",
-              gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${layout.columns}, minmax(0, 1fr))`,
               gridAutoRows: "1fr",
-              gap: 20,
+              gap: layout.gap,
             }}
           >
             {state.players.map((player, index) => {
-              const accent = index % 2 === 0 ? NEON : VIOLET;
+              const isWinner = player.id === winnerId;
+              const accent = isWinner ? GOLD : index % 2 === 0 ? NEON : VIOLET;
               return (
                 <section
                   key={player.id}
                   style={{
-                    border: `2px solid ${accent}45`,
+                    position: "relative",
+                    border: isWinner ? `3px solid ${GOLD}` : `2px solid ${accent}45`,
+                    boxShadow: isWinner ? `0 0 34px ${GOLD}44` : "none",
                     borderRadius: 26,
                     backgroundColor: CARD_BG,
-                    padding: 20,
+                    padding: layout.columns === 3 ? 14 : 20,
+                    paddingTop: isWinner ? 30 : layout.columns === 3 ? 14 : 20,
                     display: "flex",
                     flexDirection: "column",
-                    gap: 14,
+                    gap: layout.columns === 3 ? 10 : 14,
                     minHeight: 0,
                     overflow: "hidden",
                   }}
                 >
+                  {isWinner ? (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: -2,
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        backgroundColor: GOLD,
+                        color: "#3f2d00",
+                        fontSize: layout.columns === 3 ? 15 : 19,
+                        fontWeight: 900,
+                        letterSpacing: 1,
+                        borderRadius: "0 0 14px 14px",
+                        padding: "4px 16px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      👑 {t("card.winner")}
+                    </span>
+                  ) : null}
                   <div
                     style={{
                       display: "flex",
@@ -339,7 +392,7 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                         display: "flex",
                         alignItems: "center",
                         gap: 10,
-                        fontSize: 32,
+                        fontSize: layout.name,
                         fontWeight: 800,
                         minWidth: 0,
                         overflow: "hidden",
@@ -352,22 +405,22 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          width: 44,
-                          height: 44,
+                          width: layout.avatar,
+                          height: layout.avatar,
                           borderRadius: 999,
                           backgroundColor: "#27272a",
                           color: accent,
                           flexShrink: 0,
                         }}
                       >
-                        <AvatarGlyph id={player.emoji} size={24} />
+                        <AvatarGlyph id={player.emoji} size={Math.round(layout.avatar * 0.55)} />
                       </span>
                       {player.name}
                     </span>
                     <span
                       style={{
                         flexShrink: 0,
-                        fontSize: 22,
+                        fontSize: layout.price,
                         fontWeight: 800,
                         color: accent,
                         border: `2px solid ${accent}55`,
@@ -392,65 +445,36 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                     {player.roster.length === 0 ? (
                       <span style={{ fontSize: 24, color: "#52525b" }}>—</span>
                     ) : (
-                      // Roster ordinato per fascia: i 5 in alto, gli 1 in fondo.
-                      TIER_ORDER.map((tier) => {
-                        const entries = player.roster.filter((entry) => entry.tier === tier);
-                        if (entries.length === 0) return null;
-                        const tint = TIER_STYLES[tier].hex;
-                        return (
-                          <div
-                            key={tier}
-                            style={{ display: "flex", alignItems: "flex-start", gap: 10 }}
-                          >
-                            <span
-                              style={{
-                                flexShrink: 0,
-                                width: 32,
-                                height: 32,
-                                marginTop: 4,
-                                borderRadius: 10,
-                                border: `2px solid ${tint}66`,
-                                backgroundColor: `${tint}20`,
-                                color: tint,
-                                fontSize: 17,
-                                fontWeight: 900,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                              }}
-                            >
-                              {money(tier, currency)}
-                            </span>
-                            <div
-                              style={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: 10,
-                                flex: 1,
-                                minWidth: 0,
-                              }}
-                            >
-                              {entries.map((entry) => (
-                                <RosterTile
-                                  key={entry.itemId}
-                                  entry={entry}
-                                  currency={currency}
-                                  width={tileWidth}
-                                  hint={state.category.name}
-                                  auto={autoImages}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })
+                      /* I lotti in una griglia sola, dal più pagato al meno:
+                         niente più righe per fascia di prezzo. */
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: layout.columns === 3 ? 8 : 10,
+                          alignContent: "flex-start",
+                        }}
+                      >
+                        {[...player.roster]
+                          .sort((a, b) => b.price - a.price)
+                          .map((entry) => (
+                            <RosterTile
+                              key={entry.itemId}
+                              entry={entry}
+                              currency={currency}
+                              layout={layout}
+                              hint={state.category.name}
+                              auto={autoImages}
+                            />
+                          ))}
+                      </div>
                     )}
                   </div>
 
                   <div
                     style={{
                       flexShrink: 0,
-                      fontSize: 20,
+                      fontSize: layout.columns === 3 ? 15 : 20,
                       color: "#71717a",
                       display: "flex",
                       justifyContent: "space-between",
@@ -467,6 +491,53 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
               );
             })}
           </main>
+
+          {pledge ? (
+            <div
+              style={{
+                flexShrink: 0,
+                marginTop: 18,
+                border: `2px solid ${GOLD}66`,
+                backgroundColor: `${GOLD}14`,
+                borderRadius: 20,
+                padding: "14px 22px",
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                minWidth: 0,
+              }}
+            >
+              <span style={{ fontSize: 30, flexShrink: 0 }}>🎯</span>
+              <span style={{ minWidth: 0 }}>
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: 18,
+                    fontWeight: 900,
+                    letterSpacing: 3,
+                    textTransform: "uppercase",
+                    color: GOLD,
+                  }}
+                >
+                  {t("card.pledge")}
+                </span>
+                <span
+                  style={{
+                    display: "block",
+                    marginTop: 2,
+                    fontSize: 28,
+                    fontWeight: 800,
+                    color: "#f4f4f5",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {pledge}
+                </span>
+              </span>
+            </div>
+          ) : null}
 
           <footer
             style={{

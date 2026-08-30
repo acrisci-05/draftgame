@@ -34,6 +34,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [newPlayer, setNewPlayer] = useState("");
   const [copied, setCopied] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
 
   const isLocal = state.mode === "local";
   const canStart = isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0;
@@ -93,12 +94,19 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
           </div>
 
           {!isLocal && joinUrl ? (
-            <div className="flex flex-col items-center gap-1.5">
+            // Un tocco lo ingrandisce: da lontano, o su schermi piccoli, si
+            // inquadra molto meglio.
+            <button
+              type="button"
+              onClick={() => setQrOpen(true)}
+              aria-label={t("lobby.qrZoom")}
+              className="flex flex-col items-center gap-1.5 rounded-2xl p-1 transition-transform hover:scale-105"
+            >
               <QrCode value={joinUrl} size={116} />
               <span className="max-w-[9rem] text-center text-[10px] leading-tight text-faint">
                 {t("lobby.qrHint")}
               </span>
-            </div>
+            </button>
           ) : null}
         </div>
       </div>
@@ -252,6 +260,16 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             setPickerOpen(false);
           }}
         />
+      </Modal>
+
+      <Modal open={qrOpen} title={t("lobby.qrZoom")} onClose={() => setQrOpen(false)}>
+        {joinUrl ? (
+          <div className="flex flex-col items-center gap-4">
+            <QrCode value={joinUrl} size={260} />
+            <RoomCode code={state.code} size="lg" />
+            <p className="text-center text-sm text-muted">{t("lobby.qrHint")}</p>
+          </div>
+        ) : null}
       </Modal>
     </div>
   );

@@ -56,6 +56,7 @@ export const it = {
   "creator.donate": "Offrimi un caffè",
   "creator.independent": "Progetto indipendente",
   "creator.changelog": "Ultime novità",
+  "creator.log0": "Card finale su misura da 1 a 8 giocatori, con corona al vincitore e pegno in palio.",
   "creator.log1": "Pickmates, notifiche di sfida in tempo reale e scheda del creatore.",
   "creator.log2": "Foto verificate una per una per tutti gli elementi delle liste ufficiali.",
   "creator.log3": "Sulle schede compare il prezzo di apertura al posto della lettera della fascia.",
@@ -116,6 +117,10 @@ export const it = {
   "lobby.blindHint": "Immagine del lotto sfocata fino all'assegnazione",
   "lobby.mystery": "Mystery Box",
   "lobby.mysteryHint": "Ogni 5 lotti compare una box a prezzo fisso con elemento casuale",
+  "lobby.pledge": "Pegno in palio",
+  "lobby.pledgeHint": "Facoltativo: finisce in evidenza sulla card di fine partita.",
+  "lobby.pledgePlaceholder": "Es. chi perde offre la pizza",
+  "lobby.qrZoom": "Inquadra per entrare",
   "lobby.addPlayer": "Nome giocatore",
   "lobby.start": "Avvia il draft",
   "lobby.needPlayers": "Servono almeno {n} giocatori",
@@ -176,6 +181,8 @@ export const it = {
 
   "card.question": "Chi ha fatto il draft migliore?",
   "card.solo": "Il mio draft",
+  "card.winner": "1° CLASSIFICATO",
+  "card.pledge": "Pegno in palio",
   "card.footer": "Gioca gratis su {domain}",
 
   "vote.panel": "Votazione",

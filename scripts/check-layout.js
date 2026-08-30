@@ -80,6 +80,7 @@ const MEASURE = `(() => {
   );
 
   let failures = 0;
+  const problems = [];
   try {
     // Il browser impiega un attimo ad aprire la porta di controllo.
     let endpoint = null;
@@ -105,8 +106,20 @@ const MEASURE = `(() => {
 
     let messageId = 0;
     const pending = new Map();
+    /* Errori e avvisi che la pagina scrive in console mentre viene visitata. */
+    const noise = [];
     socket.addEventListener("message", (event) => {
       const message = JSON.parse(event.data);
+      if (message.method === "Runtime.consoleAPICalled" && message.params.type === "error") {
+        noise.push(
+          message.params.args.map((arg) => arg.value ?? arg.description ?? "").join(" ").slice(0, 160),
+        );
+      }
+      if (message.method === "Runtime.exceptionThrown") {
+        noise.push(
+          (message.params.exceptionDetails?.exception?.description ?? "eccezione").slice(0, 160),
+        );
+      }
       const resolve = pending.get(message.id);
       if (resolve) {
         pending.delete(message.id);
@@ -124,6 +137,8 @@ const MEASURE = `(() => {
           if (pending.delete(id)) resolve(null);
         }, 10000);
       });
+
+    await send("Runtime.enable", {});
 
     // Il viewport lo si impone qui: la finestra del browser non c'entra, e
     // così la misura vale davvero per uno schermo di quella larghezza.
@@ -155,6 +170,7 @@ const MEASURE = `(() => {
         console.log(`  ok  ${label} sta nello schermo (${data.width}px)`);
       }
     }
+    problems.push(...new Set(noise));
   } finally {
     child.kill();
     // Il profilo temporaneo resta in uso ancora per un istante: se non si
@@ -172,5 +188,11 @@ const MEASURE = `(() => {
       ? `\nNESSUNO SBORDAMENTO A ${WIDTH}px`
       : `\n${failures} pagine sbordano a ${WIDTH}px`,
   );
-  if (failures > 0) process.exitCode = 1;
+  if (problems.length > 0) {
+    console.log(`\n${problems.length} errori in console:`);
+    problems.forEach((line) => console.log(`  ${line}`));
+  } else {
+    console.log("Nessun errore in console.");
+  }
+  if (failures > 0 || problems.length > 0) process.exitCode = 1;
 })();

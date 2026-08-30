@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check, Home, Link2, Loader2, RotateCcw, Trash2, Vote } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { playSfx } from "@/lib/audio";
 import { useAuth } from "@/lib/auth";
 import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
@@ -18,6 +19,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { QrCode } from "@/components/ui/QrCode";
+import { Confetti } from "./Confetti";
 import { FriendShare } from "./FriendShare";
 import { TikTokCard } from "./TikTokCard";
 
@@ -29,7 +31,7 @@ interface ResultsProps {
 
 export function Results({ state, isHost, dispatch }: ResultsProps) {
   const router = useRouter();
-  const { locale, t } = useSettings();
+  const { locale, sound, t } = useSettings();
   const { account } = useAuth();
   const [voteUrl, setVoteUrl] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
@@ -38,6 +40,11 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
   const [copied, setCopied] = useState(false);
 
   const myAccountId = account && !account.local ? account.id : null;
+
+  // Coriandoli e squillo di chiusura: una volta sola, all'arrivo dei risultati.
+  useEffect(() => {
+    playSfx("win", sound);
+  }, [sound]);
 
   /**
    * A partita finita gli avversari con un profilo finiscono fra i "recenti":
@@ -86,6 +93,7 @@ export function Results({ state, isHost, dispatch }: ResultsProps) {
 
   return (
     <div className="flex flex-col gap-4">
+      <Confetti />
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.24em] text-faint">{t("results.title")}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">

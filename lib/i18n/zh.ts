@@ -480,4 +480,11 @@ export const zh: PartialDictionary = {
   "rules.end.body": "阵容满员后生成含全部选择的 9:16 卡片。胜者由投票决定：玩家和观众都能通过分享链接投票。",
   "rules.modes.title": "模式",
   "rules.modes.body": "Blind Draft 在成交前遮住图片，Mystery Box 每 5 件拍品出现一个定价盲盒，内容随机。",
+  "creator.log0": "最终卡片适配 1 至 8 人：冠军戴皇冠，赌注醒目展示。",
+  "lobby.pledge": "赌注",
+  "lobby.pledgeHint": "可选：会醒目地印在结算卡片上。",
+  "lobby.pledgePlaceholder": "例如：输的人请吃披萨",
+  "lobby.qrZoom": "扫码进入",
+  "card.winner": "第一名",
+  "card.pledge": "赌注",
 };

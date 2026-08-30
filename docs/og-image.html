@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Anteprima social</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: #09090b;
+    background-image:
+      radial-gradient(circle at 12% -10%, #22c55e33, transparent 45%),
+      radial-gradient(circle at 90% 8%, #a855f733, transparent 42%),
+      radial-gradient(circle at 60% 115%, #22c55e22, transparent 46%);
+    color: #f4f4f5;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 72px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    align-self: flex-start;
+    border: 2px solid #22c55e66;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #22c55e;
+  }
+  h1 {
+    margin-top: 26px;
+    font-size: 116px;
+    line-height: 0.92;
+    font-weight: 900;
+    letter-spacing: -4px;
+  }
+  .neon { color: #22c55e; text-shadow: 0 0 60px #22c55e88; }
+  .amp { color: #52525b; }
+  .violet { color: #a855f7; text-shadow: 0 0 60px #a855f788; }
+  h2 {
+    margin-top: 8px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: #a855f7;
+  }
+  p {
+    margin-top: 30px;
+    font-size: 30px;
+    line-height: 1.35;
+    color: #d4d4d8;
+    max-width: 900px;
+  }
+  .row { margin-top: 40px; display: flex; gap: 14px; }
+  .chip {
+    border: 2px solid #27272a;
+    background: #101014;
+    border-radius: 999px;
+    padding: 12px 24px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #a1a1aa;
+  }
+  .chip strong { color: #22c55e; }
+  footer {
+    position: absolute;
+    right: 72px;
+    bottom: 64px;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #3f3f46;
+  }
+</style>
+</head>
+<body>
+  <span class="badge">Asta live</span>
+  <h1><span class="neon">PICK</span><span class="amp"> &amp; </span><span class="violet">PAY</span></h1>
+  <h2>The Draft Game</h2>
+  <p>Stesso budget per tutti, gli elementi escono a caso e vince chi costruisce la lista migliore.
+     Da 2 a 8 giocatori, dal telefono.</p>
+  <div class="row">
+    <span class="chip"><strong>33</strong> categorie</span>
+    <span class="chip"><strong>15s</strong> per lotto</span>
+    <span class="chip"><strong>0€</strong> gratis</span>
+  </div>
+  <footer>pickandpay.app</footer>
+</body>
+</html>

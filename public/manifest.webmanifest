@@ -1,7 +1,7 @@
 {
   "name": "Pick & Pay - The Draft Game",
   "short_name": "Pick & Pay",
-  "description": "Asta live a budget fisso: costruisci il roster migliore e sfida i tuoi amici.",
+  "description": "Asta live a budget fisso: costruisci la lista migliore e sfida i tuoi amici.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -9,12 +9,31 @@
   "background_color": "#09090b",
   "theme_color": "#09090b",
   "lang": "it",
+  "categories": ["games", "entertainment"],
   "icons": [
     {
       "src": "/logo.svg",
       "type": "image/svg+xml",
       "sizes": "any",
       "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ]
 }

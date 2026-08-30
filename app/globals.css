@@ -135,4 +135,29 @@ body {
   .safe-bottom {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
+
+  /* Un coriandolo: cade, deriva di lato e gira su sé stesso. */
+  .confetti-piece {
+    position: absolute;
+    top: -6%;
+    border-radius: 2px;
+    opacity: 0;
+    animation-name: confetti-fall;
+    animation-timing-function: cubic-bezier(0.25, 0.6, 0.4, 1);
+    animation-fill-mode: forwards;
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift, 0), 105vh, 0) rotate(var(--spin, 360deg));
+  }
 }

@@ -486,4 +486,11 @@ export const fr: PartialDictionary = {
   "rules.end.body": "Une fois les rosters pleins tu obtiens la carte 9:16 avec tous les choix. Les votes désignent le vainqueur : joueurs et spectateurs votent depuis le lien partagé.",
   "rules.modes.title": "Modes",
   "rules.modes.body": "Blind Draft cache l'image jusqu'à l'attribution, Mystery Box propose tous les 5 lots une boîte à prix fixe avec un élément au hasard.",
+  "creator.log0": "Carte finale adaptée de 1 à 8 joueurs, avec couronne au vainqueur et enjeu affiché.",
+  "lobby.pledge": "Enjeu en jeu",
+  "lobby.pledgeHint": "Facultatif : il apparaît en évidence sur la carte de fin de partie.",
+  "lobby.pledgePlaceholder": "Ex. le perdant offre la pizza",
+  "lobby.qrZoom": "Scanne pour entrer",
+  "card.winner": "1ᵉʳ",
+  "card.pledge": "Enjeu en jeu",
 };

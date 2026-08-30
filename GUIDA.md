@@ -379,9 +379,52 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
 
 ---
 
-## 8. Verifiche automatiche
+## 8. Pubblicare il sito
 
-`npm run check:engine` compila il motore ed esegue **63 controlli**: distribuzione delle fasce,
+Il modo più semplice è **Vercel**: è di chi fa Next.js, il piano gratuito basta e si aggiorna da
+solo a ogni `git push`. Il sito è già pronto per andare online: mancano solo le chiavi.
+
+### Prima di pubblicare: il database
+Le stanze online stabili, la registrazione, i Pickmates e le notifiche hanno bisogno di Supabase.
+Va fatto **prima**, e provato in locale una volta:
+
+1. Crea un progetto gratuito su [supabase.com](https://supabase.com).
+2. In *Project Settings → API* copia **Project URL** e **anon public key**.
+3. Mettile in `.env.local` (copiando `.env.example`) e riavvia `npm run dev`.
+4. Nell'**SQL editor** esegui tutto `supabase/schema.sql`.
+5. Prova a **registrarti** dal sito in locale: se il profilo compare in `/pickmates`, è tutto a posto.
+
+### Poi la pubblicazione
+1. Vai su [vercel.com](https://vercel.com) e accedi **con GitHub**.
+2. *Add New → Project* e scegli il repository `draftgame`. Vercel riconosce Next.js da solo:
+   non toccare nulla dei comandi di build.
+3. Apri **Environment Variables** e incolla le stesse righe di `.env.local`:
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`
+   (l'indirizzo che ti darà Vercel), `NEXT_PUBLIC_ADMIN_KEY` (la parola che scegli tu),
+   e se vuoi `NEXT_PUBLIC_INSTAGRAM_URL` e `NEXT_PUBLIC_REVOLUT_USER`.
+4. **Deploy**. Dopo un paio di minuti hai un indirizzo tipo `pick-and-pay.vercel.app`.
+5. Torna su Supabase, *Authentication → URL Configuration*: metti quell'indirizzo in **Site URL** e
+   aggiungi `https://tuo-indirizzo.vercel.app/pickmates` fra le **Redirect URLs**. Senza questo
+   passaggio il link di conferma dell'email riporta a `localhost` e la registrazione non si chiude.
+6. Da quel momento ogni `git push` ripubblica il sito da solo.
+
+### Dopo la pubblicazione, in cinque minuti
+- Apri il sito dal telefono e fai una **partita locale**: deve funzionare senza altro.
+- **Registrati** con un'email vera e controlla che arrivi la mail di conferma.
+- Crea una **stanza online**, entra dal secondo telefono con il codice o il QR e verifica che
+  offerte e timer si muovano insieme.
+- Manda il link su WhatsApp: deve comparire l'anteprima con il logo (`public/og.png`).
+- Aggiungi il sito alla schermata Home dal menu, per provare l'installazione.
+
+### Un dominio tuo (facoltativo)
+Comprato il dominio, in Vercel *Settings → Domains* lo si aggiunge e si seguono le due righe DNS
+indicate. Poi si aggiorna `NEXT_PUBLIC_SITE_URL` e la Site URL su Supabase.
+
+---
+
+## 9. Verifiche automatiche
+
+`npm run check:engine` compila il motore ed esegue i controlli su: distribuzione delle fasce,
 unicità degli identificativi, apertura dell'asta, rilanci, aggiudicazione per tempo scaduto o per
 abbandono, scarti, riserva di budget, assegnazione dei lotti finali, Mystery Box, chiusura della
 partita e formato del codice stanza. Tutti superati.
@@ -390,7 +433,7 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 
 ---
 
-## 9. Stato del lavoro e limiti noti
+## 10. Stato del lavoro e limiti noti
 
 **Funziona senza configurazione**: partita locale, tutte le 26 categorie, regole complete, card
 9:16 scaricabile, lingue, temi, audio.
@@ -414,7 +457,7 @@ Da sapere:
 
 ---
 
-## 10. Dove guardare il codice
+## 11. Dove guardare il codice
 
 | Domanda | File |
 | --- | --- |

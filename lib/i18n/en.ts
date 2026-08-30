@@ -58,6 +58,7 @@ export const en: Dictionary = {
   "creator.donate": "Buy me a coffee",
   "creator.independent": "Independent project",
   "creator.changelog": "What's new",
+  "creator.log0": "Final card tuned for 1 to 8 players, with a crown for the winner and the stake on show.",
   "creator.log1": "Pickmates, live challenge notifications and the creator card.",
   "creator.log2": "Photos checked one by one for every item in the official lists.",
   "creator.log3": "Cards now show the opening price instead of the tier letter.",
@@ -117,6 +118,10 @@ export const en: Dictionary = {
   "lobby.blindHint": "Lot image stays blurred until it is assigned",
   "lobby.mystery": "Mystery Box",
   "lobby.mysteryHint": "Every 5 lots a fixed-price box with a random item shows up",
+  "lobby.pledge": "Stake on the line",
+  "lobby.pledgeHint": "Optional: it goes on the final card, in plain sight.",
+  "lobby.pledgePlaceholder": "e.g. loser buys the pizza",
+  "lobby.qrZoom": "Scan to join",
   "lobby.addPlayer": "Player name",
   "lobby.start": "Start the draft",
   "lobby.needPlayers": "At least {n} players needed",
@@ -177,6 +182,8 @@ export const en: Dictionary = {
 
   "card.question": "Who built the best draft?",
   "card.solo": "My draft",
+  "card.winner": "1ST PLACE",
+  "card.pledge": "Stake on the line",
   "card.footer": "Play for free on {domain}",
 
   "vote.panel": "Voting",

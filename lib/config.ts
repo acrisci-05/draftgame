@@ -33,10 +33,11 @@ export const KOFI_URL = process.env.NEXT_PUBLIC_KOFI_URL?.trim() ?? "";
 
 export const CREATOR_NAME = "Antonio";
 
-export const APP_VERSION = "1.0.0";
+export const APP_VERSION = "1.1.0";
 
 /** Ultime novità mostrate nella scheda del creatore, dalla più recente. */
 export const CHANGELOG: { version: string; date: string; key: TranslationKey }[] = [
+  { version: "1.1.0", date: "2026-08", key: "creator.log0" },
   { version: "1.0.0", date: "2026-08", key: "creator.log1" },
   { version: "0.9.0", date: "2026-08", key: "creator.log2" },
   { version: "0.8.0", date: "2026-08", key: "creator.log3" },

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { APP_FULL_NAME, APP_NAME } from "@/lib/config";
+import { APP_FULL_NAME, APP_NAME, SITE_URL } from "@/lib/config";
 import { Navbar } from "@/components/ui/Navbar";
 import { PwaInstallBanner } from "@/components/ui/InstallPwaModal";
 import "./globals.css";
@@ -15,10 +15,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const DESCRIPTION =
+  "Asta live a budget fisso: stesso budget per tutti, gli elementi escono a caso e vince chi costruisce la lista migliore. Da 2 a 8 giocatori, dal telefono.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: APP_FULL_NAME,
-  description:
-    "Asta live a budget fisso: costruisci il roster perfetto, sfida i tuoi amici e esporta la card in formato 9:16.",
+  description: DESCRIPTION,
   applicationName: APP_NAME,
   icons: {
     icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
@@ -26,6 +29,22 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "black-translucent" },
+  /* Anteprima quando il link viene incollato su WhatsApp, Telegram o Instagram. */
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: APP_FULL_NAME,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    locale: "it_IT",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: APP_FULL_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: APP_FULL_NAME,
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -33,6 +52,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  /* Serve perché env(safe-area-inset-*) abbia un valore su iPhone: senza,
+     la barra dei comandi finirebbe sotto la tacca di navigazione. */
+  viewportFit: "cover",
 };
 
 /**

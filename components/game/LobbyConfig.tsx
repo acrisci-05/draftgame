@@ -13,6 +13,7 @@ import {
 import { useT } from "@/lib/settings";
 import type { CurrencyCode, RoomConfig } from "@/lib/types";
 import { CURRENCIES, CURRENCY_SYMBOLS, cn, money } from "@/lib/utils";
+import { Input } from "@/components/ui/Input";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { Switch } from "@/components/ui/Switch";
 
@@ -130,6 +131,17 @@ export function LobbyConfig({ config, disabled = false, onChange }: LobbyConfigP
             hint={t("lobby.discardsHint")}
           />
         </div>
+
+        {/* La posta in palio: facoltativa, finisce in evidenza sulla card finale. */}
+        <Input
+          label={t("lobby.pledge")}
+          hint={t("lobby.pledgeHint")}
+          value={config.pledge ?? ""}
+          maxLength={60}
+          disabled={disabled}
+          placeholder={t("lobby.pledgePlaceholder")}
+          onChange={(event) => onChange({ pledge: event.target.value })}
+        />
       </div>
     </Panel>
   );
