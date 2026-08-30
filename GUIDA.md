@@ -92,6 +92,7 @@ un uso vero e continuativo.
 | `npm run check:engine` | esegue le verifiche automatiche su regole d'asta e cataloghi |
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
+| `npm run check:supabase` | dice se il database e' collegato, se le tabelle ci sono tutte e se le regole di accesso reggono |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
 | `npm run check:photos` | controlla che tutte le foto del catalogo rispondano ancora |
 | `npm run check:layout` | verifica che nessuna pagina sbordi in orizzontale su telefono |
@@ -430,7 +431,9 @@ Va fatto **prima**, e provato in locale una volta:
 2. In *Project Settings → API* copia **Project URL** e **anon public key**.
 3. Mettile in `.env.local` (copiando `.env.example`) e riavvia `npm run dev`.
 4. Nell'**SQL editor** esegui tutto `supabase/schema.sql`.
-5. Prova a **registrarti** dal sito in locale: se il profilo compare in `/pickmates`, è tutto a posto.
+5. Lancia `npm run check:supabase`: elenca tabella per tabella cosa c'è e cosa manca, e controlla
+   che email e amicizie non siano leggibili da fuori.
+6. Prova a **registrarti** dal sito in locale: se il profilo compare in `/pickmates`, è tutto a posto.
 
 ### Poi la pubblicazione
 1. Vai su [vercel.com](https://vercel.com) e accedi **con GitHub**.

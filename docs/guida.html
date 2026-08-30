@@ -688,6 +688,8 @@ NEXT_PUBLIC_PAYPAL_USER=...             # facoltativo</pre>
   <li><em>Authentication → URL Configuration</em>: metti il dominio in <strong>Site URL</strong> e
     aggiungi <code>http://localhost:3000/pickmates</code> e
     <code>https://tuodominio/pickmates</code> fra le <strong>Redirect URLs</strong>.</li>
+  <li>Lancia <code>npm run check:supabase</code>: elenca tabella per tabella cosa c'è e cosa manca,
+    e controlla che email e amicizie non siano leggibili da fuori.</li>
   <li>Riavvia <code>npm run dev</code> e <strong>prova a registrarti</strong>: se il profilo compare
     in <code>/pickmates</code>, è tutto a posto.</li>
 </ol>
@@ -762,6 +764,7 @@ Supabase.</p>
   <tr><td><code>npm run check:engine</code></td><td>verifiche automatiche su regole d'asta e cataloghi</td></tr>
   <tr><td><code>npm run check:multiplayer</code></td><td>prova una stanza online completa, host e ospite</td></tr>
   <tr><td><code>npm run check:rooms</code></td><td>prova gli indirizzi delle stanze sul server avviato</td></tr>
+  <tr><td><code>npm run check:supabase</code></td><td>dice se il database è collegato, se le tabelle ci sono tutte e se le regole di accesso reggono</td></tr>
   <tr><td><code>npm run check:images</code></td><td>controlla che ogni elemento abbia i dati immagine giusti</td></tr>
   <tr><td><code>npm run check:photos</code></td><td>interroga le foto una per una: segnala quelle che non rispondono più e quelle usate da due elementi</td></tr>
   <tr><td><code>npm run check:layout</code></td><td>verifica che le pagine non sbordino su telefono e che la console non riporti errori</td></tr>
