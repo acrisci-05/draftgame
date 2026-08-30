@@ -606,4 +606,8 @@ export const es: PartialDictionary = {
   "picker.identity": "Tu nombre, reservado",
   "picker.identityGuest": "un nombre que solo vale para esa partida.",
   "picker.identityMember": "un @apodo único que nadie más puede coger, tu avatar y tu color, y la card final firmada con tu nombre.",
+  "maintenance.title": "Pick & Pay está en mantenimiento",
+  "maintenance.body": "¡Estamos añadiendo funciones nuevas a las subastas! Vuelve dentro de un momento.",
+  "maintenance.hint": "La partida se reanuda enseguida.",
+  "maintenance.adminNotice": "Modo creador: para el resto el sitio está en mantenimiento.",
 };

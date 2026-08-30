@@ -604,4 +604,8 @@ export const ar: PartialDictionary = {
   "picker.identity": "اسمك محجوز لك",
   "picker.identityGuest": "اسم يصلح لتلك المباراة فقط.",
   "picker.identityMember": "‏@اسم فريد لا يأخذه غيرك، وصورتك ولونك، وبطاقة النهاية موقّعة باسمك.",
+  "maintenance.title": "Pick & Pay في الصيانة",
+  "maintenance.body": "نضيف ميزات جديدة للمزادات! عد بعد قليل.",
+  "maintenance.hint": "المباراة تستأنف قريباً.",
+  "maintenance.adminNotice": "وضع المُنشئ: بالنسبة للبقية الموقع في الصيانة.",
 };

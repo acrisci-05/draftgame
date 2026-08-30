@@ -606,4 +606,8 @@ export const ru: PartialDictionary = {
   "picker.identity": "Твоё имя, закреплённое",
   "picker.identityGuest": "имя только на одну партию.",
   "picker.identityMember": "уникальный @ник, который больше никто не займёт, твой аватар и цвет, и финальная карточка с твоим именем.",
+  "maintenance.title": "Pick & Pay на техобслуживании",
+  "maintenance.body": "Добавляем новые возможности для аукционов! Загляни через пару минут.",
+  "maintenance.hint": "Игра скоро продолжится.",
+  "maintenance.adminNotice": "Режим создателя: для остальных сайт закрыт на обслуживание.",
 };

@@ -796,6 +796,14 @@ ripubblica a ogni <code>git push</code>. Il database va configurato <strong>prim
   <li>Da lì in poi ogni <code>git push</code> ripubblica il sito da solo.</li>
 </ol>
 
+<h3>Modalit&agrave; manutenzione</h3>
+<p>Prima di un aggiornamento importante il sito si pu&ograve; chiudere senza toccare il codice:
+basta mettere <code>NEXT_PUBLIC_MAINTENANCE_MODE=true</code> fra le variabili e ripubblicare. Chi
+arriva trova una schermata sola, e non viene montato nient'altro: nessuna stanza, nessun accesso,
+nessuna interrogazione al database. Chi ha la chiave del creatore continua a vedere il sito per
+intero, con una striscia che ricorda che per gli altri &egrave; chiuso. Per riaprire si rimette
+<code>false</code>.</p>
+
 <h3>Un dominio tuo (facoltativo)</h3>
 <p>Comprato il dominio, in Vercel <em>Settings → Domains</em> lo si aggiunge e si seguono le due
 righe DNS indicate. Poi si aggiorna <code>NEXT_PUBLIC_SITE_URL</code> e la Site URL su

@@ -646,4 +646,8 @@ export const en: Dictionary = {
   "picker.identity": "Your name, reserved",
   "picker.identityGuest": "a name that only lasts that game.",
   "picker.identityMember": "a unique @nickname nobody else can take, your avatar and colour, and the end-of-game card signed with your name.",
+  "maintenance.title": "Pick & Pay is under maintenance",
+  "maintenance.body": "We are adding new features to the auctions! Come back in a moment.",
+  "maintenance.hint": "The game resumes shortly.",
+  "maintenance.adminNotice": "Creator mode: for everyone else the site is under maintenance.",
 };

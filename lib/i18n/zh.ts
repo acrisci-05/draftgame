@@ -601,4 +601,8 @@ export const zh: PartialDictionary = {
   "picker.identity": "你的名字，专属",
   "picker.identityGuest": "只在那一局有效的名字。",
   "picker.identityMember": "独一无二、别人抢不走的 @昵称，你的头像和颜色，以及署你名字的结算卡。",
+  "maintenance.title": "Pick & Pay 正在维护",
+  "maintenance.body": "我们在给拍卖加新功能！稍后再来看看。",
+  "maintenance.hint": "很快就能继续开局。",
+  "maintenance.adminNotice": "创作者模式：对其他人来说网站正在维护。",
 };

@@ -649,6 +649,10 @@ export const it = {
   "picker.identity": "Il tuo nome, riservato",
   "picker.identityGuest": "un nome che vale solo per quella partita.",
   "picker.identityMember": "un @nickname unico che nessun altro può prendere, il tuo avatar e il tuo colore, e la card di fine partita firmata col tuo nome.",
+  "maintenance.title": "Pick & Pay è in manutenzione",
+  "maintenance.body": "Stiamo aggiungendo nuove funzioni per le aste! Torna a trovarci tra pochissimo.",
+  "maintenance.hint": "La partita riprende a breve.",
+  "maintenance.adminNotice": "Modalità creatore: per tutti gli altri il sito è in manutenzione.",
 } as const;
 
 export type TranslationKey = keyof typeof it;

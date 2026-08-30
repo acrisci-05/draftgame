@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { APP_FULL_NAME, APP_NAME, SITE_URL } from "@/lib/config";
+import { MaintenanceGate } from "@/components/ui/MaintenanceGate";
 import { Navbar } from "@/components/ui/Navbar";
 import { PwaInstallBanner } from "@/components/ui/InstallPwaModal";
 import "./globals.css";
@@ -76,9 +77,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col bg-ink text-fg">
-        <Navbar />
-        {children}
-        <PwaInstallBanner />
+        {/*
+          Il cancello sta sopra tutto: in manutenzione non viene montato nemmeno
+          il resto del sito, quindi non parte nessuna richiesta al database.
+        */}
+        <MaintenanceGate>
+          <Navbar />
+          {children}
+          <PwaInstallBanner />
+        </MaintenanceGate>
       </body>
     </html>
   );

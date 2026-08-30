@@ -604,4 +604,8 @@ export const ja: PartialDictionary = {
   "picker.identity": "あなたの名前を確保",
   "picker.identityGuest": "その一戦だけの名前。",
   "picker.identityMember": "誰にも取られない固有の@ニックネーム、アバターと色、そしてあなたの名前入りの結果カード。",
+  "maintenance.title": "Pick & Pay はメンテナンス中です",
+  "maintenance.body": "オークションに新しい機能を追加しています。少ししたらまた来てください。",
+  "maintenance.hint": "まもなく再開します。",
+  "maintenance.adminNotice": "クリエイターモード：ほかの人にはメンテナンス中と表示されています。",
 };

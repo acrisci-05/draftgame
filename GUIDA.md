@@ -499,6 +499,28 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
 
 ---
 
+### Modalità manutenzione
+
+Prima di un aggiornamento importante il sito si può chiudere, senza toccare il codice:
+
+```
+NEXT_PUBLIC_MAINTENANCE_MODE=true
+```
+
+Su Vercel si cambia il valore fra le *Environment Variables* e si ripubblica. Chi arriva trova una
+schermata sola — martello, "Pick & Pay è in manutenzione", e la riga che dice di tornare fra poco —
+e **niente altro viene montato**: nessuna stanza da creare, nessun accesso, nessuna interrogazione
+al database.
+
+**Tu continui a vederlo per intero.** Chi ha sbloccato la modalità creatore passa oltre e trova una
+striscia in alto che ricorda che per tutti gli altri è chiuso: serve a provare le novità prima di
+riaprire. Per riaprire si rimette `false`.
+
+Una nota sul valore: chiude solo con un sì esplicito (`true`, `1`, `on`). Un valore scritto storto
+lascia il sito aperto, che è il male minore.
+
+---
+
 ## 8. Pubblicare il sito
 
 Il modo più semplice è **Vercel**: è di chi fa Next.js, il piano gratuito basta e si aggiorna da
