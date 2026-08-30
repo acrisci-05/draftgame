@@ -489,4 +489,6 @@ export const zh: PartialDictionary = {
   "card.pledge": "赌注",
   "auction.blindLot": "神秘拍品",
   "auction.revealed": "揭晓",
+  "lobby.changeAvatar": "更换头像",
+  "lobby.avatarHint": "每位玩家的头像都要不同：变暗的已被选走。",
 };

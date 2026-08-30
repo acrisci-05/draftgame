@@ -495,4 +495,6 @@ export const fr: PartialDictionary = {
   "card.pledge": "Enjeu en jeu",
   "auction.blindLot": "Lot mystère",
   "auction.revealed": "Révélé",
+  "lobby.changeAvatar": "Changer d'avatar",
+  "lobby.avatarHint": "Chaque joueur doit avoir un avatar différent : ceux qui sont éteints sont déjà pris.",
 };

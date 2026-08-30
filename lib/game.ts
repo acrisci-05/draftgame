@@ -1,4 +1,4 @@
-import { avatarForIndex } from "./avatars";
+import { firstFreeAvatar, isAvatarId } from "./avatars";
 import type {
   AuctionResult,
   CatalogItem,
@@ -33,7 +33,14 @@ export const MYSTERY_EVERY = 5;
 export const FEED_LIMIT = 24;
 
 /** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
-export { AVATAR_IDS, DEFAULT_AVATAR, randomAvatar } from "./avatars";
+export { AVATAR_IDS, DEFAULT_AVATAR, firstFreeAvatar, randomAvatar } from "./avatars";
+
+/** Avatar già usati nella stanza: gli altri giocatori non possono prenderli. */
+export function takenAvatars(state: GameState, exceptPlayerId?: string): string[] {
+  return state.players
+    .filter((player) => player.id !== exceptPlayerId)
+    .map((player) => player.emoji);
+}
 
 export const DEFAULT_CONFIG: RoomConfig = {
   budget: 20,
@@ -255,6 +262,7 @@ export function totalSlots(state: GameState): number {
 export type GameAction =
   | { type: "add_player"; player: { id: string; name: string; emoji?: string; accountId?: string } }
   | { type: "remove_player"; playerId: string }
+  | { type: "set_avatar"; playerId: string; emoji: string }
   | { type: "set_category"; category: Category }
   | { type: "set_config"; config: Partial<RoomConfig> }
   | { type: "start"; now: number }
@@ -531,15 +539,34 @@ export function reducer(state: GameState, action: GameAction): GameState {
       if (state.players.length >= state.config.maxPlayers) return state;
       if (state.players.some((p) => p.id === action.player.id)) return state;
       const index = state.players.length;
+      // Due giocatori non possono avere lo stesso avatar: se quello richiesto è
+      // già di qualcun altro, se ne assegna uno libero.
+      const taken = state.players.map((p) => p.emoji);
+      const wanted = action.player.emoji;
       const player: Player = {
         id: action.player.id,
         name: action.player.name.trim().slice(0, 16) || `Player ${index + 1}`,
-        emoji: action.player.emoji || avatarForIndex(index),
+        emoji: wanted && !taken.includes(wanted) ? wanted : firstFreeAvatar(taken),
         accountId: action.player.accountId,
         budget: state.config.budget,
         roster: [],
       };
       return touch({ ...state, players: [...state.players, player] });
+    }
+
+    /** Cambio avatar dalla lobby: l'icona deve essere ancora libera. */
+    case "set_avatar": {
+      if (state.phase !== "lobby") return state;
+      if (!isAvatarId(action.emoji)) return state;
+      const target = playerById(state, action.playerId);
+      if (!target || target.emoji === action.emoji) return state;
+      if (state.players.some((p) => p.emoji === action.emoji)) return state;
+      return touch({
+        ...state,
+        players: state.players.map((p) =>
+          p.id === action.playerId ? { ...p, emoji: action.emoji } : p,
+        ),
+      });
     }
 
     case "remove_player": {

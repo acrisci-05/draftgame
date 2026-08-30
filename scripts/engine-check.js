@@ -267,6 +267,50 @@ check(
   closing.players.every((p) => p.roster.length === 2),
 );
 
+/* ---------------- Avatar ---------------- */
+
+let room = game.createGame({
+  code: "AVTR1",
+  mode: "local",
+  hostId: "a",
+  category: categories[0],
+  config: { maxPlayers: 6 },
+});
+room = game.reducer(room, { type: "add_player", player: { id: "a", name: "Ana" } });
+room = game.reducer(room, { type: "add_player", player: { id: "b", name: "Bea" } });
+room = game.reducer(room, { type: "add_player", player: { id: "c", name: "Cip" } });
+
+check(
+  "chi entra riceve un avatar diverso dagli altri",
+  new Set(room.players.map((p) => p.emoji)).size === room.players.length,
+  room.players.map((p) => p.emoji).join(","),
+);
+
+const wanted = room.players[0].emoji;
+const doubled = game.reducer(room, {
+  type: "add_player",
+  player: { id: "d", name: "Dan", emoji: wanted },
+});
+check(
+  "chiedere un avatar già preso ne assegna uno libero",
+  doubled.players[3].emoji !== wanted && new Set(doubled.players.map((p) => p.emoji)).size === 4,
+);
+
+const free = game.AVATAR_IDS.find((id) => !room.players.some((p) => p.emoji === id));
+const changed = game.reducer(room, { type: "set_avatar", playerId: "b", emoji: free });
+check("dalla lobby si può cambiare avatar", changed.players[1].emoji === free);
+
+const refused = game.reducer(room, {
+  type: "set_avatar",
+  playerId: "b",
+  emoji: room.players[2].emoji,
+});
+check("non si può prendere l'avatar di un altro", refused === room);
+
+const started = game.reducer(changed, { type: "start", now: Date.now() });
+const late = game.reducer(started, { type: "set_avatar", playerId: "b", emoji: free });
+check("a partita avviata l'avatar non si cambia più", late === started);
+
 /* ---------------- Codice stanza ---------------- */
 
 const utils = require(path.join(OUT, "utils.js"));

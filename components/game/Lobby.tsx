@@ -1,17 +1,17 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, LayoutGrid, Play, Share2, UserPlus, Users, X } from "lucide-react";
+import { Check, LayoutGrid, Pencil, Play, Share2, UserPlus, Users, X } from "lucide-react";
 import { useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
-import { MIN_PLAYERS, type GameAction } from "@/lib/game";
+import { MIN_PLAYERS, playerById, takenAvatars, type GameAction } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import { saveConfig } from "@/lib/storage";
 import type { Category, GameState, RoomConfig } from "@/lib/types";
 import { copyText, money, uid } from "@/lib/utils";
-import { Avatar } from "@/components/ui/Avatar";
+import { Avatar, AvatarPicker } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -35,6 +35,8 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const [newPlayer, setNewPlayer] = useState("");
   const [copied, setCopied] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  /** Giocatore a cui stiamo scegliendo l'avatar, se il pannello è aperto. */
+  const [avatarFor, setAvatarFor] = useState<string | null>(null);
 
   const isLocal = state.mode === "local";
   const canStart = isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0;
@@ -177,7 +179,24 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                 exit={{ opacity: 0, x: 12 }}
                 className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-2.5"
               >
-                <Avatar id={player.emoji} size="sm" />
+                {/* In locale l'host cambia l'avatar di chiunque, perché tutti
+                    giocano dal suo schermo; online ognuno cambia il proprio. */}
+                {(isLocal ? isHost : player.id === selfId) ? (
+                  <button
+                    type="button"
+                    aria-label={t("lobby.changeAvatar")}
+                    title={t("lobby.changeAvatar")}
+                    onClick={() => setAvatarFor(player.id)}
+                    className="relative rounded-full transition-transform hover:scale-105"
+                  >
+                    <Avatar id={player.emoji} size="sm" />
+                    <span className="absolute -bottom-0.5 -end-0.5 grid size-4 place-items-center rounded-full border border-line bg-ink text-neon">
+                      <Pencil className="size-2.5" />
+                    </span>
+                  </button>
+                ) : (
+                  <Avatar id={player.emoji} size="sm" />
+                )}
                 <span className="min-w-0 flex-1 truncate font-semibold">{player.name}</span>
                 {player.id === state.hostId ? <Badge tone="violet">{t("lobby.host")}</Badge> : null}
                 {player.id === selfId && !isLocal ? (
@@ -260,6 +279,26 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             setPickerOpen(false);
           }}
         />
+      </Modal>
+
+      <Modal
+        open={avatarFor !== null}
+        title={t("lobby.changeAvatar")}
+        onClose={() => setAvatarFor(null)}
+      >
+        {avatarFor ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm text-muted">{t("lobby.avatarHint")}</p>
+            <AvatarPicker
+              value={playerById(state, avatarFor)?.emoji ?? ""}
+              taken={takenAvatars(state, avatarFor)}
+              onChange={(emoji) => {
+                dispatch({ type: "set_avatar", playerId: avatarFor, emoji });
+                setAvatarFor(null);
+              }}
+            />
+          </div>
+        ) : null}
       </Modal>
 
       <Modal open={qrOpen} title={t("lobby.qrZoom")} onClose={() => setQrOpen(false)}>

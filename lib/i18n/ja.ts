@@ -492,4 +492,6 @@ export const ja: PartialDictionary = {
   "card.pledge": "賭けるもの",
   "auction.blindLot": "ミステリーロット",
   "auction.revealed": "公開",
+  "lobby.changeAvatar": "アバターを変更",
+  "lobby.avatarHint": "プレイヤーごとに別のアバターが必要です。薄いものは使用済みです。",
 };

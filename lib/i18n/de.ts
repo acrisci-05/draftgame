@@ -494,4 +494,6 @@ export const de: PartialDictionary = {
   "card.pledge": "Einsatz",
   "auction.blindLot": "Geheimnisvolles Los",
   "auction.revealed": "Aufgedeckt",
+  "lobby.changeAvatar": "Avatar wechseln",
+  "lobby.avatarHint": "Jeder Spieler braucht einen anderen Avatar: die ausgegrauten sind schon vergeben.",
 };

@@ -120,30 +120,44 @@ export function Avatar({
   );
 }
 
-/** Selettore: cerchi affiancati, quello attivo con bordo verde neon. */
+/**
+ * Selettore: cerchi affiancati, quello attivo con bordo verde neon.
+ * Gli avatar già presi da un altro giocatore restano visibili ma spenti, così
+ * si capisce a colpo d'occhio quali sono ancora liberi.
+ */
 export function AvatarPicker({
   value,
   onChange,
+  taken = [],
   className,
 }: {
   value: string;
   onChange: (id: AvatarId) => void;
+  /** Avatar di altri giocatori: non selezionabili. */
+  taken?: readonly string[];
   className?: string;
 }) {
   return (
     <div className={cn("flex flex-wrap gap-2", className)}>
-      {AVATAR_IDS.map((id) => (
-        <button
-          key={id}
-          type="button"
-          aria-label={id}
-          aria-pressed={id === value}
-          onClick={() => onChange(id)}
-          className="rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon"
-        >
-          <Avatar id={id} selected={id === value} />
-        </button>
-      ))}
+      {AVATAR_IDS.map((id) => {
+        const used = id !== value && taken.includes(id);
+        return (
+          <button
+            key={id}
+            type="button"
+            aria-label={id}
+            aria-pressed={id === value}
+            disabled={used}
+            onClick={() => onChange(id)}
+            className={cn(
+              "rounded-full transition-transform focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neon",
+              used ? "cursor-not-allowed opacity-30" : "hover:scale-105",
+            )}
+          >
+            <Avatar id={id} selected={id === value} />
+          </button>
+        );
+      })}
     </div>
   );
 }

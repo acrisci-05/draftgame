@@ -492,4 +492,6 @@ export const ar: PartialDictionary = {
   "card.pledge": "الرهان",
   "auction.blindLot": "عنصر غامض",
   "auction.revealed": "انكشف",
+  "lobby.changeAvatar": "تغيير الصورة الرمزية",
+  "lobby.avatarHint": "لكل لاعب صورة مختلفة: الباهتة مأخوذة بالفعل.",
 };

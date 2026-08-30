@@ -76,6 +76,33 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 40));
   check("l'ospite entra nella stanza", hostState.players.length === 2, hostState.players.length);
   check("l'ospite riceve lo stato", guestState !== null);
   check(
+    "i due giocatori hanno avatar diversi",
+    hostState.players[0].emoji !== hostState.players[1].emoji,
+    hostState.players.map((p) => p.emoji).join(","),
+  );
+
+  // L'ospite cambia avatar dal proprio telefono: l'intento passa dall'host.
+  const freeAvatar = game.AVATAR_IDS.find(
+    (avatar) => !hostState.players.some((p) => p.emoji === avatar),
+  );
+  guestChannel.postMessage({
+    type: "intent",
+    action: { type: "set_avatar", playerId: "guest", emoji: freeAvatar },
+  });
+  await wait();
+  check(
+    "l'ospite cambia avatar e lo vedono tutti",
+    hostState.players[1].emoji === freeAvatar && guestState.players[1].emoji === freeAvatar,
+  );
+
+  // Ma non può prendersi quello dell'host.
+  guestChannel.postMessage({
+    type: "intent",
+    action: { type: "set_avatar", playerId: "guest", emoji: hostState.players[0].emoji },
+  });
+  await wait();
+  check("non può prendersi l'avatar dell'host", hostState.players[1].emoji === freeAvatar);
+  check(
     "i due vedono la stessa lista",
     guestState && guestState.players.length === hostState.players.length,
   );

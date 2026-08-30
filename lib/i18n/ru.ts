@@ -494,4 +494,6 @@ export const ru: PartialDictionary = {
   "card.pledge": "Ставка",
   "auction.blindLot": "Загадочный лот",
   "auction.revealed": "Раскрыт",
+  "lobby.changeAvatar": "Сменить аватар",
+  "lobby.avatarHint": "У каждого игрока свой аватар: приглушённые уже заняты.",
 };

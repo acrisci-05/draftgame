@@ -122,6 +122,8 @@ export const en: Dictionary = {
   "lobby.pledgeHint": "Optional: it goes on the final card, in plain sight.",
   "lobby.pledgePlaceholder": "e.g. loser buys the pizza",
   "lobby.qrZoom": "Scan to join",
+  "lobby.changeAvatar": "Change avatar",
+  "lobby.avatarHint": "Every player needs a different avatar: the dimmed ones are taken.",
   "lobby.addPlayer": "Player name",
   "lobby.start": "Start the draft",
   "lobby.needPlayers": "At least {n} players needed",

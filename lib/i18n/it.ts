@@ -121,6 +121,8 @@ export const it = {
   "lobby.pledgeHint": "Facoltativo: finisce in evidenza sulla card di fine partita.",
   "lobby.pledgePlaceholder": "Es. chi perde offre la pizza",
   "lobby.qrZoom": "Inquadra per entrare",
+  "lobby.changeAvatar": "Cambia avatar",
+  "lobby.avatarHint": "Ogni giocatore deve avere un avatar diverso: quelli spenti sono già presi.",
   "lobby.addPlayer": "Nome giocatore",
   "lobby.start": "Avvia il draft",
   "lobby.needPlayers": "Servono almeno {n} giocatori",
