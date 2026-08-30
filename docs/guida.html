@@ -1,35 +1,56 @@
 <!doctype html>
+<!--
+  Guida completa di Pick & Pay - The Draft Game.
+
+  Questo file e' la sorgente del PDF che si consegna con il progetto: si
+  trasforma con "npm run docs:pdf", che lo stampa con il browser gia' presente
+  sul computer (Chrome o Edge) e scrive docs/Guida-Pick-and-Pay.pdf.
+
+  Come e' organizzato:
+  - lo stile qui sotto e' pensato per la carta (A4, colori tenui, nessuna
+    dipendenza esterna: nessun font da scaricare, nessuna immagine remota);
+  - ogni sezione e' preceduta da un commento che dice cosa contiene, cosi' si
+    trova subito il punto da aggiornare;
+  - i valori citati (timer, budget, numero di elementi) sono gli stessi che
+    applica il motore in lib/game.ts: se cambiano li', vanno cambiati anche qui.
+-->
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<title>Pick &amp; Pay - The Draft Game — Guida</title>
+<title>Pick &amp; Pay - The Draft Game — Guida completa</title>
 <style>
-  @page { size: A4; margin: 18mm 16mm; }
+  /* Impaginazione per la stampa: A4 con margini generosi. */
+  @page { size: A4; margin: 16mm 15mm; }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     color: #18181b;
-    font-size: 10.5pt;
-    line-height: 1.55;
+    font-size: 10pt;
+    line-height: 1.5;
   }
+
+  /* Titoli: la barra verde sotto gli h2 scandisce i capitoli. */
   h1 { font-size: 26pt; margin: 0 0 4pt; letter-spacing: -0.5pt; }
   h2 {
-    font-size: 14pt;
-    margin: 20pt 0 6pt;
+    font-size: 13.5pt;
+    margin: 18pt 0 6pt;
     padding-bottom: 3pt;
     border-bottom: 1.5pt solid #22c55e;
     page-break-after: avoid;
   }
-  h3 { font-size: 11.5pt; margin: 12pt 0 3pt; page-break-after: avoid; }
-  p, li { margin: 0 0 5pt; }
-  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  h3 { font-size: 11pt; margin: 11pt 0 3pt; page-break-after: avoid; }
+  h4 { font-size: 10pt; margin: 8pt 0 2pt; color: #3f3f46; page-break-after: avoid; }
+  p, li { margin: 0 0 4pt; }
+  ul, ol { margin: 0 0 7pt; padding-left: 15pt; }
+  li > ul, li > ol { margin-top: 3pt; }
+
   code {
     font-family: "Cascadia Mono", Consolas, monospace;
     background: #f4f4f5;
     padding: 1pt 3pt;
     border-radius: 3pt;
-    font-size: 9.5pt;
+    font-size: 9pt;
   }
   pre {
     background: #18181b;
@@ -37,19 +58,25 @@
     padding: 8pt 10pt;
     border-radius: 6pt;
     font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 9pt;
+    font-size: 8.5pt;
     line-height: 1.45;
     white-space: pre-wrap;
+    page-break-inside: avoid;
   }
-  table { width: 100%; border-collapse: collapse; margin: 4pt 0 10pt; font-size: 9.5pt; }
-  th, td { border: 0.5pt solid #d4d4d8; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+
+  /* Tabelle: usate ovunque, restano leggibili anche fitte. */
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 9pt; font-size: 9pt; }
+  th, td { border: 0.5pt solid #d4d4d8; padding: 3.5pt 5pt; text-align: left; vertical-align: top; }
   th { background: #f4f4f5; font-weight: 700; }
-  .lead { font-size: 11.5pt; color: #3f3f46; margin-bottom: 10pt; }
+  tr { page-break-inside: avoid; }
+  td.num { text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .lead { font-size: 11pt; color: #3f3f46; margin-bottom: 10pt; }
   .cover {
     border: 1.5pt solid #22c55e;
     border-radius: 10pt;
     padding: 14pt 16pt;
-    margin-bottom: 6pt;
+    margin-bottom: 8pt;
     background: linear-gradient(135deg, #f0fdf4, #ffffff 60%);
   }
   .tag {
@@ -63,36 +90,112 @@
     border-radius: 20pt;
     text-transform: uppercase;
   }
+  /* Riquadro viola: le cose da non perdere. */
   .note {
     border-left: 3pt solid #a855f7;
     background: #faf5ff;
     padding: 6pt 10pt;
     border-radius: 0 5pt 5pt 0;
-    margin: 6pt 0 10pt;
-    font-size: 10pt;
+    margin: 6pt 0 9pt;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
   }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 14pt; }
+  /* Riquadro ambra: gli avvertimenti veri e propri. */
+  .warn {
+    border-left: 3pt solid #f59e0b;
+    background: #fffbeb;
+    padding: 6pt 10pt;
+    border-radius: 0 5pt 5pt 0;
+    margin: 6pt 0 9pt;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+  .toc { columns: 2; column-gap: 20pt; font-size: 9.5pt; margin-bottom: 4pt; }
+  .toc ol { padding-left: 16pt; margin: 0; }
+  .toc li { margin-bottom: 2pt; break-inside: avoid; }
   .muted { color: #52525b; }
   .page-break { page-break-before: always; }
-  footer { margin-top: 14pt; border-top: 0.5pt solid #d4d4d8; padding-top: 5pt; font-size: 8.5pt; color: #71717a; }
+  footer {
+    margin-top: 14pt;
+    border-top: 0.5pt solid #d4d4d8;
+    padding-top: 5pt;
+    font-size: 8.5pt;
+    color: #71717a;
+  }
 </style>
 </head>
 <body>
 
+<!-- =====================================================================
+     COPERTINA + INDICE
+     I numeri in copertina sono quelli veri del catalogo: 33 liste, 980
+     elementi. Si ricontrollano con "npm run check:engine".
+     ================================================================== -->
 <div class="cover">
-  <span class="tag">Guida d'uso</span>
+  <span class="tag">Guida completa</span>
   <h1>Pick &amp; Pay <span class="muted" style="font-weight:400">— The Draft Game</span></h1>
   <p class="lead">
-    Asta dal vivo a budget fisso: stesso budget per tutti, gli elementi della categoria escono uno
-    alla volta e vince chi costruisce la lista migliore. A fine partita esce una card verticale
-    pronta da postare e un link per far votare gli amici.
+    Asta dal vivo a budget fisso. Stesso budget per tutti, gli elementi della categoria escono uno
+    alla volta, si rilancia a tempo e vince chi costruisce la lista migliore. A fine partita esce
+    una card verticale pronta da postare e un link per far votare gli amici.
   </p>
   <p class="muted" style="margin:0">
-    Versione 1.1.0 · progetto indipendente di Antonio · da 2 a 8 giocatori · 33 liste ufficiali
+    Versione 1.1.0 · progetto indipendente di Antonio · da 2 a 8 giocatori · 33 liste ufficiali ·
+    980 elementi
   </p>
 </div>
 
-<h2>1. Come si avvia</h2>
+<h2 style="margin-top:12pt">Indice</h2>
+<div class="toc">
+  <ol>
+    <li>Che cos'è, in due minuti</li>
+    <li>Avvio rapido</li>
+    <li>Come si gioca, passo passo</li>
+    <li>Regolamento completo</li>
+    <li>Le modalità e le varianti</li>
+    <li>Schermata per schermata</li>
+    <li>Le 33 categorie</li>
+    <li>Le immagini: da dove arrivano</li>
+    <li>Account, Pickmates e notifiche</li>
+    <li>Fine partita: card e votazione</li>
+    <li>Lingue, tema, audio, installazione</li>
+    <li>Con e senza database</li>
+    <li>Configurare il database</li>
+    <li>Pubblicare il sito</li>
+    <li>Tutti i comandi</li>
+    <li>Com'è fatto il progetto</li>
+    <li>Le verifiche automatiche</li>
+    <li>Limiti noti</li>
+    <li>Se qualcosa non va</li>
+  </ol>
+</div>
+
+<!-- =====================================================================
+     1. IL CONCETTO. Per chi apre il PDF senza aver mai visto il gioco.
+     ================================================================== -->
+<h2>1. Che cos'è, in due minuti</h2>
+
+<p>Si sceglie una categoria — i burger, i film Pixar, le città italiane, le scuse per non uscire —
+e si mette all'asta un elemento alla volta. Tutti partono con lo stesso budget e devono riempire lo
+stesso numero di posti. Spendere troppo sul primo pezzo forte significa arrivare a fine partita con
+gli avanzi; tenere i crediti troppo stretti significa vedersi soffiare tutto quello che conta.</p>
+
+<p>Non c'è un punteggio calcolato dal computer: <strong>a decidere chi ha fatto la lista migliore
+sono le persone</strong>. A fine partita esce una card verticale con tutte le liste, e chi vuole la
+manda agli amici perché votino.</p>
+
+<table>
+  <tr><th>Quante persone</th><td>da 2 a 8</td></tr>
+  <tr><th>Quanto dura</th><td>10-20 minuti, a seconda di quanti elementi per lista</td></tr>
+  <tr><th>Cosa serve</th><td>un telefono a testa (stanza online) oppure un solo telefono passato di mano (stanza locale)</td></tr>
+  <tr><th>Serve registrarsi</th><td>no, si gioca subito. L'account serve solo per amici, notifiche e votazioni</td></tr>
+</table>
+
+<!-- =====================================================================
+     2. AVVIO. Tre scenari: sul proprio computer, dal telefono sulla stessa
+     rete, da fuori casa. Il quarto (sito pubblicato) sta nella sezione 14.
+     ================================================================== -->
+<h2>2. Avvio rapido</h2>
 
 <p>Serve <strong>Node.js 24 o superiore</strong>. Dalla cartella del progetto:</p>
 
@@ -101,185 +204,669 @@ npm run dev     # avvia il sito in sviluppo</pre>
 
 <p>Poi si apre <code>http://localhost:3000</code>. Senza nessuna configurazione la
 <strong>partita locale funziona subito</strong>: due o più giocatori sullo stesso telefono o
-computer, tutte le categorie, card finale scaricabile.</p>
+computer, tutte le categorie con le loro foto, card finale scaricabile.</p>
 
 <h3>Dal telefono, sulla stessa Wi-Fi</h3>
-<p>All'avvio il terminale stampa due indirizzi: <code>Local</code> e <code>Network</code> (tipo
-<code>http://192.168.1.124:3000</code>). Basta aprire il secondo dal telefono: gli indirizzi di
-rete del computer sono già autorizzati nella configurazione.</p>
+<p>All'avvio il terminale stampa due indirizzi, <code>Local</code> e <code>Network</code> (tipo
+<code>http://192.168.1.124:3000</code>). Si apre il secondo dal telefono: gli indirizzi di rete del
+computer sono già autorizzati nella configurazione, non serve toccare niente.</p>
 
 <h3>Da un'altra rete o da connessione dati</h3>
 <p>Da fuori casa il telefono non raggiunge il computer: è una regola di rete, non un difetto
 dell'app. Serve un indirizzo pubblico. Il più rapido, con il sito già avviato:</p>
 <pre>npm run share   # apre un indirizzo https temporaneo, valido anche in 4G</pre>
-<p>Per un uso continuativo conviene pubblicare il sito (Vercel, Render, Railway) e collegare il
-database.</p>
+<p>L'indirizzo dura quanto resta aperto il comando. Per un uso continuativo si pubblica il sito
+(sezione 14).</p>
 
-<h2>2. Come si gioca</h2>
+<!-- =====================================================================
+     3. IL GIRO COMPLETO DI UNA PARTITA, dal punto di vista di chi gioca.
+     ================================================================== -->
+<h2>3. Come si gioca, passo passo</h2>
 
 <ol>
-  <li><strong>Prepara la stanza</strong>: modalità, categoria, budget, valuta, quanti giocatori e
-    quanti elementi deve avere ogni lista.</li>
-  <li><strong>Parte l'asta</strong>: gli elementi escono a caso, ognuno con il suo prezzo di
-    apertura (da 1 a 5 crediti). Hai 15 secondi per lotto.</li>
-  <li><strong>Rilancia o passa</strong>: rilanci +1, +2, +5 e pulsante Max, finché il saldo li
-    copre. Ogni rilancio riporta il timer a 10 secondi.</li>
-  <li><strong>Aggiudicazione</strong>: il lotto va all'offerta più alta quando il tempo scade o
-    quando tutti gli altri hanno passato.</li>
-  <li><strong>Fine partita</strong>: a liste piene si genera la card 9:16 e il link di voto.</li>
+  <li><strong>Crea la partita</strong> dalla home. Scegli la modalità (locale oppure online), la
+    categoria, e poi budget, valuta, quanti giocatori e quanti elementi deve avere ogni lista.</li>
+  <li><strong>Raduna i giocatori nella lobby</strong>. In locale si aggiungono a mano scrivendo i
+    nomi; online si passa agli altri il codice di 5 caratteri, il QR o il link diretto. Ognuno
+    sceglie il proprio avatar, e due giocatori non possono avere lo stesso.</li>
+  <li><strong>Parte l'asta</strong>. Gli elementi escono in ordine casuale, ognuno con il suo
+    prezzo di apertura. Hai 15 secondi per decidere.</li>
+  <li><strong>Rilancia o passa</strong>. I pulsanti sono +1, +2, +5 e <em>Max</em>, e si accendono
+    solo se il saldo li copre. Ogni rilancio riporta il timer a 10 secondi, quindi l'offerta
+    all'ultimo istante non chiude mai la partita in faccia agli altri.</li>
+  <li><strong>Aggiudicazione</strong>. Il lotto va all'offerta più alta quando scade il tempo,
+    oppure subito se tutti gli altri hanno passato. Se non ha offerto nessuno, non lo prende
+    nessuno: vedi <em>scarti</em> nella sezione 4.</li>
+  <li><strong>Avanti al prossimo</strong>. Dopo 4 secondi di risultato parte il lotto seguente.</li>
+  <li><strong>Fine partita</strong>: quando tutte le liste sono piene si apre la card 9:16, con i
+    tasti per scaricarla, condividerla e generare il link di voto.</li>
 </ol>
 
 <div class="note">
-  <strong>Nessuno resta bloccato.</strong> Si tiene sempre un credito per ogni posto ancora vuoto:
-  se ti mancano tre elementi non puoi scendere sotto 3 crediti. E se resti l'ultimo a dover
-  completare, i lotti rimasti ti vengono assegnati al prezzo di apertura.
+  <strong>Nessuno resta bloccato a metà lista.</strong> Si tiene sempre un credito per ogni posto
+  ancora vuoto: se ti mancano tre elementi non puoi scendere sotto 3 crediti. E se resti l'unico a
+  dover completare, i lotti rimasti ti vengono assegnati al prezzo di apertura, senza doverli
+  contendere a nessuno.
 </div>
 
-<h3>Le regole in breve</h3>
+<!-- =====================================================================
+     4. IL REGOLAMENTO. Questa e' la sezione che deve restare allineata a
+     lib/game.ts: ogni riga corrisponde a una regola del motore ed e'
+     coperta dai test di "npm run check:engine".
+     ================================================================== -->
+<h2>4. Regolamento completo</h2>
+
+<h3>I numeri della partita</h3>
 <table>
-  <tr><th>Regola</th><th>Come funziona</th></tr>
-  <tr><td>Budget</td><td>Uguale per tutti: 10, 20, 50, 100 o valore libero, in €, $, £ o ¥</td></tr>
-  <tr><td>Timer</td><td>15 secondi per lotto, riportati a 10 dopo ogni rilancio</td></tr>
-  <tr><td>Anti-sniping</td><td>Un'offerta all'ultimo istante lascia sempre agli altri il tempo di rispondere</td></tr>
-  <tr><td>Passa</td><td>Chi passa esce da quel lotto e non rientra. Con un'offerta sul piatto, se passano tutti gli altri il lotto va a chi l'aveva fatta</td></tr>
-  <tr><td>Se non lo vuole nessuno</td><td>Passare non regala il lotto all'avversario: senza offerte possono passare tutti e vale la regola degli scarti</td></tr>
-  <tr><td>Scarti</td><td>Attivi (default): il lotto rifiutato si mette da parte e non lo paga nessuno. Disattivati: va al prezzo base a chi ha la lista più corta</td></tr>
+  <tr><th>Voce</th><th>Valore</th><th>Note</th></tr>
+  <tr><td>Budget</td><td class="num">5 – 500</td><td>uguale per tutti. Scelte rapide 10, 20, 50, 100; predefinito 20</td></tr>
+  <tr><td>Valuta</td><td class="num">€ $ £ ¥</td><td>solo estetica: i crediti sono gli stessi</td></tr>
+  <tr><td>Giocatori</td><td class="num">2 – 8</td><td>predefinito 2</td></tr>
+  <tr><td>Elementi per lista</td><td class="num">3 – 10</td><td>predefinito 5. Più elementi, partita più lunga</td></tr>
+  <tr><td>Prezzo di apertura</td><td class="num">1 – 5</td><td>dipende da quanto è ambito l'elemento; si vede quando il lotto esce</td></tr>
+  <tr><td>Tempo per lotto</td><td class="num">15 s</td><td>riportato a 10 s dopo ogni rilancio</td></tr>
+  <tr><td>Pausa dopo l'aggiudicazione</td><td class="num">4 s</td><td>poi parte il lotto successivo</td></tr>
+  <tr><td>Rilanci</td><td class="num">+1 +2 +5</td><td>più il pulsante <em>Max</em>, che offre il massimo consentito</td></tr>
+  <tr><td>Codice stanza</td><td class="num">5 caratteri</td><td>lettere e numeri, senza quelli che si confondono (0/O, 1/I)</td></tr>
 </table>
 
-<h2>3. Le modalità</h2>
+<h3>Le regole, una per una</h3>
 
+<h4>Chi può offrire</h4>
+<p>Chiunque non sia già in testa, non abbia passato su quel lotto, non abbia la lista piena e abbia
+i crediti per farlo. Chi è in testa non rilancia contro sé stesso: il pulsante è spento.</p>
+
+<h4>Riserva obbligatoria</h4>
+<p>L'offerta massima è <em>il saldo meno un credito per ogni posto ancora vuoto, escluso quello che
+stai comprando</em>. Con 12 crediti e 3 posti liberi puoi offrire al massimo 10. Serve a garantire
+che tutti chiudano la partita con la lista piena. Il pulsante <em>Max</em> propone esattamente quel
+tetto.</p>
+
+<h4>Anti-sniping</h4>
+<p>Ogni rilancio riporta il timer a 10 secondi. Un'offerta piazzata all'ultimo istante lascia
+sempre agli altri il tempo di rispondere, e quando succede compare l'avviso in mezzo allo
+schermo.</p>
+
+<h4>Passa</h4>
+<p>Chi passa esce da quel lotto e non può rientrarci. Chi è in testa non può passare: la sua
+offerta è già impegnata. Da qui nascono due situazioni diverse.</p>
+<ul>
+  <li><strong>C'è un'offerta sul piatto</strong> e tutti gli altri passano: il lotto si chiude
+    subito e va a chi aveva offerto, al suo prezzo.</li>
+  <li><strong>Non ha offerto nessuno</strong>: passare non regala niente a nessuno. Anche l'ultimo
+    rimasto può passare a sua volta, e quando hanno passato tutti il lotto si chiude senza
+    vincitore. Da lì decide l'impostazione degli scarti, qui sotto.</li>
+</ul>
+
+<h4>Scarti (interruttore nella lobby, attivo di default)</h4>
 <table>
-  <tr><th>Modalità</th><th>Quando usarla</th></tr>
-  <tr><td><strong>Locale</strong></td><td>Tutti sullo stesso dispositivo, a turno sullo stesso schermo. Non serve internet né configurazione.</td></tr>
-  <tr><td><strong>Online</strong></td><td>Ognuno dal proprio telefono, con un codice stanza di 5 caratteri (copiabile con un tocco, con QR).</td></tr>
-  <tr><td><strong>Blind Draft</strong></td><td>Variante: nome e immagine restano nascosti; alla chiusura del lotto si svelano con un'animazione.</td></tr>
-  <tr><td><strong>Mystery Box</strong></td><td>Variante: ogni 5 lotti compare una scatola a prezzo fisso con un elemento a sorpresa.</td></tr>
+  <tr><th>Impostazione</th><th>Se il lotto non lo vuole nessuno</th></tr>
+  <tr><td><strong>Scarti attivi</strong> (default)</td><td>il lotto viene messo da parte: non lo prende e non lo paga nessuno. È la regola più naturale</td></tr>
+  <tr><td><strong>Scarti disattivati</strong></td><td>il lotto viene assegnato d'ufficio, al prezzo di apertura, a chi ha la lista più corta (a parità, a chi ha più budget). Si usa se si vuole che tutti finiscano con la lista piena, anche a costo di ricevere qualcosa di indesiderato</td></tr>
 </table>
 
-<h2 class="page-break">4. Cosa c'è dentro</h2>
+<h4>Lotti finali</h4>
+<p>Se rimane un solo giocatore da servire e i lotti bastano appena a completare la sua lista, gli
+vengono assegnati d'ufficio al prezzo di apertura. Nessuno resta con i posti vuoti perché il mazzo
+è finito.</p>
 
-<h3>Categorie</h3>
-<p><strong>33 liste ufficiali</strong> da 30 elementi (le Regioni Italiane ne hanno 20, quante sono
-davvero), con foto verificate una per una:</p>
-<div class="grid">
-  <p class="muted">Burger · Best Feelings · Film Pixar · Social Media · Marvel · Superpoteri ·
-    Drinks · Snack &amp; Dolci · Pizze · Giochi da Tavolo · Videogiochi · Giochi Mobile ·
-    Clash Royale · Leggende del Calcio · Sport · Artisti Musicali · App del Telefono</p>
-  <p class="muted">Capitali Europee · Città Italiane · Città Americane · Regioni Italiane ·
-    Build a Beach · Build a Breakfast · Fast Food · Dolci &amp; Dessert · Anime · Cartoni Animati ·
-    Serie TV · Meme Web · Duo Iconici · Scuse per Non Uscire · Momenti Cringe · Isola Deserta</p>
+<h4>Fine della partita</h4>
+<p>La partita finisce quando tutte le liste sono piene, quando gli elementi finiscono, oppure
+quando l'host la chiude a mano dal pulsante in fondo alla schermata d'asta. In tutti i casi si
+arriva alla card finale.</p>
+
+<div class="note">
+  <strong>Tutte queste regole sono verificate dai test.</strong> <code>npm run check:engine</code>
+  esegue oltre settanta controlli sul motore: apertura, rilanci, anti-sniping, passaggi,
+  aggiudicazione per tempo scaduto, scarti attivi e disattivati, riserva di budget, lotti finali,
+  Mystery Box, avatar unici e chiusura della partita.
 </div>
-<p>Si cercano per nome, si filtrano per tema (Sport, Pop Culture, Gaming, Cibo, Vita quotidiana) e
-si possono creare liste proprie, da tenere sul dispositivo o da condividere con un link.</p>
 
-<h3>Account e Pickmates</h3>
+<!-- =====================================================================
+     5. MODALITA' E VARIANTI. Locale/online sono modalita', Blind Draft e
+     Mystery Box sono interruttori: si combinano con entrambe.
+     ================================================================== -->
+<h2>5. Le modalità e le varianti</h2>
+
+<h3>Le due modalità</h3>
+<table>
+  <tr><th>Modalità</th><th>Come funziona</th><th>Quando conviene</th></tr>
+  <tr>
+    <td><strong>Locale</strong></td>
+    <td>tutti sullo stesso dispositivo. Ogni giocatore ha il suo pannello sullo schermo e si tocca a turno; l'host aggiunge i giocatori scrivendo i nomi</td>
+    <td>siete nella stessa stanza e c'è un solo telefono, o un computer con lo schermo grande</td>
+  </tr>
+  <tr>
+    <td><strong>Online</strong></td>
+    <td>ognuno dal proprio telefono. Si entra con il codice di 5 caratteri, con il QR o con il link; offerte e timer sono gli stessi per tutti</td>
+    <td>siete a distanza, o volete che nessuno veda le mosse degli altri</td>
+  </tr>
+</table>
+
+<h3>Le due varianti (si attivano nella lobby, anche insieme)</h3>
+<table>
+  <tr><th>Variante</th><th>Cosa cambia</th></tr>
+  <tr>
+    <td><strong>Blind Draft</strong></td>
+    <td>durante l'asta il lotto è coperto: niente nome, niente immagine, solo un punto interrogativo e il prezzo. Si offre al buio. Appena il lotto si chiude, l'elemento si svela con un'animazione, e si scopre chi ha pagato 6 crediti per una cosa che non voleva</td>
+  </tr>
+  <tr>
+    <td><strong>Mystery Box</strong></td>
+    <td>ogni 5 lotti compare una scatola a prezzo fisso (il 15% del budget, minimo 2 crediti). Non si rilancia: si prende o si passa, e chi la prende si porta a casa un elemento a sorpresa. Se passano tutti, la scatola sparisce</td>
+  </tr>
+</table>
+
+<h3>La posta in palio</h3>
+<p>Nella lobby c'è un campo libero (fino a 60 caratteri) per scrivere cosa si gioca: <em>"chi perde
+paga la pizza"</em>. Non incide sulle regole, ma finisce in evidenza sulla card finale, così resta
+scritto.</p>
+
+<h3>Gli avatar</h3>
+<p>Ci sono 24 icone (fiamma, fulmine, corona, scudo, joypad, teschio, coppa, fantasma, gemma,
+razzo, bomba, spade, dado, bersaglio, robot, cervello, stella, cuore, gatto, cane, pizza, popcorn,
+nota musicale, fiocco di neve). Le regole sono tre: <strong>in una stanza due giocatori non possono
+avere lo stesso avatar</strong>; chi entra riceve la prima icona libera; per cambiarla si tocca
+l'avatar nella riga del giocatore e si sceglie dal pannello, dove le icone già prese restano
+visibili ma spente. In locale l'host cambia l'avatar di chiunque, perché giocano tutti dal suo
+schermo; online ognuno cambia il proprio e gli altri lo vedono subito. A partita avviata gli avatar
+non si toccano più.</p>
+
+<!-- =====================================================================
+     6. TOUR DELL'INTERFACCIA. Una riga per schermata, cosi' chi legge sa
+     cosa aspettarsi prima ancora di aprire il sito.
+     ================================================================== -->
+<h2>6. Schermata per schermata</h2>
+
+<table>
+  <tr><th>Schermata</th><th>Cosa ci trovi</th></tr>
+  <tr><td><strong>Home</strong></td><td>i due pulsanti grossi (crea partita / entra con codice), il campo per il codice, le novità e la scheda del creatore</td></tr>
+  <tr><td><strong>Crea partita</strong></td><td>scelta della modalità, elenco delle categorie con ricerca e filtri per tema, riepilogo prima di aprire la stanza</td></tr>
+  <tr><td><strong>Lobby</strong></td><td>codice stanza da copiare con un tocco e QR ingrandibile, elenco dei giocatori con avatar modificabile, tutte le impostazioni (budget, valuta, giocatori, elementi, Blind Draft, Mystery Box, scarti, posta in palio) e il pulsante <em>Avvia il draft</em></td></tr>
+  <tr><td><strong>Asta</strong></td><td>immagine grande al centro, nome sotto, prezzo corrente e chi è in testa, clessidra animata con ticchettio negli ultimi 5 secondi, comandi fissati in basso a portata di pollice e, per ogni giocatore, budget, posti occupati e inventario in miniatura</td></tr>
+  <tr><td><strong>Risultato del lotto</strong></td><td>chi se l'è aggiudicato e a quanto, oppure "nessuna offerta → finisce negli scarti". Nel Blind Draft è qui che l'elemento si svela</td></tr>
+  <tr><td><strong>Card finale</strong></td><td>la classifica, tutte le liste con i prezzi pagati, il budget avanzato, la posta in palio e il QR del voto. Da qui si scarica il PNG o si condivide</td></tr>
+  <tr><td><strong>Categorie</strong></td><td>tutte le liste con il numero di elementi sotto il nome, ricerca istantanea (cerca anche dentro gli elementi) e filtri per tema. Da qui si creano anche liste proprie</td></tr>
+  <tr><td><strong>Pickmates</strong></td><td>la rubrica degli amici e i draft ricevuti da votare</td></tr>
+  <tr><td><strong>Voto</strong></td><td>la pagina pubblica che si apre dal link o dal QR: si guardano le liste e si vota la migliore, senza registrarsi</td></tr>
+  <tr><td><strong>Studio</strong></td><td>riservato al creatore: apre qualsiasi lista ufficiale e permette di modificare nomi, icone e immagini elemento per elemento</td></tr>
+  <tr><td><strong>Menu</strong></td><td>lingua, tema chiaro/scuro, audio, foto automatiche, installazione sulla schermata Home, scheda del creatore, sostegno al progetto</td></tr>
+</table>
+
+<!-- =====================================================================
+     7. CATALOGO COMPLETO. I conteggi arrivano da data/categories.json:
+     33 liste, 980 elementi, 960 con foto.
+     ================================================================== -->
+<h2>7. Le 33 categorie</h2>
+
+<p>Tutte le liste hanno <strong>30 elementi</strong>, tranne le Regioni Italiane che ne hanno 20,
+quante sono davvero. In totale <strong>980 elementi</strong>, di cui <strong>960 con una foto
+verificata a mano</strong>.</p>
+
+<table>
+  <tr><th>Categoria</th><th>Tema</th><th>N.</th><th>Categoria</th><th>Tema</th><th>N.</th></tr>
+  <tr><td>🍔 Burger</td><td>Cibo</td><td class="num">30</td><td>🌉 Città Americane</td><td>Vita quotidiana</td><td class="num">30</td></tr>
+  <tr><td>😌 Best Feelings</td><td>Vita quotidiana</td><td class="num">30</td><td>🏖️ Build a Beach</td><td>Vita quotidiana</td><td class="num">30</td></tr>
+  <tr><td>🎈 Film Pixar</td><td>Pop culture</td><td class="num">30</td><td>🥐 Build a Breakfast</td><td>Cibo</td><td class="num">30</td></tr>
+  <tr><td>📱 Social Media</td><td>Pop culture</td><td class="num">30</td><td>🍟 Fast Food</td><td>Cibo</td><td class="num">30</td></tr>
+  <tr><td>🦸 Marvel</td><td>Pop culture</td><td class="num">30</td><td>🌸 Anime</td><td>Pop culture</td><td class="num">30</td></tr>
+  <tr><td>⚡ Superpoteri</td><td>Pop culture</td><td class="num">30</td><td>📺 Cartoni Animati</td><td>Pop culture</td><td class="num">30</td></tr>
+  <tr><td>🥤 Drinks</td><td>Cibo</td><td class="num">30</td><td>📼 Serie TV</td><td>Pop culture</td><td class="num">30</td></tr>
+  <tr><td>🍫 Snack &amp; Dolci</td><td>Cibo</td><td class="num">30</td><td>😂 Meme Web</td><td>Pop culture</td><td class="num">30</td></tr>
+  <tr><td>🍕 Pizze</td><td>Cibo</td><td class="num">30</td><td>🏞️ Regioni Italiane</td><td>Vita quotidiana</td><td class="num">20</td></tr>
+  <tr><td>🎲 Giochi da Tavolo</td><td>Gaming</td><td class="num">30</td><td>🍰 Dolci &amp; Dessert</td><td>Cibo</td><td class="num">30</td></tr>
+  <tr><td>🎮 Videogiochi</td><td>Gaming</td><td class="num">30</td><td>👥 Duo Iconici</td><td>Pop culture</td><td class="num">30</td></tr>
+  <tr><td>👑 Clash Royale</td><td>Gaming</td><td class="num">30</td><td>📱 Giochi Mobile</td><td>Gaming</td><td class="num">30</td></tr>
+  <tr><td>⚽ Leggende del Calcio</td><td>Sport</td><td class="num">30</td><td>🤥 Scuse per Non Uscire</td><td>Vita quotidiana</td><td class="num">30</td></tr>
+  <tr><td>🏆 Sport</td><td>Sport</td><td class="num">30</td><td>😬 Momenti Cringe</td><td>Vita quotidiana</td><td class="num">30</td></tr>
+  <tr><td>🎤 Artisti Musicali</td><td>Pop culture</td><td class="num">30</td><td>🏝️ Isola Deserta</td><td>Vita quotidiana</td><td class="num">30</td></tr>
+  <tr><td>📲 App del Telefono</td><td>Vita quotidiana</td><td class="num">30</td><td>🏛️ Città Italiane</td><td>Vita quotidiana</td><td class="num">30</td></tr>
+  <tr><td>🗺️ Capitali Europee</td><td>Vita quotidiana</td><td class="num">30</td><td colspan="3" class="muted">33 liste · 980 elementi</td></tr>
+</table>
+
+<h3>Liste tue</h3>
+<p>Da <em>Categorie → Crea lista</em> si scrive la propria: nome, icona, elementi con la loro
+immagine. Resta sul dispositivo e si può condividere con un link, così gli altri la usano senza
+doverla riscrivere. Le liste personali si giocano esattamente come quelle ufficiali.</p>
+
+<!-- =====================================================================
+     8. IMMAGINI. La parte piu' delicata del progetto: da dove arrivano le
+     foto, come si correggono, cosa comporta la licenza.
+     ================================================================== -->
+<h2>8. Le immagini: da dove arrivano</h2>
+
+<p>Le foto <strong>non stanno dentro il progetto</strong>: in <code>data/categories.json</code> ci
+sono gli indirizzi verso gli archivi di origine. Durante la partita non si cerca niente, quindi non
+c'è attesa e non serve una connessione veloce. Se un giorno una foto sparisce dall'archivio, quella
+scheda torna a mostrare la sua icona e il gioco non si rompe.</p>
+
+<h3>Gli archivi usati</h3>
+<table>
+  <tr><th>Come si scrive l'abbinamento</th><th>Da dove prende la foto</th></tr>
+  <tr><td><code>commons:doccia calda</code></td><td>Wikimedia Commons, per le cose comuni senza voce enciclopedica</td></tr>
+  <tr><td><code>it:Atletica leggera</code> · <code>en:Rick Astley</code></td><td>la voce di Wikipedia con quel titolo esatto</td></tr>
+  <tr><td><code>fandom:clashroyale/Mega Knight</code></td><td>il wiki dei fan: carte di un gioco, personaggi dei fumetti</td></tr>
+  <tr><td><code>itunes:Fortnite</code></td><td>l'icona ufficiale dall'App Store (prima il negozio italiano, poi quello USA)</td></tr>
+  <tr><td><code>steam:1245620</code></td><td>la copertina del gioco su Steam (il numero è quello nell'indirizzo)</td></tr>
+  <tr><td><code>tvmaze:Suits</code></td><td>la locandina della serie televisiva</td></tr>
+  <tr><td><code>imgflip:Distracted Boyfriend</code></td><td>il template originale del meme</td></tr>
+  <tr><td><code>none</code></td><td>nessuna foto: resta l'icona, di proposito</td></tr>
+</table>
+
+<p>Gli abbinamenti stanno in <code>data/image-hints.json</code>, si leggono e si correggono a mano.
+Dopo una modifica basta <code>node scripts/fetch-images.js &lt;categoria&gt; --hinted</code> per
+rifare solo quegli elementi.</p>
+
+<h3>Tre regole imparate controllando le foto una per una</h3>
 <ul>
-  <li><strong>Registrazione con email e password</strong>: quattro requisiti obbligatori (8
-    caratteri, una maiuscola, un numero, un carattere speciale) con le spunte che si accendono
-    mentre si scrive. Il nickname è unico.</li>
-  <li><strong>Pickmates</strong>: la rubrica degli amici. Si cercano per nickname, per email esatta
-    o fra gli avversari delle ultime partite. Accanto a ognuno c'è quante sfide avete giocato.</li>
-  <li><strong>Sfide e notifiche</strong>: dalla lista si invita un Pickmate nella stanza aperta;
-    a lui arriva una notifica con una battuta a sorte e i pulsanti per entrare o ignorare.</li>
+  <li><strong>Niente stemmi, cartine e firme.</strong> Per una città vogliamo il panorama, non il
+    puntino sulla mappa d'Italia né lo stemma della squadra di calcio; per un cantante la foto, non
+    l'autografo.</li>
+  <li><strong>Niente foto ripetute</strong> dentro la stessa categoria: se per "pizza ortolana" la
+    ricerca ripiegherebbe su una foto generica già usata, si passa al candidato dopo.</li>
+  <li><strong>Il nome del file deve contenere le parole cercate</strong>, altrimenti la foto viene
+    scartata: è così che si evitano gli scambi di persona ("Monopoli" la città e non il gioco,
+    "Scarabeo" il gioco e non lo scooter).</li>
 </ul>
 
-<h3>Fine partita</h3>
+<p>Il filtro di pertinenza accetta una foto solo se il titolo della pagina corrisponde davvero al
+nome cercato: "Up" prende il film del 2009 e non <em>Upload</em>, "Snake" non diventa <em>Snake
+River</em>. Se nessun risultato è pertinente resta l'icona: meglio nessuna foto che una
+sbagliata.</p>
+
+<h3>Le venti senza foto</h3>
+<p>Venti elementi non hanno immagine: sono i momenti della categoria Cringe (situazioni, non
+oggetti: non esiste una foto giusta) e "Niente" nella colazione. Mostrano la loro icona, ed è una
+scelta, non una mancanza.</p>
+
+<div class="warn">
+  <strong>Licenze, da leggere prima di pubblicare.</strong> Le foto di Wikipedia e Wikimedia
+  Commons hanno licenze libere, spesso con obbligo di citare l'autore. Le carte di Clash Royale, le
+  icone delle app, le copertine dei giochi, le locandine delle serie e i template dei meme restano
+  dei rispettivi proprietari: qui sono richiamate dal loro sito, come fa un qualsiasi collegamento.
+  Per un gioco fra amici va bene. Se un domani il sito diventasse un prodotto a pagamento, quelle
+  immagini andrebbero sostituite o autorizzate.
+</div>
+
+<!-- =====================================================================
+     9. ACCOUNT E SOCIALITA'. Tutto quello che richiede il database.
+     ================================================================== -->
+<h2>9. Account, Pickmates e notifiche</h2>
+
+<h3>Registrazione e accesso</h3>
 <ul>
-  <li><strong>Card 9:16</strong> in PNG (1080x1920) con le liste, il budget speso e il QR del voto.</li>
-  <li><strong>Votazione</strong> senza registrazione: un voto per dispositivo, dal link o dal QR.</li>
-  <li>Il draft si può mandare ai Pickmates perché lo votino.</li>
+  <li>Email e password, in due schede dentro la stessa finestra. In registrazione si scelgono
+    <strong>nickname</strong> (unico, controllato mentre si scrive) e avatar. C'è anche il recupero
+    password.</li>
+  <li><strong>La password ha quattro requisiti obbligatori</strong>: almeno 8 caratteri, una
+    maiuscola, un numero e un carattere speciale fra <code>!@#$%^&amp;*</code>. Sotto il campo ci
+    sono quattro spunte che si accendono di verde una alla volta, e finché non sono tutte verdi il
+    pulsante <em>Registrati</em> resta spento. Il controllo viene rifatto prima dell'invio, così
+    una password debole non parte nemmeno.</li>
+  <li>Le password vanno al servizio di autenticazione, che le conserva cifrate: l'app non le salva
+    e non le vede mai in chiaro.</li>
+  <li>Senza database si crea comunque un <strong>profilo su questo dispositivo</strong> e si gioca
+    subito.</li>
 </ul>
 
-<h3>Il contorno</h3>
+<h3>Pickmates</h3>
+<p>La rubrica degli amici con cui si gioca, in <code>/pickmates</code>, divisa in <em>I miei
+Pickmates</em> e <em>Draft ricevuti</em>.</p>
 <ul>
-  <li><strong>10 lingue</strong> complete: italiano, inglese, francese, spagnolo, tedesco,
-    portoghese, russo, cinese, giapponese e arabo (con layout da destra a sinistra).</li>
-  <li>Tema chiaro e scuro, effetti sonori, vibrazione dove supportata.</li>
-  <li><strong>Installabile</strong> sulla schermata Home come un'app, con istruzioni per
-    iPhone e Android.</li>
-  <li><strong>Modalità creatore</strong>: lo Studio per gestire le liste ufficiali. Sul proprio
-    computer è già aperta; online la protegge la chiave scelta in <code>NEXT_PUBLIC_ADMIN_KEY</code>.</li>
+  <li><strong>Tre modi per trovare qualcuno</strong>: per nickname (basta un pezzo del nome), per
+    email esatta, oppure fra gli <strong>avversari delle ultime partite</strong>, che si aggiungono
+    con un tocco.</li>
+  <li>Accanto a ogni Pickmate c'è <strong>quante sfide avete giocato insieme</strong>: il conteggio
+    cresce da solo a fine partita, per chi in stanza aveva fatto l'accesso.</li>
+  <li><strong>Sfida</strong>: dalla lista si invita un Pickmate nella stanza aperta.</li>
+  <li>I propri draft si mandano agli amici perché li votino.</li>
 </ul>
 
-<h2>5. Collegare il database (facoltativo)</h2>
+<h3>Notifiche dal vivo</h3>
+<p>La campanella in alto compare a chi ha fatto l'accesso e ascolta il database: l'avviso arriva
+senza ricaricare la pagina.</p>
+<table>
+  <tr><th>Notifica</th><th>Cosa mostra</th><th>Pulsanti</th></tr>
+  <tr><td>Richiesta Pickmate</td><td>chi ti ha invitato</td><td>Accetta · Rifiuta</td></tr>
+  <tr><td>Sfida in arrivo</td><td>chi ti sfida, il codice della stanza e una battuta a sorte fra otto</td><td>Entra nella stanza · Ignora</td></tr>
+</table>
 
-<p>Senza database si gioca in locale e si usa tutto ciò che vive sul dispositivo. Il database
-(Supabase, gratuito) accende: stanze online stabili, accesso, Pickmates, notifiche, votazioni,
-suggerimenti e voto del gioco.</p>
+<!-- =====================================================================
+     10. FINE PARTITA: la card e la votazione, cioe' la parte che poi
+     circola su WhatsApp e Instagram.
+     ================================================================== -->
+<h2>10. Fine partita: card e votazione</h2>
 
+<h3>La card 9:16</h3>
+<ul>
+  <li>PNG verticale <strong>1080×1920</strong>, esportato a doppia risoluzione perché resti nitido
+    anche ingrandito.</li>
+  <li><strong>Impaginazione automatica da 1 a 8 giocatori</strong>: con due giocatori le liste sono
+    grandi e affiancate, con otto si stringono in griglia senza mai uscire dal formato.</li>
+  <li>Corona dorata e badge <strong>1° CLASSIFICATO</strong> su chi guida la classifica, prezzo
+    pagato su ogni miniatura, budget avanzato, e il riquadro <strong>🎯 PEGNO</strong> se era stata
+    scritta una posta in palio.</li>
+  <li>Si scarica in PNG o si condivide con il menu nativo del telefono.</li>
+</ul>
+
+<h3>La votazione</h3>
+<p>Si genera un link <code>/vote/…</code> — e il QR corrispondente, stampato sulla card — da
+mandare a chi si vuole: si guardano le liste e si vota la migliore. Un voto per dispositivo,
+nessuna registrazione. È il modo per far decidere agli amici chi ha vinto davvero.</p>
+
+<!-- =====================================================================
+     11. IL CONTORNO: lingue, tema, audio, installazione come app.
+     ================================================================== -->
+<h2>11. Lingue, tema, audio, installazione</h2>
+
+<ul>
+  <li><strong>10 lingue complete</strong>, 472 voci ciascuna: italiano, inglese, francese,
+    spagnolo, tedesco, portoghese, russo, cinese, giapponese e arabo, quest'ultimo con
+    l'impaginazione da destra a sinistra.</li>
+  <li><strong>Tema chiaro e scuro</strong>, con il passaggio immediato dal menu.</li>
+  <li><strong>Effetti sonori sintetizzati</strong>: nessun file audio da scaricare. C'è il
+    ticchettio negli ultimi 5 secondi, il martelletto dell'aggiudicazione, il suono del rilancio.
+    Si spengono dal menu.</li>
+  <li><strong>Vibrazione</strong> dove il telefono la supporta: un colpo breve sul rilancio, uno
+    lungo quando ti aggiudichi un lotto.</li>
+  <li><strong>Installabile sulla schermata Home</strong> come un'app, con istruzioni separate per
+    iPhone/iPad e Android; dove il browser lo permette parte con un solo tocco. Una volta
+    installata si apre a schermo intero, senza barre del browser.</li>
+  <li><strong>Foto automatiche</strong>: interruttore nel menu, spento di default. Acceso, l'app
+    cerca da sola una foto per gli elementi che non ne hanno — utile nelle liste create da te.</li>
+</ul>
+
+<!-- =====================================================================
+     12. COSA CAMBIA COL DATABASE. Tabella onesta: cosa si perde senza.
+     ================================================================== -->
+<h2>12. Con e senza database</h2>
+
+<p>L'app non si blocca mai: quando le chiavi del database mancano, ogni funzione ha una via
+locale.</p>
+
+<table>
+  <tr><th>Funzione</th><th>Senza database</th><th>Con database</th></tr>
+  <tr><td>Partita locale</td><td>completa</td><td>completa</td></tr>
+  <tr><td>Stanza online fra dispositivi</td><td>dal server dell'app</td><td>dai canali del database</td></tr>
+  <tr><td>Profilo</td><td>nickname e avatar su questo dispositivo</td><td>account con email e password</td></tr>
+  <tr><td>Pickmates e sfide</td><td>non disponibili</td><td>complete</td></tr>
+  <tr><td>Notifiche dal vivo</td><td>non disponibili</td><td>complete</td></tr>
+  <tr><td>Link di voto dei draft</td><td>non disponibile</td><td>link e QR condivisibili</td></tr>
+  <tr><td>Voto del gioco e suggerimenti</td><td>salvati sul dispositivo</td><td>arrivano al creatore</td></tr>
+</table>
+
+<h3>Come viaggiano le stanze online</h3>
+<p>L'app sceglie da sola il canale migliore fra i tre disponibili, e in alto nella stanza c'è
+sempre scritto quale sta usando.</p>
 <ol>
-  <li>Crea un progetto su <code>supabase.com</code>.</li>
-  <li>Copia <code>.env.example</code> in <code>.env.local</code> e inserisci URL e chiave anon.</li>
-  <li>Apri l'SQL editor ed esegui tutto <code>supabase/schema.sql</code>: crea le tabelle e le
-    regole di accesso. Si può rieseguire quando serve.</li>
-  <li>In <em>Authentication → URL Configuration</em> aggiungi il dominio e gli indirizzi
-    <code>/pickmates</code> fra le Redirect URLs.</li>
+  <li><strong>Database</strong> (se configurato): il più solido. Funziona ovunque e regge il
+    riavvio del sito.</li>
+  <li><strong>Server dell'app</strong>: tutti i dispositivi che raggiungono il server giocano
+    insieme — sulla stessa Wi-Fi con l'indirizzo di rete del computer, o da qualsiasi rete quando
+    il sito è pubblicato. Le stanze vivono nella memoria del server, quindi si azzerano se il
+    server si riavvia.</li>
+  <li><strong>Solo browser</strong>: ultimo ripiego, sincronizza schede e finestre dello stesso
+    computer.</li>
 </ol>
 
-<h2>6. Pubblicare il sito</h2>
+<div class="warn">
+  Il canale del server ha bisogno di un processo sempre attivo (Railway, Render, Fly, un server
+  proprio). Su Vercel, che esegue funzioni separate, le stanze online vanno collegate al database —
+  che è comunque la strada consigliata.
+</div>
 
-<p>Il modo più semplice è <strong>Vercel</strong>: piano gratuito, riconosce Next.js da solo e
-ripubblica a ogni <code>git push</code>.</p>
+<!-- =====================================================================
+     13. SUPABASE. Passi in ordine, tabelle create, e le due scelte di
+     sicurezza che vale la pena capire.
+     ================================================================== -->
+<h2>13. Configurare il database</h2>
 
-<h3>Prima: il database</h3>
+<p>Il database è <strong>Supabase</strong>, gratuito per questo uso. Serve per: stanze online
+stabili, accesso con email, Pickmates, notifiche, votazioni, suggerimenti, liste pubblicate.</p>
+
 <ol>
   <li>Crea un progetto gratuito su <code>supabase.com</code>.</li>
-  <li>In <em>Project Settings → API</em> copia <strong>Project URL</strong> e <strong>anon key</strong>.</li>
-  <li>Mettile in <code>.env.local</code> e riavvia <code>npm run dev</code>.</li>
-  <li>Nell'SQL editor esegui tutto <code>supabase/schema.sql</code>.</li>
-  <li><strong>Prova a registrarti</strong> dal sito in locale: se il profilo compare in
-    <code>/pickmates</code>, è tutto a posto.</li>
+  <li>In <em>Project Settings → API</em> copia <strong>Project URL</strong> e
+    <strong>anon public key</strong>.</li>
+  <li>Copia <code>.env.example</code> in <code>.env.local</code> e riempi i valori:</li>
 </ol>
 
-<h3>Poi: la pubblicazione</h3>
+<pre>NEXT_PUBLIC_SUPABASE_URL=...            # indirizzo del progetto
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...       # chiave pubblica (anon)
+NEXT_PUBLIC_SITE_URL=https://tuosito    # dominio, senza slash finale
+NEXT_PUBLIC_ADMIN_KEY=parola-tua        # sblocca lo Studio quando sei online
+NEXT_PUBLIC_INSTAGRAM_URL=...           # facoltativo, link nel menu
+NEXT_PUBLIC_REVOLUT_USER=...            # facoltativo, sostegno al progetto
+NEXT_PUBLIC_PAYPAL_USER=...             # facoltativo</pre>
+
+<ol start="4">
+  <li>Apri l'<strong>SQL editor</strong> di Supabase ed esegui tutto il contenuto di
+    <code>supabase/schema.sql</code>: crea le tabelle e le regole di accesso. Si può rieseguire
+    quando serve, aggiorna quello che manca senza cancellare nulla.</li>
+  <li><em>Authentication → URL Configuration</em>: metti il dominio in <strong>Site URL</strong> e
+    aggiungi <code>http://localhost:3000/pickmates</code> e
+    <code>https://tuodominio/pickmates</code> fra le <strong>Redirect URLs</strong>.</li>
+  <li>Riavvia <code>npm run dev</code> e <strong>prova a registrarti</strong>: se il profilo compare
+    in <code>/pickmates</code>, è tutto a posto.</li>
+</ol>
+
+<h3>Le tabelle che vengono create</h3>
+<table>
+  <tr><th>Tabella</th><th>A cosa serve</th></tr>
+  <tr><td><code>profiles</code> · <code>profile_emails</code></td><td>nickname e avatar; le email stanno a parte</td></tr>
+  <tr><td><code>pickmates</code> · <code>recent_opponents</code> · <code>challenges</code></td><td>amici, avversari recenti, sfide</td></tr>
+  <tr><td><code>games</code> · <code>game_players</code> · <code>results</code></td><td>partite giocate e loro esito</td></tr>
+  <tr><td><code>shared_results</code> · <code>votes</code></td><td>draft condivisi e voti ricevuti</td></tr>
+  <tr><td><code>categories</code> · <code>official_lists</code></td><td>liste condivise dagli utenti e liste ufficiali</td></tr>
+  <tr><td><code>suggestions</code> · <code>feedback</code></td><td>suggerimenti di categoria e voto del gioco</td></tr>
+</table>
+
+<h3>Due scelte di sicurezza</h3>
+<ul>
+  <li><strong>Le email non stanno in <code>profiles</code></strong> ma in una tabella a parte che
+    legge solo il proprietario. La ricerca per email passa da una funzione che accetta unicamente
+    l'indirizzo esatto: nessuno può scorrere l'elenco degli iscritti.</li>
+  <li><strong>Le liste ufficiali sono in sola lettura</strong> per l'app: si aggiungono solo
+    dall'SQL editor, e lo Studio prepara la query da incollare. I commenti del voto non sono
+    pubblici: si vedono solo media e numero di voti. Amicizie e draft condivisi sono visibili solo
+    alle persone coinvolte.</li>
+</ul>
+
+<!-- =====================================================================
+     14. PUBBLICAZIONE. Il percorso consigliato e' Vercel + Supabase.
+     ================================================================== -->
+<h2>14. Pubblicare il sito</h2>
+
+<p>Il modo più semplice è <strong>Vercel</strong>: piano gratuito, riconosce Next.js da solo e
+ripubblica a ogni <code>git push</code>. Il database va configurato <strong>prima</strong> (sezione
+13) e provato in locale almeno una volta.</p>
+
 <ol>
   <li>Su <code>vercel.com</code> accedi <strong>con GitHub</strong>.</li>
   <li><em>Add New → Project</em> e scegli il repository: non toccare i comandi di build.</li>
   <li>In <strong>Environment Variables</strong> incolla le stesse righe di <code>.env.local</code>,
-    più <code>NEXT_PUBLIC_SITE_URL</code> (l'indirizzo che ti dà Vercel) e
-    <code>NEXT_PUBLIC_ADMIN_KEY</code> (la parola che scegli tu per lo Studio).</li>
+    con <code>NEXT_PUBLIC_SITE_URL</code> uguale all'indirizzo che ti dà Vercel.</li>
   <li><strong>Deploy</strong>: in un paio di minuti hai l'indirizzo pubblico.</li>
-  <li>Su Supabase, <em>Authentication → URL Configuration</em>: metti quell'indirizzo in
-    <strong>Site URL</strong> e aggiungi <code>.../pickmates</code> fra le <strong>Redirect URLs</strong>.
-    Senza questo passaggio il link di conferma dell'email riporta a localhost.</li>
+  <li>Torna su Supabase, <em>Authentication → URL Configuration</em>: metti quell'indirizzo in
+    <strong>Site URL</strong> e aggiungi <code>…/pickmates</code> fra le <strong>Redirect
+    URLs</strong>. Senza questo passaggio il link di conferma dell'email riporta a
+    <code>localhost</code> e la registrazione non si chiude.</li>
+  <li>Da lì in poi ogni <code>git push</code> ripubblica il sito da solo.</li>
 </ol>
 
+<h3>Un dominio tuo (facoltativo)</h3>
+<p>Comprato il dominio, in Vercel <em>Settings → Domains</em> lo si aggiunge e si seguono le due
+righe DNS indicate. Poi si aggiorna <code>NEXT_PUBLIC_SITE_URL</code> e la Site URL su
+Supabase.</p>
+
 <div class="note">
-  <strong>Cinque minuti di collaudo dopo la pubblicazione:</strong> una partita locale dal telefono,
-  una registrazione con email vera, una stanza online con due telefoni, il link mandato su WhatsApp
-  (deve uscire l'anteprima col logo) e l'installazione sulla schermata Home.
+  <strong>Cinque minuti di collaudo dopo la pubblicazione:</strong> una partita locale dal telefono;
+  una registrazione con email vera, controllando che la mail di conferma arrivi; una stanza online
+  con due telefoni, controllando che offerte e timer si muovano insieme; il link mandato su
+  WhatsApp, dove deve uscire l'anteprima col logo; e l'installazione sulla schermata Home.
 </div>
 
-<h2>7. Comandi utili</h2>
+<!-- =====================================================================
+     15. COMANDI. Presi da package.json: se se ne aggiunge uno, va anche qui.
+     ================================================================== -->
+<h2>15. Tutti i comandi</h2>
 
 <table>
   <tr><th>Comando</th><th>Cosa fa</th></tr>
-  <tr><td><code>npm run dev</code></td><td>avvia in sviluppo</td></tr>
-  <tr><td><code>npm run build</code></td><td>compila la versione di produzione</td></tr>
+  <tr><td><code>npm run dev</code></td><td>avvia il sito in sviluppo su <code>localhost:3000</code></td></tr>
+  <tr><td><code>npm run build</code></td><td>compila la versione di produzione: è il controllo definitivo</td></tr>
+  <tr><td><code>npm start</code></td><td>esegue la versione compilata</td></tr>
+  <tr><td><code>npm run lint</code></td><td>controlla stile ed errori del codice</td></tr>
   <tr><td><code>npm run check:engine</code></td><td>verifiche automatiche su regole d'asta e cataloghi</td></tr>
-  <tr><td><code>npm run check:multiplayer</code></td><td>prova una stanza online completa</td></tr>
-  <tr><td><code>npm run check:photos</code></td><td>controlla che tutte le foto rispondano ancora</td></tr>
-  <tr><td><code>npm run check:layout</code></td><td>verifica che le pagine non sbordino su telefono</td></tr>
-  <tr><td><code>npm run images:fetch</code></td><td>riempie le liste con le foto</td></tr>
-  <tr><td><code>npm run images:sheet</code></td><td>mette tutte le foto in griglia per controllarle a occhio</td></tr>
-  <tr><td><code>npm run share</code></td><td>apre un indirizzo pubblico temporaneo</td></tr>
+  <tr><td><code>npm run check:multiplayer</code></td><td>prova una stanza online completa, host e ospite</td></tr>
+  <tr><td><code>npm run check:rooms</code></td><td>prova gli indirizzi delle stanze sul server avviato</td></tr>
+  <tr><td><code>npm run check:images</code></td><td>controlla che ogni elemento abbia i dati immagine giusti</td></tr>
+  <tr><td><code>npm run check:photos</code></td><td>interroga le foto una per una: segnala quelle che non rispondono più e quelle usate da due elementi</td></tr>
+  <tr><td><code>npm run check:layout</code></td><td>verifica che le pagine non sbordino su telefono e che la console non riporti errori</td></tr>
+  <tr><td><code>npm run images:fetch</code></td><td>riempie le liste con le foto, riprendendo da dove si era interrotto</td></tr>
+  <tr><td><code>npm run images:fix</code></td><td>rimette a posto le foto segnalate come sbagliate</td></tr>
+  <tr><td><code>npm run images:sheet</code></td><td>mette tutte le foto in griglia su una pagina, per controllarle a occhio</td></tr>
+  <tr><td><code>npm run docs:pdf</code></td><td>rigenera questo PDF da <code>docs/guida.html</code></td></tr>
+  <tr><td><code>npm run share</code></td><td>apre un indirizzo pubblico temporaneo, valido anche in 4G</td></tr>
 </table>
 
-<h2>8. Da sapere</h2>
-<ul>
-  <li>Le foto arrivano dagli archivi di origine (Wikipedia, Wikimedia Commons, Fandom, App Store,
-    Steam, TVmaze, Imgflip): quelle di Wikimedia hanno licenze libere, le altre restano dei
-    rispettivi proprietari e qui sono richiamate come farebbe un collegamento. Per un uso fra amici
-    va bene; per un prodotto commerciale vanno sostituite o autorizzate.</li>
-  <li>Venti elementi (i meme più recenti e alcuni momenti della categoria Cringe) non hanno foto:
-    mostrano la loro icona, che è meglio di una fotografia sbagliata.</li>
-  <li>Senza database le stanze online passano dal server dell'app: funzionano finché quel server
-    resta acceso.</li>
-</ul>
+<!-- =====================================================================
+     16. MAPPA DEL CODICE. Per chi apre il progetto e non sa da dove
+     cominciare.
+     ================================================================== -->
+<h2>16. Com'è fatto il progetto</h2>
+
+<p>Next.js 16 con React 19 e TypeScript, interfaccia con Tailwind CSS v4 e animazioni Framer
+Motion. Il cuore del gioco è una funzione pura: prende lo stato della partita e una mossa, e
+restituisce il nuovo stato. Per questo si può verificare con i test senza aprire il browser, e per
+questo host e ospiti vedono sempre esattamente la stessa cosa.</p>
+
+<pre>app/                        pagine e rotte
+  page.tsx                    home
+  create/                     configurazione partita
+  room/[code]/                stanza di gioco
+  categories/                 elenco, editor e liste condivise
+  studio/                     gestione liste (solo creatore)
+  pickmates/                  amici, sfide e draft ricevuti
+  vote/[id]/                  votazione pubblica dei draft
+  api/rooms/[code]/           canale delle stanze sul server dell'app
+components/ui/              bottoni, badge, input, modali, navbar, menu
+components/game/            asta, timer, controlli offerta, lobby, card finale
+lib/                        motore, realtime, catalogo, immagini, accesso, amici
+lib/i18n/                   dizionari delle 10 lingue
+data/categories.json        33 liste ufficiali con le foto gia' fissate
+data/image-hints.json       abbinamenti a mano fra elemento e archivio
+scripts/                    verifiche automatiche e strumenti per le immagini
+supabase/schema.sql         schema del database con tutte le regole di accesso
+docs/                       questa guida (sorgente HTML e PDF)
+public/                     logo, icone dell'app, anteprima social</pre>
+
+<h3>Dove guardare per capire una cosa</h3>
+<table>
+  <tr><th>Domanda</th><th>File</th></tr>
+  <tr><td>Come funziona l'asta, regola per regola</td><td><code>lib/game.ts</code></td></tr>
+  <tr><td>Come si sincronizzano i dispositivi</td><td><code>lib/realtime.ts</code>, <code>lib/multiplayer.ts</code></td></tr>
+  <tr><td>Da dove arrivano le liste</td><td><code>data/categories.json</code>, <code>lib/catalog.ts</code></td></tr>
+  <tr><td>Come si risolvono le immagini</td><td><code>lib/images.ts</code>, <code>lib/image-match.ts</code></td></tr>
+  <tr><td>Accesso, amici e notifiche</td><td><code>lib/auth.ts</code>, <code>lib/pickmates.ts</code>, <code>lib/notifications.ts</code></td></tr>
+  <tr><td>Schermata d'asta e comandi</td><td><code>components/game/AuctionStage.tsx</code>, <code>BidControls.tsx</code></td></tr>
+  <tr><td>Lobby, impostazioni e avatar</td><td><code>components/game/Lobby.tsx</code>, <code>LobbyConfig.tsx</code></td></tr>
+  <tr><td>Card finale</td><td><code>components/game/TikTokCard.tsx</code></td></tr>
+  <tr><td>Regole del database</td><td><code>supabase/schema.sql</code></td></tr>
+</table>
+
+<!-- =====================================================================
+     17. TEST. Cosa coprono davvero, per non promettere piu' di quel che c'e'.
+     ================================================================== -->
+<h2>17. Le verifiche automatiche</h2>
+
+<table>
+  <tr><th>Comando</th><th>Cosa controlla</th></tr>
+  <tr>
+    <td><code>check:engine</code></td>
+    <td>i cataloghi (identificativi unici, ogni elemento con la sua icona, andata e ritorno del formato dati) e tutte le regole d'asta: apertura, rilanci, anti-sniping, passaggi, lotto che non vuole nessuno, scarti attivi e disattivati, riserva di budget, posti della lista, lotti finali, Mystery Box, avatar unici, formato del codice stanza</td>
+  </tr>
+  <tr>
+    <td><code>check:multiplayer</code></td>
+    <td>una stanza online vera: ingresso dell'ospite, stato condiviso, offerta che arriva all'host, stesso timer per tutti, cambio avatar, due offerte nello stesso istante, disconnessione e rientro senza doppioni</td>
+  </tr>
+  <tr>
+    <td><code>check:photos</code></td>
+    <td>ogni foto viene interrogata: segnala quelle che non rispondono più e quelle usate da due elementi diversi</td>
+  </tr>
+  <tr>
+    <td><code>check:layout</code></td>
+    <td>apre le pagine alle misure di un telefono e verifica che niente sbordi in orizzontale e che la console non riporti errori</td>
+  </tr>
+  <tr>
+    <td><code>lint</code> + <code>build</code></td>
+    <td>stile del codice e compilazione completa. Insieme ai due sopra sono i comandi da lanciare prima di pubblicare</td>
+  </tr>
+</table>
+
+<!-- =====================================================================
+     18. LIMITI. Elencati onestamente: e' la sezione che evita sorprese.
+     ================================================================== -->
+<h2>18. Limiti noti</h2>
+
+<ol>
+  <li><strong>Venti elementi senza foto</strong>: i momenti della categoria Cringe e "Niente" a
+    colazione mostrano la loro icona. È una scelta: per una situazione non esiste una foto
+    giusta.</li>
+  <li><strong>Licenze delle immagini</strong>: vedi il riquadro nella sezione 8. Per un uso fra
+    amici va bene; per un prodotto commerciale vanno riviste.</li>
+  <li><strong>La registrazione va provata sul proprio progetto</strong>: il codice è completo e le
+    pagine rispondono, ma il giro dell'email (conferma, recupero password) dipende dalle
+    impostazioni del progetto Supabase, che va creato e collaudato una volta.</li>
+  <li><strong>Stanze online senza database</strong>: passano dal server dell'app e vivono nella sua
+    memoria, quindi si azzerano se il server si riavvia.</li>
+  <li><strong>Emoji bandiera su Windows</strong>: il sistema non ha quei glifi e mostra le sigle
+    ("IT", "GB"). Per questo nei cataloghi si usano monumenti e simboli; le bandiere restano solo
+    nel selettore della lingua, dove sul telefono si vedono correttamente.</li>
+  <li><strong>Il logo</strong> in <code>public/logo.svg</code> è una versione vettoriale del
+    marchio: sostituendo quel file cambia ovunque, anche nell'anteprima dei link.</li>
+</ol>
+
+<!-- =====================================================================
+     19. PROBLEMI COMUNI. Le domande vere ricevute durante le prove.
+     ================================================================== -->
+<h2>19. Se qualcosa non va</h2>
+
+<table>
+  <tr><th>Sintomo</th><th>Cosa succede e come si risolve</th></tr>
+  <tr>
+    <td>Dal telefono non si apre il sito</td>
+    <td>stai usando <code>localhost</code>, che per il telefono significa "il telefono stesso". Usa l'indirizzo <code>Network</code> stampato all'avvio, restando sulla stessa Wi-Fi. Da un'altra rete serve <code>npm run share</code></td>
+  </tr>
+  <tr>
+    <td>Gli amici non entrano nella stanza</td>
+    <td>guarda il canale indicato in alto nella stanza: se dice "solo browser", i dispositivi non si vedono fra loro. Serve il database configurato oppure un indirizzo pubblico</td>
+  </tr>
+  <tr>
+    <td>Ho passato e il lotto è finito all'altro</td>
+    <td>succede solo se lui aveva già offerto, e in quel caso è corretto. Se non ha offerto nessuno, il lotto non va a nessuno dei due</td>
+  </tr>
+  <tr>
+    <td>Non riesco a offrire, i pulsanti sono spenti</td>
+    <td>o sei già in testa (non si rilancia contro sé stessi), o hai passato su questo lotto, o hai la lista piena, o l'importo supera il tetto della riserva</td>
+  </tr>
+  <tr>
+    <td>Il link di conferma dell'email porta a localhost</td>
+    <td>manca la <em>Site URL</em> su Supabase: mettila insieme alle Redirect URLs come nella sezione 13</td>
+  </tr>
+  <tr>
+    <td>Un elemento mostra l'icona invece della foto</td>
+    <td>o è uno dei venti senza foto, o l'archivio non risponde in quel momento. <code>npm run check:photos</code> dice quale delle due</td>
+  </tr>
+  <tr>
+    <td>Lo Studio non si apre online</td>
+    <td>serve la chiave scelta in <code>NEXT_PUBLIC_ADMIN_KEY</code>. Sul proprio computer, in sviluppo, è già aperto</td>
+  </tr>
+</table>
 
 <footer>
-  Pick &amp; Pay - The Draft Game · versione 1.1.0 · guida aggiornata al 30 agosto 2026.
-  Documentazione completa in GUIDA.md e PROJECT_SPECS.md nella cartella del progetto.
+  Pick &amp; Pay - The Draft Game · versione 1.1.0 · guida aggiornata al 30 agosto 2026 ·
+  progetto indipendente di Antonio. Documentazione tecnica completa in <code>GUIDA.md</code> e
+  <code>PROJECT_SPECS.md</code>; le regole applicate dal motore stanno in <code>lib/game.ts</code>.
 </footer>
 
 </body>

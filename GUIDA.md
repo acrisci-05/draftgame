@@ -89,7 +89,7 @@ un uso vero e continuativo.
 | `npm run build` | compila la versione di produzione |
 | `npm run start` | serve la versione compilata |
 | `npm run lint` | controlla stile e regole del codice |
-| `npm run check:engine` | esegue 63 verifiche automatiche su regole d'asta e cataloghi |
+| `npm run check:engine` | esegue le verifiche automatiche su regole d'asta e cataloghi |
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 | `npm run check:images` | verifica il filtro che scarta le foto non pertinenti |
@@ -210,10 +210,11 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 
   Il file si legge e si corregge a mano: dopo averlo modificato basta
   `node scripts/fetch-images.js <categoria> --hinted` per rifare solo quegli elementi.
-- **Tutti gli elementi hanno la foto** tranne uno, "Niente" a colazione, che di proposito mostra la
-  sua icona. `npm run check:photos` le interroga una per una, segnala quelle che non rispondono più
-  e quelle usate da due elementi; `npm run images:sheet` le mette tutte in griglia su una pagina,
-  per controllare a occhio che l'immagine sia davvero quella giusta.
+- **960 elementi su 980 hanno la foto.** I venti senza sono i momenti della categoria Cringe
+  (situazioni, non oggetti: non esiste una foto giusta) e "Niente" a colazione: mostrano la loro
+  icona, ed è una scelta. `npm run check:photos` interroga le foto una per una, segnala quelle che
+  non rispondono più e quelle usate da due elementi; `npm run images:sheet` le mette tutte in
+  griglia su una pagina, per controllare a occhio che l'immagine sia davvero quella giusta.
 - Tre regole imparate controllando le foto una per una, e ora applicate dallo script:
   - **niente stemmi, cartine e firme**: per una città vogliamo il panorama, non il puntino sulla
     mappa d'Italia o lo stemma della squadra di calcio; per un cantante la foto, non l'autografo;
@@ -440,8 +441,8 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 
 ## 10. Stato del lavoro e limiti noti
 
-**Funziona senza configurazione**: partita locale, tutte le 26 categorie, regole complete, card
-9:16 scaricabile, lingue, temi, audio.
+**Funziona senza configurazione**: partita locale, tutte le 33 categorie (980 elementi), regole
+complete, card 9:16 scaricabile, lingue, temi, audio.
 
 **Richiede Supabase**: stanze online, accesso, Pickmates, votazioni, suggerimenti, voto a stelle,
 liste pubblicate sul database.
@@ -452,8 +453,8 @@ Da sapere:
    giro completo dell'email richiede un progetto Supabase reale, che va creato.
 2. **Immagini da Wikipedia**: le licenze variano da foto a foto. Prima di pubblicare conviene
    verificarle, oppure inserire URL propri dallo Studio.
-3. **Traduzioni**: italiano e inglese sono completi; le altre otto lingue coprono quasi tutto e
-   per le voci più recenti ripiegano sull'inglese.
+3. **Traduzioni**: tutte e dieci le lingue sono complete, 472 voci ciascuna. Quando si aggiunge un
+   testo va aggiunto in tutte, altrimenti la compilazione lo segnala.
 4. **Logo**: `public/logo.svg` è una versione vettoriale del marchio. Sostituendo quel file cambia
    ovunque.
 5. **Emoji bandiera**: Windows non ha i glifi delle bandiere e le mostra come sigle ("IT", "GB").
