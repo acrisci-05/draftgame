@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, EyeOff, Flame, Gavel, PackageOpen, Trash2, Trophy, Zap } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Flame, Gavel, PackageOpen, Trash2, Trophy, Zap } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
@@ -50,8 +50,12 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
   const inRace = state.players.filter(
     (p) => !state.passed.includes(p.id) && p.roster.length < state.config.slots,
   ).length;
-  const blurred = state.config.blindDraft && state.phase === "auction";
+  /** Asta al buio in corso: nome e immagine restano coperti per tutti. */
+  const covered = state.config.blindDraft && state.phase === "auction" && !mystery;
   const resultItem = state.lastResult ? itemById(state, state.lastResult.itemId) : undefined;
+  /** Il lotto appena chiuso era al buio: merita lo svelamento. */
+  const revealing =
+    state.phase === "result" && state.config.blindDraft && !state.lastResult?.mystery;
 
   useEffect(() => {
     const latest = state.feed[0];
@@ -117,7 +121,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
                 item={item ?? null}
                 size="xl"
                 mystery={mystery}
-                blurred={blurred}
+                covered={covered}
                 auto={autoImages}
                 hint={state.category.name}
               />
@@ -131,13 +135,19 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               </span>
             ) : null}
 
+            {/* Al buio il nome non compare da nessuna parte finché il lotto non è
+                aggiudicato: è tutto il senso della modalità. */}
             <h1 className="text-2xl leading-tight font-black tracking-tight text-balance sm:text-3xl">
-              {mystery ? t("auction.mystery") : (item?.name ?? "—")}
+              {mystery
+                ? t("auction.mystery")
+                : covered
+                  ? `❓ ${t("auction.blindLot")}`
+                  : (item?.name ?? "—")}
             </h1>
 
             {mystery ? (
               <p className="text-xs text-muted">{t("auction.mysteryHint")}</p>
-            ) : blurred ? (
+            ) : covered ? (
               <p className="flex items-center gap-1.5 text-xs text-violet">
                 <EyeOff className="size-3.5" />
                 {t("auction.blind")}
@@ -208,21 +218,44 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               >
                 {state.lastResult.winnerId ? (
                   <>
-                    <ItemCover
-                      item={resultItem ?? null}
-                      size="lg"
-                      auto={autoImages}
-                      hint={state.category.name}
-                    />
+                    {/* Svelamento: la copertina si gira e mostra che cosa c'era
+                        sotto. Con l'asta normale è una semplice comparsa. */}
+                    <motion.div
+                      key={`reveal-${state.lastResult.itemId}`}
+                      initial={
+                        revealing
+                          ? { rotateY: 90, scale: 0.82, opacity: 0 }
+                          : { opacity: 0, scale: 0.9 }
+                      }
+                      animate={{ rotateY: 0, scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 210, damping: 17, delay: 0.05 }}
+                      style={{ transformPerspective: 900 }}
+                    >
+                      <ItemCover
+                        item={resultItem ?? null}
+                        size="lg"
+                        auto={autoImages}
+                        hint={state.category.name}
+                      />
+                    </motion.div>
                     <span className="flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-faint">
                       {state.lastResult.mystery ? (
                         <PackageOpen className="size-3.5 text-violet" />
+                      ) : revealing ? (
+                        <Eye className="size-3.5 text-violet" />
                       ) : (
                         <Trophy className="size-3.5 text-neon" />
                       )}
-                      {t("auction.awarded")}
+                      {revealing ? t("auction.revealed") : t("auction.awarded")}
                     </span>
-                    <p className="text-2xl font-black text-balance">{state.lastResult.itemName}</p>
+                    <motion.p
+                      initial={revealing ? { opacity: 0, y: 8 } : false}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: revealing ? 0.32 : 0 }}
+                      className="text-2xl font-black text-balance"
+                    >
+                      {state.lastResult.itemName}
+                    </motion.p>
                     <p className="text-lg font-bold text-neon text-glow">
                       {state.lastResult.winnerName} · {money(state.lastResult.price, currency)}
                     </p>

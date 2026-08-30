@@ -153,7 +153,7 @@ migliore.
   vengono assegnati d'ufficio al prezzo base.
 - **Scarti**: l'host decide prima di iniziare. Attivi, un lotto senza offerte viene messo da parte;
   disattivati, viene assegnato a chi ha meno elementi.
-- **Varianti**: *Blind Draft* (immagine coperta fino all'assegnazione) e *Mystery Box* (ogni 5
+- **Varianti**: *Blind Draft* (nome e immagine nascosti fino all'assegnazione, poi lo svelamento) e *Mystery Box* (ogni 5
   lotti una scatola a prezzo fisso con elemento casuale).
 
 Tutte queste regole sono verificate da `npm run check:engine`.

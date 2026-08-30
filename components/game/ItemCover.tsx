@@ -27,7 +27,12 @@ const FALLBACK_ICON: Record<CoverSize, string> = {
 interface ItemCoverProps {
   item: CatalogItem | RosterEntry | null;
   size?: CoverSize;
-  blurred?: boolean;
+  /**
+   * Asta al buio: l'elemento non si deve vedere né leggere. Non basta sfocare
+   * l'immagine, perché indirizzo e testo alternativo resterebbero nella pagina:
+   * qui non viene proprio disegnata.
+   */
+  covered?: boolean;
   mystery?: boolean;
   /** Cerca online una foto reale quando l'elemento non ne ha già una. */
   auto?: boolean;
@@ -39,19 +44,26 @@ interface ItemCoverProps {
 export function ItemCover({
   item,
   size = "md",
-  blurred = false,
+  covered = false,
   mystery = false,
   auto = false,
   hint,
   className,
 }: ItemCoverProps) {
-  const { src, onError } = useItemImage(item, hint, auto && !mystery);
+  const hide = mystery || covered || !item;
+  // Con il lotto coperto non si cerca nemmeno la foto: nessuna richiesta, nessun
+  // indirizzo che passi dalla pagina prima del tempo.
+  const { src, onError } = useItemImage(item, hint, auto && !hide);
 
-  if (mystery || !item) {
+  if (hide) {
     return (
       <div
+        aria-label="?"
         className={cn(
-          "grid shrink-0 place-items-center border border-violet/50 bg-violet/15 text-violet",
+          "grid shrink-0 place-items-center border",
+          mystery
+            ? "border-violet/50 bg-violet/15 text-violet"
+            : "border-line bg-zinc-950 text-zinc-600",
           SIZES[size],
           className,
         )}
@@ -88,16 +100,12 @@ export function ItemCover({
             large
               ? "h-full w-full object-contain p-6 drop-shadow-2xl transition-all duration-300 hover:scale-105"
               : "size-full object-cover",
-            blurred && "scale-110 blur-md",
           )}
         />
       ) : (
         <div
           style={large ? cover.style : undefined}
-          className={cn(
-            "grid size-full place-items-center font-black text-white/90",
-            blurred && "scale-110 blur-md",
-          )}
+          className="grid size-full place-items-center font-black text-white/90"
         >
           <span
             className={cn(

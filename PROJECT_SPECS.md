@@ -76,7 +76,7 @@
   Modalità online: stanza con codice di 5 caratteri (lettere e numeri, senza O/0/I/1/L)
   sincronizzata via Supabase Realtime Channels, con il dispositivo che ha creato la stanza come
   autorità sullo stato e sul timer. Il codice si copia con un tocco e ha il QR di accesso rapido.
-- Varianti opzionali attivabili in lobby: Blind Draft (cover sfocata fino all'aggiudicazione) e
+- Varianti opzionali attivabili in lobby: Blind Draft (nome e immagine nascosti fino all'aggiudicazione, con svelamento animato) e
   Mystery Box (ogni 5 lotti una box a prezzo fisso con elemento casuale).
 - Fine partita: oltre alla card 9:16 si può pubblicare il risultato e ottenere un link di voto
   (un voto per dispositivo, nessuna registrazione). Richiede Supabase.
