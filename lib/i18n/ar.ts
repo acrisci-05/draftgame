@@ -116,7 +116,7 @@ export const ar: PartialDictionary = {
   "lobby.you": "أنت",
   "lobby.rulesTitle": "القواعد",
   "lobby.rule1": "يبدأ كل لاعب بـ {budget}.",
-  "lobby.rule2": "١٥ ثانية لكل عنصر، و١٠ بعد كل مزايدة.",
+  "lobby.rule2": "{n} ثانية لكل قطعة: كل عرض يعيد المؤقّت إلى الحد الأقصى.",
   "lobby.rule3": "المزايدات +١ و+٢ و+٥ فقط إذا سمح الرصيد.",
   "lobby.rule4": "من يمرّر يخرج من القطعة. وإن لم يعرض أحد، لا يأخذها أحد.",
   "lobby.rule5": "تُغلق كل قائمة عند {slots} عناصر.",
@@ -567,4 +567,7 @@ export const ar: PartialDictionary = {
   "color.orange": "برتقالي",
   "color.gold": "ذهبي",
   "color.silver": "فضي",
+  "lobby.timer": "الوقت لكل قطعة",
+  "lobby.timerHint": "15 ثانية هي المعيار. كل عرض يعيد المؤقّت إلى الحد الأقصى.",
+  "studio.clearItem": "إفراغ العنصر",
 };

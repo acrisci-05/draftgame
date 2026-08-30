@@ -133,7 +133,7 @@ export const en: Dictionary = {
   "lobby.you": "you",
   "lobby.rulesTitle": "Rules",
   "lobby.rule1": "Every player starts with {budget}.",
-  "lobby.rule2": "15 seconds per lot, 10 after every raise.",
+  "lobby.rule2": "{n} seconds per lot: every raise puts the timer back to full.",
   "lobby.rule3": "Raises of +1, +2, +5 only when the balance covers them.",
   "lobby.rule4": "Passing drops you from the lot. If nobody bids, nobody takes it.",
   "lobby.rule5": "Each roster closes at {slots} items.",
@@ -609,4 +609,7 @@ export const en: Dictionary = {
   "color.orange": "Orange",
   "color.gold": "Gold",
   "color.silver": "Silver",
+  "lobby.timer": "Time per lot",
+  "lobby.timerHint": "15 seconds is standard. Every raise puts the timer back to full.",
+  "studio.clearItem": "Clear item",
 };

@@ -117,7 +117,7 @@ export const pt: PartialDictionary = {
   "lobby.you": "tu",
   "lobby.rulesTitle": "Regras",
   "lobby.rule1": "Cada jogador começa com {budget}.",
-  "lobby.rule2": "15 segundos por lote, 10 após cada licitação.",
+  "lobby.rule2": "{n} segundos por lote: cada licitação repõe o cronómetro no máximo.",
   "lobby.rule3": "Licitações de +1, +2, +5 só se o saldo permitir.",
   "lobby.rule4": "Quem passa sai do lote. Se ninguém licitar, ninguém o leva.",
   "lobby.rule5": "Cada plantel fecha com {slots} elementos.",
@@ -569,4 +569,7 @@ export const pt: PartialDictionary = {
   "color.orange": "Laranja",
   "color.gold": "Ouro",
   "color.silver": "Prata",
+  "lobby.timer": "Tempo por lote",
+  "lobby.timerHint": "15 segundos é o padrão. Cada licitação repõe o cronómetro no máximo.",
+  "studio.clearItem": "Limpar elemento",
 };

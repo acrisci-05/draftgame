@@ -109,7 +109,7 @@ check("start: feed inizializzato", state.feed.length >= 1);
 
 state = game.reducer(state, { type: "bid", playerId: "a", amount: 1, now: t0 + 2000 });
 check("offerta: Ana in testa a 1", state.highBidderId === "a" && state.currentBid === 1);
-check("offerta: timer riportato a 10s", state.deadline === t0 + 2000 + 10000);
+check("offerta: timer di nuovo al massimo", state.deadline === t0 + 2000 + 15000);
 check("offerta: niente anti-sniping fuori finestra", state.sniped === false);
 check("chi è in testa non rilancia contro se stesso", !game.canBid(state, "a", 2));
 check("chi è in testa non può passare", !game.canPass(state, "a"));
@@ -121,7 +121,7 @@ check(
 const beforeSnipe = state.deadline;
 state = game.reducer(state, { type: "bid", playerId: "b", amount: 3, now: beforeSnipe - 1500 });
 check("anti-sniping: rilancio in extremis segnalato", state.sniped === true);
-check("anti-sniping: timer di nuovo a 10s", state.deadline === beforeSnipe - 1500 + 10000);
+check("anti-sniping: timer di nuovo al massimo", state.deadline === beforeSnipe - 1500 + 15000);
 
 state = game.reducer(state, { type: "pass", playerId: "c", now: t0 + 5000 });
 check("passo singolo: asta ancora aperta", state.phase === "auction");
@@ -184,6 +184,38 @@ check(
   forced.lastResult.winnerId,
 );
 check("senza scarti: al prezzo base", forced.lastResult.price === 1);
+
+/* ---------------- Durata del lotto ---------------- */
+
+// La durata e' una sola: vale all'apertura del lotto e a ogni rilancio.
+let fast = lobby({ budget: 20, slots: 3, lotSeconds: 10 });
+fast = game.reducer(fast, { type: "start", now: t0 });
+check("stanza veloce: 10 secondi all'apertura", fast.deadline === t0 + 10000, fast.deadline - t0);
+fast = game.reducer(fast, { type: "bid", playerId: "a", amount: 1, now: t0 + 3000 });
+check(
+  "stanza veloce: il rilancio rimette 10 secondi",
+  fast.deadline === t0 + 3000 + 10000,
+  fast.deadline - (t0 + 3000),
+);
+
+let slow = lobby({ budget: 20, slots: 3, lotSeconds: 20 });
+slow = game.reducer(slow, { type: "start", now: t0 });
+check("stanza comoda: 20 secondi all'apertura", slow.deadline === t0 + 20000);
+slow = game.reducer(slow, { type: "bid", playerId: "b", amount: 1, now: t0 + 5000 });
+check("stanza comoda: il rilancio rimette 20 secondi", slow.deadline === t0 + 5000 + 20000);
+
+// Le partite vecchie non hanno la durata scritta: vale lo standard.
+const legacy = game.reducer(
+  { ...lobby({ budget: 20, slots: 3 }), config: { ...lobby({}).config, lotSeconds: undefined } },
+  { type: "start", now: t0 },
+);
+check("senza durata scritta valgono 15 secondi", legacy.deadline === t0 + 15000, legacy.deadline - t0);
+check("lo standard e' 15", game.LOT_TIMER_DURATION === 15);
+check(
+  "le scelte sono 10, 15 e 20",
+  JSON.stringify(game.LOT_TIMER_CHOICES) === "[10,15,20]",
+  JSON.stringify(game.LOT_TIMER_CHOICES),
+);
 
 /* ---------------- Livelli, trofei e colori ---------------- */
 

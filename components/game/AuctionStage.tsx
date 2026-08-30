@@ -17,8 +17,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import {
-  ITEM_SECONDS,
-  RAISE_SECONDS,
+  lotSeconds,
   currentItem,
   drawnCount,
   isMysteryLot,
@@ -59,7 +58,12 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
   const leader = playerById(state, state.highBidderId);
   const self = playerById(state, selfId);
   const currency = state.config.currency;
-  const totalSeconds = state.highBidderId ? RAISE_SECONDS : ITEM_SECONDS;
+  /*
+   * Il cronometro parte sempre dalla stessa durata: quella scelta per la
+   * stanza. Un rilancio la rimette al massimo, non a una frazione, quindi non
+   * c'e' piu' un "prima" e un "dopo".
+   */
+  const totalSeconds = lotSeconds(state);
   const turnId = nextToAct(state);
   const inRace = state.players.filter(
     (p) => !state.passed.includes(p.id) && p.roster.length < state.config.slots,
@@ -239,7 +243,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               className="mt-3 flex items-center justify-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-[11px] font-bold text-amber-500"
             >
               <Zap className="size-3.5" />
-              {t("auction.antiSnipe", { n: RAISE_SECONDS })}
+              {t("auction.antiSnipe", { n: totalSeconds })}
             </motion.p>
           ) : null}
 

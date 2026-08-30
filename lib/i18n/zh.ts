@@ -114,7 +114,7 @@ export const zh: PartialDictionary = {
   "lobby.you": "你",
   "lobby.rulesTitle": "规则",
   "lobby.rule1": "每位玩家从 {budget} 开始。",
-  "lobby.rule2": "每个拍品 15 秒，每次加价后回到 10 秒。",
+  "lobby.rule2": "每件 {n} 秒：每次出价都会把计时器拉回满值。",
   "lobby.rule3": "只有余额足够时才能加价 +1、+2、+5。",
   "lobby.rule4": "跳过就退出该件。没有人出价，就没有人拿到。",
   "lobby.rule5": "每份名单在 {slots} 个条目时截止。",
@@ -564,4 +564,7 @@ export const zh: PartialDictionary = {
   "color.orange": "橙色",
   "color.gold": "金色",
   "color.silver": "银色",
+  "lobby.timer": "每件时间",
+  "lobby.timerHint": "15 秒是标准。每次出价都会把计时器拉回满值。",
+  "studio.clearItem": "清空条目",
 };

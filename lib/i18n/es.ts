@@ -117,7 +117,7 @@ export const es: PartialDictionary = {
   "lobby.you": "tú",
   "lobby.rulesTitle": "Reglas",
   "lobby.rule1": "Cada jugador empieza con {budget}.",
-  "lobby.rule2": "15 segundos por lote, 10 tras cada puja.",
+  "lobby.rule2": "{n} segundos por lote: cada puja devuelve el cronómetro al máximo.",
   "lobby.rule3": "Pujas de +1, +2, +5 solo si el saldo lo permite.",
   "lobby.rule4": "Quien pasa sale del lote. Si nadie puja, no se lo queda nadie.",
   "lobby.rule5": "Cada róster se cierra con {slots} elementos.",
@@ -569,4 +569,7 @@ export const es: PartialDictionary = {
   "color.orange": "Naranja",
   "color.gold": "Oro",
   "color.silver": "Plata",
+  "lobby.timer": "Tiempo por lote",
+  "lobby.timerHint": "15 segundos es lo estándar. Cada puja devuelve el cronómetro al máximo.",
+  "studio.clearItem": "Vaciar elemento",
 };

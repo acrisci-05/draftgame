@@ -12,10 +12,23 @@ import type {
   RoomMode,
 } from "./types";
 
-/** Secondi a disposizione quando un nuovo lotto viene estratto. */
-export const ITEM_SECONDS = 15;
-/** Secondi a cui il timer viene riportato dopo ogni rilancio. */
-export const RAISE_SECONDS = 10;
+/**
+ * Secondi a disposizione su ogni lotto.
+ *
+ * Vale sia quando il lotto viene estratto sia dopo ogni rilancio: un'offerta
+ * rimette il cronometro al massimo, non a una frazione. Una sola costante per
+ * tutte e due le cose, cosi' non possono piu' andare in disaccordo.
+ */
+export const LOT_TIMER_DURATION = 15;
+
+/** Le durate che l'host puo' scegliere in lobby. */
+export const LOT_TIMER_CHOICES = [10, 15, 20] as const;
+
+/** Quanto dura un lotto in questa stanza. Le partite vecchie non lo dicono. */
+export function lotSeconds(state: GameState): number {
+  const chosen = state.config.lotSeconds;
+  return typeof chosen === "number" && chosen > 0 ? chosen : LOT_TIMER_DURATION;
+}
 /** Durata della schermata di aggiudicazione prima del prossimo lotto. */
 export const RESULT_SECONDS = 4;
 export const MIN_PLAYERS = 2;
@@ -59,6 +72,7 @@ export const DEFAULT_CONFIG: RoomConfig = {
   blindDraft: false,
   mysteryBox: false,
   allowDiscards: true,
+  lotSeconds: LOT_TIMER_DURATION,
 };
 
 /** Costo fisso della Mystery Box, proporzionato al budget di partenza. */
@@ -384,7 +398,7 @@ function draw(state: GameState, now: number): GameState {
           currentBid: price,
           highBidderId: null,
           passed: [],
-          deadline: now + ITEM_SECONDS * 1000,
+          deadline: now + lotSeconds(state) * 1000,
           lotNumber,
           sniped: false,
         },
@@ -407,7 +421,7 @@ function draw(state: GameState, now: number): GameState {
         currentBid: OPENING_BID,
         highBidderId: null,
         passed: [],
-        deadline: now + ITEM_SECONDS * 1000,
+        deadline: now + lotSeconds(state) * 1000,
         lotNumber,
         sniped: false,
       },
@@ -690,7 +704,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
     case "bid": {
       if (!canBid(state, action.playerId, action.amount)) return state;
       const player = playerById(state, action.playerId);
-      // Anti-sniping: ogni rilancio riporta il timer a RAISE_SECONDS, quindi anche
+      // Anti-sniping: ogni rilancio riporta il timer al massimo, quindi anche
       // un'offerta all'ultimo istante lascia agli altri il tempo di rispondere.
       const lastSecond = state.deadline - action.now <= SNIPE_WINDOW_SECONDS * 1000;
       const bidded = touch(
@@ -699,7 +713,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
             ...state,
             currentBid: action.amount,
             highBidderId: action.playerId,
-            deadline: action.now + RAISE_SECONDS * 1000,
+            deadline: action.now + lotSeconds(state) * 1000,
             sniped: lastSecond,
           },
           feedEntry("bid", action.now, {

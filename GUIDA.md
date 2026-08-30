@@ -142,10 +142,13 @@ migliore.
   prezzo si vede in asta quando il lotto esce; le **fasce non compaiono più** nell'interfaccia,
   perché sapere che una lista ha trenta elementi è utile, sapere come sono divisi per prezzo no.
   Sotto il nome di ogni categoria c'è il numero di elementi.
-- **Asta**: 15 secondi per lotto, riportati a 10 dopo ogni rilancio. Rilanci +1, +2, +5 e
-  pulsante Max.
-- **Anti-sniping**: siccome ogni rilancio riporta il timer a 10 secondi, un'offerta all'ultimo
-  istante lascia sempre agli altri il tempo di rispondere; quando succede compare l'avviso.
+- **Asta**: la durata del lotto la sceglie l'host prima di iniziare — **10 secondi** (veloce),
+  **15** (standard) o **20** (comodo) — e vale sia all'apertura del lotto sia dopo ogni rilancio:
+  un'offerta rimette il cronometro al massimo, non a una frazione. Rilanci +1, +2, +5 e pulsante
+  Max. La scadenza viaggia dentro lo stato condiviso, quindi tutti i dispositivi vedono il timer
+  ripartire dallo stesso istante.
+- **Anti-sniping**: siccome ogni rilancio riporta il timer al massimo, un'offerta all'ultimo
+  istante lascia sempre agli altri il tempo pieno per rispondere; quando succede compare l'avviso.
 - **Passa**: chi passa esce da quel lotto e non può rientrarci. Se **c'è già un'offerta** e tutti
   gli altri passano, il lotto va a chi l'aveva fatta al suo prezzo. Se invece **nessuno ha offerto**,
   passare non regala niente a nessuno: anche l'ultimo rimasto può passare a sua volta, e allora si
@@ -189,8 +192,12 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Pagina categorie con il **numero di elementi** sotto ogni nome, **ricerca istantanea**
   (cerca anche dentro gli elementi) e **filtri per tema** (Sport, Pop Culture, Gaming, Cibo,
   Vita quotidiana).
-- **Studio** riservato al creatore: apre qualsiasi lista, modifica emoji, nomi e immagini elemento
-  per elemento, salva sul dispositivo ed esporta il JSON o la query SQL già pronta.
+- **Studio** riservato al creatore: apre qualsiasi lista e modifica emoji, nomi e immagini elemento
+  per elemento. Per ogni riga ci sono quattro comandi: cerca una foto, scegli fra i candidati,
+  incolla un indirizzo a mano (il campo mostra quello attuale, quindi si corregge invece di
+  riscriverlo) e **svuota l'elemento**, che azzera nome, icona e foto per rimpiazzarlo con un altro.
+  Il posto resta, perché ogni fascia ne vuole sei. Si salva sul dispositivo e si esporta il JSON o
+  la query SQL già pronta.
 
 ### Immagini
 - Le liste ufficiali hanno le **foto già fissate** dentro `data/categories.json`: arrivano da

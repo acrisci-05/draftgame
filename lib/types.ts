@@ -79,6 +79,8 @@ export interface RoomConfig {
   maxPlayers: number;
   /** Elementi che ogni giocatore deve portare a casa. */
   slots: number;
+  /** Secondi a disposizione su ogni lotto. Assente sulle partite vecchie. */
+  lotSeconds?: number;
   blindDraft: boolean;
   mysteryBox: boolean;
   /**

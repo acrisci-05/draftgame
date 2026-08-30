@@ -13,7 +13,7 @@
     "check:supabase": "node scripts/supabase-check.js",
     "check:images": "tsc -p tsconfig.check.json && node scripts/images-check.js",
     "check:photos": "node scripts/check-photos.js",
-    "check:layout": "node scripts/check-layout.js",
+    "check:layout": "node scripts/check-layout.js http://localhost:3000 390 9333",
     "share": "cloudflared tunnel --url http://localhost:3000",
     "images:fetch": "tsc -p tsconfig.check.json && node scripts/fetch-images.js",
     "images:fix": "node scripts/fix-images.js",

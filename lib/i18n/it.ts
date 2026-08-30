@@ -135,7 +135,7 @@ export const it = {
   "lobby.you": "tu",
   "lobby.rulesTitle": "Regole",
   "lobby.rule1": "Ogni giocatore parte con {budget}.",
-  "lobby.rule2": "15 secondi per lotto, 10 dopo ogni rilancio.",
+  "lobby.rule2": "{n} secondi per lotto: ogni rilancio rimette il timer al massimo.",
   "lobby.rule3": "Rilanci da +1, +2, +5 solo se il saldo li copre.",
   "lobby.rule4": "Chi passa esce dal lotto. Se non offre nessuno, non lo prende nessuno.",
   "lobby.rule5": "Ogni roster si chiude a {slots} elementi.",
@@ -612,6 +612,9 @@ export const it = {
   "color.orange": "Arancio",
   "color.gold": "Oro",
   "color.silver": "Argento",
+  "lobby.timer": "Tempo per lotto",
+  "lobby.timerHint": "15 secondi è lo standard. Ogni rilancio rimette il timer al massimo.",
+  "studio.clearItem": "Svuota elemento",
 } as const;
 
 export type TranslationKey = keyof typeof it;

@@ -9,6 +9,8 @@ import {
   MIN_BUDGET,
   MIN_PLAYERS,
   MIN_SLOTS,
+  LOT_TIMER_CHOICES,
+  LOT_TIMER_DURATION,
 } from "@/lib/game";
 import { useT } from "@/lib/settings";
 import type { CurrencyCode, RoomConfig } from "@/lib/types";
@@ -100,6 +102,32 @@ export function LobbyConfig({ config, disabled = false, onChange }: LobbyConfigP
           disabled={disabled}
           onChange={(maxPlayers) => onChange({ maxPlayers })}
         />
+
+        {/* Quanto dura un lotto: veloce, standard o comodo. */}
+        <div>
+          <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-faint">
+            {t("lobby.timer")}
+          </p>
+          <div className="flex gap-1.5">
+            {LOT_TIMER_CHOICES.map((seconds) => (
+              <button
+                key={seconds}
+                type="button"
+                disabled={disabled}
+                onClick={() => onChange({ lotSeconds: seconds })}
+                className={cn(
+                  "h-11 flex-1 rounded-xl border text-sm font-bold transition-colors",
+                  (config.lotSeconds ?? LOT_TIMER_DURATION) === seconds
+                    ? "border-neon bg-neon/15 text-neon"
+                    : "border-line bg-surface-2 text-muted hover:text-fg",
+                )}
+              >
+                {seconds}s
+              </button>
+            ))}
+          </div>
+          <p className="mt-1.5 text-xs text-faint">{t("lobby.timerHint")}</p>
+        </div>
 
         <Stepper
           label={t("common.slots")}

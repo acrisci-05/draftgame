@@ -116,7 +116,7 @@ export const ja: PartialDictionary = {
   "lobby.you": "あなた",
   "lobby.rulesTitle": "ルール",
   "lobby.rule1": "各プレイヤーは {budget} からスタート。",
-  "lobby.rule2": "1ロット15秒、入札のたびに10秒。",
+  "lobby.rule2": "1ロット{n}秒。入札のたびにタイマーは満タンに戻ります。",
   "lobby.rule3": "残高が足りる場合のみ +1、+2、+5 で入札。",
   "lobby.rule4": "パスするとそのロットから抜けます。誰も入札しなければ誰のものにもなりません。",
   "lobby.rule5": "各ロスターは {slots} アイテムで締め切りです。",
@@ -567,4 +567,7 @@ export const ja: PartialDictionary = {
   "color.orange": "オレンジ",
   "color.gold": "ゴールド",
   "color.silver": "シルバー",
+  "lobby.timer": "1ロットの時間",
+  "lobby.timerHint": "15秒が標準です。入札のたびにタイマーは満タンに戻ります。",
+  "studio.clearItem": "項目を空にする",
 };

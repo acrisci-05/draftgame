@@ -117,7 +117,7 @@ export const ru: PartialDictionary = {
   "lobby.you": "ты",
   "lobby.rulesTitle": "Правила",
   "lobby.rule1": "Каждый игрок начинает с {budget}.",
-  "lobby.rule2": "15 секунд на лот, 10 после каждой ставки.",
+  "lobby.rule2": "{n} секунд на лот: каждая ставка возвращает таймер на максимум.",
   "lobby.rule3": "Ставки +1, +2, +5 только если хватает баланса.",
   "lobby.rule4": "Пас выводит из лота. Если ставок нет, лот не достаётся никому.",
   "lobby.rule5": "Каждый состав закрывается на {slots} элементах.",
@@ -569,4 +569,7 @@ export const ru: PartialDictionary = {
   "color.orange": "Оранжевый",
   "color.gold": "Золотой",
   "color.silver": "Серебряный",
+  "lobby.timer": "Время на лот",
+  "lobby.timerHint": "15 секунд — стандарт. Каждая ставка возвращает таймер на максимум.",
+  "studio.clearItem": "Очистить элемент",
 };

@@ -8,6 +8,7 @@ import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
 import {
   MIN_PLAYERS,
+  lotSeconds,
   PLAYER_COLORS,
   colorLook,
   playerById,
@@ -297,7 +298,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
         <PanelTitle>{t("lobby.rulesTitle")}</PanelTitle>
         <ul className="flex flex-col gap-1.5">
           <li>{t("lobby.rule1", { budget: money(state.config.budget, state.config.currency) })}</li>
-          <li>{t("lobby.rule2")}</li>
+          <li>{t("lobby.rule2", { n: lotSeconds(state) })}</li>
           <li>{t("lobby.rule3")}</li>
           <li>{t("lobby.rule4")}</li>
           <li>{t("lobby.rule5", { slots: state.config.slots })}</li>

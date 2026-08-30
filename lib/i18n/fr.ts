@@ -118,7 +118,7 @@ export const fr: PartialDictionary = {
   "lobby.you": "toi",
   "lobby.rulesTitle": "Règles",
   "lobby.rule1": "Chaque joueur commence avec {budget}.",
-  "lobby.rule2": "15 secondes par lot, 10 après chaque relance.",
+  "lobby.rule2": "{n} secondes par lot : chaque enchère remet le chrono au maximum.",
   "lobby.rule3": "Relances de +1, +2, +5 seulement si le solde le permet.",
   "lobby.rule4": "Passer, c'est quitter le lot. Si personne n'enchérit, personne ne le prend.",
   "lobby.rule5": "Chaque roster se ferme à {slots} éléments.",
@@ -570,4 +570,7 @@ export const fr: PartialDictionary = {
   "color.orange": "Orange",
   "color.gold": "Or",
   "color.silver": "Argent",
+  "lobby.timer": "Temps par lot",
+  "lobby.timerHint": "15 secondes, c'est le standard. Chaque enchère remet le chrono au maximum.",
+  "studio.clearItem": "Vider l'élément",
 };

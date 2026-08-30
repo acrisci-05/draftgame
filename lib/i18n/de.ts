@@ -117,7 +117,7 @@ export const de: PartialDictionary = {
   "lobby.you": "du",
   "lobby.rulesTitle": "Regeln",
   "lobby.rule1": "Jeder Spieler startet mit {budget}.",
-  "lobby.rule2": "15 Sekunden pro Los, 10 nach jedem Gebot.",
+  "lobby.rule2": "{n} Sekunden pro Los: jedes Gebot setzt die Uhr wieder aufs Maximum.",
   "lobby.rule3": "Erhöhungen um +1, +2, +5 nur, wenn das Guthaben reicht.",
   "lobby.rule4": "Wer passt, ist raus aus dem Los. Bietet niemand, bekommt es auch niemand.",
   "lobby.rule5": "Jeder Kader schließt bei {slots} Elementen.",
@@ -569,4 +569,7 @@ export const de: PartialDictionary = {
   "color.orange": "Orange",
   "color.gold": "Gold",
   "color.silver": "Silber",
+  "lobby.timer": "Zeit pro Los",
+  "lobby.timerHint": "15 Sekunden sind Standard. Jedes Gebot setzt die Uhr wieder aufs Maximum.",
+  "studio.clearItem": "Eintrag leeren",
 };

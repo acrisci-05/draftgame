@@ -279,6 +279,21 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
                       >
                         <ImageIcon className="size-4" />
                       </button>
+                      {/*
+                        Svuota la riga: nome, icona e foto. Il posto resta,
+                        perche' ogni fascia ne vuole sei: si libera per
+                        rimpiazzare l'elemento con un altro.
+                      */}
+                      <button
+                        type="button"
+                        aria-label={t("studio.clearItem")}
+                        title={t("studio.clearItem")}
+                        disabled={!row.name && !row.image}
+                        onClick={() => setRow(tier, index, { name: "", emoji: "", image: "" })}
+                        className="grid size-11 shrink-0 place-items-center rounded-xl border border-line bg-surface-2 text-faint transition-colors hover:border-red-500/50 hover:text-red-500 disabled:opacity-40"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
                     </div>
 
                     {notFound.includes(key) ? (
@@ -326,6 +341,10 @@ export function ListEditor({ category, official, overridden, onSaved }: ListEdit
                     {openImage === key ? (
                       <div className="flex gap-2">
                         <input
+                          // Senza il valore il campo si apriva vuoto anche con
+                          // una foto gia' impostata: sembrava che non si potesse
+                          // correggere, si poteva solo riscrivere da capo.
+                          value={row.image}
                           placeholder={t("editor.imagePlaceholder", {
                             optional: t("common.optional"),
                           })}

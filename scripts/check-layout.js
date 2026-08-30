@@ -5,7 +5,10 @@
  * larghezza di un telefono e misura quanto è larga la pagina rispetto allo
  * schermo: se il contenuto è più largo, indica anche gli elementi colpevoli.
  *
- * Uso:  node scripts/check-layout.js [indirizzo] [larghezza]
+ * Uso:  node scripts/check-layout.js [indirizzo] [larghezza] [porta]
+ *
+ * La porta di controllo del browser si puo' cambiare: la 9222 e' quella di
+ * default di Chrome, e capita che sia gia' occupata da un altro programma.
  */
 const { spawn } = require("node:child_process");
 const fs = require("node:fs");
@@ -15,7 +18,7 @@ const path = require("node:path");
 const BASE = process.argv[2] ?? "http://localhost:3000";
 const WIDTH = Number(process.argv[3] ?? 390);
 const HEIGHT = 844;
-const PORT = 9222;
+const PORT = Number(process.argv[4] ?? 9222);
 
 const PAGES = ["/", "/create", "/categories", "/pickmates", "/studio"];
 
