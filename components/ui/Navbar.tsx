@@ -27,7 +27,10 @@ import { syncRemoteLists } from "@/lib/remote-lists";
 import { useSettings } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { AdminModal } from "./AdminModal";
+import { AccountChip } from "./AccountChip";
 import { AuthModal } from "./AuthModal";
+import { PickerBenefitsModal } from "./PickerBenefits";
+import { ToastHost } from "./Toast";
 import { InstagramGlyph } from "./BrandGlyphs";
 import { InstallPwaModal } from "./InstallPwaModal";
 import { Drawer } from "./Drawer";
@@ -85,6 +88,8 @@ export function Navbar() {
 
   return (
     <>
+      <ToastHost />
+
       <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
         <nav className="mx-auto flex w-full max-w-3xl items-center gap-2 px-4 py-2.5">
           <Link href="/" className="me-auto min-w-0">
@@ -104,6 +109,8 @@ export function Navbar() {
           </IconButton>
 
           <NotificationBell />
+
+          <AccountChip />
 
           <IconButton label={t("nav.menu")} onClick={() => setMenuOpen(true)}>
             <Menu className="size-5" />
@@ -195,7 +202,12 @@ export function Navbar() {
       <SupportModal open={panel === "support"} onClose={() => setPanel(null)} />
       <RatingModal open={panel === "rate"} onClose={() => setPanel(null)} />
       <AdminModal open={panel === "admin"} onClose={() => setPanel(null)} />
-      <AuthModal open={panel === "account"} onClose={() => setPanel(null)} />
+      <AuthModal
+        open={panel === "account" || panel === "register"}
+        initialTab={panel === "register" ? "up" : "in"}
+        onClose={() => setPanel(null)}
+      />
+      <PickerBenefitsModal open={panel === "picker"} onClose={() => setPanel(null)} />
       <InstallPwaModal open={panel === "install"} onClose={() => setPanel(null)} />
 
       <Modal open={panel === "language"} title={t("nav.language")} onClose={() => setPanel(null)}>

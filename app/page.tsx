@@ -9,6 +9,7 @@ import { APP_FULL_NAME, APP_TAGLINE, APP_VERSION } from "@/lib/config";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { openPanel } from "@/lib/panels";
 import { useSettings } from "@/lib/settings";
+import { useAuth } from "@/lib/auth";
 import { ensureProfile, readProfile, saveProfile, saveSession } from "@/lib/storage";
 import type { Profile } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
@@ -16,6 +17,7 @@ import { AvatarPicker } from "@/components/ui/Avatar";
 import { Input } from "@/components/ui/Input";
 import { JoinModal } from "@/components/ui/JoinModal";
 import { LogoMark, LogoWordmark } from "@/components/ui/Logo";
+import { PickerBanner } from "@/components/ui/PickerBenefits";
 import { SupportModal } from "@/components/ui/SupportModal";
 
 const HOW_KEYS = ["home.how1", "home.how2", "home.how3", "home.how4"] as const;
@@ -29,8 +31,15 @@ export default function HomePage() {
   const [joinOpen, setJoinOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
 
-  const name = nameDraft ?? stored?.name ?? "";
-  const emoji = emojiDraft ?? stored?.emoji ?? DEFAULT_AVATAR;
+  /*
+   * Chi ha un profilo entra in partita con quel nome: il campo qui sotto parte
+   * gia' compilato col nickname e l'avatar scelti in fase di registrazione,
+   * invece di chiederli una seconda volta. Resta modificabile: il nome in
+   * partita puo' essere diverso da quello dell'account.
+   */
+  const { account } = useAuth();
+  const name = nameDraft ?? stored?.name ?? account?.nickname ?? "";
+  const emoji = emojiDraft ?? stored?.emoji ?? account?.emoji ?? DEFAULT_AVATAR;
 
   const persistProfile = (): Profile => {
     const profile = { ...ensureProfile(), name: name.trim() || "Player", emoji };
@@ -114,6 +123,9 @@ export default function HomePage() {
           <p className="mt-2.5 text-center text-xs text-faint">{t("home.createHint")}</p>
         </div>
       </motion.section>
+
+      {/* Invito a farsi un profilo: compare solo a chi gioca da ospite. */}
+      <PickerBanner />
 
       <section className="flex flex-col gap-3 text-sm text-muted">
         <div className="flex items-center gap-3">

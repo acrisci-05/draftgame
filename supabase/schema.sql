@@ -533,3 +533,47 @@ create policy "suggestions_signed_insert"
     and char_length(name) between 1 and 60
     and char_length(idea) <= 1000
   );
+
+-- ---------------------------------------------------------------------------
+-- Storico delle partite.
+-- Una riga per giocatore per partita, scritta da chi l'ha giocata. Serve alle
+-- statistiche del profilo: quante partite, quante vinte, quanto si e' speso.
+-- Ognuno vede e scrive solo le proprie righe: nessuno puo' leggere lo storico
+-- di un altro, e nessuno puo' gonfiare il proprio scrivendo a nome altrui.
+-- ---------------------------------------------------------------------------
+
+create table if not exists public.match_history (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles on delete cascade,
+  code text not null,
+  category text not null,
+  players integer not null check (players between 1 and 8),
+  position integer not null check (position >= 1),
+  spent integer not null check (spent >= 0),
+  items integer not null check (items >= 0),
+  currency text not null default 'EUR',
+  played_at timestamptz not null default now(),
+  -- La stessa partita non si conta due volte, anche se la pagina viene
+  -- ricaricata o il risultato arriva da piu' dispositivi.
+  unique (user_id, code, played_at)
+);
+
+create index if not exists match_history_user_idx
+  on public.match_history (user_id, played_at desc);
+
+alter table public.match_history enable row level security;
+
+drop policy if exists "match_history_own_read" on public.match_history;
+create policy "match_history_own_read"
+  on public.match_history for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "match_history_own_insert" on public.match_history;
+create policy "match_history_own_insert"
+  on public.match_history for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "match_history_own_delete" on public.match_history;
+create policy "match_history_own_delete"
+  on public.match_history for delete
+  using (auth.uid() = user_id);

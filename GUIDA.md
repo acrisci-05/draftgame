@@ -291,6 +291,26 @@ e *Draft ricevuti*.
 - Si continuano a mandare i propri draft agli amici perché li votino.
 - I **suggerimenti di categoria** arrivano solo da chi ha fatto l'accesso.
 
+### Dopo l'accesso
+- **Saluto**: appena il profilo compare arriva un avviso verde in alto, *"Accesso effettuato!
+  Bentornato, {nickname}"*. Il saluto si prepara al momento dell'accesso e si ritira quando il
+  profilo è davvero in mano, così il nome è quello giusto; funziona anche al rientro da Google,
+  dove la pagina viene ricaricata da capo, e non si ripete al caricamento successivo.
+- **Micro-profilo in barra**: al posto del pulsante *Accedi* compaiono avatar con il pallino verde
+  e nickname. Al tocco si apre la tendina con *Il mio profilo*, *I miei Pickmates* ed *Esci*.
+- **Statistiche**: nella scheda del profilo ci sono partite giocate, vinte, percentuale di successo
+  ed elementi conquistati. Vengono dalla tabella `match_history`, dove ogni giocatore scrive la
+  propria riga a fine partita e legge soltanto le proprie.
+- **In home il nome è già compilato** con nickname e avatar dell'account, invece di chiederli una
+  seconda volta. Resta modificabile: il nome in partita può essere diverso.
+
+### Perché diventare un Picker
+Chi gioca da ospite trova in home un invito che apre una finestra con tre motivi per farsi un
+profilo — rete Pickmates e sfide dirette, storico e statistiche, card firmata col proprio nickname —
+e un pulsante che porta dritto alla registrazione. Sparisce da solo appena il profilo esiste, e non
+compare affatto dove il database non è collegato: lì quelle funzioni non ci sono e prometterle
+sarebbe falso.
+
 ### Notifiche dal vivo
 La campanella in navbar compare a chi ha fatto l'accesso e ascolta il canale realtime del database:
 quando qualcuno scrive una riga che ti riguarda, l'avviso arriva senza ricaricare la pagina. La
@@ -392,7 +412,8 @@ NEXT_PUBLIC_REVOLUT_USER=tuoutente
 
 3. Apri l'**SQL editor** di Supabase ed esegui tutto il contenuto di `supabase/schema.sql`:
    crea le tabelle `categories`, `suggestions`, `results`, `votes`, `feedback`, `official_lists`,
-   `profiles`, `pickmates`, `recent_opponents`, `challenges`, `profile_emails`, `shared_results`
+   `profiles`, `pickmates`, `recent_opponents`, `challenges`, `profile_emails`, `shared_results`,
+   `match_history`
    con le rispettive regole di accesso. Lo script si può rieseguire quando serve: aggiorna quello
    che manca e travasa da solo la vecchia tabella `friendships` in `pickmates`.
    Due note sul perché è fatto così:

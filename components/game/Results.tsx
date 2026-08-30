@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth";
 import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
 import { itemById, playerById, rosterValue, standings, type GameAction } from "@/lib/game";
+import { recordMatch } from "@/lib/history";
 import { recordOpponent } from "@/lib/pickmates";
 import { useSettings, useT } from "@/lib/settings";
 import { isSupabaseConfigured, publishResult } from "@/lib/supabase";
@@ -91,6 +92,29 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
       .filter((id): id is string => Boolean(id) && id !== myAccountId);
     for (const opponentId of new Set(opponents)) void recordOpponent(opponentId);
   }, [myAccountId, state.players]);
+
+  /*
+   * La partita finisce nello storico personale: da lì escono le statistiche del
+   * profilo. Ognuno scrive la propria riga, con la posizione in classifica e
+   * quanto ha speso; chi gioca da ospite non scrive niente.
+   */
+  useEffect(() => {
+    if (!myAccountId) return;
+    const ranking = standings(state);
+    const mine = ranking.findIndex((player) => player.accountId === myAccountId);
+    if (mine < 0) return;
+    const me = ranking[mine];
+    void recordMatch(myAccountId, {
+      code: state.code,
+      category: state.category.name,
+      players: state.players.length,
+      position: mine + 1,
+      spent: rosterValue(me),
+      items: me.roster.length,
+      currency: state.config.currency,
+    });
+    // Una volta sola per partita: le dipendenze sono la stanza e chi sono io.
+  }, [myAccountId, state]);
 
   const currency = state.config.currency;
   const ordered = standings(state);

@@ -30,10 +30,12 @@ import {
   type AuthError,
   type PasswordChecks,
   enabledProviders,
+  markGreeting,
   signInWithProvider,
   type OAuthProvider,
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
+import { fetchStats, type PlayerStats } from "@/lib/history";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import { cn } from "@/lib/utils";
@@ -56,18 +58,37 @@ const ERROR_KEYS: Record<AuthError, TranslationKey> = {
   unknown: "auth.errUnknown",
 };
 
-export function AuthModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function AuthModal({
+  open,
+  onClose,
+  initialTab = "in",
+}: {
+  open: boolean;
+  onClose: () => void;
+  /** "up" per aprirsi direttamente sulla registrazione. */
+  initialTab?: Tab;
+}) {
   const t = useT();
   const auth = useAuth();
 
   return (
     <Modal open={open} title={t("auth.title")} onClose={onClose}>
-      <AuthPanel onDone={onClose} key={auth.account?.id ?? auth.session?.user.id ?? "anon"} />
+      <AuthPanel
+        onDone={onClose}
+        initialTab={initialTab}
+        key={`${auth.account?.id ?? auth.session?.user.id ?? "anon"}:${initialTab}`}
+      />
     </Modal>
   );
 }
 
-export function AuthPanel({ onDone }: { onDone?: () => void }) {
+export function AuthPanel({
+  onDone,
+  initialTab = "in",
+}: {
+  onDone?: () => void;
+  initialTab?: Tab;
+}) {
   const { mode, session, email, account, refreshAccount } = useAuth();
 
   /* Profilo già pronto. */
@@ -85,7 +106,7 @@ export function AuthPanel({ onDone }: { onDone?: () => void }) {
     return <LocalProfileForm onDone={onDone} />;
   }
 
-  return <CredentialsForm onDone={onDone} />;
+  return <CredentialsForm onDone={onDone} initialTab={initialTab} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -107,6 +128,8 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
         </span>
       </div>
 
+      <PlayerStatsBlock userId={account.id} />
+
       <Button
         variant="danger"
         onClick={async () => {
@@ -121,13 +144,89 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
   );
 }
 
+/**
+ * Le statistiche di chi guarda, dalle sue partite.
+ *
+ * Finche' non si e' giocata una partita da registrati non c'e' niente da
+ * mostrare: al posto dei numeri a zero compare la riga che spiega quando
+ * cominceranno a riempirsi.
+ */
+function PlayerStatsBlock({ userId }: { userId: string }) {
+  const t = useT();
+  const [stats, setStats] = useState<PlayerStats | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetchStats(userId).then((result) => {
+      if (active) setStats(result);
+    });
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
+  if (!stats) return null;
+
+  if (stats.played === 0) {
+    return (
+      <p className="rounded-2xl border border-line bg-surface-2 p-3 text-center text-xs text-faint">
+        {t("stats.empty")}
+      </p>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-line bg-surface-2 p-3">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-faint">
+        {t("stats.title")}
+      </p>
+      <div className="grid grid-cols-4 gap-2 text-center">
+        <Stat value={stats.played} label={t("stats.played")} />
+        <Stat value={stats.won} label={t("stats.won")} tone="gold" />
+        <Stat value={`${stats.winRate}%`} label={t("stats.rate")} tone="neon" />
+        <Stat value={stats.items} label={t("stats.items")} />
+      </div>
+    </div>
+  );
+}
+
+function Stat({
+  value,
+  label,
+  tone,
+}: {
+  value: number | string;
+  label: string;
+  tone?: "gold" | "neon";
+}) {
+  return (
+    <span className="flex flex-col">
+      <span
+        className={cn(
+          "font-mono text-xl font-black",
+          tone === "gold" ? "text-gold" : tone === "neon" ? "text-neon" : "text-fg",
+        )}
+      >
+        {value}
+      </span>
+      <span className="text-[10px] uppercase tracking-wider text-faint">{label}</span>
+    </span>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 
 type Tab = "in" | "up";
 
-function CredentialsForm({ onDone }: { onDone?: () => void }) {
+function CredentialsForm({
+  onDone,
+  initialTab = "in",
+}: {
+  onDone?: () => void;
+  initialTab?: Tab;
+}) {
   const t = useT();
-  const [tab, setTab] = useState<Tab>("in");
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
@@ -163,6 +262,7 @@ function CredentialsForm({ onDone }: { onDone?: () => void }) {
     try {
       if (tab === "in") {
         await signInWithPassword(email, password);
+        markGreeting("in");
         onDone?.();
       } else {
         const { confirmationRequired } = await signUpWithPassword({
@@ -171,8 +271,12 @@ function CredentialsForm({ onDone }: { onDone?: () => void }) {
           nickname: cleanNick,
           emoji,
         });
-        if (confirmationRequired) setNotice("auth.confirmSent");
-        else onDone?.();
+        if (confirmationRequired) {
+          setNotice("auth.confirmSent");
+        } else {
+          markGreeting("up");
+          onDone?.();
+        }
       }
     } catch (cause) {
       fail(cause instanceof AuthFailure ? cause.reason : "unknown");

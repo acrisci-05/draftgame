@@ -17,6 +17,10 @@ export type PanelName =
   | "rate"
   | "admin"
   | "account"
+  /** Apre l'accesso gia' sulla scheda di registrazione. */
+  | "register"
+  /** "Perche' diventare un Picker?": i vantaggi del profilo. */
+  | "picker"
   | "install";
 
 const EVENT = "pp:panel";

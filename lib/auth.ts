@@ -166,6 +166,42 @@ function clearPendingProfile() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Il saluto dopo l'accesso                                            */
+/* ------------------------------------------------------------------ */
+
+const GREETING_KEY = "pp:greeting";
+
+export type Greeting = "in" | "up";
+
+/**
+ * Segna che c'e' un saluto da dare.
+ *
+ * Il nickname, al momento dell'accesso, non si conosce ancora: arriva col
+ * profilo, un istante dopo. E con Google la pagina viene addirittura ricaricata.
+ * Quindi non si mostra il saluto subito: si lascia un segnale, e chi vede
+ * comparire il profilo lo raccoglie. Vale per la sola scheda aperta.
+ */
+export function markGreeting(kind: Greeting) {
+  try {
+    window.sessionStorage.setItem(GREETING_KEY, kind);
+  } catch {
+    /* senza storage si perde solo il saluto */
+  }
+}
+
+/** Ritira il saluto in sospeso, una volta sola. */
+export function consumeGreeting(): Greeting | null {
+  try {
+    const value = window.sessionStorage.getItem(GREETING_KEY);
+    if (value !== "in" && value !== "up") return null;
+    window.sessionStorage.removeItem(GREETING_KEY);
+    return value;
+  } catch {
+    return null;
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Accesso con un profilo che si ha già (Google, Apple, Facebook...)   */
 /* ------------------------------------------------------------------ */
 
@@ -214,6 +250,7 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<void>
   const supabase = getSupabase();
   if (!supabase) throw new AuthFailure("offline");
 
+  markGreeting("in");
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
