@@ -448,6 +448,20 @@ export const it = {
   "auth.signOut": "Esci dall'account",
   "auth.signedAs": "Sei dentro come {email}",
   "auth.nickname": "Scegli il tuo nickname",
+  "profile.edit":
+    "Modifica profilo",
+  "profile.avatarFree":
+    "L'avatar lo cambi quando vuoi.",
+  "profile.renameFree":
+    "Il nickname si cambia una volta ogni 30 giorni: è l'indirizzo con cui gli amici ti trovano e la firma che resta sulle card già condivise.",
+  "profile.renameLocked":
+    "Nickname bloccato fino al {date}. L'avatar puoi cambiarlo lo stesso.",
+  "profile.renameTooSoon":
+    "Non sono ancora passati 30 giorni dall'ultimo cambio.",
+  "profile.saved":
+    "Salvato.",
+  "auth.identityNotice":
+    "Scegli con cura: l'avatar lo cambi quando vuoi, il nickname una volta ogni 30 giorni. È l'indirizzo con cui gli amici ti trovano e la firma sulle tue card.",
   "auth.nicknameHint": "È l'indirizzo con cui gli amici ti aggiungono. Lettere, numeri e underscore.",
   "auth.nicknamePlaceholder": "es. marco_23",
   "auth.nicknameTaken": "Nickname già preso, provane un altro.",

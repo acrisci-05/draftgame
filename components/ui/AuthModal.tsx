@@ -15,6 +15,7 @@ import {
   Trophy,
   UserPlus,
   Users,
+  Pencil,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -62,6 +63,7 @@ import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { LevelBar } from "./LevelBar";
+import { EditProfile } from "./EditProfile";
 import { Modal } from "./Modal";
 import { Rewards } from "./Rewards";
 import { Switch } from "./Switch";
@@ -143,6 +145,7 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
    * abbastanza lungo da far sembrare che il tocco non abbia funzionato.
    */
   const [presenceDraft, setPresenceDraft] = useState<boolean | null>(null);
+  const [editing, setEditing] = useState(false);
 
   const userId = account?.id ?? null;
   const showsPresence = presenceDraft ?? account?.showsPresence !== false;
@@ -197,6 +200,15 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
             <span className="flex items-center gap-1.5">
               <span className="truncate font-black">@{account.nickname}</span>
               {level.tier.id === "whale" ? <Crown className="size-3.5 shrink-0 text-gold" /> : null}
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                aria-label={t("profile.edit")}
+                title={t("profile.edit")}
+                className="ms-auto shrink-0 rounded-lg p-1 text-faint transition-colors hover:text-neon"
+              >
+                <Pencil className="size-3.5" />
+              </button>
             </span>
             {account.title ? (
               <span className="mt-0.5 block truncate text-xs font-semibold text-gold">
@@ -233,6 +245,8 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
           hint={t("presence.shareHint")}
         />
       </div>
+
+      <EditProfile open={editing} onClose={() => setEditing(false)} />
 
       <Rewards level={level} />
 
@@ -531,6 +545,14 @@ function CredentialsForm({
             </p>
             <AvatarPicker value={emoji} onChange={setEmoji} />
           </div>
+
+          {/*
+            Le due regole sono diverse e va detto adesso, non quando si prova a
+            cambiare: l'avatar e' libero, il nickname aspetta trenta giorni.
+          */}
+          <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-relaxed text-amber-400">
+            {t("auth.identityNotice")}
+          </p>
         </>
       ) : null}
 

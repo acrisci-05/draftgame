@@ -439,6 +439,20 @@ export const en: Dictionary = {
   "auth.signOut": "Sign out",
   "auth.signedAs": "Signed in as {email}",
   "auth.nickname": "Pick your nickname",
+  "profile.edit":
+    "Edit profile",
+  "profile.avatarFree":
+    "Change your avatar whenever you like.",
+  "profile.renameFree":
+    "The nickname can be changed once every 30 days: it is the address friends find you by, and the signature left on cards already shared.",
+  "profile.renameLocked":
+    "Nickname locked until {date}. You can still change the avatar.",
+  "profile.renameTooSoon":
+    "30 days have not passed since the last change.",
+  "profile.saved":
+    "Saved.",
+  "auth.identityNotice":
+    "Choose carefully: the avatar can change whenever you like, the nickname once every 30 days. It is the address friends find you by, and the signature on your cards.",
   "auth.nicknameHint": "It is how friends add you. Letters, numbers and underscore.",
   "auth.nicknamePlaceholder": "e.g. marco_23",
   "auth.nicknameTaken": "Nickname already taken, try another one.",

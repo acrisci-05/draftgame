@@ -44,6 +44,8 @@ export interface Account {
   xp?: number;
   /** Titolo scelto fra quelli sbloccati, mostrato accanto al nickname. */
   title?: string | null;
+  /** Ultimo cambio di nickname: da qui parte l'attesa di trenta giorni. */
+  nicknameChangedAt?: string | null;
 }
 
 function requireClient() {
@@ -386,6 +388,7 @@ interface ProfileRow {
   shows_presence?: boolean;
   xp?: number;
   equipped_title?: string | null;
+  nickname_changed_at?: string | null;
 }
 
 export async function fetchAccount(userId: string): Promise<Account | null> {
@@ -411,6 +414,7 @@ export async function fetchAccount(userId: string): Promise<Account | null> {
     showsPresence: row.shows_presence !== false,
     xp: typeof row.xp === "number" ? row.xp : 0,
     title: row.equipped_title ?? null,
+    nicknameChangedAt: row.nickname_changed_at ?? null,
   };
 }
 
@@ -552,6 +556,40 @@ export function useAuth(): AuthState {
 /* ---------------------------------------------------------------- */
 
 export type RenameResult = "ok" | "taken" | "invalid" | "too-soon" | "not-signed-in" | "error";
+
+/** Giorni di attesa fra un cambio di nickname e il successivo. */
+export const NICKNAME_COOLDOWN_DAYS = 30;
+
+/**
+ * Quando si potra' cambiare di nuovo il nickname, o null se si puo' subito.
+ *
+ * Il conto vero lo tiene il database, che rifiuta comunque: questo serve solo
+ * a dirlo prima invece di far scoprire il divieto premendo salva.
+ */
+export function nicknameAvailableFrom(changedAt: string | null | undefined): Date | null {
+  if (!changedAt) return null;
+  const quando = new Date(changedAt).getTime();
+  if (Number.isNaN(quando)) return null;
+  const libero = quando + NICKNAME_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+  return libero > Date.now() ? new Date(libero) : null;
+}
+
+/**
+ * Cambia l'avatar del profilo.
+ *
+ * Nessuna attesa: l'avatar non e' un indirizzo, non ci si trova nessuno e non
+ * resta scritto sulle card gia' condivise. Cambiarlo tutti i giorni non fa
+ * danno a nessuno.
+ */
+export async function updateAvatar(emoji: string): Promise<boolean> {
+  const supabase = getSupabase();
+  if (!supabase) return false;
+  const { data } = await supabase.auth.getUser();
+  const id = data.user?.id;
+  if (!id) return false;
+  const { error } = await supabase.from(PROFILES_TABLE).update({ emoji }).eq("id", id);
+  return !error;
+}
 
 /**
  * Cambia il nickname globale, non più di una volta ogni trenta giorni.
