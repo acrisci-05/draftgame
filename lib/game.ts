@@ -488,6 +488,7 @@ export type GameAction =
       player: { id: string; name: string; emoji?: string; accountId?: string; handle?: string };
     }
   | { type: "set_name"; playerId: string; name: string }
+  | { type: "link_account"; playerId: string; accountId: string; handle?: string }
   | { type: "remove_player"; playerId: string }
   | { type: "set_avatar"; playerId: string; emoji: string }
   | { type: "set_color"; playerId: string; color: string }
@@ -854,6 +855,33 @@ export function reducer(state: GameState, action: GameAction): GameState {
     }
 
     /** Cambio avatar dalla lobby: l'icona deve essere ancora libera. */
+    /*
+     * Attacca il profilo a un giocatore gia' in stanza.
+     *
+     * Serve perche' la sessione si legge dal dispositivo dopo il montaggio: chi
+     * apre la stanza viene iscritto un istante prima che si sappia chi e', e
+     * senza questo resterebbe anonimo per tutta la partita. Anonimo vuol dire
+     * che a fine partita non gli si accredita niente -- ne' la partita nello
+     * storico, ne' l'esperienza -- e le statistiche del profilo restano a zero
+     * anche giocando.
+     *
+     * E' senza effetto se il collegamento c'e' gia': altrimenti ogni ritocco
+     * dello stato ne farebbe partire un altro, all'infinito.
+     */
+    case "link_account": {
+      const player = playerById(state, action.playerId);
+      if (!player) return state;
+      if (player.accountId === action.accountId && player.handle === action.handle) return state;
+      return touch({
+        ...state,
+        players: state.players.map((p) =>
+          p.id === action.playerId
+            ? { ...p, accountId: action.accountId, handle: action.handle }
+            : p,
+        ),
+      });
+    }
+
     case "set_name": {
       if (state.phase !== "lobby") return state;
       // Un nome vuoto o di soli spazi lascerebbe una riga anonima nella card.

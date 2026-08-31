@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Home, Loader2, Plus, Radio, SearchX, Smartphone, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { DEFAULT_CATEGORY } from "@/lib/catalog";
 import { useClientValue, useIsClient } from "@/lib/client-store";
@@ -80,6 +80,27 @@ export function RoomClient({ code }: { code: string }) {
     config,
   });
 
+  /*
+   * Il profilo arriva dopo il montaggio, e la stanza si crea subito: senza
+   * questo il proprio giocatore resterebbe senza identita' per tutta la
+   * partita, e a fine gara non gli verrebbe accreditato niente -- ne' la
+   * partita nello storico, ne' l'esperienza.
+   */
+  const mine = room.state?.players.find((player) => player.id === session?.playerId);
+  const daCollegare = Boolean(accountId) && Boolean(mine) && mine?.accountId !== accountId;
+
+  useEffect(() => {
+    if (!daCollegare || !accountId || !session) return;
+    room.dispatch({
+      type: "link_account",
+      playerId: session.playerId,
+      accountId,
+      handle,
+    });
+    // room.dispatch e' stabile: si dipende dai dati, non dall'oggetto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [daCollegare, accountId, handle, session?.playerId]);
+
   if (!isClient) {
     return (
       <CenteredNotice icon={<Loader2 className="size-6 animate-spin" />} text={t("room.loading")} />
@@ -100,6 +121,7 @@ export function RoomClient({ code }: { code: string }) {
   }
 
   const { state, status, error: errorKey, transport, dispatch, now, isHost } = room;
+
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-4 safe-bottom">

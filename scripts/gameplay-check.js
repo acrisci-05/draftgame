@@ -168,6 +168,41 @@ check("passando sempre, le liste si riempiono d'ufficio",
 const assegnati = passata.history.filter((r) => r.winnerId);
 check("i lotti invenduti trovano comunque un proprietario", assegnati.length > 0, assegnati.length);
 
+/* 8. Il profilo che arriva in ritardo. */
+//
+// La sessione si legge dal dispositivo dopo il montaggio: chi apre la stanza
+// viene iscritto un istante prima che si sappia chi e'. Senza il collegamento
+// successivo resterebbe anonimo, e a fine partita non gli si accrediterebbe
+// niente: e' il motivo per cui le statistiche restavano a zero.
+let tardi = game.createGame({
+  code: "TARDI", mode: "online", hostId: "p0",
+  category: catalog.OFFICIAL_CATEGORIES[0],
+  config: { budget: 20, slots: 3, maxPlayers: 5 },
+});
+tardi = game.reducer(tardi, { type: "add_player", player: { id: "p0", name: "anti" } });
+check("all'inizio il giocatore e' senza profilo",
+  game.playerById(tardi, "p0").accountId === undefined);
+
+const collegato = game.reducer(tardi, {
+  type: "link_account", playerId: "p0", accountId: "acc-1", handle: "crispy",
+});
+check("il profilo si attacca quando arriva",
+  game.playerById(collegato, "p0").accountId === "acc-1",
+  game.playerById(collegato, "p0").accountId);
+check("arriva anche il nickname per la card",
+  game.playerById(collegato, "p0").handle === "crispy");
+check("ripetere il collegamento non cambia niente",
+  game.reducer(collegato, { type: "link_account", playerId: "p0", accountId: "acc-1", handle: "crispy" }) === collegato);
+check("collegare uno che non c'e' non rompe nulla",
+  game.reducer(collegato, { type: "link_account", playerId: "ignoto", accountId: "x" }) === collegato);
+
+// E la classifica finale deve poi riconoscerlo.
+let conProfilo = game.reducer(collegato, { type: "add_player", player: { id: "p1", name: "dani" } });
+conProfilo = game.reducer(conProfilo, { type: "start", now: Date.now() });
+const trovato = game.finalStandings(conProfilo)
+  .findIndex((entry) => entry.player.accountId === "acc-1");
+check("a fine partita il profilo viene ritrovato in classifica", trovato >= 0, trovato);
+
 console.log("");
 console.log(ko === 0 ? "TUTTI I CASI LIMITE REGGONO" : `${ko} CONTROLLI FALLITI`);
 process.exit(ko === 0 ? 0 : 1);
