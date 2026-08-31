@@ -627,6 +627,8 @@ export const it = {
   "support.oneLine": "Zero pubblicità, zero paywall: il progetto vive col tuo aiuto.",
 
   "home.create": "Crea partita",
+  "home.resume": "Torna alla partita",
+  "home.resumeHint": "Hai lasciato aperta la stanza {code}",
   "home.createHint": "Scegli modalità, budget e categoria",
   "home.joinCta": "Unisciti con codice",
   "home.joinHint": "Serve il codice a 5 caratteri della stanza",

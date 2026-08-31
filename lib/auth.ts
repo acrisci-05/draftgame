@@ -310,6 +310,23 @@ export async function signUpWithPassword(input: {
   const { data, error } = await supabase.auth.signUp({
     email: input.email.trim(),
     password: input.password,
+    options: {
+      /*
+       * Dove riportare chi clicca il link di conferma.
+       *
+       * Senza, Supabase usa l'indirizzo fisso configurato nel pannello, che di
+       * base e' localhost: sul telefono di chi si iscrive e' una pagina morta.
+       * Prendendo l'indirizzo da cui e' partita la registrazione funziona sia
+       * dal computer di casa, sia da un collegamento temporaneo, sia dal sito
+       * pubblicato, senza doverlo cambiare ogni volta.
+       *
+       * L'indirizzo deve comunque essere fra quelli consentiti nel pannello
+       * Supabase: e' una difesa contro chi provasse a far tornare la conferma
+       * su un sito suo.
+       */
+      emailRedirectTo:
+        typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
+    },
   });
 
   if (error) {

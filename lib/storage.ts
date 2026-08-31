@@ -149,7 +149,9 @@ export function getSession(code: string): RoomSession | null {
 }
 
 export function saveSession(session: RoomSession) {
-  write(SESSION_PREFIX + session.code, session);
+  // L'orario di ingresso si segna qui, cosi' nessuno se lo dimentica: serve a
+  // sapere se la stanza vale ancora la pena di essere riproposta.
+  write(SESSION_PREFIX + session.code, { openedAt: Date.now(), ...session });
 }
 
 export function clearSession(code: string) {
@@ -221,4 +223,32 @@ export function readVote(resultId: string): string | null {
 
 export function saveVote(resultId: string, playerId: string) {
   write(VOTE_PREFIX + resultId, playerId);
+}
+
+/**
+ * L'ultima stanza aperta su questo dispositivo, se è ancora fresca.
+ *
+ * Serve a ritrovare la partita dopo un ricarico o una chiusura per sbaglio: su
+ * telefono basta uno scorrimento storto per uscire dal sito, e ripartire dalla
+ * home con l'asta ancora in corso significa perdere il proprio turno.
+ *
+ * "Fresca" vuol dire aperta nelle ultime ore: una stanza di ieri non va
+ * riproposta, perché quella partita è finita e riaprirla confonderebbe.
+ */
+export function resumableSession(maxAgeHours = 6): RoomSession | null {
+  if (typeof window === "undefined") return null;
+  let migliore: { session: RoomSession; at: number } | null = null;
+
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index);
+    if (!key?.startsWith(SESSION_PREFIX)) continue;
+    const session = read<RoomSession | null>(key, null);
+    if (!session) continue;
+    const at = session.openedAt ?? 0;
+    if (!migliore || at > migliore.at) migliore = { session, at };
+  }
+
+  if (!migliore) return null;
+  const eta = Date.now() - migliore.at;
+  return eta <= maxAgeHours * 60 * 60 * 1000 ? migliore.session : null;
 }

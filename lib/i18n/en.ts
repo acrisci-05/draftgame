@@ -616,6 +616,8 @@ export const en: Dictionary = {
   "support.oneLine": "No ads, no paywall: the project runs on your support.",
 
   "home.create": "Create game",
+  "home.resume": "Back to the match",
+  "home.resumeHint": "You left room {code} open",
   "home.createHint": "Pick the mode, budget and category",
   "home.joinCta": "Join with a code",
   "home.joinHint": "You need the 5-character room code",

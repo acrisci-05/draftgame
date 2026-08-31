@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, Heart, LayoutGrid, LogIn, Plus } from "lucide-react";
+import { Gavel, Heart, LayoutGrid, LogIn, Plus, Undo2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClientValue } from "@/lib/client-store";
@@ -10,7 +10,9 @@ import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { openPanel } from "@/lib/panels";
 import { useSettings } from "@/lib/settings";
 import { useAuth } from "@/lib/auth";
-import { ensureProfile, readProfile, saveProfile, saveSession } from "@/lib/storage";
+import { ensureProfile, readProfile, saveProfile, saveSession,
+  resumableSession,
+} from "@/lib/storage";
 import type { Profile } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
 import { AvatarPicker } from "@/components/ui/Avatar";
@@ -52,6 +54,9 @@ export default function HomePage() {
     router.push("/create");
   };
 
+  /* La stanza aperta di recente su questo dispositivo, se c'e'. */
+  const aperta = useClientValue(resumableSession, null);
+
   const joinRoom = (code: string) => {
     const profile = persistProfile();
     saveSession({
@@ -67,6 +72,32 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-6 safe-bottom">
+      {/*
+        La partita lasciata a meta'. Su telefono basta uno scorrimento storto
+        per uscire dal sito, e ripartire dalla home con l'asta ancora in corso
+        significa perdere i propri turni. Si propone, non si trascina dentro a
+        forza: magari quella partita e' finita e si voleva davvero tornare qui.
+      */}
+      {aperta ? (
+        <motion.button
+          type="button"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          onClick={() => router.push(`/room/${aperta.code}`)}
+          className="flex items-center gap-3 rounded-2xl border border-neon/50 bg-neon/10 p-4 text-start transition-colors hover:border-neon"
+        >
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-neon/20 text-neon">
+            <Undo2 className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-bold text-neon">{t("home.resume")}</span>
+            <span className="block truncate text-xs text-muted">
+              {t("home.resumeHint", { code: aperta.code })}
+            </span>
+          </span>
+        </motion.button>
+      ) : null}
+
       <motion.section
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

@@ -174,6 +174,11 @@ export interface RoomSession {
   categoryId?: string;
   /** Regole scelte nella schermata di configurazione (solo per chi ospita). */
   config?: RoomConfig;
+  /**
+   * Quando si e' entrati in questa stanza. Serve a capire se vale la pena
+   * riproporla dopo un ricarico: una stanza di ieri e' una partita finita.
+   */
+  openedAt?: number;
 }
 
 export interface Profile {
