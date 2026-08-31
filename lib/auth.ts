@@ -34,6 +34,12 @@ export interface Account {
    * senza questo contrassegno rispondono con una lista vuota.
    */
   isAdmin?: boolean;
+  /**
+   * true se lo stato di attività è condiviso con i PickMates. Spegnendolo si
+   * smette anche di vedere il loro: è una regola del database, non una scelta
+   * dell'interfaccia.
+   */
+  showsPresence?: boolean;
 }
 
 function requireClient() {
@@ -373,6 +379,7 @@ interface ProfileRow {
   nickname: string;
   emoji: string;
   is_admin?: boolean;
+  shows_presence?: boolean;
 }
 
 export async function fetchAccount(userId: string): Promise<Account | null> {
@@ -393,6 +400,9 @@ export async function fetchAccount(userId: string): Promise<Account | null> {
     nickname: row.nickname,
     emoji: row.emoji,
     isAdmin: row.is_admin === true,
+    // Assente sul database non ancora aggiornato: si considera acceso, che è
+    // il valore predefinito della colonna.
+    showsPresence: row.shows_presence !== false,
   };
 }
 

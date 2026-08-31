@@ -636,3 +636,87 @@ create policy "suggestions_creator_delete"
 
 -- Il creatore. Cambia il nickname se un giorno usi un altro profilo.
 update public.profiles set is_admin = true where nickname = 'crispy';
+
+-- ---------------------------------------------------------------------------
+-- Stato di attività dei PickMates.
+--
+-- Ogni riga dice se quella persona sta guardando il sito o sta giocando, e da
+-- quanto. Non si conserva uno storico: c'è una riga per persona che viene
+-- riscritta, quindi non si può ricostruire a posteriori quando qualcuno era
+-- collegato.
+--
+-- La regola della reciprocità vive qui e non nell'interfaccia: chi spegne il
+-- proprio stato non riesce a leggere quello degli altri nemmeno aggirando la
+-- pagina, perché è la lettura stessa a richiedere che il lettore sia visibile.
+-- Nascondersi e continuare a guardare non è una cosa che il database consenta.
+-- ---------------------------------------------------------------------------
+
+alter table public.profiles
+  add column if not exists shows_presence boolean not null default true;
+
+create table if not exists public.presence (
+  user_id uuid primary key references public.profiles on delete cascade,
+  -- "online" = sito aperto, "playing" = dentro una partita.
+  state text not null default 'online' check (state in ('online', 'playing')),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.presence enable row level security;
+
+-- Ognuno scrive solo la propria riga.
+drop policy if exists "presence_self_write" on public.presence;
+create policy "presence_self_write"
+  on public.presence for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+drop policy if exists "presence_self_update" on public.presence;
+create policy "presence_self_update"
+  on public.presence for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+drop policy if exists "presence_self_delete" on public.presence;
+create policy "presence_self_delete"
+  on public.presence for delete
+  to authenticated
+  using (auth.uid() = user_id);
+
+-- Vero se le due persone sono PickMates accettati, in un verso o nell'altro.
+create or replace function public.are_pickmates(a uuid, b uuid) returns boolean
+  language sql
+  stable
+  security definer
+  set search_path = public
+  as $$
+    select exists (
+      select 1 from public.pickmates
+      where status = 'accepted'
+        and ((user_id = a and friend_id = b) or (user_id = b and friend_id = a))
+    )
+  $$;
+
+-- Vero se quella persona ha lasciato acceso il proprio stato.
+create or replace function public.shows_presence(who uuid) returns boolean
+  language sql
+  stable
+  security definer
+  set search_path = public
+  as $$
+    select coalesce((select shows_presence from public.profiles where id = who), false)
+  $$;
+
+-- Si legge lo stato di un PickMate solo se lui lo mostra e se lo mostri anche tu.
+drop policy if exists "presence_mates_read" on public.presence;
+create policy "presence_mates_read"
+  on public.presence for select
+  to authenticated
+  using (
+    user_id = auth.uid()
+    or (
+      public.shows_presence(auth.uid())
+      and public.shows_presence(user_id)
+      and public.are_pickmates(auth.uid(), user_id)
+    )
+  );

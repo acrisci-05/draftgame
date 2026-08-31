@@ -6,7 +6,6 @@ import {
   Copy,
   Loader2,
   ShieldCheck,
-  Swords,
   UserPlus,
   Users,
   Vote,
@@ -15,7 +14,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { useClientValue } from "@/lib/client-store";
 import {
   acceptPickmate,
   listPickmates,
@@ -26,14 +24,17 @@ import {
   type Pickmate,
   type SharedDraft,
 } from "@/lib/pickmates";
-import { lastOnlineRoomCode } from "@/lib/storage";
+import { DEFAULT_CATEGORY } from "@/lib/catalog";
+import { usePresence, type PresenceState } from "@/lib/presence";
+import { ensureProfile, readConfig, saveSession } from "@/lib/storage";
 import { useT } from "@/lib/settings";
-import { cn, copyText } from "@/lib/utils";
+import { cn, copyText, roomCode as newRoomCode } from "@/lib/utils";
 import { AddPickmateModal } from "@/components/ui/AddPickmateModal";
 import { AuthPanel } from "@/components/ui/AuthModal";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { PickmateModal } from "@/components/ui/PickmateModal";
+import { PresenceDot } from "@/components/ui/PresenceDot";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 
 type Tab = "list" | "drafts";
@@ -49,13 +50,20 @@ export default function PickmatesPage() {
   const [adding, setAdding] = useState(false);
   const [copied, setCopied] = useState(false);
   const [challenged, setChallenged] = useState<string | null>(null);
-
-  // Codice proposto: l'ultima stanza online aperta qui, finché non se ne scrive un altro.
-  const suggestedCode = useClientValue(lastOnlineRoomCode, null);
-  const [codeDraft, setCodeDraft] = useState<string | null>(null);
-  const roomCode = codeDraft ?? suggestedCode ?? "";
+  const [openMate, setOpenMate] = useState<Pickmate | null>(null);
 
   const userId = account && !account.local ? account.id : null;
+
+  /*
+   * Chi ha spento il proprio stato non vede quello degli altri: qui si smette
+   * proprio di chiederlo. Non e' una cortesia dell'interfaccia, e' anche la
+   * regola del database, che a un lettore nascosto risponderebbe comunque vuoto.
+   */
+  const sharesPresence = account?.showsPresence !== false;
+  const mateIds = mates
+    .filter((mate) => mate.status === "accepted")
+    .map((mate) => mate.account.id);
+  const presence = usePresence(mateIds, sharesPresence && Boolean(userId));
 
   const reload = useCallback(() => {
     if (!userId) return;
@@ -77,11 +85,28 @@ export default function PickmatesPage() {
   const outgoing = mates.filter((mate) => mate.status === "pending" && !mate.incoming);
   const known = new Set(mates.map((mate) => mate.account.id));
 
+  /*
+   * Sfidare vuol dire aprire una stanza e chiamarci qualcuno: si crea il codice,
+   * parte la notifica e ci si va ad aspettare l'amico. Prima serviva incollare a
+   * mano il codice di una stanza gia' aperta, che spesso era quella della partita
+   * finita ieri.
+   */
   const challenge = async (mate: Pickmate) => {
-    if (!roomCode.trim()) return;
-    await sendChallenge(mate.account.id, roomCode.trim());
+    const profile = ensureProfile();
+    const code = newRoomCode();
+    saveSession({
+      code,
+      mode: "online",
+      playerId: profile.id,
+      isHost: true,
+      name: profile.name || "Player",
+      emoji: profile.emoji,
+      categoryId: DEFAULT_CATEGORY.id,
+      config: readConfig(),
+    });
+    await sendChallenge(mate.account.id, code);
     setChallenged(mate.account.nickname);
-    setTimeout(() => setChallenged(null), 2500);
+    router.push(`/room/${code}`);
   };
 
   return (
@@ -199,41 +224,16 @@ export default function PickmatesPage() {
                 {accepted.length === 0 ? (
                   <p className="text-sm text-faint">{t("friends.none")}</p>
                 ) : (
-                  <>
-                    <div className="mb-3">
-                      <Input
-                        label={t("pickmates.roomCode")}
-                        hint={t("pickmates.challengeNeedsRoom")}
-                        value={roomCode}
-                        maxLength={8}
-                        placeholder="ABC12"
-                        onChange={(event) => setCodeDraft(event.target.value.toUpperCase())}
+                  <div className="flex flex-col gap-2">
+                    {accepted.map((mate) => (
+                      <MateRow
+                        key={mate.account.id}
+                        mate={mate}
+                        presence={presence ? (presence[mate.account.id] ?? "offline") : null}
+                        onOpen={() => setOpenMate(mate)}
                       />
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      {accepted.map((mate) => (
-                        <MateRow key={mate.account.id} mate={mate}>
-                          <Button
-                            size="sm"
-                            variant="violet"
-                            disabled={!roomCode.trim()}
-                            onClick={() => challenge(mate)}
-                          >
-                            <Swords className="size-4" />
-                            {t("pickmates.challenge")}
-                          </Button>
-                          <RemoveButton
-                            onClick={async () => {
-                              if (!userId) return;
-                              await removePickmate(userId, mate.account.id);
-                              reload();
-                            }}
-                          />
-                        </MateRow>
-                      ))}
-                    </div>
-                  </>
+                    ))}
+                  </div>
                 )}
 
                 {challenged ? (
@@ -292,13 +292,28 @@ export default function PickmatesPage() {
           )}
 
           {userId ? (
-            <AddPickmateModal
-              open={adding}
-              userId={userId}
-              known={known}
-              onClose={() => setAdding(false)}
-              onInvited={reload}
-            />
+            <>
+              <PickmateModal
+                mate={openMate}
+                presence={
+                  openMate && presence ? (presence[openMate.account.id] ?? "offline") : null
+                }
+                onClose={() => setOpenMate(null)}
+                onChallenge={challenge}
+                onRemove={async (mate) => {
+                  await removePickmate(userId, mate.account.id);
+                  reload();
+                }}
+              />
+
+              <AddPickmateModal
+                open={adding}
+                userId={userId}
+                known={known}
+                onClose={() => setAdding(false)}
+                onInvited={reload}
+              />
+            </>
           ) : null}
         </>
       )}
@@ -306,13 +321,39 @@ export default function PickmatesPage() {
   );
 }
 
-function MateRow({ mate, children }: { mate: Pickmate; children: React.ReactNode }) {
+/**
+ * Una riga della lista amici.
+ *
+ * Con `onOpen` diventa un pulsante che apre la scheda; senza, resta una riga
+ * ferma con i suoi pulsanti a lato (e' il caso degli inviti da accettare).
+ */
+function MateRow({
+  mate,
+  children,
+  presence,
+  onOpen,
+}: {
+  mate: Pickmate;
+  children?: React.ReactNode;
+  presence?: PresenceState | null;
+  onOpen?: () => void;
+}) {
   const t = useT();
+  const Tag = onOpen ? "button" : "div";
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-2.5">
+    <Tag
+      {...(onOpen ? { type: "button" as const, onClick: onOpen } : {})}
+      className={cn(
+        "flex w-full items-center gap-3 rounded-xl border border-line bg-surface-2 p-2.5 text-start",
+        onOpen && "transition-colors hover:border-neon/50",
+      )}
+    >
       <Avatar id={mate.account.emoji} size="sm" />
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-semibold">@{mate.account.nickname}</span>
+        <span className="flex items-center gap-2">
+          <span className="truncate font-semibold">@{mate.account.nickname}</span>
+          <PresenceDot state={presence ?? null} />
+        </span>
         <span className="block text-xs text-faint">
           {mate.played === 0
             ? t("pickmates.playedNone")
@@ -322,7 +363,7 @@ function MateRow({ mate, children }: { mate: Pickmate; children: React.ReactNode
         </span>
       </span>
       {children}
-    </div>
+    </Tag>
   );
 }
 

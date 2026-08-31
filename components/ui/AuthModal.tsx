@@ -52,6 +52,7 @@ import {
   type TrophyId,
 } from "@/lib/levels";
 import { listPickmates } from "@/lib/pickmates";
+import { setPresenceVisibility } from "@/lib/presence";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import type { CurrencyCode } from "@/lib/types";
@@ -61,6 +62,7 @@ import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { Modal } from "./Modal";
+import { Switch } from "./Switch";
 
 const ERROR_KEYS: Record<AuthError, TranslationKey> = {
   "nickname-taken": "auth.errNicknameTaken",
@@ -131,11 +133,22 @@ export function AuthPanel({
 function AccountCard({ onDone }: { onDone?: () => void }) {
   const t = useT();
   const router = useRouter();
-  const { account, email } = useAuth();
+  const { account, email, refreshAccount } = useAuth();
   const [progress, setProgress] = useState<PlayerProgress | null>(null);
   const [history, setHistory] = useState<PastMatch[] | null>(null);
+  /*
+   * Copia locale dell'interruttore: il giro fino al database e ritorno e'
+   * abbastanza lungo da far sembrare che il tocco non abbia funzionato.
+   */
+  const [presenceDraft, setPresenceDraft] = useState<boolean | null>(null);
 
   const userId = account?.id ?? null;
+  const showsPresence = presenceDraft ?? account?.showsPresence !== false;
+
+  const togglePresence = (next: boolean) => {
+    setPresenceDraft(next);
+    void setPresenceVisibility(next).then(refreshAccount);
+  };
 
   /* Statistiche e Pickmates: due letture, una sola attesa. */
   useEffect(() => {
@@ -186,6 +199,20 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
         <StatCard emoji="🏆" value={numbers.won} label={t("stats.won")} tone="gold" />
         <StatCard emoji="📈" value={`${winRate(numbers)}%`} label={t("stats.rate")} tone="neon" />
         <StatCard emoji="👥" value={numbers.mates} label={t("nav.pickmates")} tone="violet" />
+      </div>
+
+      {/*
+        Lo stato di attivita'. La reciprocita' e' scritta nell'avviso perche' e'
+        una conseguenza che sorprenderebbe: spegnendolo si smette anche di
+        vedere gli altri, e chi non lo sa penserebbe a un guasto.
+      */}
+      <div className="rounded-2xl border border-line bg-surface-2 p-3">
+        <Switch
+          checked={showsPresence}
+          onChange={togglePresence}
+          label={t("presence.share")}
+          hint={t("presence.shareHint")}
+        />
       </div>
 
       {/* Trofei: spenti finche' non si sbloccano. */}
