@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, Heart, LayoutGrid, LogIn, Plus, Undo2 } from "lucide-react";
+import { Gavel, Heart, LayoutGrid, LogIn, Plus, Undo2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClientValue } from "@/lib/client-store";
@@ -12,6 +12,7 @@ import { useSettings } from "@/lib/settings";
 import { useAuth } from "@/lib/auth";
 import { ensureProfile, readProfile, saveProfile, saveSession,
   resumableSession,
+  clearSession,
 } from "@/lib/storage";
 import type { Profile } from "@/lib/types";
 import { Button } from "@/components/ui/Button";
@@ -56,6 +57,7 @@ export default function HomePage() {
 
   /* La stanza aperta di recente su questo dispositivo, se c'e'. */
   const aperta = useClientValue(resumableSession, null);
+  const [scartata, setScartata] = useState(false);
 
   const joinRoom = (code: string) => {
     const profile = persistProfile();
@@ -78,24 +80,46 @@ export default function HomePage() {
         significa perdere i propri turni. Si propone, non si trascina dentro a
         forza: magari quella partita e' finita e si voleva davvero tornare qui.
       */}
-      {aperta ? (
-        <motion.button
-          type="button"
+      {aperta && !scartata ? (
+        <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          onClick={() => router.push(`/room/${aperta.code}`)}
-          className="flex items-center gap-3 rounded-2xl border border-neon/50 bg-neon/10 p-4 text-start transition-colors hover:border-neon"
+          className="flex items-center gap-2 rounded-2xl border border-neon/50 bg-neon/10 p-2 ps-4"
         >
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-neon/20 text-neon">
-            <Undo2 className="size-5" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-bold text-neon">{t("home.resume")}</span>
-            <span className="block truncate text-xs text-muted">
-              {t("home.resumeHint", { code: aperta.code })}
+          <button
+            type="button"
+            onClick={() => router.push(`/room/${aperta.code}`)}
+            className="flex min-w-0 flex-1 items-center gap-3 py-2 text-start"
+          >
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-neon/20 text-neon">
+              <Undo2 className="size-5" />
             </span>
-          </span>
-        </motion.button>
+            <span className="min-w-0 flex-1">
+              <span className="block font-bold text-neon">{t("home.resume")}</span>
+              <span className="block truncate text-xs text-muted">
+                {t("home.resumeHint", { code: aperta.code })}
+              </span>
+            </span>
+          </button>
+
+          {/*
+            Si puo' scartare a mano. La proposta non deve diventare una cosa
+            che si subisce: chi sa che quella partita e' finita la toglie e non
+            la rivede piu'.
+          */}
+          <button
+            type="button"
+            aria-label={t("common.close")}
+            title={t("common.close")}
+            onClick={() => {
+              clearSession(aperta.code);
+              setScartata(true);
+            }}
+            className="shrink-0 self-start rounded-lg p-2 text-faint transition-colors hover:text-fg"
+          >
+            <X className="size-4" />
+          </button>
+        </motion.div>
       ) : null}
 
       <motion.section

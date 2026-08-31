@@ -24,7 +24,8 @@
     "check:tiebreak": "tsc -p tsconfig.check.json && node scripts/tiebreak-check.js",
     "check:gameplay": "tsc -p tsconfig.check.json && node scripts/gameplay-check.js",
     "check:rating": "tsc -p tsconfig.check.json && node scripts/rating-check.js",
-    "check:name": "node scripts/name-input-check.js"
+    "check:name": "node scripts/name-input-check.js",
+    "check:resume": "tsc -p tsconfig.check.json && node scripts/resume-check.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

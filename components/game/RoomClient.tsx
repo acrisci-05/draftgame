@@ -17,6 +17,7 @@ import {
   readProfile,
   saveProfile,
   saveSession,
+  clearSession,
 } from "@/lib/storage";
 import type { Profile, RoomSession } from "@/lib/types";
 import { cn, isRoomCode } from "@/lib/utils";
@@ -199,7 +200,16 @@ export function RoomClient({ code }: { code: string }) {
             <Button variant="outline" className="flex-1" onClick={() => setLeaving(false)}>
               {t("room.leaveStay")}
             </Button>
-            <Button variant="danger" className="flex-1" onClick={() => router.push("/")}>
+            <Button
+              variant="danger"
+              className="flex-1"
+              onClick={() => {
+                // Uscire apposta vuol dire non voler tornare: la home non deve
+                // riproporre quella stanza.
+                clearSession(code);
+                router.push("/");
+              }}
+            >
               {t("room.leaveGo")}
             </Button>
           </div>

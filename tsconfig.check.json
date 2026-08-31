@@ -17,6 +17,7 @@
     "lib/types.ts",
     "data/categories.json",
     "lib/image-match.ts",
-    "lib/rating-prompt.ts"
+    "lib/rating-prompt.ts",
+    "lib/storage.ts"
   ]
 }

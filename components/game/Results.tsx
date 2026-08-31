@@ -30,6 +30,7 @@ import {
   type WinReason,
 } from "@/lib/game";
 import { awardMatchXp, recordMatch } from "@/lib/history";
+import { clearSession } from "@/lib/storage";
 import {
   countMatch,
   markPrompted,
@@ -171,6 +172,14 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    */
   useEffect(() => {
     countMatch();
+    /*
+     * La partita e' finita: la sessione di questa stanza non serve piu'.
+     *
+     * E' il segnale esatto, e vale piu' di qualunque scadenza a tempo: senza,
+     * la home continuava a proporre "torna alla partita" per ore su una gara
+     * gia' conclusa, e il codice restava nel dispositivo per sempre.
+     */
+    clearSession(state.code);
   }, [state.code]);
 
   /*

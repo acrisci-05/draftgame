@@ -232,10 +232,16 @@ export function saveVote(resultId: string, playerId: string) {
  * telefono basta uno scorrimento storto per uscire dal sito, e ripartire dalla
  * home con l'asta ancora in corso significa perdere il proprio turno.
  *
- * "Fresca" vuol dire aperta nelle ultime ore: una stanza di ieri non va
- * riproposta, perché quella partita è finita e riaprirla confonderebbe.
+ * Due filtri, in ordine di attendibilità:
+ *
+ * - la sessione viene cancellata appena la partita finisce, o quando si esce
+ *   dalla stanza apposta. È il segnale esatto e vale più di qualunque orologio;
+ * - resta la scadenza a tempo per i casi in cui l'app non è arrivata a
+ *   cancellarla — telefono spento a metà, scheda chiusa di colpo. Un'ora: una
+ *   stanza più vecchia o è finita, o il dispositivo che la ospitava se n'è
+ *   andato, e in entrambi i casi tornarci non porterebbe da nessuna parte.
  */
-export function resumableSession(maxAgeHours = 6): RoomSession | null {
+export function resumableSession(maxAgeHours = 1): RoomSession | null {
   if (typeof window === "undefined") return null;
   let migliore: { session: RoomSession; at: number } | null = null;
 
