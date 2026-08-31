@@ -17,6 +17,14 @@ import { Modal } from "./Modal";
 interface Point {
   label: TranslationKey;
   body: TranslationKey;
+  /**
+   * Una formula da mostrare staccata dal discorso, in corsivo.
+   *
+   * Sta fuori dalle traduzioni perche' e' la stessa in ogni lingua: i nomi
+   * delle variabili non si traducono, e ripeterla in dieci file vorrebbe dire
+   * dieci occasioni di scriverla diversa.
+   */
+  formula?: string;
 }
 
 interface Section {
@@ -84,7 +92,11 @@ const SECTIONS: Section[] = [
     points: [
       { label: "rules.modes.where", body: "rules.modes.whereBody" },
       { label: "rules.modes.extras", body: "rules.modes.extrasBody" },
-      { label: "rules.modes.pool", body: "rules.modes.poolBody" },
+      {
+        label: "rules.modes.pool",
+        body: "rules.modes.poolBody",
+        formula: "(numero_giocatori * slot_roster) + 5",
+      },
     ],
   },
   {
@@ -133,11 +145,16 @@ export function RulesModal({ open, onClose }: { open: boolean; onClose: () => vo
             ) : null}
 
             <ul className="mt-3 flex flex-col gap-2.5">
-              {points.map(({ label, body }) => (
+              {points.map(({ label, body, formula }) => (
                 <li key={label} className="flex gap-2.5 text-sm leading-relaxed">
                   <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-neon/60" />
                   <span className="min-w-0 text-muted">
                     <b className="font-semibold text-fg">{t(label)}</b> {t(body)}
+                    {formula ? (
+                      <em className="mt-1.5 block font-mono text-xs text-neon not-italic">
+                        <span className="italic">{formula}</span>
+                      </em>
+                    ) : null}
                   </span>
                 </li>
               ))}
