@@ -17,6 +17,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import {
+  MAX_DISCARDS,
   colorLook,
   lotSeconds,
   currentItem,
@@ -82,6 +83,9 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
    * Qualcuno ha già passato ma sul lotto non c'è ancora nessuna offerta: qui
    * conviene ricordare che passare non regala niente a nessuno.
    */
+  /* La riserva di scarti e' finita: da qui in poi i lotti si assegnano. */
+  const scartiFiniti = state.discards.length >= MAX_DISCARDS;
+
   const nobodyYet =
     state.phase === "auction" && !mystery && !state.highBidderId && state.passed.length > 0;
   const resultItem = state.lastResult ? itemById(state, state.lastResult.itemId) : undefined;
@@ -153,6 +157,25 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
+          {/*
+            Gli scarti rimasti. E' una riserva di gruppo: quando finisce, i
+            lotti che non vuole nessuno vengono assegnati d'ufficio, quindi
+            conviene saperlo prima di passare per l'ennesima volta.
+          */}
+          {state.config.allowDiscards ? (
+            <span
+              title={t(scartiFiniti ? "auction.discardsOut" : "auction.discardsLeft")}
+              className={cn(
+                "hidden items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold sm:inline-flex",
+                scartiFiniti
+                  ? "border-red-500/50 bg-red-500/10 text-red-400"
+                  : "border-line bg-surface-2 text-faint",
+              )}
+            >
+              <span aria-hidden>🗑️</span>
+              {state.discards.length}/{MAX_DISCARDS}
+            </span>
+          ) : null}
           <RoomCode code={state.code} />
           {state.phase === "auction" && state.deadline ? (
             <Timer deadline={state.deadline} totalSeconds={totalSeconds} now={now} />
@@ -288,7 +311,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               className="mt-3 flex items-center justify-center gap-1.5 rounded-xl border border-line bg-surface-2 px-3 py-2 text-center text-[11px] font-bold text-balance text-muted"
             >
               <Ban className="size-3.5 shrink-0" />
-              {state.config.allowDiscards
+              {state.config.allowDiscards && !scartiFiniti
                 ? t("auction.nobodyYet")
                 : t("auction.nobodyYetForced")}
             </motion.p>

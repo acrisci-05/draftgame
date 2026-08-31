@@ -122,7 +122,7 @@ export const it = {
   "rules.special.title": "Casi speciali e fine partita",
   "rules.special.nobid": "Se nessuno offre.",
   "rules.special.nobidBody":
-    "Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno. Con gli scarti spenti va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri.",
+    "Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno — ma gli scarti sono cinque per partita, condivisi da tutti. Finiti quelli, e con gli scarti spenti, il lotto va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri, ma bruciare presto i cinque scarti significa doversi prendere d'ufficio quello che avanza nella seconda metà.",
   "rules.special.last": "Ultimo rimasto.",
   "rules.special.lastBody":
     "Se sei l'unico con la lista incompleta e i lotti rimasti bastano appena a riempirla, ti vengono assegnati d'ufficio al prezzo base.",
@@ -268,7 +268,10 @@ export const it = {
   "auction.noOffers": "Nessuna offerta",
   "auction.toDiscards": "Finisce negli scarti",
   "auction.nobodyYet": "Nessuno ha offerto: se passate tutti il lotto va agli scarti",
-  "auction.nobodyYetForced": "Nessuno ha offerto: se passate tutti va a chi ha meno elementi",
+  "auction.discardsLeft": "Lotti buttati finora, su cinque disponibili",
+  "auction.discardsOut": "Scarti esauriti: i prossimi lotti invenduti vengono assegnati",
+  "auction.nobodyYetForced":
+    "Nessuno ha ancora offerto. Passando tutti, il lotto va a chi ha meno elementi al prezzo base.",
   "auction.mysteryLost": "Nessuno ha aperto la box",
   "auction.nextLot": "Prossimo lotto",
   "auction.endGame": "Chiudi la partita e genera la card",

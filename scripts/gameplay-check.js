@@ -137,6 +137,37 @@ for (const lotti of [20, 25, 30]) {
 
 check("la soglia minima di una lista e' venti", game.MIN_CATEGORY_ITEMS === 20, game.MIN_CATEGORY_ITEMS);
 
+/* 7. Gli scarti sono cinque, poi i lotti si assegnano d'ufficio. */
+check("il tetto degli scarti e' cinque", game.MAX_DISCARDS === 5, game.MAX_DISCARDS);
+
+// Una partita in cui passano sempre tutti: senza tetto si svuoterebbe il mazzo.
+function passanoTutti() {
+  let s = stanza(3, { slots: 3, allowDiscards: true });
+  let now = Date.now();
+  for (let giri = 0; giri < 2000 && s.phase !== "ended" && s.phase !== "voting"; giri += 1) {
+    now += 300;
+    if (s.phase === "result") { s = game.reducer(s, { type: "tick", now: now + 5000 }); continue; }
+    if (s.phase !== "auction") { s = game.reducer(s, { type: "tick", now }); continue; }
+    const chi = s.players.find((p) => game.canPass(s, p.id));
+    if (!chi) { s = game.reducer(s, { type: "tick", now: s.deadline + 1 }); continue; }
+    s = game.reducer(s, { type: "pass", playerId: chi.id, now });
+  }
+  return s;
+}
+const passata = passanoTutti();
+check("passando sempre, non si supera il tetto",
+  passata.discards.length <= game.MAX_DISCARDS, passata.discards.length);
+check("passando sempre, la partita finisce lo stesso",
+  passata.phase === "ended" || passata.phase === "voting", passata.phase);
+check("passando sempre, le liste si riempiono d'ufficio",
+  passata.players.every((p) => p.roster.length === passata.config.slots),
+  passata.players.map((p) => p.roster.length).join(","));
+
+// Il lotto d'ufficio va a chi ha piu' spazio, non a caso: e' quello che
+// garantisce che tutti arrivino in fondo.
+const assegnati = passata.history.filter((r) => r.winnerId);
+check("i lotti invenduti trovano comunque un proprietario", assegnati.length > 0, assegnati.length);
+
 console.log("");
 console.log(ko === 0 ? "TUTTI I CASI LIMITE REGGONO" : `${ko} CONTROLLI FALLITI`);
 process.exit(ko === 0 ? 0 : 1);

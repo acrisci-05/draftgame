@@ -52,6 +52,14 @@ export const RAISE_STEPS = [1, 2, 5] as const;
 export const BUDGET_PRESETS = [10, 20, 50, 100];
 /** Ogni quanti lotti compare una Mystery Box, quando è attiva. */
 export const MYSTERY_EVERY = 5;
+/**
+ * Quanti lotti si possono buttare in una partita.
+ *
+ * E' un tetto di stanza, condiviso da tutti: bruciarli presto su elementi
+ * poco interessanti vuol dire ritrovarsi, nella seconda meta', a doversi
+ * prendere d'ufficio quello che avanza.
+ */
+export const MAX_DISCARDS = 5;
 export const FEED_LIMIT = 24;
 
 /** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
@@ -731,8 +739,21 @@ function resolve(state: GameState, now: number): GameState {
   const winner = playerById(state, state.highBidderId);
   if (winner) return award(state, now, winner, item, state.currentBid);
 
-  // Con gli scarti disattivati il lotto va comunque a chi deve ancora completare la lista.
-  if (!state.config.allowDiscards) {
+  /*
+   * Gli scarti sono una riserva di gruppo, non infinita.
+   *
+   * Finiti i cinque, un lotto che non vuole nessuno viene assegnato d'ufficio
+   * a chi ha piu' spazio libero. Serve a garantire che la partita finisca: se
+   * si potesse scartare all'infinito, un tavolo poco interessato bruceriebbe
+   * il mazzo e resterebbe con le liste vuote.
+   *
+   * Va a chi ha meno elementi -- non a sorte -- proprio perche' il punto e'
+   * chiudere la partita: darlo a caso potrebbe riempire l'ultimo posto di chi
+   * era quasi a posto, lasciando a secco chi ne ha ancora quattro da coprire,
+   * cioe' ricreando il problema che questa regola esiste per togliere.
+   */
+  const scartiFiniti = state.discards.length >= MAX_DISCARDS;
+  if (!state.config.allowDiscards || scartiFiniti) {
     const fallback = pendingPlayers(state)
       .filter((p) => maxBid(state, p) >= OPENING_BID)
       .sort((a, b) => a.roster.length - b.roster.length || b.budget - a.budget)[0];

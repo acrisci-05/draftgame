@@ -124,7 +124,7 @@ export const en: Dictionary = {
   "rules.special.title": "Special cases and endgame",
   "rules.special.nobid": "If nobody bids.",
   "rules.special.nobidBody":
-    "With discards on, the lot is set aside and nobody gets it. With discards off it goes at base price to whoever has the fewest items. Passing never hands anything to the others.",
+    "With discards on the lot is set aside and nobody gets it — but discards are five per match, shared by everyone. Once they are gone, and with discards off, the lot goes at base price to whoever has the fewest items. Passing never hands anything to the others, but burning the five discards early means taking whatever is left in the second half.",
   "rules.special.last": "Last one left.",
   "rules.special.lastBody":
     "If you are the only one with an unfinished list and the remaining lots are just enough to fill it, they are assigned to you at base price.",
@@ -646,7 +646,10 @@ export const en: Dictionary = {
   "studio.open": "Category studio",
 
   "auction.nobodyYet": "No bids yet: if everyone passes the lot goes to the discards",
-  "auction.nobodyYetForced": "No bids yet: if everyone passes it goes to whoever has fewest items",
+  "auction.discardsLeft": "Lots dropped so far, out of five",
+  "auction.discardsOut": "No discards left: unsold lots are assigned from now on",
+  "auction.nobodyYetForced":
+    "Nobody has bid yet. If everyone passes, the lot goes at base price to whoever has the fewest items.",
   "results.mineTitle": "Your line-up",
   "results.mineHeadline": "Here's what you won ({n}/{tot})",
   "results.revealStandings": "See the final standings 🏆",
