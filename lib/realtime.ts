@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createGame, nextHost, reducer, type GameAction } from "./game";
+import { canPass, createGame, nextHost, reducer, type GameAction } from "./game";
 import type { TranslationKey } from "./i18n";
 import {
   createTransport,
@@ -278,10 +278,38 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
       const current = stateRef.current;
       if (!current) return;
       if (current.phase !== "auction" && current.phase !== "result") return;
+
+      /*
+       * Chi non c'e' piu' passa da solo.
+       *
+       * Senza questo, un telefono che si spegne a meta' partita costringe
+       * tutti gli altri ad aspettare che scada il timer a ogni singolo lotto:
+       * con sei lotti rimasti sono un minuto e mezzo di attesa per una persona
+       * che non tornera'. Il passo viene dato da chi ospita, che e' l'unico a
+       * sapere chi e' ancora collegato.
+       *
+       * Vale solo online e solo per chi manca davvero dall'elenco dei presenti:
+       * in locale si gioca da un dispositivo solo e non c'e' nessuno da
+       * saltare. Chi rientra ritrova il proprio posto e i lotti successivi.
+       */
+      if (mode === "online" && current.phase === "auction") {
+        const presenti = presenceRef.current;
+        const assente = current.players.find(
+          (player) =>
+            player.id !== self.id &&
+            !presenti.includes(player.id) &&
+            canPass(current, player.id),
+        );
+        if (assente) {
+          commit(reducer(current, { type: "pass", playerId: assente.id, now: Date.now() }));
+          return;
+        }
+      }
+
       commit(reducer(current, { type: "tick", now: Date.now() }));
     }, TICK_MS);
     return () => clearInterval(timer);
-  }, [hosting, commit]);
+  }, [hosting, commit, mode, self.id]);
 
   /**
    * Rientro dall'app in secondo piano, o rete che torna.

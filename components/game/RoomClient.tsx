@@ -23,6 +23,7 @@ import { cn, isRoomCode } from "@/lib/utils";
 import { AvatarPicker } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { AuctionStage } from "./AuctionStage";
 import { Lobby } from "./Lobby";
@@ -47,6 +48,10 @@ export function RoomClient({ code }: { code: string }) {
     if (!session?.isHost) return undefined;
     return session.config ?? readConfig();
   }, [session]);
+
+  // La conferma di uscita: dichiarata qui in cima, prima delle uscite
+  // anticipate, perche' i ganci vanno chiamati sempre nello stesso ordine.
+  const [leaving, setLeaving] = useState(false);
 
   // Il profilo, quando c'è, viaggia con il giocatore: serve a ritrovarsi fra i
   // Pickmates dopo la partita.
@@ -99,9 +104,19 @@ export function RoomClient({ code }: { code: string }) {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-4 safe-bottom">
       <header className="flex items-center justify-between gap-3">
+        {/*
+          Uscire a partita iniziata si conferma. A meta' asta il tocco
+          sbagliato costa la serata: si riparte dal proprio posto solo se la
+          stanza e' ancora aperta, e nel frattempo gli altri vanno avanti
+          senza aspettare.
+        */}
         <button
           type="button"
-          onClick={() => router.push("/")}
+          onClick={() =>
+            !state || state.phase === "lobby" || state.phase === "ended"
+              ? router.push("/")
+              : setLeaving(true)
+          }
           className="flex items-center gap-1.5 text-sm text-faint transition-colors hover:text-fg"
         >
           <ArrowLeft className="size-4" />
@@ -154,6 +169,20 @@ export function RoomClient({ code }: { code: string }) {
       ) : (
         <AuctionStage state={state} selfId={self.id} isHost={isHost} now={now} dispatch={dispatch} />
       )}
+
+      <Modal open={leaving} title={t("room.leaveTitle")} onClose={() => setLeaving(false)}>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-muted">{t("room.leaveBody")}</p>
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1" onClick={() => setLeaving(false)}>
+              {t("room.leaveStay")}
+            </Button>
+            <Button variant="danger" className="flex-1" onClick={() => router.push("/")}>
+              {t("room.leaveGo")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

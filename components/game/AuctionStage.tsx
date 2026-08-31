@@ -30,7 +30,7 @@ import {
 import { HAPTIC_BID, HAPTIC_PASS, HAPTIC_WIN, vibrate } from "@/lib/haptics";
 import { useSettings } from "@/lib/settings";
 import type { GameState } from "@/lib/types";
-import { cn, money } from "@/lib/utils";
+import { TIER_STYLES, cn, money } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { RoomCode } from "@/components/ui/RoomCode";
@@ -160,7 +160,15 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl border border-line bg-surface grid-noise p-5">
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-3xl border bg-surface grid-noise p-5 transition-colors",
+          // Al buio e sulla Mystery Box la fascia non si rivela: sarebbe un
+          // indizio su quanto vale il lotto, e toglierebbe senso alle due
+          // modalita'.
+          item && !covered && !mystery ? TIER_STYLES[item.tier].frame : "border-line",
+        )}
+      >
         <div className="mx-auto flex max-w-[19rem] flex-col items-center gap-3 text-center">
           <AnimatePresence mode="wait">
             <motion.div
@@ -186,6 +194,23 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
             {mystery ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-violet">
                 <PackageOpen className="size-3" /> {t("auction.mystery")}
+              </span>
+            ) : null}
+
+            {/*
+              La fascia del lotto. Dice quanto e' pregiato l'elemento, quindi
+              quanto ci si puo' aspettare che gli altri rilancino: e' un
+              suggerimento sul prezzo, non un punteggio. A vincere sono i voti.
+            */}
+            {item && !covered && !mystery ? (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider",
+                  TIER_STYLES[item.tier].chip,
+                )}
+              >
+                <span aria-hidden>{TIER_STYLES[item.tier].badge}</span>
+                {locale === "it" ? TIER_STYLES[item.tier].label : TIER_STYLES[item.tier].labelEn}
               </span>
             ) : null}
 

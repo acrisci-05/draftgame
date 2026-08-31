@@ -340,6 +340,10 @@ export const it = {
   "editor.publishError": "Pubblicazione non riuscita.",
 
   "room.exit": "Esci",
+  "room.leaveTitle": "Uscire dalla partita?",
+  "room.leaveBody": "L'asta va avanti senza di te: i tuoi turni vengono saltati e i lotti che restano se li prendono gli altri. Finché la stanza è aperta puoi rientrare con lo stesso codice.",
+  "room.leaveStay": "Resto",
+  "room.leaveGo": "Esci",
   "room.online": "online",
   "room.offline": "offline",
   "room.connecting": "connessione...",

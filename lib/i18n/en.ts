@@ -334,6 +334,10 @@ export const en: Dictionary = {
   "editor.publishError": "Publishing failed.",
 
   "room.exit": "Exit",
+  "room.leaveTitle": "Leave the match?",
+  "room.leaveBody": "The auction goes on without you: your turns are skipped and the remaining lots go to the others. While the room is open you can come back with the same code.",
+  "room.leaveStay": "Stay",
+  "room.leaveGo": "Leave",
   "room.online": "online",
   "room.offline": "offline",
   "room.connecting": "connecting...",

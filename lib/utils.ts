@@ -89,46 +89,71 @@ export function clamp(value: number, min: number, max: number): number {
 export interface TierStyle {
   label: string;
   labelEn: string;
+  /** Il simbolo che si vede sulla carta in asta, prima ancora del nome. */
+  badge: string;
   hex: string;
   chip: string;
   text: string;
+  /** Bordo e alone della carta durante l'asta. */
+  frame: string;
 }
 
+/**
+ * Le fasce degli elementi.
+ *
+ * Servono a una cosa sola: far capire in un colpo d'occhio quanto vale la pena
+ * spendere su questo lotto. **Non danno punti e non decidono chi vince** — a
+ * dirlo sono i voti degli altri giocatori a fine partita. Un tier 5 pagato caro
+ * non fa vincere nessuno da solo, e una rosa di soli tier 1 puo' benissimo
+ * prendere piu' voti se sta in piedi meglio.
+ *
+ * La scala va dall'oro al verde: piu' e' pregiato, piu' e' caldo il colore.
+ */
 export const TIER_STYLES: Record<Tier, TierStyle> = {
   5: {
     label: "Top",
     labelEn: "Top",
-    hex: "#22c55e",
-    chip: "bg-neon/15 text-neon border-neon/40",
-    text: "text-neon",
+    badge: "👑",
+    hex: "#facc15",
+    chip: "bg-gold/15 text-gold border-gold/40",
+    text: "text-gold",
+    frame: "border-gold/60 shadow-[0_0_28px_-6px_rgba(250,204,21,0.55)]",
   },
   4: {
     label: "Elite",
     labelEn: "Elite",
+    badge: "🟣",
     hex: "#a855f7",
     chip: "bg-violet/15 text-violet border-violet/40",
     text: "text-violet",
+    frame: "border-violet/60 shadow-[0_0_24px_-8px_rgba(168,85,247,0.5)]",
   },
   3: {
-    label: "Solido",
-    labelEn: "Solid",
+    label: "Standard",
+    labelEn: "Standard",
+    badge: "🔵",
     hex: "#38bdf8",
-    chip: "bg-sky-400/15 text-sky-500 border-sky-400/40",
-    text: "text-sky-500",
+    chip: "bg-sky-400/15 text-sky-400 border-sky-400/40",
+    text: "text-sky-400",
+    frame: "border-sky-400/55",
   },
   2: {
-    label: "Rotazione",
-    labelEn: "Rotation",
-    hex: "#f59e0b",
-    chip: "bg-amber-400/15 text-amber-500 border-amber-400/40",
-    text: "text-amber-500",
+    label: "Base",
+    labelEn: "Base",
+    badge: "🟢",
+    hex: "#22c55e",
+    chip: "bg-neon/15 text-neon border-neon/40",
+    text: "text-neon",
+    frame: "border-neon/50",
   },
   1: {
-    label: "Economy",
-    labelEn: "Economy",
-    hex: "#94a3b8",
-    chip: "bg-slate-400/15 text-slate-400 border-slate-400/35",
-    text: "text-slate-400",
+    label: "Base",
+    labelEn: "Base",
+    badge: "🟢",
+    hex: "#22c55e",
+    chip: "bg-neon/15 text-neon border-neon/40",
+    text: "text-neon",
+    frame: "border-neon/50",
   },
 };
 
