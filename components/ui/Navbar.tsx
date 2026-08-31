@@ -90,7 +90,7 @@ export function Navbar() {
     <>
       <ToastHost />
 
-      <header className="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
+      <header className="safe-header sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur">
         <nav className="mx-auto flex w-full max-w-3xl items-center gap-2 px-4 py-2.5">
           <Link href="/" className="me-auto min-w-0">
             <Logo size={34} />

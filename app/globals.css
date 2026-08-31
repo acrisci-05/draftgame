@@ -151,6 +151,21 @@ body {
     margin-top: env(safe-area-inset-top);
   }
 
+  /*
+   * La barra dei comandi, quando il gioco e' installato come app.
+   *
+   * Con viewport-fit=cover la pagina si estende sotto l'orologio e la batteria
+   * dell'iPhone: senza questo spazio, logo e menu finiscono la' sotto, illeggibili
+   * e soprattutto non toccabili, perche' il sistema si prende quei tocchi.
+   *
+   * Serve un riempimento e non un margine: la barra ha lo sfondo e resta
+   * appiccicata in cima, quindi il colore deve arrivare fino al bordo dello
+   * schermo e il contenuto scendere sotto la tacca.
+   */
+  .safe-header {
+    padding-top: env(safe-area-inset-top);
+  }
+
   /* Un coriandolo: cade, deriva di lato e gira su sé stesso. */
   .confetti-piece {
     position: absolute;
