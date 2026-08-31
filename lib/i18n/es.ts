@@ -93,7 +93,7 @@ export const es: PartialDictionary = {
 
   "home.badge": "subasta en vivo",
   "home.subtitle":
-    "De 2 a 8 jugadores, el mismo presupuesto para todos. Los elementos salen al azar, se puja contrarreloj y al final sale la tarjeta vertical para publicar.",
+    "De 2 a 5 jugadores, el mismo presupuesto para todos. Los elementos salen al azar, se puja contrarreloj y al final sale la tarjeta vertical para publicar.",
   "home.profile": "Tu perfil",
   "home.namePlaceholder": "Nombre del jugador",
   "home.avatar": "Avatar",
@@ -481,7 +481,7 @@ export const es: PartialDictionary = {
   "studio.exported": "JSON copiado al portapapeles",
   "studio.exportHint": "Pega el JSON en data/categories.json para que el cambio sea permanente.",
   "studio.open": "Studio de categorías",
-  "creator.log0": "Tarjeta final adaptada de 1 a 8 jugadores, con corona al ganador y la apuesta a la vista.",
+  "creator.log0": "Tarjeta final adaptada de 1 a 5 jugadores, con corona al ganador y la apuesta a la vista.",
   "lobby.pledge": "Apuesta en juego",
   "lobby.pledgeHint": "Opcional: aparece destacada en la tarjeta de final de partida.",
   "lobby.pledgePlaceholder": "P. ej. el que pierde paga la pizza",

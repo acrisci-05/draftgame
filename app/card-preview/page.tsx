@@ -10,7 +10,7 @@ import { TikTokCard } from "@/components/game/TikTokCard";
 /**
  * Anteprima della card finale, solo in sviluppo.
  *
- * Serve a controllare che il layout regga da 1 a 8 giocatori senza dover
+ * Serve a controllare che il layout regga da 1 a 5 giocatori senza dover
  * giocare una partita intera: `/card-preview?players=8&slots=6&pledge=...`.
  * In produzione la pagina non esiste.
  */
@@ -33,7 +33,7 @@ function Preview() {
   const names = ["Antonio", "Marco", "Giulia", "Sara", "Luca", "Elena", "Paolo", "Chiara"];
 
   const players: Player[] = Array.from({ length: playerCount }, (_, index) => {
-    // Gli elementi si riusano a giro: con otto giocatori da cinque lotti
+    // Gli elementi si riusano a giro: con cinque giocatori da cinque lotti
     // servirebbero quaranta elementi e la lista ne ha trenta.
     const roster: RosterEntry[] = Array.from({ length: slots }, (_, position) => {
       const item = category.items[(index * slots + position) % category.items.length];

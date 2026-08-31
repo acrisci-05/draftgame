@@ -131,7 +131,7 @@ export const it = {
   "rules.modes.title": "Modalità di gioco",
   "rules.modes.where": "Locale oppure online.",
   "rules.modes.whereBody":
-    "Su un solo dispositivo passandovelo di mano, oppure in una stanza con un codice di 5 caratteri da condividere.",
+    "Su un solo dispositivo passandovelo di mano, oppure in una stanza con un codice di 5 caratteri da condividere. Da due a cinque giocatori: le categorie hanno trenta elementi, e in cinque con cinque lotti a testa ne restano cinque per gli scarti. In due la stanza diventa un Duello 1v1, dove a decidere sono i crediti risparmiati.",
   "rules.modes.extras": "Modificatori.",
   "rules.modes.extrasBody":
     "Blind Draft copre nome e immagine fino all'assegnazione. Mystery Box, ogni 5 lotti, mette in palio un elemento a sorpresa a prezzo fisso: se lo prendi è tuo, senza asta. Gli Scarti decidono che fine fa un lotto che non vuole nessuno.",
@@ -154,7 +154,7 @@ export const it = {
   "creator.donateNote": "Il pagamento avviene su PayPal o Revolut: da qui non passa nessun dato.",
   "creator.independent": "Progetto indipendente",
   "creator.changelog": "Ultime novità",
-  "creator.log0": "Card finale su misura da 1 a 8 giocatori, con corona al vincitore e pegno in palio.",
+  "creator.log0": "Card finale su misura da 1 a 5 giocatori, con corona al vincitore e pegno in palio.",
   "creator.log1": "Pickmates, notifiche di sfida in tempo reale e scheda del creatore.",
   "creator.log2": "Foto verificate una per una per tutti gli elementi delle liste ufficiali.",
   "creator.log3": "Sulle schede compare il prezzo di apertura al posto della lettera della fascia.",
@@ -187,7 +187,7 @@ export const it = {
 
   "home.badge": "asta live",
   "home.subtitle":
-    "Da 2 a 8 giocatori, stesso budget per tutti. Gli elementi escono a caso, si rilancia a tempo e alla fine esce la card verticale da postare.",
+    "Da 2 a 5 giocatori, stesso budget per tutti. Gli elementi escono a caso, si rilancia a tempo e alla fine esce la card verticale da postare.",
   "home.profile": "Il tuo profilo",
   "home.namePlaceholder": "Nome giocatore",
   "home.avatar": "Avatar",
@@ -213,6 +213,10 @@ export const it = {
   "lobby.budgetHint": "Budget iniziale di ogni giocatore",
   "lobby.slotsHint": "Quanti elementi deve prendere ogni giocatore",
   "lobby.blind": "Blind Draft",
+  "lobby.duel": "⚔️ Duello 1v1",
+  "lobby.duelHint": "In due il voto finisce sempre alla pari: vince chi ha risparmiato più crediti, salvo ribaltone ai voti degli spettatori.",
+  "lobby.needLots": "Servono {n} lotti, la categoria ne ha {ha}",
+  "lobby.needLotsHint": "Con questi giocatori e questi elementi a testa servono {n} lotti, ma la categoria ne ha {ha}. Riduci gli elementi per roster o scegli una lista più grande.",
   "lobby.blindHint": "Nome e immagine del lotto restano nascosti fino all'assegnazione",
   "lobby.mystery": "Mystery Box",
   "lobby.mysteryHint": "Ogni 5 lotti compare una box a prezzo fisso con elemento casuale",

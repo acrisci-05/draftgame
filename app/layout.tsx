@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 const DESCRIPTION =
-  "Asta live a budget fisso: stesso budget per tutti, gli elementi escono a caso e vince chi costruisce la lista migliore. Da 2 a 8 giocatori, dal telefono.";
+  "Asta live a budget fisso: stesso budget per tutti, gli elementi escono a caso e vince chi costruisce la lista migliore. Da 2 a 5 giocatori, dal telefono.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

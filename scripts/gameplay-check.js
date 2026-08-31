@@ -27,7 +27,7 @@ function stanza(quanti, config) {
   let s = game.createGame({
     code: "CHECK", mode: "online", hostId: "p0",
     category: catalog.OFFICIAL_CATEGORIES[0],
-    config: { budget: 20, slots: 3, maxPlayers: 8, ...config },
+    config: { budget: 20, slots: 3, maxPlayers: 5, ...config },
   });
   for (let i = 0; i < quanti; i += 1) {
     s = game.reducer(s, { type: "add_player", player: { id: `p${i}`, name: `g${i}` } });
@@ -78,20 +78,24 @@ check("il voto dura novanta secondi", game.VOTE_SECONDS === 90, game.VOTE_SECOND
 
 /* 4. Si parte da due fino a otto. */
 check("con due giocatori la partita parte", stanza(2).phase !== "lobby");
-check("con otto giocatori la partita parte", stanza(8).phase !== "lobby");
+// Cinque e' il tetto: con quei giocatori e tre slot i lotti bastano.
+check("con cinque giocatori la partita parte", stanza(5, { slots: 3 }).phase !== "lobby");
 const uno = game.reducer(
   game.reducer(
     game.createGame({ code: "CHECK", mode: "online", hostId: "p0",
-      category: catalog.OFFICIAL_CATEGORIES[0], config: { budget: 20, slots: 3, maxPlayers: 8 } }),
+      category: catalog.OFFICIAL_CATEGORIES[0], config: { budget: 20, slots: 3, maxPlayers: 5 } }),
     { type: "add_player", player: { id: "p0", name: "solo" } }),
   { type: "start", now: Date.now() });
 check("con un giocatore solo non parte", uno.phase === "lobby", uno.phase);
-const nono = game.reducer(stanza(8), { type: "add_player", player: { id: "p9", name: "nono" } });
-check("il nono giocatore non entra", nono.players.length === 8, nono.players.length);
+const sesto = game.reducer(stanza(5, { slots: 3 }), {
+  type: "add_player",
+  player: { id: "p6", name: "sesto" },
+});
+check("il sesto giocatore non entra", sesto.players.length === 5, sesto.players.length);
 
 /* 5. L'host puo' togliere qualcuno prima di cominciare. */
 let lobby = game.createGame({ code: "CHECK", mode: "online", hostId: "p0",
-  category: catalog.OFFICIAL_CATEGORIES[0], config: { budget: 20, slots: 3, maxPlayers: 8 } });
+  category: catalog.OFFICIAL_CATEGORIES[0], config: { budget: 20, slots: 3, maxPlayers: 5 } });
 for (const id of ["p0", "p1", "p2"]) {
   lobby = game.reducer(lobby, { type: "add_player", player: { id, name: id } });
 }
@@ -100,6 +104,16 @@ check("in attesa si puo' togliere un giocatore", tolto.players.length === 2, tol
 const inCorso = game.reducer(stanza(3), { type: "remove_player", playerId: "p2" });
 check("a partita iniziata non si toglie piu' nessuno",
   inCorso.players.length === 3, inCorso.players.length);
+
+/* 6. I lotti devono bastare per tutti. */
+const troppi = stanza(5, { slots: 10 });
+check("non si parte se i lotti non bastano per tutti", troppi.phase === "lobby", troppi.phase);
+const giusti = stanza(5, { slots: 5 });
+check(
+  "cinque giocatori con cinque elementi a testa ci stanno",
+  giusti.phase !== "lobby",
+  giusti.phase,
+);
 
 console.log("");
 console.log(ko === 0 ? "TUTTI I CASI LIMITE REGGONO" : `${ko} CONTROLLI FALLITI`);

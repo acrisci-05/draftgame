@@ -8,6 +8,7 @@ import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
 import {
   MIN_PLAYERS,
+  lotsNeeded,
   lotSeconds,
   PLAYER_COLORS,
   colorLook,
@@ -50,7 +51,15 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const [avatarFor, setAvatarFor] = useState<string | null>(null);
 
   const isLocal = state.mode === "local";
-  const canStart = isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0;
+  /*
+   * I lotti bastano per chi c'e'? Con cinque giocatori e dieci elementi a testa
+   * ne servirebbero cinquanta, e le categorie ne hanno trenta: senza questo
+   * controllo la partita parte e finisce con le liste a meta'.
+   */
+  const servono = lotsNeeded(state.players.length, state.config.slots);
+  const lottiBastano = state.items.length >= servono;
+  const canStart =
+    isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0 && lottiBastano;
   const isClient = useIsClient();
   const joinUrl = isClient ? `${window.location.origin}/room/${state.code}` : null;
 
@@ -201,6 +210,14 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             <Badge>
               {t("common.players")} {state.config.maxPlayers}
             </Badge>
+            {/*
+              In due il voto finisce sempre alla pari -- nessuno puo' votare se
+              stesso -- quindi a decidere sono i crediti risparmiati. Vale la
+              pena dirlo prima di cominciare, non dopo: cambia come si gioca.
+            */}
+            {state.config.maxPlayers === 2 ? (
+              <Badge tone="gold">{t("lobby.duel")}</Badge>
+            ) : null}
             {state.config.blindDraft ? <Badge tone="violet">{t("lobby.blind")}</Badge> : null}
             {state.config.mysteryBox ? <Badge tone="violet">{t("lobby.mystery")}</Badge> : null}
           </div>
@@ -323,10 +340,22 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
       </Panel>
 
       {isHost ? (
-        <Button size="lg" disabled={!canStart} onClick={start}>
-          <Play className="size-5" />
-          {canStart ? t("lobby.start") : t("lobby.needPlayers", { n: MIN_PLAYERS })}
-        </Button>
+        <>
+          {!lottiBastano && state.players.length >= MIN_PLAYERS ? (
+            <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-center text-xs text-amber-400">
+              {t("lobby.needLotsHint", { n: servono, ha: state.items.length })}
+            </p>
+          ) : null}
+
+          <Button size="lg" disabled={!canStart} onClick={start}>
+            <Play className="size-5" />
+            {canStart
+              ? t("lobby.start")
+              : state.players.length < MIN_PLAYERS
+                ? t("lobby.needPlayers", { n: MIN_PLAYERS })
+                : t("lobby.needLots", { n: servono, ha: state.items.length })}
+          </Button>
+        </>
       ) : (
         <p className="rounded-2xl border border-line bg-surface p-4 text-center text-sm text-faint">
           {t("lobby.waitingHost")}

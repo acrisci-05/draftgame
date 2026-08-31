@@ -133,7 +133,7 @@ export const en: Dictionary = {
   "rules.modes.title": "Game modes",
   "rules.modes.where": "Local or online.",
   "rules.modes.whereBody":
-    "On a single device passed around, or in a room with a 5-character code to share.",
+    "On a single device passed around, or in a room with a 5-character code to share. Two to five players: categories hold thirty items, and five people with five lots each leave five for the discards. With two the room becomes a 1v1 Duel, where credits saved decide it.",
   "rules.modes.extras": "Modifiers.",
   "rules.modes.extrasBody":
     "Blind Draft hides name and picture until the lot is assigned. Mystery Box, every 5 lots, puts a surprise item up at a fixed price: take it and it is yours, no bidding. Discards decide what happens to a lot nobody wants.",
@@ -153,7 +153,7 @@ export const en: Dictionary = {
   "creator.donate": "Buy me a coffee",
   "creator.independent": "Independent project",
   "creator.changelog": "What's new",
-  "creator.log0": "Final card tuned for 1 to 8 players, with a crown for the winner and the stake on show.",
+  "creator.log0": "Final card tuned for 1 to 5 players, with a crown for the winner and the stake on show.",
   "creator.log1": "Pickmates, live challenge notifications and the creator card.",
   "creator.log2": "Photos checked one by one for every item in the official lists.",
   "creator.log3": "Cards now show the opening price instead of the tier letter.",
@@ -186,7 +186,7 @@ export const en: Dictionary = {
 
   "home.badge": "live auction",
   "home.subtitle":
-    "2 to 8 players, same budget for everyone. Items come up at random, you bid against the clock and end up with a vertical card to post.",
+    "2 to 5 players, same budget for everyone. Items come up at random, you bid against the clock and end up with a vertical card to post.",
   "home.profile": "Your profile",
   "home.namePlaceholder": "Player name",
   "home.avatar": "Avatar",
@@ -211,6 +211,10 @@ export const en: Dictionary = {
   "lobby.budgetHint": "Starting budget for every player",
   "lobby.slotsHint": "How many items each player must win",
   "lobby.blind": "Blind Draft",
+  "lobby.duel": "⚔️ 1v1 Duel",
+  "lobby.duelHint": "With two players the vote always ties: whoever saved more credits wins, unless spectators overturn it.",
+  "lobby.needLots": "{n} lots needed, the category has {ha}",
+  "lobby.needLotsHint": "With these players and items each you need {n} lots, but the category has {ha}. Lower the items per roster or pick a bigger list.",
   "lobby.blindHint": "Name and image stay hidden until the lot is assigned",
   "lobby.mystery": "Mystery Box",
   "lobby.mysteryHint": "Every 5 lots a fixed-price box with a random item shows up",

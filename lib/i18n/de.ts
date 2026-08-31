@@ -93,7 +93,7 @@ export const de: PartialDictionary = {
 
   "home.badge": "Live-Auktion",
   "home.subtitle":
-    "2 bis 8 Spieler, gleiches Budget für alle. Die Elemente kommen zufällig, geboten wird gegen die Uhr und am Ende gibt es die vertikale Card zum Posten.",
+    "2 bis 5 Spieler, gleiches Budget für alle. Die Elemente kommen zufällig, geboten wird gegen die Uhr und am Ende gibt es die vertikale Card zum Posten.",
   "home.profile": "Dein Profil",
   "home.namePlaceholder": "Spielername",
   "home.avatar": "Avatar",
@@ -481,7 +481,7 @@ export const de: PartialDictionary = {
   "studio.exported": "JSON in die Zwischenablage kopiert",
   "studio.exportHint": "Füge das JSON in data/categories.json ein, damit die Änderung dauerhaft ist.",
   "studio.open": "Kategorien-Studio",
-  "creator.log0": "Abschlusskarte für 1 bis 8 Spieler, mit Krone für den Sieger und sichtbarem Einsatz.",
+  "creator.log0": "Abschlusskarte für 1 bis 5 Spieler, mit Krone für den Sieger und sichtbarem Einsatz.",
   "lobby.pledge": "Einsatz",
   "lobby.pledgeHint": "Optional: steht gut sichtbar auf der Karte am Spielende.",
   "lobby.pledgePlaceholder": "z. B. Verlierer zahlt die Pizza",

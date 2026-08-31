@@ -393,7 +393,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
         <>
           {/*
             La striscia con tutti: avatar, crediti e stato di ognuno in una
-            riga sola. Con otto giocatori serve, perche' otto pannelli di
+            riga sola. Con cinque giocatori serve, perche' cinque pannelli di
             comandi aperti insieme facevano una pagina alta quasi tremila
             pixel: per arrivare al proprio bisognava scorrere mentre il timer
             correva.

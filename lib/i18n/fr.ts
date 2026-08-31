@@ -94,7 +94,7 @@ export const fr: PartialDictionary = {
 
   "home.badge": "enchère live",
   "home.subtitle":
-    "De 2 à 8 joueurs, le même budget pour tous. Les éléments sortent au hasard, on relance contre la montre et à la fin sort la carte verticale à poster.",
+    "De 2 à 5 joueurs, le même budget pour tous. Les éléments sortent au hasard, on relance contre la montre et à la fin sort la carte verticale à poster.",
   "home.profile": "Ton profil",
   "home.namePlaceholder": "Nom du joueur",
   "home.avatar": "Avatar",
@@ -482,7 +482,7 @@ export const fr: PartialDictionary = {
   "studio.exported": "JSON copié dans le presse-papiers",
   "studio.exportHint": "Colle le JSON dans data/categories.json pour rendre la modification permanente.",
   "studio.open": "Studio des catégories",
-  "creator.log0": "Carte finale adaptée de 1 à 8 joueurs, avec couronne au vainqueur et enjeu affiché.",
+  "creator.log0": "Carte finale adaptée de 1 à 5 joueurs, avec couronne au vainqueur et enjeu affiché.",
   "lobby.pledge": "Enjeu en jeu",
   "lobby.pledgeHint": "Facultatif : il apparaît en évidence sur la carte de fin de partie.",
   "lobby.pledgePlaceholder": "Ex. le perdant offre la pizza",

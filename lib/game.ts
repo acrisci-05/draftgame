@@ -32,7 +32,15 @@ export function lotSeconds(state: GameState): number {
 /** Durata della schermata di aggiudicazione prima del prossimo lotto. */
 export const RESULT_SECONDS = 4;
 export const MIN_PLAYERS = 2;
-export const MAX_PLAYERS = 8;
+/**
+ * Quanti si sta al massimo in una stanza.
+ *
+ * Cinque, non otto, per una ragione aritmetica: le categorie contengono trenta
+ * elementi, e cinque giocatori con cinque slot a testa ne consumano venticinque,
+ * lasciandone cinque per gli scarti. A otto giocatori con cinque slot ne
+ * servirebbero quaranta e la partita finirebbe con le liste a meta'.
+ */
+export const MAX_PLAYERS = 5;
 export const MIN_SLOTS = 3;
 export const MAX_SLOTS = 10;
 export const MIN_BUDGET = 5;
@@ -67,7 +75,10 @@ export function takenAvatars(state: GameState, exceptPlayerId?: string): string[
 export const DEFAULT_CONFIG: RoomConfig = {
   budget: 20,
   currency: "EUR",
-  maxPlayers: 2,
+  // Tre e non due: in due il voto finisce sempre alla pari, perche' nessuno
+  // puo' votare se stesso, e a decidere restano solo i crediti. Da tre in su
+  // il voto conta davvero.
+  maxPlayers: 3,
   slots: 5,
   blindDraft: false,
   mysteryBox: false,
@@ -134,6 +145,29 @@ export function createGame({ code, mode, hostId, category, config }: CreateGameA
 /* ------------------------------------------------------------------ */
 /* Selettori                                                          */
 /* ------------------------------------------------------------------ */
+
+/**
+ * Quanti lotti servono perche' tutti riempiano la lista.
+ *
+ * Non basta uno a testa per slot: se la categoria ne ha esattamente quelli, il
+ * primo che si aggiudica un doppione lascia qualcun altro a secco. Si tiene un
+ * margine di uno a giocatore, che e' anche quello che alimenta gli scarti.
+ */
+export function lotsNeeded(players: number, slots: number): number {
+  return players * slots;
+}
+
+/**
+ * Se la categoria basta per come e' impostata la stanza.
+ *
+ * Serve perche' la lobby lascia scegliere fino a dieci elementi a testa: con
+ * cinque giocatori sarebbero cinquanta lotti, e le categorie ne hanno trenta.
+ * Senza questo controllo la partita parte lo stesso e finisce con le liste a
+ * meta', senza che nessuno capisca perche'.
+ */
+export function categoryFits(state: GameState): boolean {
+  return state.items.length >= lotsNeeded(state.config.maxPlayers, state.config.slots);
+}
 
 export function playerById(state: GameState, id: string | null): Player | undefined {
   if (!id) return undefined;
@@ -282,7 +316,7 @@ export function tierPoints(player: Player): number {
  * Secondi per votare, prima che la fase si chiuda da sola.
  *
  * E' un tetto, non un'attesa: appena hanno votato tutti si passa oltre. Serve
- * largo perche' con otto giocatori ci sono sette rose da guardare, e trenta
+ * largo perche' con cinque giocatori ci sono quattro rose da guardare, e trenta
  * secondi erano quattro secondi a rosa -- il tempo di scorrerle, non di
  * leggerle.
  */
@@ -839,6 +873,9 @@ export function reducer(state: GameState, action: GameAction): GameState {
       if (state.phase !== "lobby") return state;
       if (state.players.length < MIN_PLAYERS) return state;
       if (state.items.length === 0) return state;
+      // I lotti devono bastare per chi c'e' davvero, non per il massimo
+      // consentito: se sono in tre su una stanza da cinque, servono i loro.
+      if (state.items.length < lotsNeeded(state.players.length, state.config.slots)) return state;
       return draw(
         {
           ...state,

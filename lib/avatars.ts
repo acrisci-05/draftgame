@@ -49,7 +49,7 @@ export function avatarForIndex(index: number): AvatarId {
  * Primo avatar ancora libero.
  * In una stanza due giocatori non possono avere la stessa icona: quando qualcuno
  * entra gli si dà il primo che nessuno ha preso, e se fossero finiti (non può
- * succedere con otto giocatori e ventiquattro icone) si riparte dal primo.
+ * succedere con cinque giocatori e ventiquattro icone) si riparte dal primo.
  */
 export function firstFreeAvatar(taken: readonly string[]): AvatarId {
   return AVATAR_IDS.find((id) => !taken.includes(id)) ?? AVATAR_IDS[0];

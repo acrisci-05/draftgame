@@ -93,7 +93,7 @@ export const pt: PartialDictionary = {
 
   "home.badge": "leilão ao vivo",
   "home.subtitle":
-    "De 2 a 8 jogadores, o mesmo orçamento para todos. Os elementos saem ao acaso, licita-se contra o tempo e no fim sai o card vertical para publicar.",
+    "De 2 a 5 jogadores, o mesmo orçamento para todos. Os elementos saem ao acaso, licita-se contra o tempo e no fim sai o card vertical para publicar.",
   "home.profile": "O teu perfil",
   "home.namePlaceholder": "Nome do jogador",
   "home.avatar": "Avatar",
@@ -481,7 +481,7 @@ export const pt: PartialDictionary = {
   "studio.exported": "JSON copiado para a área de transferência",
   "studio.exportHint": "Cola o JSON em data/categories.json para tornar a alteração permanente.",
   "studio.open": "Studio das categorias",
-  "creator.log0": "Carta final adaptada de 1 a 8 jogadores, com coroa ao vencedor e a aposta à vista.",
+  "creator.log0": "Carta final adaptada de 1 a 5 jogadores, com coroa ao vencedor e a aposta à vista.",
   "lobby.pledge": "Aposta em jogo",
   "lobby.pledgeHint": "Opcional: fica em destaque na carta de fim de jogo.",
   "lobby.pledgePlaceholder": "Ex. quem perde paga a pizza",
