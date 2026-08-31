@@ -178,11 +178,16 @@ export function LobbyConfig({
             label={t("lobby.mystery")}
             hint={t("lobby.mysteryHint")}
           />
+          {/*
+            La spiegazione cambia con l'interruttore: le due conseguenze sono
+            opposte, e una descrizione sola le costringerebbe entrambe in una
+            frase che non si capisce.
+          */}
           <Switch
             checked={config.allowDiscards}
             onChange={(allowDiscards) => !disabled && onChange({ allowDiscards })}
             label={t("lobby.discards")}
-            hint={t("lobby.discardsHint")}
+            hint={config.allowDiscards ? t("lobby.discardsOn") : t("lobby.discardsOff")}
           />
         </div>
 

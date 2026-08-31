@@ -137,6 +137,10 @@ export const en: Dictionary = {
   "rules.modes.extras": "Modifiers.",
   "rules.modes.extrasBody":
     "Blind Draft hides name and picture until the lot is assigned. Mystery Box, every 5 lots, puts a surprise item up at a fixed price: take it and it is yours, no bidding. Discards decide what happens to a lot nobody wants.",
+  "rules.modes.pool":
+    "How many lots you need.",
+  "rules.modes.poolBody":
+    "A match only starts if the list holds at least (players × items each) + 5 lots. The extra five are the reserve: with the exact numbers nobody could afford to let an item they dislike go by, and the auction would stop being a choice. A 30-item list fits five players with five items each exactly; a 20-item one fits three at most. The player selector stops on its own and says so.",
 
   "rules.mates.title": "PickMates",
   "rules.mates.friends": "Friends.",
@@ -572,9 +576,13 @@ export const en: Dictionary = {
   "categories.filterGaming": "Gaming",
   "categories.filterFood": "Food",
   "categories.filterLife": "Everyday life",
-
-  "lobby.discards": "Discards on",
+  "lobby.discards":
+    "Drop unsold lots",
   "lobby.discardsHint": "With discards a lot nobody bids on is set aside; switch them off and it is assigned anyway",
+  "lobby.discardsOff":
+    "If everyone passes, the lot goes at base price to whoever has the fewest items (ties go to more credits).",
+  "lobby.discardsOn":
+    "If everyone passes, the lot is dropped and the next one comes up. Nobody gets it.",
 
   "auction.max": "Max",
   "auction.reserve": "Keep {amount} for the slots you still need",

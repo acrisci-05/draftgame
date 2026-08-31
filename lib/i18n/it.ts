@@ -135,6 +135,10 @@ export const it = {
   "rules.modes.extras": "Modificatori.",
   "rules.modes.extrasBody":
     "Blind Draft copre nome e immagine fino all'assegnazione. Mystery Box, ogni 5 lotti, mette in palio un elemento a sorpresa a prezzo fisso: se lo prendi è tuo, senza asta. Gli Scarti decidono che fine fa un lotto che non vuole nessuno.",
+  "rules.modes.pool":
+    "Quanti lotti servono.",
+  "rules.modes.poolBody":
+    "Una partita parte solo se la lista ha almeno (giocatori × elementi a testa) + 5 lotti. I cinque in più sono la riserva: senza, con i numeri esatti nessuno potrebbe permettersi di lasciar perdere un elemento che non gli piace, e l'asta smetterebbe di essere una scelta. Con una lista da 30, cinque giocatori da cinque elementi ci stanno esatti; con una da 20 se ne sta al massimo tre. Il selettore dei giocatori si ferma da solo e lo dice.",
 
   "rules.mates.title": "PickMates",
   "rules.mates.friends": "Gli amici.",
@@ -580,9 +584,13 @@ export const it = {
   "categories.filterGaming": "Gaming",
   "categories.filterFood": "Cibo",
   "categories.filterLife": "Vita quotidiana",
-
-  "lobby.discards": "Scarti attivi",
+  "lobby.discards":
+    "Elimina lotti invenduti",
   "lobby.discardsHint": "Se nessuno offre il lotto va agli scarti; disattivandoli viene assegnato d'ufficio",
+  "lobby.discardsOff":
+    "Se tutti passano, il lotto va al prezzo base a chi ha meno elementi (a parità, a chi ha più crediti).",
+  "lobby.discardsOn":
+    "Se tutti passano, il lotto viene scartato e si passa al successivo. Nessuno se lo prende.",
 
   "auction.max": "Max",
   "auction.reserve": "Tieni {amount} per gli slot che ti restano",
