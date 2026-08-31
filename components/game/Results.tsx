@@ -30,6 +30,13 @@ import {
   type WinReason,
 } from "@/lib/game";
 import { awardMatchXp, recordMatch } from "@/lib/history";
+import {
+  countMatch,
+  markPrompted,
+  markRated,
+  shouldAskRating,
+} from "@/lib/rating-prompt";
+import { RatingModal } from "@/components/ui/RatingModal";
 import { GuestBadge, XpEarned } from "./XpEarned";
 import { openPanel } from "@/lib/panels";
 import { recordOpponent } from "@/lib/pickmates";
@@ -151,6 +158,38 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
     });
     // Una volta sola per partita: le dipendenze sono la stanza e chi sono io.
   }, [myAccountId, state]);
+
+  /*
+   * La partita conta anche per chi gioca da ospite: il parere sull'app non
+   * dipende dall'avere un profilo, e chiederlo dopo tre partite vale per
+   * tutti allo stesso modo.
+   */
+  useEffect(() => {
+    countMatch();
+  }, [state.code]);
+
+  /*
+   * Il parere sull'app si chiede qui e non altrove: e' il momento in cui la
+   * partita e' appena finita e si sta per uscire, cioe' l'unico in cui non si
+   * interrompe niente. Chi risponde, o chi dice di no, prosegue subito dopo.
+   */
+  const [rating, setRating] = useState<(() => void) | null>(null);
+
+  const leave = (dopo: () => void) => {
+    if (shouldAskRating()) {
+      markPrompted();
+      setRating(() => dopo);
+      return;
+    }
+    dopo();
+  };
+
+  const closeRating = (segna?: () => void) => {
+    segna?.();
+    const dopo = rating;
+    setRating(null);
+    dopo?.();
+  };
 
   const currency = state.config.currency;
   const ordered = finalStandings(state);
@@ -432,18 +471,26 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
 
       <div className="grid grid-cols-2 gap-2 pb-8">
         {isHost ? (
-          <Button variant="outline" onClick={() => dispatch({ type: "restart" })}>
+          <Button variant="outline" onClick={() => leave(() => dispatch({ type: "restart" }))}>
             <RotateCcw className="size-4" />
             {t("results.restart")}
           </Button>
         ) : (
           <span />
         )}
-        <Button variant="ghost" onClick={() => router.push("/")}>
+        <Button variant="ghost" onClick={() => leave(() => router.push("/"))}>
           <Home className="size-4" />
           {t("common.home")}
         </Button>
       </div>
+
+      <RatingModal
+        open={rating !== null}
+        prompted
+        onClose={() => closeRating()}
+        onLater={() => closeRating()}
+        onNever={() => closeRating(markRated)}
+      />
     </div>
   );
 }

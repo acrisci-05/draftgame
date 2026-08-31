@@ -562,6 +562,8 @@ export const it = {
   "rate.comment": "Vuoi aggiungere qualcosa?",
   "rate.commentPlaceholder": "Cosa miglioreresti?",
   "rate.send": "Invia voto",
+  "rate.later": "Più tardi",
+  "rate.never": "Non mostrare più",
   "rate.thanks": "Grazie per il voto!",
   "rate.average": "Media {avg} su {count} voti",
   "rate.offline": "Il voto richiede la configurazione del database.",

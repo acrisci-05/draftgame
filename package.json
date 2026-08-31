@@ -22,7 +22,8 @@
     "docs:pdf": "node scripts/build-guide-pdf.js",
     "check:levels": "tsc -p tsconfig.check.json && node scripts/levels-check.js",
     "check:tiebreak": "tsc -p tsconfig.check.json && node scripts/tiebreak-check.js",
-    "check:gameplay": "tsc -p tsconfig.check.json && node scripts/gameplay-check.js"
+    "check:gameplay": "tsc -p tsconfig.check.json && node scripts/gameplay-check.js",
+    "check:rating": "tsc -p tsconfig.check.json && node scripts/rating-check.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

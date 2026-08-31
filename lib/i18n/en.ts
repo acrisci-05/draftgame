@@ -551,6 +551,8 @@ export const en: Dictionary = {
   "rate.comment": "Anything to add?",
   "rate.commentPlaceholder": "What would you improve?",
   "rate.send": "Send rating",
+  "rate.later": "Later",
+  "rate.never": "Don't show again",
   "rate.thanks": "Thanks for rating!",
   "rate.average": "{avg} average out of {count} ratings",
   "rate.offline": "Rating needs the database to be configured.",

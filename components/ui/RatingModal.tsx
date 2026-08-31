@@ -11,7 +11,24 @@ import { Button } from "./Button";
 import { Textarea } from "./Input";
 import { Modal } from "./Modal";
 
-export function RatingModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function RatingModal({
+  open,
+  onClose,
+  /**
+   * Quando la richiesta arriva da sola dopo una partita, invece che dal menu.
+   * Cambia i pulsanti in fondo: chi non l'ha cercata deve poter dire "adesso
+   * no" o "mai piu'" senza doversi inventare come chiudere.
+   */
+  prompted = false,
+  onLater,
+  onNever,
+}: {
+  open: boolean;
+  onClose: () => void;
+  prompted?: boolean;
+  onLater?: () => void;
+  onNever?: () => void;
+}) {
   const t = useT();
   const [stars, setStars] = useState(0);
   const [hover, setHover] = useState(0);
@@ -111,6 +128,25 @@ export function RatingModal({ open, onClose }: { open: boolean; onClose: () => v
           )}
           {t("rate.send")}
         </Button>
+
+        {prompted ? (
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onLater}
+              className="flex-1 rounded-xl border border-line px-3 py-2 text-sm text-muted transition-colors hover:text-fg"
+            >
+              {t("rate.later")}
+            </button>
+            <button
+              type="button"
+              onClick={onNever}
+              className="flex-1 rounded-xl px-3 py-2 text-sm text-faint transition-colors hover:text-fg"
+            >
+              {t("rate.never")}
+            </button>
+          </div>
+        ) : null}
       </div>
     </Modal>
   );
