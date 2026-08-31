@@ -683,8 +683,21 @@ create policy "presence_self_delete"
   to authenticated
   using (auth.uid() = user_id);
 
+-- Le due funzioni di appoggio stanno in uno schema separato, non in "public".
+--
+-- Il motivo e' che scavalcano le protezioni (security definer: devono poter
+-- guardare amicizie e profili altrui per rispondere) e tutto quello che sta in
+-- "public" viene pubblicato come indirizzo interrogabile dall'esterno. Lasciate
+-- li', chiunque avrebbe potuto prendere gli id dei profili -- che sono pubblici
+-- -- e chiedere coppia per coppia "questi due sono amici?", ricostruendo la
+-- rete di amicizie che la tabella pickmates si rifiuta di consegnare.
+--
+-- In uno schema non pubblicato restano usabili dalle regole di accesso, che
+-- girano dentro il database, e irraggiungibili da fuori.
+create schema if not exists private;
+
 -- Vero se le due persone sono PickMates accettati, in un verso o nell'altro.
-create or replace function public.are_pickmates(a uuid, b uuid) returns boolean
+create or replace function private.are_pickmates(a uuid, b uuid) returns boolean
   language sql
   stable
   security definer
@@ -698,7 +711,7 @@ create or replace function public.are_pickmates(a uuid, b uuid) returns boolean
   $$;
 
 -- Vero se quella persona ha lasciato acceso il proprio stato.
-create or replace function public.shows_presence(who uuid) returns boolean
+create or replace function private.shows_presence(who uuid) returns boolean
   language sql
   stable
   security definer
@@ -706,6 +719,11 @@ create or replace function public.shows_presence(who uuid) returns boolean
   as $$
     select coalesce((select shows_presence from public.profiles where id = who), false)
   $$;
+
+-- Servono a chi ha fatto l'accesso solo perche' le regole le richiamano.
+grant usage on schema private to authenticated;
+grant execute on function private.are_pickmates(uuid, uuid) to authenticated;
+grant execute on function private.shows_presence(uuid) to authenticated;
 
 -- Si legge lo stato di un PickMate solo se lui lo mostra e se lo mostri anche tu.
 drop policy if exists "presence_mates_read" on public.presence;
@@ -715,8 +733,12 @@ create policy "presence_mates_read"
   using (
     user_id = auth.uid()
     or (
-      public.shows_presence(auth.uid())
-      and public.shows_presence(user_id)
-      and public.are_pickmates(auth.uid(), user_id)
+      private.shows_presence(auth.uid())
+      and private.shows_presence(user_id)
+      and private.are_pickmates(auth.uid(), user_id)
     )
   );
+
+-- Via le versioni pubbliche, che erano interrogabili da chiunque.
+drop function if exists public.are_pickmates(uuid, uuid);
+drop function if exists public.shows_presence(uuid);
