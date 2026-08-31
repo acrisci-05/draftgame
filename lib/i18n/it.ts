@@ -80,7 +80,7 @@ export const it = {
   "picker.nameGuest": "Un nome usa e getta, valido solo per quella partita.",
   "picker.nameMember": "Un nickname unico che nessun altro può prendere, in firma sulla card 9:16.",
   "rules.win.title": "Come si vince",
-  "rules.win.body": "A liste piene si apre il voto: 30 secondi, ognuno sceglie la rosa che gli piace di più tranne la propria. Vince chi prende più voti.",
+  "rules.win.body": "A liste piene si apre il voto: fino a 90 secondi, ognuno sceglie la rosa che gli piace di più tranne la propria. Vince chi prende più voti.",
   "rules.win.tie": "Se sono pari.",
   "rules.win.tieBody": "Non esistono ex aequo: si scende lungo questa scala finché uno passa avanti. 1) Più voti. 2) Più crediti risparmiati. 3) L'acquisto più caro. 4) Un sorteggio, uguale su tutti i dispositivi ma che non premia né chi ospita né chi è entrato prima.",
   "rules.win.two": "Attenzione in due.",

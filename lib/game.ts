@@ -278,8 +278,15 @@ export function tierPoints(player: Player): number {
   return player.roster.reduce((sum, entry) => sum + entry.tier, 0);
 }
 
-/** Secondi per votare, prima che si chiuda da sola. */
-export const VOTE_SECONDS = 30;
+/**
+ * Secondi per votare, prima che la fase si chiuda da sola.
+ *
+ * E' un tetto, non un'attesa: appena hanno votato tutti si passa oltre. Serve
+ * largo perche' con otto giocatori ci sono sette rose da guardare, e trenta
+ * secondi erano quattro secondi a rosa -- il tempo di scorrerle, non di
+ * leggerle.
+ */
+export const VOTE_SECONDS = 90;
 
 /** Quanti voti ha preso ciascuno. */
 export function voteTally(state: GameState): Record<string, number> {

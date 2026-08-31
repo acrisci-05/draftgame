@@ -82,7 +82,7 @@ export const en: Dictionary = {
   "picker.nameGuest": "A throwaway name, good for that match only.",
   "picker.nameMember": "A unique nickname nobody else can take, signed on the 9:16 card.",
   "rules.win.title": "How you win",
-  "rules.win.body": "With full line-ups the vote opens: 30 seconds, everyone picks the line-up they like best except their own. Most votes wins.",
+  "rules.win.body": "With full line-ups the vote opens: up to 90 seconds, everyone picks the line-up they like best except their own. Most votes wins.",
   "rules.win.tie": "If it is a tie.",
   "rules.win.tieBody": "There are no draws: you go down this ladder until someone pulls ahead. 1) Most votes. 2) Most credits saved. 3) The most expensive buy. 4) A draw, identical on every device but favouring neither the host nor whoever joined first.",
   "rules.win.two": "Careful with two players.",
