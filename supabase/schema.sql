@@ -701,7 +701,7 @@ create or replace function private.are_pickmates(a uuid, b uuid) returns boolean
   language sql
   stable
   security definer
-  set search_path = public
+  set search_path = ''
   as $$
     select exists (
       select 1 from public.pickmates
@@ -715,12 +715,15 @@ create or replace function private.shows_presence(who uuid) returns boolean
   language sql
   stable
   security definer
-  set search_path = public
+  set search_path = ''
   as $$
     select coalesce((select shows_presence from public.profiles where id = who), false)
   $$;
 
--- Servono a chi ha fatto l'accesso solo perche' le regole le richiamano.
+-- Nessuno le puo' chiamare, tranne chi ha fatto l'accesso, e solo perche' le
+-- regole di lettura le richiamano per suo conto.
+revoke execute on function private.are_pickmates(uuid, uuid) from public;
+revoke execute on function private.shows_presence(uuid) from public;
 grant usage on schema private to authenticated;
 grant execute on function private.are_pickmates(uuid, uuid) to authenticated;
 grant execute on function private.shows_presence(uuid) to authenticated;
