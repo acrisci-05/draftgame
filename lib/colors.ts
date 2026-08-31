@@ -1,32 +1,34 @@
+import type { TranslationKey } from "./i18n/it";
+
 /**
- * Il colore personale di ogni giocatore.
+ * Gli otto colori dei giocatori.
  *
- * Serve a riconoscersi al volo nella lista durante l'asta: l'avatar è piccolo,
- * il nome si accorcia, ma l'alone colorato si vede anche con la coda dell'occhio.
+ * Uno per posto al tavolo: con otto persone in stanza servono otto tinte che si
+ * distinguano a colpo d'occhio su uno schermo di telefono, anche viste di
+ * sfuggita durante un rilancio. Sono tutte a tinta piena e ben separate sulla
+ * ruota dei colori — niente due azzurri vicini, niente grigi: un colore poco
+ * saturo su fondo scuro non legge come "questo giocatore", legge come
+ * "elemento spento".
  *
- * Sono otto, quanti sono i giocatori al massimo: così in una stanza piena
- * nessuno resta senza il proprio. Sono scelti a distanza sulla ruota dei colori
- * — verde, azzurro, viola, rosa, rosso, arancio, oro, argento — perché due
- * tinte vicine, viste piccole e in movimento, si confondono.
- *
- * I valori sono classi Tailwind già scritte, non colori calcolati: così restano
- * nel foglio di stile compilato.
+ * Il colore vale per la singola partita: si sceglie in lobby, viaggia nello
+ * stato del gioco e non viene conservato sul profilo. Chi ne ha già preso uno
+ * lo toglie dal tavolo agli altri.
  */
 
 export const PLAYER_COLORS = [
-  "green",
-  "blue",
+  "cyan",
   "purple",
+  "emerald",
+  "amber",
   "pink",
   "red",
   "orange",
-  "gold",
-  "silver",
+  "indigo",
 ] as const;
 
 export type PlayerColor = (typeof PLAYER_COLORS)[number];
 
-export const DEFAULT_COLOR: PlayerColor = "green";
+export const DEFAULT_COLOR: PlayerColor = "cyan";
 
 export function isPlayerColor(value: string): value is PlayerColor {
   return (PLAYER_COLORS as readonly string[]).includes(value);
@@ -35,6 +37,11 @@ export function isPlayerColor(value: string): value is PlayerColor {
 /** Il primo colore libero, per non ritrovarsi due aloni uguali. */
 export function firstFreeColor(taken: readonly string[]): PlayerColor {
   return PLAYER_COLORS.find((color) => !taken.includes(color)) ?? DEFAULT_COLOR;
+}
+
+/** L'etichetta da leggere, per chi naviga con lo schermo letto ad alta voce. */
+export function colorLabel(color: PlayerColor): TranslationKey {
+  return `color.${color}` as TranslationKey;
 }
 
 interface ColorLook {
@@ -54,23 +61,29 @@ interface ColorLook {
  * invisibili al compilatore, e i colori non uscirebbero affatto.
  */
 const LOOKS: Record<PlayerColor, ColorLook> = {
-  green: {
-    ring: "ring-2 ring-[#22c55e]",
-    text: "text-[#22c55e]",
-    soft: "bg-[#22c55e]/10 border-[#22c55e]/40",
-    dot: "bg-[#22c55e]",
-  },
-  blue: {
-    ring: "ring-2 ring-[#38bdf8]",
-    text: "text-[#38bdf8]",
-    soft: "bg-[#38bdf8]/10 border-[#38bdf8]/40",
-    dot: "bg-[#38bdf8]",
+  cyan: {
+    ring: "ring-2 ring-[#22d3ee]",
+    text: "text-[#22d3ee]",
+    soft: "bg-[#22d3ee]/10 border-[#22d3ee]/40",
+    dot: "bg-[#22d3ee]",
   },
   purple: {
     ring: "ring-2 ring-[#a855f7]",
     text: "text-[#a855f7]",
     soft: "bg-[#a855f7]/10 border-[#a855f7]/40",
     dot: "bg-[#a855f7]",
+  },
+  emerald: {
+    ring: "ring-2 ring-[#22c55e]",
+    text: "text-[#22c55e]",
+    soft: "bg-[#22c55e]/10 border-[#22c55e]/40",
+    dot: "bg-[#22c55e]",
+  },
+  amber: {
+    ring: "ring-2 ring-[#f59e0b]",
+    text: "text-[#f59e0b]",
+    soft: "bg-[#f59e0b]/10 border-[#f59e0b]/40",
+    dot: "bg-[#f59e0b]",
   },
   pink: {
     ring: "ring-2 ring-[#f472b6]",
@@ -90,17 +103,11 @@ const LOOKS: Record<PlayerColor, ColorLook> = {
     soft: "bg-[#fb923c]/10 border-[#fb923c]/40",
     dot: "bg-[#fb923c]",
   },
-  gold: {
-    ring: "ring-2 ring-[#facc15]",
-    text: "text-[#facc15]",
-    soft: "bg-[#facc15]/10 border-[#facc15]/40",
-    dot: "bg-[#facc15]",
-  },
-  silver: {
-    ring: "ring-2 ring-[#cbd5e1]",
-    text: "text-[#cbd5e1]",
-    soft: "bg-[#cbd5e1]/10 border-[#cbd5e1]/40",
-    dot: "bg-[#cbd5e1]",
+  indigo: {
+    ring: "ring-2 ring-[#818cf8]",
+    text: "text-[#818cf8]",
+    soft: "bg-[#818cf8]/10 border-[#818cf8]/40",
+    dot: "bg-[#818cf8]",
   },
 };
 

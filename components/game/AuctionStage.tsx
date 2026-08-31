@@ -13,10 +13,11 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import {
+  colorLook,
   lotSeconds,
   currentItem,
   drawnCount,
@@ -65,6 +66,13 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
    */
   const totalSeconds = lotSeconds(state);
   const turnId = nextToAct(state);
+  /*
+   * In locale si tiene aperto un pannello di comandi alla volta: quello di chi
+   * tocca, finche' non se ne apre un altro a mano. Il lotto che cambia riporta
+   * l'apertura sul giocatore di turno.
+   */
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
+  const expandedId = openPanel ?? turnId;
   const inRace = state.players.filter(
     (p) => !state.passed.includes(p.id) && p.roster.length < state.config.slots,
   ).length;
@@ -357,20 +365,79 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
       ) : null}
 
       {state.mode === "local" ? (
-        <div className={cn("grid gap-2", state.players.length > 1 && "sm:grid-cols-2")}>
-          {state.players.map((player) => (
-            <BidControls
-              key={player.id}
-              compact
-              state={state}
-              player={player}
-              highlight={player.id === turnId}
-              onBid={(amount) => bid(player.id, amount)}
-              onPass={() => pass(player.id)}
-              onClaim={() => claim(player.id)}
-            />
-          ))}
-        </div>
+        <>
+          {/*
+            La striscia con tutti: avatar, crediti e stato di ognuno in una
+            riga sola. Con otto giocatori serve, perche' otto pannelli di
+            comandi aperti insieme facevano una pagina alta quasi tremila
+            pixel: per arrivare al proprio bisognava scorrere mentre il timer
+            correva.
+          */}
+          <PlayerRail state={state} nextId={turnId} />
+
+          <div className="flex flex-col gap-2">
+            {state.players.map((player) => {
+              const aperto = player.id === expandedId;
+              if (aperto) {
+                return (
+                  <BidControls
+                    key={player.id}
+                    compact
+                    state={state}
+                    player={player}
+                    highlight={player.id === turnId}
+                    onBid={(amount) => bid(player.id, amount)}
+                    onPass={() => pass(player.id)}
+                    onClaim={() => claim(player.id)}
+                  />
+                );
+              }
+
+              /*
+               * Chiuso resta una riga sola. Si apre al tocco: chiunque puo'
+               * rilanciare quando vuole, non solo chi e' di turno, quindi i
+               * comandi non si possono nascondere del tutto.
+               */
+              const passato = state.passed.includes(player.id);
+              const pieno = player.roster.length >= state.config.slots;
+              return (
+                <button
+                  key={player.id}
+                  type="button"
+                  onClick={() => setOpenPanel(player.id)}
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-xl border border-line bg-surface-2 p-2.5 text-start transition-colors hover:border-neon/40",
+                    (passato || pieno) && "opacity-50",
+                  )}
+                >
+                  <Avatar
+                    id={player.emoji}
+                    size="xs"
+                    className={colorLook(player.color).ring}
+                  />
+                  <span
+                    className={cn(
+                      "min-w-0 flex-1 truncate text-sm font-semibold",
+                      colorLook(player.color).text,
+                    )}
+                  >
+                    {player.name}
+                  </span>
+                  <span className="shrink-0 text-[10px] uppercase tracking-wider text-faint">
+                    {passato
+                      ? t("auction.passed")
+                      : pieno
+                        ? t("auction.full")
+                        : t("auction.inPlay")}
+                  </span>
+                  <span className="shrink-0 font-mono text-sm font-bold text-neon">
+                    {money(player.budget, currency)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
       ) : (
         <>
           <PlayerRail state={state} selfId={selfId} nextId={turnId} />

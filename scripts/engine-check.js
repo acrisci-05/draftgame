@@ -334,11 +334,11 @@ check(
   palette.players[0].color !== palette.players[1].color,
   palette.players.map((p) => p.color).join(","),
 );
-const recolored = game.reducer(palette, { type: "set_color", playerId: "b", color: "gold" });
-check("dalla lobby si cambia colore", game.playerById(recolored, "b").color === "gold");
+const recolored = game.reducer(palette, { type: "set_color", playerId: "b", color: "amber" });
+check("dalla lobby si cambia colore", game.playerById(recolored, "b").color === "amber");
 check(
   "non si prende il colore di un altro",
-  game.reducer(recolored, { type: "set_color", playerId: "a", color: "gold" }) === recolored,
+  game.reducer(recolored, { type: "set_color", playerId: "a", color: "amber" }) === recolored,
 );
 const colorLocked = game.reducer(recolored, { type: "start", now: t0 });
 check(
