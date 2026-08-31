@@ -69,7 +69,7 @@ const RECAP_SECONDS = 5;
 export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   const router = useRouter();
   const { locale, sound, t } = useSettings();
-  const { account } = useAuth();
+  const { account, refreshAccount } = useAuth();
   const [voteUrl, setVoteUrl] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
   const [voteBusy, setVoteBusy] = useState(false);
@@ -154,10 +154,15 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
       votes: tally[me.id] ?? 0,
       withMate,
     }).then((earned) => {
-      if (earned > 0) setEarnedXp(earned);
+      if (earned <= 0) return;
+      setEarnedXp(earned);
+      // Il profilo in memoria ha ancora i punti di prima: senza rileggerlo, il
+      // riquadro direbbe quanto manca al livello successivo sbagliando di una
+      // partita intera.
+      refreshAccount();
     });
     // Una volta sola per partita: le dipendenze sono la stanza e chi sono io.
-  }, [myAccountId, state]);
+  }, [myAccountId, state, refreshAccount]);
 
   /*
    * La partita conta anche per chi gioca da ospite: il parere sull'app non
