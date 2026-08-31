@@ -28,6 +28,7 @@ import { DEFAULT_CATEGORY } from "@/lib/catalog";
 import { usePresence, type PresenceState } from "@/lib/presence";
 import { ensureProfile, readConfig, saveSession } from "@/lib/storage";
 import { useT } from "@/lib/settings";
+import { showToast } from "@/lib/toast";
 import { cn, copyText, roomCode as newRoomCode } from "@/lib/utils";
 import { AddPickmateModal } from "@/components/ui/AddPickmateModal";
 import { AuthPanel } from "@/components/ui/AuthModal";
@@ -51,6 +52,8 @@ export default function PickmatesPage() {
   const [copied, setCopied] = useState(false);
   const [challenged, setChallenged] = useState<string | null>(null);
   const [openMate, setOpenMate] = useState<Pickmate | null>(null);
+  /** Richiesta che si sta ritirando: spegne il pulsante e mostra la rotella. */
+  const [cancelling, setCancelling] = useState<string | null>(null);
 
   const userId = account && !account.local ? account.id : null;
 
@@ -84,6 +87,26 @@ export default function PickmatesPage() {
   const incoming = mates.filter((mate) => mate.status === "pending" && mate.incoming);
   const outgoing = mates.filter((mate) => mate.status === "pending" && !mate.incoming);
   const known = new Set(mates.map((mate) => mate.account.id));
+
+  /**
+   * Ritira una richiesta di amicizia mandata e non ancora accettata.
+   *
+   * La riga sparisce subito dall'elenco senza aspettare il database: se poi la
+   * cancellazione fallisse, la rilettura la rimetterebbe al suo posto. Meglio
+   * un elenco che si corregge che un pulsante che sembra non aver fatto niente.
+   */
+  const cancelRequest = async (mate: Pickmate) => {
+    if (!userId) return;
+    setCancelling(mate.account.id);
+    setMates((prima) => prima.filter((m) => m.account.id !== mate.account.id));
+    try {
+      await removePickmate(userId, mate.account.id);
+      showToast(t("friends.cancelled", { name: `@${mate.account.nickname}` }), "info");
+    } finally {
+      setCancelling(null);
+      reload();
+    }
+  };
 
   /*
    * Sfidare vuol dire aprire una stanza e chiamarci qualcuno: si crea il codice,
@@ -250,7 +273,24 @@ export default function PickmatesPage() {
                     <div className="flex flex-col gap-2">
                       {outgoing.map((mate) => (
                         <MateRow key={mate.account.id} mate={mate}>
-                          <span className="text-xs text-faint">{t("friends.waiting")}</span>
+                          {/*
+                            Una richiesta mandata per sbaglio, o a cui non
+                            risponde nessuno, deve poter essere ritirata: senza,
+                            resta li' per sempre e non si puo' nemmeno rimandare.
+                          */}
+                          <button
+                            type="button"
+                            disabled={cancelling === mate.account.id}
+                            onClick={() => cancelRequest(mate)}
+                            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-xs text-faint transition-colors hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
+                          >
+                            {cancelling === mate.account.id ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <X className="size-3.5" />
+                            )}
+                            {t("friends.cancelRequest")}
+                          </button>
                         </MateRow>
                       ))}
                     </div>

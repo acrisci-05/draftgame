@@ -488,6 +488,8 @@ export const en: Dictionary = {
   "friends.accept": "Accept",
   "friends.remove": "Remove",
   "friends.waiting": "Waiting",
+  "friends.cancelRequest": "Cancel",
+  "friends.cancelled": "Request to {name} withdrawn.",
   "friends.drafts": "Drafts to vote",
   "friends.noDrafts": "No draft received yet.",
   "friends.fromFriend": "from {name}",

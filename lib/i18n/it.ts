@@ -497,6 +497,8 @@ export const it = {
   "friends.accept": "Accetta",
   "friends.remove": "Rimuovi",
   "friends.waiting": "In attesa",
+  "friends.cancelRequest": "Annulla",
+  "friends.cancelled": "Richiesta a {name} ritirata.",
   "friends.drafts": "Draft da votare",
   "friends.noDrafts": "Nessun draft ricevuto.",
   "friends.fromFriend": "da {name}",
