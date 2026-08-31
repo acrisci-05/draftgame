@@ -105,7 +105,7 @@ const inCorso = game.reducer(stanza(3), { type: "remove_player", playerId: "p2" 
 check("a partita iniziata non si toglie piu' nessuno",
   inCorso.players.length === 3, inCorso.players.length);
 
-/* 6. I lotti devono bastare per tutti. */
+/* 6. I lotti devono bastare per tutti, margine compreso. */
 const troppi = stanza(5, { slots: 10 });
 check("non si parte se i lotti non bastano per tutti", troppi.phase === "lobby", troppi.phase);
 const giusti = stanza(5, { slots: 5 });
@@ -114,6 +114,28 @@ check(
   giusti.phase !== "lobby",
   giusti.phase,
 );
+
+// La regola, presa da sola. Trenta lotti sono il taglio esatto per cinque
+// giocatori da cinque elementi: 5x5+5 fa trenta.
+check("la soglia e' (giocatori x slot) + 5", game.canStartMatch(5, 30, 5));
+check("un lotto in meno e non si parte", !game.canStartMatch(5, 29, 5));
+check("il margine e' di cinque", game.LOT_MARGIN === 5, game.LOT_MARGIN);
+check("una lista da venti regge tre giocatori da cinque", game.canStartMatch(3, 20, 5));
+check("una lista da venti non regge quattro giocatori da cinque", !game.canStartMatch(4, 20, 5));
+check("una lista da venti regge cinque giocatori da tre", game.canStartMatch(5, 20, 3));
+
+// Il tetto suggerito deve coincidere con la regola.
+for (const lotti of [20, 25, 30]) {
+  for (const slot of [3, 4, 5]) {
+    const tetto = game.maxPlayersFor(lotti, slot);
+    const coerente =
+      (tetto === 0 || game.canStartMatch(tetto, lotti, slot)) &&
+      (tetto >= 5 || !game.canStartMatch(tetto + 1, lotti, slot));
+    check(`tetto coerente con ${lotti} lotti e ${slot} elementi (max ${tetto})`, coerente);
+  }
+}
+
+check("la soglia minima di una lista e' venti", game.MIN_CATEGORY_ITEMS === 20, game.MIN_CATEGORY_ITEMS);
 
 console.log("");
 console.log(ko === 0 ? "TUTTI I CASI LIMITE REGGONO" : `${ko} CONTROLLI FALLITI`);

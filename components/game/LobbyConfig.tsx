@@ -5,6 +5,7 @@ import {
   BUDGET_PRESETS,
   MAX_BUDGET,
   MAX_PLAYERS,
+  maxPlayersFor,
   MAX_SLOTS,
   MIN_BUDGET,
   MIN_PLAYERS,
@@ -22,11 +23,29 @@ import { Switch } from "@/components/ui/Switch";
 interface LobbyConfigProps {
   config: RoomConfig;
   disabled?: boolean;
+  /** Quanti lotti ha la lista scelta: limita quanti si puo' essere. */
+  categoryItems?: number;
   onChange: (patch: Partial<RoomConfig>) => void;
 }
 
-export function LobbyConfig({ config, disabled = false, onChange }: LobbyConfigProps) {
+export function LobbyConfig({
+  config,
+  disabled = false,
+  categoryItems,
+  onChange,
+}: LobbyConfigProps) {
   const t = useT();
+
+  /*
+   * Il tetto vero non e' cinque: e' quanti ce ne stanno in questa lista con
+   * questi elementi a testa. Si spegne la scelta impossibile invece di
+   * lasciarla prendere e poi rifiutare l'avvio: e' piu' onesto dirlo prima.
+   */
+  const tetto =
+    typeof categoryItems === "number"
+      ? Math.max(MIN_PLAYERS, maxPlayersFor(categoryItems, config.slots))
+      : MAX_PLAYERS;
+  const stretta = typeof categoryItems === "number" && tetto < MAX_PLAYERS;
 
   return (
     <Panel className={disabled ? "opacity-60" : undefined}>
@@ -94,14 +113,21 @@ export function LobbyConfig({ config, disabled = false, onChange }: LobbyConfigP
           </div>
         </div>
 
-        <Stepper
-          label={t("common.players")}
-          value={config.maxPlayers}
-          min={MIN_PLAYERS}
-          max={MAX_PLAYERS}
-          disabled={disabled}
-          onChange={(maxPlayers) => onChange({ maxPlayers })}
-        />
+        <div>
+          <Stepper
+            label={t("common.players")}
+            value={config.maxPlayers}
+            min={MIN_PLAYERS}
+            max={tetto}
+            disabled={disabled}
+            onChange={(maxPlayers) => onChange({ maxPlayers })}
+          />
+          {stretta ? (
+            <p className="mt-1.5 text-xs text-amber-400">
+              {t("lobby.playersCapped", { lots: categoryItems, n: tetto })}
+            </p>
+          ) : null}
+        </div>
 
         {/* Quanto dura un lotto: veloce, standard o comodo. */}
         <div>

@@ -147,26 +147,54 @@ export function createGame({ code, mode, hostId, category, config }: CreateGameA
 /* ------------------------------------------------------------------ */
 
 /**
- * Quanti lotti servono perche' tutti riempiano la lista.
+ * Il margine di lotti oltre quelli strettamente necessari.
  *
- * Non basta uno a testa per slot: se la categoria ne ha esattamente quelli, il
- * primo che si aggiudica un doppione lascia qualcun altro a secco. Si tiene un
- * margine di uno a giocatore, che e' anche quello che alimenta gli scarti.
+ * Senza, una categoria che ha esattamente i lotti per riempire le liste
+ * costringerebbe ogni giocatore a prendersi tutto quello che passa: nessuno
+ * potrebbe permettersi di lasciar perdere un elemento che non gli piace, e
+ * l'asta smetterebbe di essere una scelta. Cinque bastano a dare respiro e
+ * alimentano gli scarti.
  */
+export const LOT_MARGIN = 5;
+
+/** Sotto questa soglia una lista e' troppo corta per giocarci. */
+export const MIN_CATEGORY_ITEMS = 20;
+
+/**
+ * Se una partita cosi' composta si puo' cominciare.
+ *
+ * E' la regola che evita la partita rovinata a meta': senza abbastanza lotti
+ * il gioco parte lo stesso e finisce con tutte le liste incomplete, e chi
+ * gioca non ha modo di capire cosa sia andato storto.
+ */
+export function canStartMatch(
+  numPlayers: number,
+  categoryTotalItems: number,
+  targetRosterSlots: number,
+): boolean {
+  return categoryTotalItems >= numPlayers * targetRosterSlots + LOT_MARGIN;
+}
+
+/** Quanti lotti servono per questa combinazione, margine compreso. */
 export function lotsNeeded(players: number, slots: number): number {
-  return players * slots;
+  return players * slots + LOT_MARGIN;
 }
 
 /**
- * Se la categoria basta per come e' impostata la stanza.
+ * Quanti si puo' essere al massimo con questa lista e questi slot.
  *
- * Serve perche' la lobby lascia scegliere fino a dieci elementi a testa: con
- * cinque giocatori sarebbero cinquanta lotti, e le categorie ne hanno trenta.
- * Senza questo controllo la partita parte lo stesso e finisce con le liste a
- * meta', senza che nessuno capisca perche'.
+ * Serve a spegnere le scelte impossibili invece di lasciarle prendere e poi
+ * rifiutare: e' piu' onesto dire prima quanti ci si sta.
  */
+export function maxPlayersFor(categoryTotalItems: number, slots: number): number {
+  if (slots <= 0) return MAX_PLAYERS;
+  const capienza = Math.floor((categoryTotalItems - LOT_MARGIN) / slots);
+  return Math.max(0, Math.min(MAX_PLAYERS, capienza));
+}
+
+/** Se la categoria basta per come e' impostata la stanza. */
 export function categoryFits(state: GameState): boolean {
-  return state.items.length >= lotsNeeded(state.config.maxPlayers, state.config.slots);
+  return canStartMatch(state.config.maxPlayers, state.items.length, state.config.slots);
 }
 
 export function playerById(state: GameState, id: string | null): Player | undefined {
@@ -875,7 +903,9 @@ export function reducer(state: GameState, action: GameAction): GameState {
       if (state.items.length === 0) return state;
       // I lotti devono bastare per chi c'e' davvero, non per il massimo
       // consentito: se sono in tre su una stanza da cinque, servono i loro.
-      if (state.items.length < lotsNeeded(state.players.length, state.config.slots)) return state;
+      if (!canStartMatch(state.players.length, state.items.length, state.config.slots)) {
+        return state;
+      }
       return draw(
         {
           ...state,

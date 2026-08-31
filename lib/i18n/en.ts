@@ -211,10 +211,14 @@ export const en: Dictionary = {
   "lobby.budgetHint": "Starting budget for every player",
   "lobby.slotsHint": "How many items each player must win",
   "lobby.blind": "Blind Draft",
+  "lobby.playersCapped":
+    "This list has {lots} lots: at most {n} players with this many items each.",
   "lobby.duel": "⚔️ 1v1 Duel",
   "lobby.duelHint": "With two players the vote always ties: whoever saved more credits wins, unless spectators overturn it.",
-  "lobby.needLots": "{n} lots needed, the category has {ha}",
-  "lobby.needLotsHint": "With these players and items each you need {n} lots, but the category has {ha}. Lower the items per roster or pick a bigger list.",
+  "lobby.needLots":
+    "{n} lots needed, the list has {ha}",
+  "lobby.needLotsHint":
+    "This list has {ha} lots: with {p} players and {s} items each you would need {n}. Lower the players or the items per roster, or pick a longer list.",
   "lobby.blindHint": "Name and image stay hidden until the lot is assigned",
   "lobby.mystery": "Mystery Box",
   "lobby.mysteryHint": "Every 5 lots a fixed-price box with a random item shows up",
@@ -305,6 +309,7 @@ export const en: Dictionary = {
   "vote.total": "{n} votes in total",
 
   "categories.count": "{n} items",
+  "categories.tooShort": "Too short: at least {n} items are needed to play.",
   "categories.title": "Categories",
   "categories.subtitle": "{n} lists ready to play, plus the ones you build.",
   "categories.official": "Official lists",

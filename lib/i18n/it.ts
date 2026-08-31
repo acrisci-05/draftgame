@@ -213,10 +213,14 @@ export const it = {
   "lobby.budgetHint": "Budget iniziale di ogni giocatore",
   "lobby.slotsHint": "Quanti elementi deve prendere ogni giocatore",
   "lobby.blind": "Blind Draft",
+  "lobby.playersCapped":
+    "Questa lista ha {lots} lotti: al massimo {n} giocatori con questi elementi a testa.",
   "lobby.duel": "⚔️ Duello 1v1",
   "lobby.duelHint": "In due il voto finisce sempre alla pari: vince chi ha risparmiato più crediti, salvo ribaltone ai voti degli spettatori.",
-  "lobby.needLots": "Servono {n} lotti, la categoria ne ha {ha}",
-  "lobby.needLotsHint": "Con questi giocatori e questi elementi a testa servono {n} lotti, ma la categoria ne ha {ha}. Riduci gli elementi per roster o scegli una lista più grande.",
+  "lobby.needLots":
+    "Servono {n} lotti, la lista ne ha {ha}",
+  "lobby.needLotsHint":
+    "Questa lista ha {ha} lotti: con {p} giocatori e {s} elementi a testa ne servirebbero {n}. Riduci i giocatori o gli elementi per roster, oppure scegli una lista più lunga.",
   "lobby.blindHint": "Nome e immagine del lotto restano nascosti fino all'assegnazione",
   "lobby.mystery": "Mystery Box",
   "lobby.mysteryHint": "Ogni 5 lotti compare una box a prezzo fisso con elemento casuale",
@@ -309,6 +313,7 @@ export const it = {
   "vote.total": "{n} voti totali",
 
   "categories.count": "{n} elementi",
+  "categories.tooShort": "Troppo corta: servono almeno {n} elementi per giocarci.",
   "categories.title": "Categorie",
   "categories.subtitle": "{n} liste pronte da giocare, più quelle che crei tu.",
   "categories.official": "Liste ufficiali",

@@ -8,6 +8,7 @@ import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
 import {
   MIN_PLAYERS,
+  canStartMatch,
   lotsNeeded,
   lotSeconds,
   PLAYER_COLORS,
@@ -57,7 +58,11 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
    * controllo la partita parte e finisce con le liste a meta'.
    */
   const servono = lotsNeeded(state.players.length, state.config.slots);
-  const lottiBastano = state.items.length >= servono;
+  const lottiBastano = canStartMatch(
+    state.players.length,
+    state.items.length,
+    state.config.slots,
+  );
   const canStart =
     isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0 && lottiBastano;
   const isClient = useIsClient();
@@ -198,7 +203,11 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
       </Panel>
 
       {isHost ? (
-        <LobbyConfig config={state.config} onChange={updateConfig} />
+        <LobbyConfig
+          config={state.config}
+          categoryItems={state.items.length}
+          onChange={updateConfig}
+        />
       ) : (
         <Panel>
           <PanelTitle>{t("lobby.settings")}</PanelTitle>
@@ -343,7 +352,12 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
         <>
           {!lottiBastano && state.players.length >= MIN_PLAYERS ? (
             <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-center text-xs text-amber-400">
-              {t("lobby.needLotsHint", { n: servono, ha: state.items.length })}
+              {t("lobby.needLotsHint", {
+                n: servono,
+                ha: state.items.length,
+                p: state.players.length,
+                s: state.config.slots,
+              })}
             </p>
           ) : null}
 
