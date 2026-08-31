@@ -577,3 +577,62 @@ drop policy if exists "match_history_own_delete" on public.match_history;
 create policy "match_history_own_delete"
   on public.match_history for delete
   using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- Suggerimenti: chi li legge e chi li gestisce.
+--
+-- Finora la tabella aveva solo il permesso di scrittura: chiunque poteva
+-- mandare un'idea, nessuno poteva rileggerla dal sito, nemmeno il creatore.
+-- L'unica porta era il pannello Supabase.
+--
+-- Qui si aggiunge il contrassegno di creatore sul profilo e si aprono lettura,
+-- aggiornamento e cancellazione dei suggerimenti a chi ce l'ha. Il controllo
+-- vive nel database, non nell'interfaccia: la chiave dello Studio nasconde i
+-- pulsanti, questa regola difende i dati. Chi provasse a chiedere la tabella
+-- con la chiave pubblica continua a ricevere una lista vuota.
+-- ---------------------------------------------------------------------------
+
+alter table public.profiles
+  add column if not exists is_admin boolean not null default false;
+
+-- Quando il suggerimento è stato letto e sistemato. Nullo = ancora da vedere.
+alter table public.suggestions
+  add column if not exists handled_at timestamptz;
+
+create index if not exists suggestions_recent_idx
+  on public.suggestions (created_at desc);
+
+-- Vero solo per chi ha il contrassegno di creatore sul proprio profilo.
+-- Resta a diritti di chi chiama: i profili sono già leggibili da tutti, quindi
+-- non serve (e non si vuole) alzare i privilegi.
+create or replace function public.is_creator() returns boolean
+  language sql
+  stable
+  as $$
+    select exists (
+      select 1 from public.profiles
+      where id = auth.uid() and is_admin
+    )
+  $$;
+
+drop policy if exists "suggestions_creator_read" on public.suggestions;
+create policy "suggestions_creator_read"
+  on public.suggestions for select
+  to authenticated
+  using (public.is_creator());
+
+drop policy if exists "suggestions_creator_update" on public.suggestions;
+create policy "suggestions_creator_update"
+  on public.suggestions for update
+  to authenticated
+  using (public.is_creator())
+  with check (public.is_creator());
+
+drop policy if exists "suggestions_creator_delete" on public.suggestions;
+create policy "suggestions_creator_delete"
+  on public.suggestions for delete
+  to authenticated
+  using (public.is_creator());
+
+-- Il creatore. Cambia il nickname se un giorno usi un altro profilo.
+update public.profiles set is_admin = true where nickname = 'crispy';

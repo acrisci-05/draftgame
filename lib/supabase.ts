@@ -90,21 +90,99 @@ export async function fetchSharedCategory(shareId: string): Promise<Category> {
 }
 
 /* ---------------------------------------------------------------- */
-/* Suggerimenti anonimi                                              */
+/* Suggerimenti                                                      */
 /* ---------------------------------------------------------------- */
 
-/** Richiede l'accesso: l'autore resta collegato al suggerimento. */
-export async function sendSuggestion(
-  name: string,
-  idea: string,
-  author: string,
-): Promise<void> {
-  const supabase = requireClient();
-  const { error } = await supabase.from(SUGGESTIONS_TABLE).insert({
-    name: name.trim().slice(0, 60),
-    idea: idea.trim().slice(0, 1000),
-    author,
+export interface Suggestion {
+  id: string;
+  name: string;
+  idea: string;
+  /** Nickname di chi l'ha proposto, o null se il profilo è stato cancellato. */
+  author: string | null;
+  createdAt: string;
+  /** Quando è stato segnato come sistemato; null se è ancora da vedere. */
+  handledAt: string | null;
+}
+
+interface SuggestionRow {
+  id: string;
+  name: string;
+  idea: string;
+  created_at: string;
+  handled_at: string | null;
+  profiles: { nickname: string } | { nickname: string }[] | null;
+}
+
+/** Il token della sessione, che il server usa per riconoscere chi scrive. */
+async function accessToken(): Promise<string | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? null;
+}
+
+/**
+ * Richiede l'accesso: l'autore resta collegato al suggerimento.
+ *
+ * Passa dal nostro server invece di scrivere dritto sul database, perché è lì
+ * che vive il token del bot Telegram: così il salvataggio e la notifica sul
+ * telefono partono insieme.
+ */
+export async function sendSuggestion(name: string, idea: string): Promise<void> {
+  const token = await accessToken();
+  if (!token) throw new Error("not-signed-in");
+
+  const response = await fetch("/api/suggestions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ name, idea }),
   });
+  if (!response.ok) throw new Error("send-failed");
+}
+
+/**
+ * I suggerimenti ricevuti, dal più recente.
+ *
+ * Le regole del database li mostrano solo a chi ha il contrassegno di creatore:
+ * a chiunque altro questa chiamata risponde con una lista vuota, non con un
+ * errore. Non c'è quindi modo di sbirciarli forzando l'interfaccia.
+ */
+export async function fetchSuggestions(): Promise<Suggestion[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from(SUGGESTIONS_TABLE)
+    .select("id, name, idea, created_at, handled_at, profiles:author (nickname)")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error || !data) return [];
+
+  return (data as SuggestionRow[]).map((row) => {
+    const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+    return {
+      id: row.id,
+      name: row.name,
+      idea: row.idea,
+      author: profile?.nickname ?? null,
+      createdAt: row.created_at,
+      handledAt: row.handled_at,
+    };
+  });
+}
+
+/** Segna un suggerimento come sistemato, o lo riporta fra quelli da vedere. */
+export async function markSuggestion(id: string, handled: boolean): Promise<void> {
+  const supabase = requireClient();
+  const { error } = await supabase
+    .from(SUGGESTIONS_TABLE)
+    .update({ handled_at: handled ? new Date().toISOString() : null })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteSuggestion(id: string): Promise<void> {
+  const supabase = requireClient();
+  const { error } = await supabase.from(SUGGESTIONS_TABLE).delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
 

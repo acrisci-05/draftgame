@@ -23,7 +23,7 @@ export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => 
     setStatus("sending");
     try {
       if (isSupabaseConfigured) {
-        await sendSuggestion(name, idea, account.id);
+        await sendSuggestion(name, idea);
       } else {
         // Senza database il suggerimento resta sul dispositivo: niente blocchi.
         saveLocalSuggestion(name, idea);

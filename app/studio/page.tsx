@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
+import { SuggestionsPanel } from "@/components/ui/SuggestionsPanel";
 import { ListEditor } from "@/components/game/ListEditor";
 import { ItemCount } from "@/components/game/ItemCount";
 
@@ -103,6 +104,8 @@ export default function StudioPage() {
 
       {isAdmin ? (
         <>
+          <SuggestionsPanel />
+
           <Panel>
         <PanelTitle
           action={

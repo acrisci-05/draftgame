@@ -28,6 +28,12 @@ export interface Account {
   emoji: string;
   /** true quando il profilo esiste solo su questo dispositivo. */
   local?: boolean;
+  /**
+   * true solo per il creatore del sito. Serve a mostrargli i suggerimenti
+   * ricevuti; a difendere i dati sono comunque le regole del database, che
+   * senza questo contrassegno rispondono con una lista vuota.
+   */
+  isAdmin?: boolean;
 }
 
 function requireClient() {
@@ -366,6 +372,7 @@ interface ProfileRow {
   id: string;
   nickname: string;
   emoji: string;
+  is_admin?: boolean;
 }
 
 export async function fetchAccount(userId: string): Promise<Account | null> {
@@ -373,12 +380,20 @@ export async function fetchAccount(userId: string): Promise<Account | null> {
   if (!supabase) return null;
   const { data, error } = await supabase
     .from(PROFILES_TABLE)
-    .select("id, nickname, emoji")
+    // Tutte le colonne, non un elenco: cosi' il profilo si legge anche prima che
+    // la migrazione aggiunga is_admin, invece di far sembrare disconnesso chi ha
+    // un database non ancora aggiornato.
+    .select("*")
     .eq("id", userId)
     .maybeSingle();
   if (error || !data) return null;
   const row = data as ProfileRow;
-  return { id: row.id, nickname: row.nickname, emoji: row.emoji };
+  return {
+    id: row.id,
+    nickname: row.nickname,
+    emoji: row.emoji,
+    isAdmin: row.is_admin === true,
+  };
 }
 
 /** Nickname pubblico: è l'indirizzo con cui gli amici ti aggiungono. */
