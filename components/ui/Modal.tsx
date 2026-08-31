@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
+import { useIsClient } from "@/lib/client-store";
 
 interface ModalProps {
   open: boolean;
@@ -12,7 +14,24 @@ interface ModalProps {
   children: ReactNode;
 }
 
+/**
+ * Una finestra sopra il resto della pagina.
+ *
+ * Viene disegnata in fondo al documento e non dove e' scritta nel codice, e la
+ * ragione e' una trappola del CSS: un elemento con `backdrop-filter` diventa il
+ * riferimento per i figli posizionati in modo fisso. La barra in alto ha lo
+ * sfondo sfocato, quindi una finestra aperta da li' non copriva lo schermo ma
+ * soltanto la barra: usciva schiacciata, con titolo e pulsante di chiusura
+ * tagliati fuori, e cliccare piu' in basso non la chiudeva perche' lo sfondo
+ * cliccabile finiva dopo pochi pixel. Restava incastrata e serviva ricaricare.
+ *
+ * Spostandola in fondo al documento non ha piu' nessun antenato sfocato, e
+ * torna a comportarsi come ci si aspetta ovunque venga aperta.
+ */
 export function Modal({ open, title, onClose, children }: ModalProps) {
+  // Il documento esiste solo nel browser: al primo disegno sul server no.
+  const isClient = useIsClient();
+
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -22,7 +41,9 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  return (
+  if (!isClient) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open ? (
         <motion.div
@@ -55,6 +76,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
           </motion.div>
         </motion.div>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
