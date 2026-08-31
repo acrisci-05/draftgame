@@ -36,6 +36,7 @@ export function Input({ label, hint, className, id, type, ...props }: InputProps
           className={cn(
             "h-12 w-full rounded-xl border border-line bg-surface-2 px-4 text-base text-fg placeholder:text-faint/70",
             "transition-colors focus:border-neon/70 focus:outline-none",
+          "disabled:cursor-not-allowed disabled:opacity-50",
             // Spazio per l'occhio, che sta dentro il campo.
             isPassword && "pe-12",
             className,
@@ -79,6 +80,7 @@ export function Textarea({ label, className, id, ...props }: TextareaProps) {
         className={cn(
           "min-h-28 w-full rounded-xl border border-line bg-surface-2 p-3 text-sm text-fg placeholder:text-faint/70",
           "transition-colors focus:border-neon/70 focus:outline-none",
+          "disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}

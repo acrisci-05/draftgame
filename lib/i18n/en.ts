@@ -64,7 +64,8 @@ export const en: Dictionary = {
   "creator.sendIdea": "Send a suggestion",
 
   "suggest.title": "Suggest a category",
-  "suggest.subtitle": "Anonymous submission: no personal data is collected.",
+  "suggest.subtitle": "It reaches the creator with your nickname. Nothing else from your profile.",
+  "suggest.sending": "Sending...",
   "suggest.name": "Category name",
   "suggest.namePlaceholder": "e.g. TV shows, Cars, Snacks",
   "suggest.idea": "Item ideas or notes",

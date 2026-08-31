@@ -57,26 +57,35 @@ export async function POST(request: NextRequest) {
   const idea = typeof body.idea === "string" ? body.idea.trim().slice(0, MAX_IDEA) : "";
   if (!name) return Response.json({ error: "missing-name" }, { status: 400 });
 
+  // Prima si salva. È l'unica parte che l'utente non può rifare da solo: se
+  // fallisce questa, il suggerimento è perso e va segnalato.
   const { error } = await supabase
     .from("suggestions")
     .insert({ name, idea, author: user.id });
   if (error) return Response.json({ error: "insert-failed" }, { status: 400 });
 
-  // Da qui in poi il suggerimento è al sicuro: se la notifica non parte,
-  // l'utente non deve accorgersene né riprovare.
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("nickname")
-    .eq("id", user.id)
-    .maybeSingle();
+  // Da qui in poi il suggerimento è al sicuro. La notifica è un di più: se
+  // Telegram è irraggiungibile, ha cambiato le regole o il token è scaduto,
+  // l'utente non deve vedere un errore né riprovare — creerebbe un doppione.
+  // Il messaggio resta comunque nello Studio.
+  let notified = false;
+  try {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("nickname")
+      .eq("id", user.id)
+      .maybeSingle();
 
-  const notified = await notifyTelegram(
-    suggestionMessage({
-      nickname: (profile as { nickname?: string } | null)?.nickname ?? "sconosciuto",
-      name,
-      idea,
-    }),
-  );
+    notified = await notifyTelegram(
+      suggestionMessage({
+        nickname: (profile as { nickname?: string } | null)?.nickname ?? "sconosciuto",
+        name,
+        idea,
+      }),
+    );
+  } catch {
+    // Si perde solo l'avviso sul telefono.
+  }
 
   return Response.json({ ok: true, notified });
 }

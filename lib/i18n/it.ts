@@ -65,7 +65,8 @@ export const it = {
   "creator.sendIdea": "Invia un suggerimento",
 
   "suggest.title": "Suggerisci una categoria",
-  "suggest.subtitle": "Invio anonimo: nessun dato personale viene raccolto.",
+  "suggest.subtitle": "Arriva al creatore con il tuo nickname. Nient'altro del tuo profilo.",
+  "suggest.sending": "Invio in corso...",
   "suggest.name": "Nome della categoria",
   "suggest.namePlaceholder": "Es. Serie TV, Auto, Snack",
   "suggest.idea": "Idee di elementi o note",

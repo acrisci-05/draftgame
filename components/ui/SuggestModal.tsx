@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Loader2, Send } from "lucide-react";
+import { AlertCircle, CheckCircle2, Loader2, Send } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useT } from "@/lib/settings";
@@ -17,6 +17,13 @@ export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => 
   const [name, setName] = useState("");
   const [idea, setIdea] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  // Toccare i campi cancella l'esito precedente: un "inviato" verde che resta
+  // mentre si scrive la proposta successiva confonde e basta.
+  const edit = (set: (value: string) => void) => (value: string) => {
+    if (status === "sent" || status === "error") setStatus("idle");
+    set(value);
+  };
 
   const submit = async () => {
     if (!name.trim() || !account) return;
@@ -57,34 +64,47 @@ export function SuggestModal({ open, onClose }: { open: boolean; onClose: () => 
           label={t("suggest.name")}
           value={name}
           maxLength={60}
+          disabled={status === "sending"}
           placeholder={t("suggest.namePlaceholder")}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => edit(setName)(event.target.value)}
         />
 
         <Textarea
           label={t("suggest.idea")}
           value={idea}
           maxLength={1000}
+          disabled={status === "sending"}
           placeholder={t("suggest.ideaPlaceholder")}
-          onChange={(event) => setIdea(event.target.value)}
+          onChange={(event) => edit(setIdea)(event.target.value)}
         />
 
-        {status === "error" ? <p className="text-sm text-red-500">{t("suggest.error")}</p> : null}
+        {status === "error" ? (
+          <p
+            role="alert"
+            className="flex items-start gap-2 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-400"
+          >
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>{t("suggest.error")}</span>
+          </p>
+        ) : null}
+
         {status === "sent" ? (
-          <p className="text-sm text-neon">
-            {isSupabaseConfigured ? t("suggest.sent") : t("suggest.localSaved")}
+          <p
+            role="status"
+            className="flex items-start gap-2 rounded-xl border border-neon/40 bg-neon/10 p-3 text-sm text-neon"
+          >
+            <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+            <span>{isSupabaseConfigured ? t("suggest.sent") : t("suggest.localSaved")}</span>
           </p>
         ) : null}
 
         <Button onClick={submit} disabled={status === "sending" || !name.trim()}>
           {status === "sending" ? (
             <Loader2 className="size-4 animate-spin" />
-          ) : status === "sent" ? (
-            <Check className="size-4" />
           ) : (
             <Send className="size-4" />
           )}
-          {t("suggest.send")}
+          {status === "sending" ? t("suggest.sending") : t("suggest.send")}
         </Button>
       </div>
     </Modal>

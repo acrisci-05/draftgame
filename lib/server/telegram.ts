@@ -48,19 +48,53 @@ export async function notifyTelegram(text: string): Promise<boolean> {
   }
 }
 
-/** Il messaggio che arriva sul telefono quando qualcuno propone un'idea. */
+const RULE = "━━━━━━━━━━━━━━━";
+
+/** Data e ora italiane: il server può stare in qualunque fuso, il telefono no. */
+function romeTime(when: Date): string {
+  return new Intl.DateTimeFormat("it-IT", {
+    timeZone: "Europe/Rome",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(when);
+}
+
+/**
+ * Il messaggio che arriva sul telefono quando qualcuno propone un'idea.
+ *
+ * Formattato in HTML perché è l'unico dei due dialetti di Telegram che non
+ * obbliga a mettere una barra rovesciata davanti a mezzo alfabeto: con
+ * Markdown un punto esclamativo nel testo di un utente basterebbe a far
+ * rifiutare l'intero messaggio.
+ */
 export function suggestionMessage(input: {
   nickname: string;
   name: string;
   idea: string;
+  when?: Date;
 }): string {
   const idea = input.idea.trim();
-  return [
-    "💡 <b>Nuovo suggerimento</b>",
+  const lines = [
+    "💡 <b>NUOVO SUGGERIMENTO</b>",
+    RULE,
     "",
-    `<b>Categoria:</b> ${escapeHtml(input.name)}`,
-    idea ? `<b>Idea:</b> ${escapeHtml(idea)}` : "<i>Nessun testo, solo il nome.</i>",
+    "📂 <b>Categoria</b>",
+    escapeHtml(input.name),
     "",
-    `Da @${escapeHtml(input.nickname)}`,
-  ].join("\n");
+  ];
+
+  if (idea) {
+    lines.push("💬 <b>Idea</b>", `<blockquote>${escapeHtml(idea)}</blockquote>`, "");
+  } else {
+    lines.push("<i>Nessun testo: solo il nome della categoria.</i>", "");
+  }
+
+  lines.push(
+    RULE,
+    `👤 <code>@${escapeHtml(input.nickname)}</code>  ·  🕐 ${romeTime(input.when ?? new Date())}`,
+  );
+
+  return lines.join("\n");
 }
