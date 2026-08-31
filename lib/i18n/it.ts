@@ -296,6 +296,9 @@ export const it = {
   "results.discards": "Scarti",
   "results.restart": "Nuova partita",
   "results.download": "Scarica immagine",
+  "results.asImage": "Mostra come immagine 🖼️",
+  "results.holdToSave": "Tieni premuto sull'immagine e scegli “Salva in Foto”",
+  "results.cardAlt": "La tua card di fine partita",
   "results.exportError": "Esportazione non riuscita. Riprova.",
   "results.shareError": "Condivisione non riuscita. Usa il download.",
 

@@ -289,6 +289,9 @@ export const en: Dictionary = {
   "results.discards": "Discards",
   "results.restart": "New game",
   "results.download": "Download image",
+  "results.asImage": "Show as image 🖼️",
+  "results.holdToSave": "Press and hold the image, then choose “Save to Photos”",
+  "results.cardAlt": "Your end-of-match card",
   "results.exportError": "Export failed. Try again.",
   "results.shareError": "Sharing failed. Use the download.",
 

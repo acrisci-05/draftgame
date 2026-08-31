@@ -187,6 +187,28 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
 
   const fileName = `pick-and-pay-${state.code}.png`;
 
+  /*
+   * L'immagine generata, mostrata come <img> vera.
+   *
+   * La card sullo schermo e' fatta di elementi HTML: su iPhone tenere premuto
+   * su un riquadro non offre "Salva in Foto", perche' non e' un'immagine.
+   * Trasformandola in un <img> quel gesto funziona -- ed e' il modo in cui la
+   * gente salva le foto sul telefono, piu' di qualunque pulsante.
+   */
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const genera = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      setPreview(await render());
+    } catch {
+      setError(t("results.exportError"));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const download = async () => {
     setBusy(true);
     setError(null);
@@ -628,6 +650,34 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
           {t("common.share")}
         </Button>
       </div>
+
+      {/*
+        Su telefono il modo naturale di salvare una foto e' tenerci premuto
+        sopra: si apre "Salva in Foto" e finisce nella galleria. Funziona solo
+        con le immagini vere, quindi qui la card diventa un <img>.
+      */}
+      {isClient ? (
+        <button
+          type="button"
+          onClick={genera}
+          disabled={busy}
+          className="rounded-xl border border-line px-3 py-2 text-sm text-muted transition-colors hover:border-neon/50 hover:text-fg disabled:opacity-50"
+        >
+          {t("results.asImage")}
+        </button>
+      ) : null}
+
+      {preview ? (
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-neon/40 bg-neon/5 p-3">
+          <p className="text-center text-xs text-muted">{t("results.holdToSave")}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={preview}
+            alt={t("results.cardAlt")}
+            className="w-full max-w-[15rem] rounded-xl border border-line"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

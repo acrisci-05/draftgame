@@ -50,6 +50,35 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   /** Giocatore a cui stiamo scegliendo l'avatar, se il pannello è aperto. */
   const [avatarFor, setAvatarFor] = useState<string | null>(null);
+  /*
+   * Il nome mentre lo si sta scrivendo.
+   *
+   * Il campo non puo' leggere direttamente dallo stato della partita: quel
+   * valore torna indietro a ogni battuta, e in due cose si rompeva.
+   *
+   * La prima: il motore rifiuta un nome vuoto -- giusto, sulla card non ci
+   * deve finire una riga anonima -- quindi cancellando l'ultima lettera lo
+   * stato non cambiava e il campo se la riprendeva. Non si riusciva a
+   * svuotarlo per riscriverlo da capo. Stessa cosa con lo spazio: veniva
+   * tolto a ogni battuta, e "Il Lupo" era impossibile da digitare.
+   *
+   * La seconda: online lo stato arriva dal dispositivo che ospita la stanza.
+   * Se due persone scrivevano insieme, ognuna si vedeva riscrivere il campo
+   * sotto le dita.
+   *
+   * Ora si scrive in locale e si consegna quando si esce dal campo: nel
+   * frattempo puo' essere vuoto, avere spazi, essere qualunque cosa.
+   */
+  const [nameDraft, setNameDraft] = useState<string | null>(null);
+
+  /** Consegna il nome scritto, o rimette quello di prima se e' rimasto vuoto. */
+  const commitName = (playerId: string) => {
+    const scritto = (nameDraft ?? "").trim();
+    if (scritto && scritto !== playerById(state, playerId)?.name) {
+      dispatch({ type: "set_name", playerId, name: scritto });
+    }
+    setNameDraft(null);
+  };
 
   const isLocal = state.mode === "local";
   /*
@@ -389,7 +418,10 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
       <Modal
         open={avatarFor !== null}
         title={t("lobby.changeLook")}
-        onClose={() => setAvatarFor(null)}
+        onClose={() => {
+          setNameDraft(null);
+          setAvatarFor(null);
+        }}
       >
         {avatarFor ? (
           <div className="flex flex-col gap-3">
@@ -404,11 +436,13 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             <Input
               label={t("lobby.battleName")}
               hint={t("lobby.battleNameHint")}
-              value={playerById(state, avatarFor)?.name ?? ""}
+              value={nameDraft ?? playerById(state, avatarFor)?.name ?? ""}
               maxLength={16}
-              onChange={(event) =>
-                dispatch({ type: "set_name", playerId: avatarFor, name: event.target.value })
-              }
+              onChange={(event) => setNameDraft(event.target.value)}
+              onBlur={() => commitName(avatarFor)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.blur();
+              }}
             />
 
             <AvatarPicker
