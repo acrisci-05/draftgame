@@ -534,5 +534,5 @@ const WIN_REASON_KEYS: Record<WinReason, TranslationKey> = {
   votes: "vote.winVotes",
   credits: "vote.winCredits",
   bestBuy: "vote.winBest",
-  order: "vote.winOrder",
+  coin: "vote.winCoin",
 };

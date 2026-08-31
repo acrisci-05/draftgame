@@ -315,7 +315,7 @@ function bestBuy(player: Player): number {
 }
 
 /** Perche' quel giocatore sta davanti a quello dopo di lui. */
-export type WinReason = "votes" | "credits" | "bestBuy" | "order";
+export type WinReason = "votes" | "credits" | "bestBuy" | "coin";
 
 export interface Standing {
   player: Player;
@@ -338,9 +338,32 @@ export function standings(state: GameState): Player[] {
   return finalStandings(state).map((entry) => entry.player);
 }
 
+/**
+ * Il sorteggio dell'ultimo spareggio.
+ *
+ * Quando due giocatori sono pari su voti, crediti e acquisto piu' caro serve
+ * un modo per separarli. L'ordine di ingresso sarebbe la cosa piu' semplice,
+ * ma premia sempre chi ha creato la stanza o ha la connessione piu' svelta:
+ * non e' merito di gioco, e si vede.
+ *
+ * Un sorteggio vero pero' non si puo' fare, perche' la classifica la calcola
+ * ogni dispositivo per conto suo: due tiri di moneta diversi darebbero due
+ * vincitori diversi sui due telefoni. Qui il numero si ricava dal codice della
+ * stanza e dall'identificativo del giocatore, quindi esce identico ovunque ma
+ * non ha niente a che vedere con chi e' entrato prima.
+ */
+function coinFlip(code: string, playerId: string): number {
+  const seme = `${code}:${playerId}`;
+  let hash = 2166136261;
+  for (let i = 0; i < seme.length; i += 1) {
+    hash ^= seme.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
 export function finalStandings(state: GameState): Standing[] {
   const tally = voteTally(state);
-  const order = new Map(state.players.map((player, index) => [player.id, index]));
 
   const sorted = [...state.players].sort((a, b) => {
     const byVotes = (tally[b.id] ?? 0) - (tally[a.id] ?? 0);
@@ -349,16 +372,17 @@ export function finalStandings(state: GameState): Standing[] {
     if (byCredits !== 0) return byCredits;
     const byBest = bestBuy(b) - bestBuy(a);
     if (byBest !== 0) return byBest;
-    return (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0);
+    return coinFlip(state.code, a.id) - coinFlip(state.code, b.id);
   });
 
   return sorted.map((player, index) => {
     const next = sorted[index + 1];
-    let reason: WinReason = "order";
+    let reason: WinReason = "coin";
     if (next) {
       if ((tally[player.id] ?? 0) !== (tally[next.id] ?? 0)) reason = "votes";
       else if (player.budget !== next.budget) reason = "credits";
       else if (bestBuy(player) !== bestBuy(next)) reason = "bestBuy";
+      else reason = "coin";
     }
     return { player, votes: tally[player.id] ?? 0, reason };
   });

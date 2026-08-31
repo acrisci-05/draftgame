@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, Layers, Sparkles, Target, Trophy, Users } from "lucide-react";
+import { Gavel, Layers, Medal, Sparkles, Target, Trophy, Users } from "lucide-react";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import { Modal } from "./Modal";
@@ -22,10 +22,21 @@ interface Point {
 interface Section {
   icon: typeof Gavel;
   title: TranslationKey;
+  /** Frase d'apertura, prima dell'elenco. Solo dove serve un contesto. */
+  lead?: TranslationKey;
   points: Point[];
 }
 
 const SECTIONS: Section[] = [
+  {
+    icon: Trophy,
+    title: "rules.win.title",
+    lead: "rules.win.body",
+    points: [
+      { label: "rules.win.tie", body: "rules.win.tieBody" },
+      { label: "rules.win.two", body: "rules.win.twoBody" },
+    ],
+  },
   {
     icon: Gavel,
     title: "rules.auction.title",
@@ -53,6 +64,18 @@ const SECTIONS: Section[] = [
       { label: "rules.xp.guest", body: "rules.xp.guestBody" },
       { label: "rules.xp.earn", body: "rules.xp.earnBody" },
       { label: "rules.xp.tiers", body: "rules.xp.tiersBody" },
+    ],
+  },
+  {
+    icon: Medal,
+    title: "rules.rewards.title",
+    points: [
+      { label: "rules.rewards.r0", body: "rules.rewards.r0Body" },
+      { label: "rules.rewards.r1", body: "rules.rewards.r1Body" },
+      { label: "rules.rewards.r2", body: "rules.rewards.r2Body" },
+      { label: "rules.rewards.r3", body: "rules.rewards.r3Body" },
+      { label: "rules.rewards.r4", body: "rules.rewards.r4Body" },
+      { label: "rules.rewards.r5", body: "rules.rewards.r5Body" },
     ],
   },
   {
@@ -89,7 +112,7 @@ export function RulesModal({ open, onClose }: { open: boolean; onClose: () => vo
           <p className="mt-1.5 text-sm leading-relaxed text-muted">{t("rules.goal.body")}</p>
         </motion.section>
 
-        {SECTIONS.map(({ icon: Icon, title, points }, index) => (
+        {SECTIONS.map(({ icon: Icon, title, lead, points }, index) => (
           <motion.section
             key={title}
             initial={{ opacity: 0, y: 8 }}
@@ -103,6 +126,10 @@ export function RulesModal({ open, onClose }: { open: boolean; onClose: () => vo
               </span>
               <span className="font-bold">{t(title)}</span>
             </span>
+
+            {lead ? (
+              <p className="mt-2.5 text-sm leading-relaxed text-muted">{t(lead)}</p>
+            ) : null}
 
             <ul className="mt-3 flex flex-col gap-2.5">
               {points.map(({ label, body }) => (

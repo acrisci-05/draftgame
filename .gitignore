@@ -52,3 +52,6 @@ public/_review.html
 
 # scarti temporanei degli script
 .tmp-missing.json
+
+# Impostazioni locali degli strumenti di sviluppo.
+.claude/

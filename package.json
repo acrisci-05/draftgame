@@ -20,7 +20,8 @@
     "images:fix": "node scripts/fix-images.js",
     "images:sheet": "node scripts/contact-sheet.js",
     "docs:pdf": "node scripts/build-guide-pdf.js",
-    "check:levels": "tsc -p tsconfig.check.json && node scripts/levels-check.js"
+    "check:levels": "tsc -p tsconfig.check.json && node scripts/levels-check.js",
+    "check:tiebreak": "tsc -p tsconfig.check.json && node scripts/tiebreak-check.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",

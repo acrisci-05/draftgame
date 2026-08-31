@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   ChevronRight,
   IdCard,
-  Medal,
   Sparkles,
   TrendingUp,
   Trophy,
@@ -50,13 +49,6 @@ const ROWS: {
     member: "picker.xpMember",
   },
   {
-    key: "name",
-    icon: IdCard,
-    title: "picker.nameRow",
-    guest: "picker.nameGuest",
-    member: "picker.nameMember",
-  },
-  {
     key: "mates",
     icon: Users,
     title: "picker.mates",
@@ -64,25 +56,18 @@ const ROWS: {
     member: "picker.matesMember",
   },
   {
+    key: "name",
+    icon: IdCard,
+    title: "picker.nameRow",
+    guest: "picker.nameGuest",
+    member: "picker.nameMember",
+  },
+  {
     key: "stats",
     icon: Trophy,
     title: "picker.stats",
     guest: "picker.statsGuest",
     member: "picker.statsMember",
-  },
-  {
-    key: "trophies",
-    icon: Medal,
-    title: "picker.trophies",
-    guest: "picker.trophiesGuest",
-    member: "picker.trophiesMember",
-  },
-  {
-    key: "identity",
-    icon: Sparkles,
-    title: "picker.identity",
-    guest: "picker.identityGuest",
-    member: "picker.identityMember",
   },
 ];
 
