@@ -415,7 +415,34 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                       >
                         <AvatarGlyph id={player.emoji} size={Math.round(layout.avatar * 0.55)} />
                       </span>
-                      {player.name}
+                      {/*
+                        Il nome grande e' quello scelto per questa partita; la
+                        targhetta sotto dice chi c'e' dietro, ed e' quella che
+                        rende attribuibili voti e punti. Chi gioca da ospite
+                        porta il grado zero al posto della chiocciola.
+                      */}
+                      <span style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {player.name}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: Math.round(layout.name * 0.42),
+                            fontWeight: 600,
+                            color: player.handle ? "#a1a1aa" : "#71717a",
+                            letterSpacing: 0.2,
+                            marginTop: 1,
+                          }}
+                        >
+                          {player.handle ? `@${player.handle}` : "Lvl 0 · Ospite"}
+                        </span>
+                      </span>
                     </span>
                     <span
                       style={{

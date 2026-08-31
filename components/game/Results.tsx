@@ -22,13 +22,15 @@ import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
 import {
   finalStandings,
+  voteTally,
   itemById,
   playerById,
   rosterValue,
   type GameAction,
   type WinReason,
 } from "@/lib/game";
-import { recordMatch } from "@/lib/history";
+import { awardMatchXp, recordMatch } from "@/lib/history";
+import { GuestBadge, XpEarned } from "./XpEarned";
 import { openPanel } from "@/lib/panels";
 import { recordOpponent } from "@/lib/pickmates";
 import type { TranslationKey } from "@/lib/i18n";
@@ -66,6 +68,8 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   const [voteBusy, setVoteBusy] = useState(false);
   const [voteError, setVoteError] = useState(false);
   const [copied, setCopied] = useState(false);
+  // Quanta esperienza ha dato questa partita: zero quando era gia' stata pagata.
+  const [earnedXp, setEarnedXp] = useState(0);
 
   const me = playerById(state, selfId);
   /**
@@ -125,6 +129,26 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
       items: me.roster.length,
       currency: state.config.currency,
     });
+
+    /*
+     * L'esperienza. Il conto lo fa il database, qui si dice solo com'e'
+     * andata; la stessa partita paga una volta sola, quindi riaprire questa
+     * schermata non regala punti. Il bonus scatta se in stanza c'era almeno
+     * un altro profilo registrato: e' il modo di premiare chi gioca con
+     * qualcuno invece che da solo.
+     */
+    const withMate = state.players.some(
+      (player) => player.accountId && player.accountId !== myAccountId,
+    );
+    const tally = voteTally(state);
+    void awardMatchXp({
+      code: state.code,
+      won: mine === 0,
+      votes: tally[me.id] ?? 0,
+      withMate,
+    }).then((earned) => {
+      if (earned > 0) setEarnedXp(earned);
+    });
     // Una volta sola per partita: le dipendenze sono la stanza e chi sono io.
   }, [myAccountId, state]);
 
@@ -181,6 +205,16 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
         </div>
 
         <MyRoster player={me} currency={currency} />
+
+        {/*
+          Quanto ha reso la partita, o cosa ci si perde a giocare da ospiti:
+          e' il punto in cui la differenza fra le due cose si capisce da sola.
+        */}
+        {account && !account.local ? (
+          <XpEarned earned={earnedXp} totalXp={account.xp ?? 0} />
+        ) : (
+          <GuestBadge />
+        )}
 
         <div className="flex flex-col items-center gap-2">
           <motion.button

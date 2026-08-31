@@ -537,3 +537,33 @@ export function useAuth(): AuthState {
     refreshAccount: () => setVersion((value) => value + 1),
   };
 }
+
+/* ---------------------------------------------------------------- */
+/* Cambio del nickname                                               */
+/* ---------------------------------------------------------------- */
+
+export type RenameResult = "ok" | "taken" | "invalid" | "too-soon" | "not-signed-in" | "error";
+
+/**
+ * Cambia il nickname globale, non più di una volta ogni trenta giorni.
+ *
+ * Il freno e il controllo di unicità stanno nel database: qui si chiede e si
+ * riporta la risposta. Metterli nell'app vorrebbe dire poterli aggirare
+ * cambiando la pagina, e il nickname è l'indirizzo con cui gli amici ti
+ * trovano e la firma che resta sulle card già condivise.
+ */
+export async function renameProfile(nickname: string): Promise<RenameResult> {
+  const supabase = getSupabase();
+  if (!supabase) return "error";
+  try {
+    const { data, error } = await supabase.rpc("rename_profile", {
+      new_nickname: nickname,
+    });
+    if (error) return "error";
+    const attesi: readonly string[] = ["ok", "taken", "invalid", "too-soon", "not-signed-in"];
+    const esito = String(data);
+    return attesi.includes(esito) ? (esito as RenameResult) : "error";
+  } catch {
+    return "error";
+  }
+}

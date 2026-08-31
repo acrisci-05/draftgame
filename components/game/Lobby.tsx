@@ -351,6 +351,23 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
         {avatarFor ? (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-muted">{t("lobby.avatarHint")}</p>
+
+            {/*
+              Il nome da battaglia. Vale solo per questa partita: l'account
+              resta quello, e sulla card comparira' sotto in piccolo. Serve a
+              potersi chiamare "Il Lupo" stasera senza rinunciare a farsi
+              accreditare i punti.
+            */}
+            <Input
+              label={t("lobby.battleName")}
+              hint={t("lobby.battleNameHint")}
+              value={playerById(state, avatarFor)?.name ?? ""}
+              maxLength={16}
+              onChange={(event) =>
+                dispatch({ type: "set_name", playerId: avatarFor, name: event.target.value })
+              }
+            />
+
             <AvatarPicker
               value={playerById(state, avatarFor)?.emoji ?? ""}
               taken={takenAvatars(state, avatarFor)}

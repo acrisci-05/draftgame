@@ -21,6 +21,8 @@ interface SelfPlayer {
   emoji: string;
   /** Profilo di chi ha fatto l'accesso, per ritrovarsi fra i Pickmates. */
   accountId?: string;
+  /** Nickname fisso dell'account: la card lo mostra sotto il nome di partita. */
+  handle?: string;
 }
 
 interface UseRoomArgs {

@@ -1,7 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ChevronRight, Medal, Sparkles, Trophy, UserPlus, Users } from "lucide-react";
+import {
+  ChevronRight,
+  IdCard,
+  Medal,
+  Sparkles,
+  TrendingUp,
+  Trophy,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { openPanel } from "@/lib/panels";
 import { useT } from "@/lib/settings";
@@ -33,6 +42,20 @@ const ROWS: {
   guest: TranslationKey;
   member: TranslationKey;
 }[] = [
+  {
+    key: "xp",
+    icon: TrendingUp,
+    title: "picker.xpRow",
+    guest: "picker.xpGuest",
+    member: "picker.xpMember",
+  },
+  {
+    key: "name",
+    icon: IdCard,
+    title: "picker.nameRow",
+    guest: "picker.nameGuest",
+    member: "picker.nameMember",
+  },
   {
     key: "mates",
     icon: Users,

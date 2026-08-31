@@ -856,3 +856,69 @@ $$;
 
 revoke execute on function public.award_match_xp(text, boolean, integer, boolean) from public;
 grant execute on function public.award_match_xp(text, boolean, integer, boolean) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Il nickname si cambia una volta al mese.
+--
+-- Serve perche' il nickname e' l'indirizzo con cui gli amici ti trovano e la
+-- firma che resta sulle card gia' condivise: se cambiasse ogni giorno, chi ti
+-- ha aggiunto la settimana scorsa non saprebbe piu' chi sei, e una card di un
+-- mese fa attribuirebbe la rosa a un nome che nel frattempo e' di un altro.
+--
+-- Il conto lo tiene il database e non l'app: il freno si mette dove non si puo'
+-- aggirare cambiando la pagina.
+-- ---------------------------------------------------------------------------
+
+alter table public.profiles
+  add column if not exists nickname_changed_at timestamptz;
+
+create or replace function public.rename_profile(new_nickname text)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  me uuid := auth.uid();
+  pulito text := lower(btrim(new_nickname));
+  ultimo timestamptz;
+  attuale text;
+begin
+  if me is null then
+    return 'not-signed-in';
+  end if;
+  if pulito !~ '^[a-z0-9_]{3,20}$' then
+    return 'invalid';
+  end if;
+
+  select nickname, nickname_changed_at into attuale, ultimo
+  from public.profiles where id = me;
+
+  if attuale = pulito then
+    return 'ok';
+  end if;
+
+  -- Trenta giorni dall'ultimo cambio. Il primo e' sempre concesso: chi non ha
+  -- mai cambiato ha la colonna vuota.
+  if ultimo is not null and ultimo > now() - interval '30 days' then
+    return 'too-soon';
+  end if;
+
+  if exists (select 1 from public.profiles where nickname = pulito) then
+    return 'taken';
+  end if;
+
+  update public.profiles
+  set nickname = pulito, nickname_changed_at = now()
+  where id = me;
+
+  return 'ok';
+end;
+$$;
+
+revoke execute on function public.rename_profile(text) from public;
+grant execute on function public.rename_profile(text) to authenticated;
+
+-- Il nickname passa da qui: la colonna non e' piu' modificabile a mano.
+revoke update on public.profiles from authenticated;
+grant update (emoji, shows_presence, equipped_title) on public.profiles to authenticated;

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, Layers, Target, Trophy, Users } from "lucide-react";
+import { Gavel, Layers, Sparkles, Target, Trophy, Users } from "lucide-react";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import { Modal } from "./Modal";
@@ -43,6 +43,16 @@ const SECTIONS: Section[] = [
       { label: "rules.special.nobid", body: "rules.special.nobidBody" },
       { label: "rules.special.last", body: "rules.special.lastBody" },
       { label: "rules.special.winner", body: "rules.special.winnerBody" },
+    ],
+  },
+  {
+    icon: Sparkles,
+    title: "rules.xp.title",
+    points: [
+      { label: "rules.xp.fair", body: "rules.xp.fairBody" },
+      { label: "rules.xp.guest", body: "rules.xp.guestBody" },
+      { label: "rules.xp.earn", body: "rules.xp.earnBody" },
+      { label: "rules.xp.tiers", body: "rules.xp.tiersBody" },
     ],
   },
   {

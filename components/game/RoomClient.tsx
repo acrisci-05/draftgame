@@ -51,6 +51,9 @@ export function RoomClient({ code }: { code: string }) {
   // Il profilo, quando c'è, viaggia con il giocatore: serve a ritrovarsi fra i
   // Pickmates dopo la partita.
   const accountId = account && !account.local ? account.id : undefined;
+  // Il nickname fisso viaggia accanto al nome scelto per la partita: la card
+  // mostra il secondo in grande e il primo in piccolo, per attribuire i voti.
+  const handle = account && !account.local ? account.nickname : undefined;
 
   const self = useMemo(
     () => ({
@@ -58,8 +61,9 @@ export function RoomClient({ code }: { code: string }) {
       name: session?.name ?? "",
       emoji: session?.emoji ?? DEFAULT_AVATAR,
       accountId,
+      handle,
     }),
-    [session?.playerId, session?.name, session?.emoji, accountId],
+    [session?.playerId, session?.name, session?.emoji, accountId, handle],
   );
 
   const room = useRoom({

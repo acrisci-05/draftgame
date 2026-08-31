@@ -52,6 +52,13 @@ export interface Player {
   color?: string;
   /** Profilo collegato, quando chi gioca ha fatto l'accesso: serve per i Pickmates. */
   accountId?: string;
+  /**
+   * Il nickname fisso dell'account, senza chiocciola. Viaggia con il giocatore
+   * perche' la card e la classifica mostrano in grande il nome scelto per la
+   * partita e sotto, in piccolo, chi c'e' davvero dietro. Assente per gli
+   * ospiti, che non hanno un account a cui attribuire niente.
+   */
+  handle?: string;
   budget: number;
   roster: RosterEntry[];
 }

@@ -63,6 +63,7 @@ import { Button } from "./Button";
 import { Input } from "./Input";
 import { LevelBar } from "./LevelBar";
 import { Modal } from "./Modal";
+import { Rewards } from "./Rewards";
 import { Switch } from "./Switch";
 
 const ERROR_KEYS: Record<AuthError, TranslationKey> = {
@@ -232,6 +233,8 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
           hint={t("presence.shareHint")}
         />
       </div>
+
+      <Rewards level={level} />
 
       {/* Trofei: spenti finche' non si sbloccano. */}
       <div className="rounded-2xl border border-line bg-surface-2 p-3">

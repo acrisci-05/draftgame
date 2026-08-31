@@ -382,7 +382,11 @@ export function totalSlots(state: GameState): number {
 /* ------------------------------------------------------------------ */
 
 export type GameAction =
-  | { type: "add_player"; player: { id: string; name: string; emoji?: string; accountId?: string } }
+  | {
+      type: "add_player";
+      player: { id: string; name: string; emoji?: string; accountId?: string; handle?: string };
+    }
+  | { type: "set_name"; playerId: string; name: string }
   | { type: "remove_player"; playerId: string }
   | { type: "set_avatar"; playerId: string; emoji: string }
   | { type: "set_color"; playerId: string; color: string }
@@ -701,6 +705,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
         // Anche il colore parte diverso da quello degli altri.
         color: firstFreeColor(state.players.map((p) => p.color ?? "")),
         accountId: action.player.accountId,
+        handle: action.player.handle,
         budget: state.config.budget,
         roster: [],
       };
@@ -735,6 +740,19 @@ export function reducer(state: GameState, action: GameAction): GameState {
     }
 
     /** Cambio avatar dalla lobby: l'icona deve essere ancora libera. */
+    case "set_name": {
+      if (state.phase !== "lobby") return state;
+      // Un nome vuoto o di soli spazi lascerebbe una riga anonima nella card.
+      const name = action.name.trim().slice(0, 16);
+      if (!name) return state;
+      return touch({
+        ...state,
+        players: state.players.map((player) =>
+          player.id === action.playerId ? { ...player, name } : player,
+        ),
+      });
+    }
+
     case "set_avatar": {
       if (state.phase !== "lobby") return state;
       if (!isAvatarId(action.emoji)) return state;
