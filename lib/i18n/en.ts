@@ -35,17 +35,48 @@ export const en: Dictionary = {
   "common.items": "items",
 
   "rules.title": "How to play",
-  "rules.step1.title": "1. Set up the room",
-  "rules.step1.body":
-    "Pick the category, budget, currency, number of players and how many items each roster needs.",
-  "rules.step2.title": "2. The auction starts",
-  "rules.step2.body":
-    "Items come up at random from the base price. You get 15 seconds per lot, back to 10 after every raise.",
-  "rules.step3.title": "3. Raise or pass",
-  "rules.step3.body": "Raise by +1, +2 or +5 as long as your balance covers it. Passing drops you from the lot: with a bid on the table the lot goes to that bidder, with no bids at all it goes to the discards.",
-  "rules.step4.title": "4. Card and voting",
-  "rules.step4.body":
-    "Once rosters are full you get the vertical card to post and a voting link for your friends.",
+
+  "rules.goal.title": "Goal",
+  "rules.goal.body":
+    "Build the strongest, most iconic list in the category by outbidding your rivals. The winner is whoever handles the budget best and collects the most votes.",
+
+  "rules.auction.title": "Auction rules",
+  "rules.auction.budget": "Budget and tiers.",
+  "rules.auction.budgetBody":
+    "Everyone starts with the same credits (20 by default). Items come up one at a time and are worth 1 to 5 depending on their tier.",
+  "rules.auction.live": "Live auction.",
+  "rules.auction.liveBody":
+    "Raise by +1, +2 or +5, or pass. Whoever passes is out of that lot and cannot come back.",
+  "rules.auction.timer": "Anti-sniping timer.",
+  "rules.auction.timerBody":
+    "Every raise puts the clock back to full: 15 seconds, or whatever the room chose. Nobody wins a lot just by arriving at the last instant.",
+  "rules.auction.reserve": "The balance rule.",
+  "rules.auction.reserveBody":
+    "Always keep one credit for every slot that would stay empty. If you are 3 items short you can spend down to 2 left: the current lot fills the third.",
+
+  "rules.special.title": "Special cases and endgame",
+  "rules.special.nobid": "If nobody bids.",
+  "rules.special.nobidBody":
+    "With discards on, the lot is set aside and nobody gets it. With discards off it goes at base price to whoever has the fewest items. Passing never hands anything to the others.",
+  "rules.special.last": "Last one left.",
+  "rules.special.lastBody":
+    "If you are the only one with an unfinished list and the remaining lots are just enough to fill it, they are assigned to you at base price.",
+  "rules.special.winner": "Winner and card.",
+  "rules.special.winnerBody":
+    "With full lists the vote opens: 30 seconds, everyone picks the best line-up but their own, and ties are broken by credits saved. Then you download your 9:16 card and share it: from that link spectators can vote for their favourite line-up too.",
+
+  "rules.modes.title": "Game modes",
+  "rules.modes.where": "Local or online.",
+  "rules.modes.whereBody":
+    "On a single device passed around, or in a room with a 5-character code to share.",
+  "rules.modes.extras": "Modifiers.",
+  "rules.modes.extrasBody":
+    "Blind Draft hides name and picture until the lot is assigned. Mystery Box, every 5 lots, puts a surprise item up at a fixed price: take it and it is yours, no bidding. Discards decide what happens to a lot nobody wants.",
+
+  "rules.mates.title": "PickMates",
+  "rules.mates.friends": "Friends.",
+  "rules.mates.friendsBody":
+    "Add your PickMates, get challenges in real time and jump into a room with one tap.",
 
   "creator.title": "Creator info",
   "creator.badge": "Creator",
@@ -467,11 +498,6 @@ export const en: Dictionary = {
   "studio.imageNotFound": "No image found",
   "studio.imageSource": "Images from Wikipedia/Wikimedia: check licence and attribution before publishing.",
 
-  "rules.nobid.title": "When nobody bids",
-  "rules.nobid.body": "Passing never hands the lot to someone else: if nobody has bid, everyone can pass. With discards on the lot is set aside and no one takes it; if the host turns them off it goes to whoever has fewest items, at the base price.",
-  "rules.reserve.title": "Nobody ends up stuck",
-  "rules.reserve.body":
-    "You always keep one credit per empty slot: three items missing means you cannot go below 3. If you are the last one left to complete, the remaining lots are assigned to you at the base price.",
 
   "support.quick": "Support with {amount}",
   "support.oneLine": "No ads, no paywall: the project runs on your support.",
@@ -522,27 +548,6 @@ export const en: Dictionary = {
     "Paste the JSON into data/categories.json to make the change permanent in the code.",
   "studio.open": "Category studio",
 
-  "rules.goal.title": "Goal",
-  "rules.goal.body":
-    "Build the strongest, most iconic list in the category by winning the auctions. Best budget management and best combination wins.",
-  "rules.budget.title": "Budget and setup",
-  "rules.budget.body":
-    "Everyone starts with the same credits (20 by default). Items come up one at a time and are worth 1 to 5 depending on their tier.",
-  "rules.auction.title": "Live auction",
-  "rules.auction.body":
-    "When an item appears you can raise (+1, +2, +5) or pass. The lot goes to the highest bid when the timer runs out or when everyone else has passed.",
-  "rules.snipe.title": "Anti-sniping timer",
-  "rules.snipe.body":
-    "Every lot starts at 15 seconds, back to 10 after a raise. A raise inside the last 3 seconds pushes the timer back to 5: no wins by lag.",
-  "rules.manage.title": "Budget rules",
-  "rules.manage.body":
-    "You can never bid more than your balance. Spend it all on the top picks and you are empty-handed at the end, and passing on a lot is final for that lot.",
-  "rules.end.title": "End of the game",
-  "rules.end.body":
-    "Once rosters are full you get the 9:16 card with every pick. Votes decide the winner: players and spectators vote from the shared link.",
-  "rules.modes.title": "Modes",
-  "rules.modes.body":
-    "Local on a single device or online with a 5-character code. You can also switch on Blind Draft (cover hidden until the lot is assigned) and Mystery Box (fixed-price lot with a random item).",
   "auction.nobodyYet": "No bids yet: if everyone passes the lot goes to the discards",
   "auction.nobodyYetForced": "No bids yet: if everyone passes it goes to whoever has fewest items",
   "results.mineTitle": "Your line-up",

@@ -33,17 +33,48 @@ export const it = {
   "common.items": "elementi",
 
   "rules.title": "Come si gioca",
-  "rules.step1.title": "1. Prepara la stanza",
-  "rules.step1.body":
-    "Scegli categoria, budget, valuta, numero di giocatori e quanti elementi deve avere ogni roster.",
-  "rules.step2.title": "2. Parte l'asta",
-  "rules.step2.body":
-    "Gli elementi escono a caso e partono dal prezzo base. Hai 15 secondi per lotto, che tornano a 10 dopo ogni rilancio.",
-  "rules.step3.title": "3. Rilancia o passa",
-  "rules.step3.body": "Rilanci da +1, +2 e +5 finché il saldo li copre. Chi passa esce dal lotto: se c'è un'offerta il lotto va a chi l'ha fatta, se non ha offerto nessuno finisce negli scarti.",
-  "rules.step4.title": "4. Card e votazione",
-  "rules.step4.body":
-    "A roster pieni si genera la card verticale da postare e il link di voto per far decidere agli amici.",
+
+  "rules.goal.title": "Obiettivo",
+  "rules.goal.body":
+    "Componi la lista più forte e iconica della categoria battendo i rivali all'asta. Vince chi gestisce meglio il budget e raccoglie più voti.",
+
+  "rules.auction.title": "Le regole dell'asta",
+  "rules.auction.budget": "Budget e fasce.",
+  "rules.auction.budgetBody":
+    "Tutti partono con gli stessi crediti (di base 20). Gli elementi escono uno alla volta e valgono da 1 a 5 secondo la fascia.",
+  "rules.auction.live": "Asta dal vivo.",
+  "rules.auction.liveBody":
+    "Rilanci da +1, +2 e +5, oppure passi. Chi passa è fuori da quel lotto e non può rientrare.",
+  "rules.auction.timer": "Timer anti-sniping.",
+  "rules.auction.timerBody":
+    "Ogni rilancio riporta il cronometro al massimo: 15 secondi, o la durata scelta per la stanza. Nessuno vince un lotto solo perché è arrivato all'ultimo istante.",
+  "rules.auction.reserve": "La regola del saldo.",
+  "rules.auction.reserveBody":
+    "Tieni sempre un credito per ogni slot che resterebbe vuoto. Se ti mancano 3 elementi puoi spendere fino a lasciartene 2: il lotto in corso riempie il terzo.",
+
+  "rules.special.title": "Casi speciali e fine partita",
+  "rules.special.nobid": "Se nessuno offre.",
+  "rules.special.nobidBody":
+    "Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno. Con gli scarti spenti va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri.",
+  "rules.special.last": "Ultimo rimasto.",
+  "rules.special.lastBody":
+    "Se sei l'unico con la lista incompleta e i lotti rimasti bastano appena a riempirla, ti vengono assegnati d'ufficio al prezzo base.",
+  "rules.special.winner": "Vincitore e card.",
+  "rules.special.winnerBody":
+    "A liste piene si vota: 30 secondi, ognuno sceglie la rosa migliore tranne la propria, e in caso di parità contano i crediti risparmiati. Poi scarichi la tua card 9:16 e la condividi: dal link anche gli spettatori possono votare la rosa che preferiscono.",
+
+  "rules.modes.title": "Modalità di gioco",
+  "rules.modes.where": "Locale oppure online.",
+  "rules.modes.whereBody":
+    "Su un solo dispositivo passandovelo di mano, oppure in una stanza con un codice di 5 caratteri da condividere.",
+  "rules.modes.extras": "Modificatori.",
+  "rules.modes.extrasBody":
+    "Blind Draft copre nome e immagine fino all'assegnazione. Mystery Box, ogni 5 lotti, mette in palio un elemento a sorpresa a prezzo fisso: se lo prendi è tuo, senza asta. Gli Scarti decidono che fine fa un lotto che non vuole nessuno.",
+
+  "rules.mates.title": "PickMates",
+  "rules.mates.friends": "Gli amici.",
+  "rules.mates.friendsBody":
+    "Aggiungi i tuoi PickMates, ricevi le sfide in tempo reale ed entri in stanza con un tocco.",
 
   "creator.title": "Info creatore",
   "creator.badge": "Creatore",
@@ -475,12 +506,6 @@ export const it = {
   "studio.imageNotFound": "Nessuna immagine trovata",
   "studio.imageSource": "Immagini da Wikipedia/Wikimedia: controlla licenza e attribuzione prima di pubblicare.",
 
-  "rules.nobid.title": "Se nessuno offre",
-  "rules.nobid.body":
-    "Passare non regala il lotto agli altri: se nessuno ha offerto possono passare tutti. Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno; se l'host li disattiva va d'ufficio a chi ha meno elementi, al prezzo base.",
-  "rules.reserve.title": "Nessuno resta a secco",
-  "rules.reserve.body":
-    "Devi sempre tenere un credito per ogni slot ancora vuoto: se ti mancano 3 elementi non puoi scendere sotto 3. Se resti l'unico da completare, gli ultimi lotti ti vengono assegnati al prezzo base.",
 
   "support.quick": "Sostieni con {amount}",
   "support.oneLine": "Zero pubblicità, zero paywall: il progetto vive col tuo aiuto.",
@@ -531,27 +556,6 @@ export const it = {
     "Incolla il JSON in data/categories.json per rendere la modifica definitiva nel codice.",
   "studio.open": "Studio categorie",
 
-  "rules.goal.title": "Obiettivo",
-  "rules.goal.body":
-    "Componi la lista più forte e iconica della categoria battendo gli avversari nelle aste. Vince chi gestisce meglio il budget e crea la combinazione migliore.",
-  "rules.budget.title": "Budget e preparazione",
-  "rules.budget.body":
-    "Tutti partono con gli stessi crediti (default 20). Gli elementi escono uno alla volta e valgono da 1 a 5 in base alla fascia.",
-  "rules.auction.title": "Asta live",
-  "rules.auction.body":
-    "Quando l'elemento appare puoi rilanciare (+1, +2, +5) oppure passare. Il lotto va a chi ha l'offerta più alta allo scadere del timer o quando tutti gli altri hanno passato.",
-  "rules.snipe.title": "Timer anti-sniping",
-  "rules.snipe.body":
-    "Ogni lotto parte da 15 secondi, che tornano a 10 dopo un rilancio. Se qualcuno rilancia negli ultimi 3 secondi il timer risale a 5: niente vittorie per lag.",
-  "rules.manage.title": "Gestione del budget",
-  "rules.manage.body":
-    "Non puoi offrire più del tuo saldo. Se spendi tutto sui top resti a mani vuote nel finale, e chi passa su un lotto non può più rientrare su quel lotto.",
-  "rules.end.title": "Fine partita e vincitore",
-  "rules.end.body":
-    "A roster pieni si genera la card 9:16 con tutti gli acquisti. Il vincitore lo decidono i voti: giocatori e spettatori votano dal link condiviso.",
-  "rules.modes.title": "Modalità",
-  "rules.modes.body":
-    "Locale su un solo dispositivo o online con codice a 5 caratteri. Attivabili anche Blind Draft (immagine coperta fino all'assegnazione) e Mystery Box (lotto a prezzo fisso con elemento casuale).",
   "results.mineTitle": "La tua rosa",
   "results.mineHeadline": "Ecco i tuoi lotti conquistati ({n}/{tot})",
   "results.revealStandings": "Scopri la classifica finale 🏆",
