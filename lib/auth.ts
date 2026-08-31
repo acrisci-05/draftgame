@@ -40,6 +40,10 @@ export interface Account {
    * dell'interfaccia.
    */
   showsPresence?: boolean;
+  /** Esperienza accumulata. Gli ospiti e i profili locali restano a zero. */
+  xp?: number;
+  /** Titolo scelto fra quelli sbloccati, mostrato accanto al nickname. */
+  title?: string | null;
 }
 
 function requireClient() {
@@ -380,6 +384,8 @@ interface ProfileRow {
   emoji: string;
   is_admin?: boolean;
   shows_presence?: boolean;
+  xp?: number;
+  equipped_title?: string | null;
 }
 
 export async function fetchAccount(userId: string): Promise<Account | null> {
@@ -403,6 +409,8 @@ export async function fetchAccount(userId: string): Promise<Account | null> {
     // Assente sul database non ancora aggiornato: si considera acceso, che è
     // il valore predefinito della colonna.
     showsPresence: row.shows_presence !== false,
+    xp: typeof row.xp === "number" ? row.xp : 0,
+    title: row.equipped_title ?? null,
   };
 }
 

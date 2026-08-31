@@ -745,3 +745,114 @@ create policy "presence_mates_read"
 -- Via le versioni pubbliche, che erano interrogabili da chiunque.
 drop function if exists public.are_pickmates(uuid, uuid);
 drop function if exists public.shows_presence(uuid);
+
+-- ---------------------------------------------------------------------------
+-- Esperienza e livelli.
+--
+-- Due accorgimenti, perche' i punti li chiede il dispositivo di chi gioca e
+-- non c'e' un arbitro sul server che possa smentirlo:
+--
+-- 1. Le colonne dell'esperienza non sono scrivibili da nessuno. Il permesso di
+--    modifica sui profili viene tolto e ridato solo su nickname, avatar e
+--    stato di attivita': una richiesta che provasse a scrivere xp direttamente
+--    viene rifiutata dal database, non dall'app.
+--
+-- 2. Una partita paga una volta sola. Ogni premio lascia una riga con il
+--    codice della stanza: richiamare la stessa partita cento volte non da'
+--    cento volte i punti. E' la difesa che conta davvero, perche' senza di
+--    essa bastava ripetere la stessa chiamata.
+--
+-- Resta possibile, a chi sa mettere le mani nel traffico, dichiarare una
+-- vittoria che non c'e' stata. Non e' aggirabile senza spostare tutta la
+-- partita sul server: i premi sono solo estetici anche per questo.
+-- ---------------------------------------------------------------------------
+
+alter table public.profiles
+  add column if not exists xp integer not null default 0 check (xp >= 0);
+-- Nessuna colonna "livello": il livello e' una funzione dell'esperienza, e
+-- tenerne due copie vuol dire che prima o poi si contraddicono. Si calcola
+-- dove serve, da lib/levels.ts, che e' l'unico posto dove sono scritte le
+-- soglie ed e' coperto dai test.
+alter table public.profiles
+  add column if not exists equipped_title text;
+alter table public.profiles
+  add column if not exists last_social_bonus_date date;
+
+-- Le colonne che una persona puo' cambiare di suo pugno. Tutto il resto del
+-- profilo -- esperienza, livello, contrassegno di creatore -- resta fuori.
+revoke update on public.profiles from authenticated;
+grant update (nickname, emoji, shows_presence, equipped_title) on public.profiles to authenticated;
+
+-- Una riga per ogni partita gia' pagata.
+create table if not exists public.xp_awards (
+  user_id uuid not null references public.profiles on delete cascade,
+  code text not null,
+  amount integer not null,
+  awarded_at timestamptz not null default now(),
+  primary key (user_id, code)
+);
+
+alter table public.xp_awards enable row level security;
+
+drop policy if exists "xp_awards_own_read" on public.xp_awards;
+create policy "xp_awards_own_read"
+  on public.xp_awards for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+-- Assegna l'esperienza di una partita e restituisce quanta ne ha data.
+-- Zero significa "questa partita era gia' stata pagata".
+create or replace function public.award_match_xp(
+  match_code text,
+  won boolean,
+  votes integer,
+  with_mate boolean
+) returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  me uuid := auth.uid();
+  oggi date := (now() at time zone 'utc')::date;
+  bonus_gia_preso date;
+  punti integer;
+  sociale integer := 0;
+begin
+  if me is null then
+    return 0;
+  end if;
+
+  -- I tetti si applicano qui, non nell'app: e' l'unico punto che non si
+  -- puo' scavalcare cambiando il codice della pagina.
+  punti := 50
+    + (case when won then 100 else 0 end)
+    + least(greatest(coalesce(votes, 0), 0) * 10, 100);
+
+  select last_social_bonus_date into bonus_gia_preso
+  from public.profiles where id = me;
+
+  if coalesce(with_mate, false)
+     and (bonus_gia_preso is null or bonus_gia_preso < oggi) then
+    sociale := 100;
+  end if;
+
+  -- La chiave doppia rifiuta la seconda richiesta sulla stessa partita.
+  begin
+    insert into public.xp_awards (user_id, code, amount)
+    values (me, upper(btrim(match_code)), punti + sociale);
+  exception when unique_violation then
+    return 0;
+  end;
+
+  update public.profiles
+  set xp = xp + punti + sociale,
+      last_social_bonus_date = case when sociale > 0 then oggi else last_social_bonus_date end
+  where id = me;
+
+  return punti + sociale;
+end;
+$$;
+
+revoke execute on function public.award_match_xp(text, boolean, integer, boolean) from public;
+grant execute on function public.award_match_xp(text, boolean, integer, boolean) to authenticated;

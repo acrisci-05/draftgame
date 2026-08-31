@@ -61,6 +61,7 @@ import { AppleGlyph, FacebookGlyph, GoogleGlyph } from "./BrandGlyphs";
 import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
 import { Input } from "./Input";
+import { LevelBar } from "./LevelBar";
 import { Modal } from "./Modal";
 import { Switch } from "./Switch";
 
@@ -161,6 +162,9 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
           played: stats.played,
           won: stats.won,
           mates: mates.filter((mate) => mate.status === "accepted").length,
+          // L'esperienza vive sul profilo, non nello storico: e' l'unico
+          // numero che il giocatore non puo' scriversi da solo.
+          xp: account?.xp ?? 0,
         });
         setHistory(past);
       },
@@ -168,29 +172,43 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
     return () => {
       active = false;
     };
-  }, [userId]);
+  }, [userId, account?.xp]);
 
   if (!account) return null;
 
   const numbers = progress ?? NO_PROGRESS;
-  const level = levelFor(numbers.played);
+  const level = levelFor(numbers.xp);
   const trophies = trophiesFor(numbers);
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Chi sei, e a che punto sei. */}
-      <div className="flex items-center gap-3 rounded-2xl border border-neon/40 bg-neon/10 p-4">
-        <Avatar id={account.emoji} size="lg" selected />
-        <span className="min-w-0">
-          <span className="block truncate font-black">@{account.nickname}</span>
-          <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-[11px] font-black text-gold">
-            <Crown className="size-3" />
-            {t("level.badge", { rank: level.rank })} · {t(level.name)}
+      {/*
+        Chi sei e a che punto sei. La cornice dell'avatar prende il colore
+        della fascia: e' la ricompensa che si vede per prima, e cambia da sola
+        salendo di livello senza doverla scegliere.
+      */}
+      <div className="rounded-2xl border border-neon/40 bg-neon/10 p-4">
+        <div className="flex items-center gap-3">
+          <span className={cn("rounded-full ring-2 ring-offset-2 ring-offset-ink", level.tier.ring)}>
+            <Avatar id={account.emoji} size="lg" selected />
           </span>
-          <span className="mt-1 block truncate text-xs text-muted">
-            {email ?? t("auth.localProfile")}
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-1.5">
+              <span className="truncate font-black">@{account.nickname}</span>
+              {level.tier.id === "whale" ? <Crown className="size-3.5 shrink-0 text-gold" /> : null}
+            </span>
+            {account.title ? (
+              <span className="mt-0.5 block truncate text-xs font-semibold text-gold">
+                {account.title}
+              </span>
+            ) : null}
+            <span className="mt-0.5 block truncate text-xs text-muted">
+              {email ?? t("auth.localProfile")}
+            </span>
           </span>
-        </span>
+        </div>
+
+        <LevelBar xp={numbers.xp} className="mt-3" />
       </div>
 
       {/* Le quattro cifre che contano. */}

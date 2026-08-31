@@ -117,3 +117,42 @@ export async function fetchStats(userId: string): Promise<PlayerStats> {
     items: rows.reduce((total, row) => total + row.items, 0),
   };
 }
+
+/* ---------------------------------------------------------------- */
+/* Esperienza                                                        */
+/* ---------------------------------------------------------------- */
+
+/**
+ * Chiede al database l'esperienza di una partita finita.
+ *
+ * I punti li conta il database, non questa funzione: qui si dice solo com'è
+ * andata. Il conto e i tetti stanno dentro `award_match_xp`, che è l'unico
+ * punto che non si può scavalcare cambiando il codice della pagina. La stessa
+ * partita paga una volta sola, quindi ripetere la chiamata restituisce zero.
+ *
+ * Torna 0 anche per gli ospiti, che non hanno un profilo a cui accreditare
+ * niente.
+ */
+export async function awardMatchXp(input: {
+  code: string;
+  won: boolean;
+  votes: number;
+  /** Vero se in stanza c'era almeno un PickMate: apre il bonus giornaliero. */
+  withMate: boolean;
+}): Promise<number> {
+  const supabase = getSupabase();
+  if (!supabase) return 0;
+  try {
+    const { data, error } = await supabase.rpc("award_match_xp", {
+      match_code: input.code,
+      won: input.won,
+      votes: input.votes,
+      with_mate: input.withMate,
+    });
+    if (error) return 0;
+    return typeof data === "number" ? data : 0;
+  } catch {
+    /* l'esperienza è un di più: la partita resta valida comunque */
+    return 0;
+  }
+}
