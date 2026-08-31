@@ -39,6 +39,9 @@ export async function recordMatch(userId: string, match: MatchRecord): Promise<v
   const supabase = getSupabase();
   if (!supabase) return;
   try {
+    // Il doppione lo rifiuta il database, per vincolo su utente e codice
+    // stanza: qui non e' un errore da segnalare, e' il comportamento voluto
+    // quando la schermata finale viene riaperta.
     await supabase.from(MATCH_HISTORY_TABLE).insert({ user_id: userId, ...match });
   } catch {
     /* lo storico è un di più: la partita resta valida comunque */

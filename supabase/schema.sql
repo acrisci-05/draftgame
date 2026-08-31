@@ -922,3 +922,31 @@ grant execute on function public.rename_profile(text) to authenticated;
 -- Il nickname passa da qui: la colonna non e' piu' modificabile a mano.
 revoke update on public.profiles from authenticated;
 grant update (emoji, shows_presence, equipped_title) on public.profiles to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Lo storico non deve contare due volte la stessa partita.
+--
+-- Il vincolo era su (utente, codice, orario), ma l'orario vale now(): a ogni
+-- ricarico della schermata finale cambiava, quindi il doppione passava. Bastava
+-- riaprire la pagina per vedersi salire il numero di partite giocate e, se si
+-- era arrivati primi, anche quello delle vittorie.
+--
+-- Con il vincolo sul solo (utente, codice) la seconda scrittura viene rifiutata
+-- dal database, che e' l'unico posto dove il divieto vale davvero: le pagine
+-- aperte sono tante e non si parlano fra loro.
+-- ---------------------------------------------------------------------------
+
+-- Prima si tolgono le righe gia' duplicate, tenendo la piu' vecchia.
+delete from public.match_history a
+using public.match_history b
+where a.user_id = b.user_id
+  and a.code = b.code
+  and a.played_at > b.played_at;
+
+alter table public.match_history
+  drop constraint if exists match_history_user_id_code_played_at_key;
+
+alter table public.match_history
+  drop constraint if exists match_history_user_id_code_key;
+alter table public.match_history
+  add constraint match_history_user_id_code_key unique (user_id, code);

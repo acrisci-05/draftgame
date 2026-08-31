@@ -421,9 +421,18 @@ export async function createAccount(
   emoji: string,
 ): Promise<Account> {
   const supabase = requireClient();
+  /*
+   * Inserimento, non upsert.
+   *
+   * Il nickname non e' piu' una colonna modificabile a mano -- si cambia solo
+   * dalla funzione che fa rispettare l'attesa di trenta giorni -- e un upsert
+   * su un profilo gia' esistente proverebbe a riscriverlo, facendosi rifiutare
+   * dal database. Qui si crea il profilo la prima volta e basta: chi ce l'ha
+   * gia' passa da rename_profile.
+   */
   const { data, error } = await supabase
     .from(PROFILES_TABLE)
-    .upsert({ id: userId, nickname: normalizeNickname(nickname), emoji })
+    .insert({ id: userId, nickname: normalizeNickname(nickname), emoji })
     .select("id, nickname, emoji")
     .single();
   // 23505 è il codice del vincolo di unicità: il nickname è già di qualcun altro.
