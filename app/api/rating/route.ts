@@ -55,10 +55,30 @@ export async function POST(request: NextRequest) {
     global: token ? { headers: { Authorization: `Bearer ${token}` } } : {},
   });
 
+  /*
+   * Inserimento semplice, non "inserisci oppure aggiorna".
+   *
+   * La seconda forma permetterebbe di cambiare voto, ma richiede il permesso
+   * di aggiornamento sulla tabella, che sul database non c'e': l'intera
+   * operazione veniva rifiutata anche al primo voto, quando non c'era proprio
+   * niente da aggiornare. Meglio una funzione che funziona senza poter
+   * cambiare idea, che una completa che non parte mai.
+   *
+   * Il codice 23505 e' il vincolo di unicita': quel dispositivo aveva gia'
+   * votato. Non e' un errore da mostrare -- il voto c'e', ed e' quello che
+   * conta -- quindi si prosegue e si ringrazia lo stesso.
+   */
   const { error } = await supabase
     .from("feedback")
-    .upsert({ stars, comment: comment || null, voter_key: voterKey }, { onConflict: "voter_key" });
-  if (error) return Response.json({ error: "save-failed" }, { status: 400 });
+    .insert({ stars, comment: comment || null, voter_key: voterKey });
+
+  const giaVotato = error?.code === "23505";
+  if (error && !giaVotato) {
+    return Response.json({ error: "save-failed" }, { status: 400 });
+  }
+
+  // Un voto ripetuto non si rimanda al creatore: sarebbe rumore.
+  if (giaVotato) return Response.json({ ok: true, already: true });
 
   // Da qui in poi il voto è al sicuro: la notifica è un di più.
   let nickname: string | null = null;
