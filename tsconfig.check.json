@@ -18,6 +18,8 @@
     "data/categories.json",
     "lib/image-match.ts",
     "lib/rating-prompt.ts",
-    "lib/storage.ts"
+    "lib/storage.ts",
+    "lib/history.ts",
+    "lib/pickmates.ts"
   ]
 }
