@@ -39,13 +39,18 @@ check(
     ),
   ),
 );
-// Quasi tutte le liste hanno 30 elementi. Le Regioni Italiane ne hanno 20,
-// perché venti sono: il numero lo detta la geografia, non il formato.
+// Quasi tutte le liste hanno 30 elementi. Due fanno eccezione, e in entrambi
+// i casi e' l'argomento a dettare il numero, non la voglia di sgarrare: le
+// Regioni Italiane sono venti, e le Auto sono quarantacinque perche' le marche
+// in vendita sono quelle -- tagliarne quindici per far quadrare il formato
+// vorrebbe dire togliere dal gioco marchi che la gente conosce.
+const QUANTI = { regioni: 20, cars: 45 };
+const attesi = (c) => QUANTI[c.id] ?? 30;
 check(
-  "ogni lista ha 30 elementi (20 per le regioni)",
-  categories.every((c) => c.items.length === (c.id === "regioni" ? 20 : 30)),
+  "ogni lista ha il numero di elementi previsto",
+  categories.every((c) => c.items.length === attesi(c)),
   categories
-    .filter((c) => c.items.length !== (c.id === "regioni" ? 20 : 30))
+    .filter((c) => c.items.length !== attesi(c))
     .map((c) => `${c.id}:${c.items.length}`)
     .join(","),
 );

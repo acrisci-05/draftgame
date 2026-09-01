@@ -129,6 +129,7 @@ export function createGame({ code, mode, hostId, category, config }: CreateGameA
       name: category.name,
       nameEn: category.nameEn,
       emoji: category.emoji,
+      covers: category.covers,
     },
     items: category.items,
     queue: [],
@@ -927,6 +928,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
           name: action.category.name,
           nameEn: action.category.nameEn,
           emoji: action.category.emoji,
+          covers: action.category.covers,
         },
         items: action.category.items,
       });

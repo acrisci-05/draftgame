@@ -26,6 +26,16 @@ export interface Category {
   nameEn?: string;
   emoji: string;
   theme?: CategoryTheme;
+  /**
+   * Come vanno mostrate le immagini.
+   *
+   * Le foto stanno bene sul fondo scuro delle card. I loghi no: quasi tutti
+   * sono disegnati in nero su sfondo trasparente, e su nero spariscono --
+   * la Ford diventava un rettangolo vuoto. Con "logo" si mette dietro una
+   * lastra chiara e si mostra l'immagine intera invece di ritagliarla,
+   * perche' un marchio tagliato a meta' non si riconosce.
+   */
+  covers?: "photo" | "logo";
   items: CatalogItem[];
   source: CategorySource;
   /** Id remoto usato per il link di condivisione. */
@@ -137,7 +147,18 @@ export interface GameState {
   hostId: string;
   phase: Phase;
   config: RoomConfig;
-  category: { id: string; name: string; nameEn?: string; emoji: string };
+  /**
+   * Della categoria viaggia solo l'essenziale: gli elementi stanno gia' in
+   * `items`, e rimandare l'intera lista a ogni aggiornamento sarebbe spreco.
+   */
+  category: {
+    id: string;
+    name: string;
+    nameEn?: string;
+    emoji: string;
+    /** Serve a disegnare i marchi su fondo chiaro: vedi Category.covers. */
+    covers?: "photo" | "logo";
+  };
   items: CatalogItem[];
   /** Id degli elementi non ancora estratti, in ordine casuale. */
   queue: string[];

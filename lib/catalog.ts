@@ -126,6 +126,8 @@ export interface RawCategory {
   nameEn?: string;
   emoji: string;
   theme?: CategoryTheme;
+  /** "logo" per le liste di marchi: vedi Category.covers. */
+  covers?: "photo" | "logo";
   tiers: Record<string, [string, string?, string?][]>;
 }
 
@@ -145,6 +147,7 @@ export function fromRawCategory(raw: RawCategory): Category {
     nameEn: raw.nameEn,
     emoji: raw.emoji,
     theme: raw.theme,
+    covers: raw.covers,
     items: buildItems(raw.id, draft),
     source: "official",
   };
@@ -168,6 +171,7 @@ export function toRawCategory(category: Category): RawCategory {
     nameEn: category.nameEn,
     emoji: category.emoji,
     theme: category.theme,
+    covers: category.covers,
     tiers,
   };
 }

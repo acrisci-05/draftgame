@@ -42,16 +42,22 @@ function RosterTile({
   layout,
   hint,
   auto,
+  logo = false,
 }: {
   entry: RosterEntry;
   currency: CurrencyCode;
   layout: CardLayout;
   hint?: string;
   auto: boolean;
+  /** La lista e' fatta di marchi: fondo bianco e immagine intera, non ritagliata. */
+  logo?: boolean;
 }) {
   const palette = coverPalette(entry.itemId + entry.name);
   const width = layout.tile;
   const { src, onError } = useItemImage(entry, hint, auto);
+  // Un marchio nero su un gradiente scuro non si vede, e ritagliato non si
+  // riconosce: la card condivisa e' la vetrina del gioco, non puo' uscire cosi'.
+  const lastra = logo && Boolean(src);
 
   return (
     <div style={{ width, display: "flex", flexDirection: "column", gap: 6 }}>
@@ -62,7 +68,9 @@ function RosterTile({
           aspectRatio: "1 / 1",
           borderRadius: 16,
           border: "2px solid #ffffff1f",
-          backgroundImage: `linear-gradient(140deg, ${palette.from}, ${palette.to})`,
+          ...(lastra
+            ? { backgroundColor: "#ffffff" }
+            : { backgroundImage: `linear-gradient(140deg, ${palette.from}, ${palette.to})` }),
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -77,7 +85,11 @@ function RosterTile({
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
             onError={onError}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={
+              lastra
+                ? { width: "100%", height: "100%", objectFit: "contain", padding: width * 0.12 }
+                : { width: "100%", height: "100%", objectFit: "cover" }
+            }
           />
         ) : (
           <span style={{ fontSize: width / 3, fontWeight: 900, color: "#ffffffdd" }}>
@@ -514,6 +526,7 @@ export function TikTokCard({ state, voteUrl }: { state: GameState; voteUrl?: str
                               layout={layout}
                               hint={state.category.name}
                               auto={autoImages}
+                              logo={state.category.covers === "logo"}
                             />
                           ))}
                       </div>

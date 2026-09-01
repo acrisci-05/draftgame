@@ -226,7 +226,7 @@ export function BidControls({
               ))
             : player.roster.map((entry) => (
                 <span key={entry.itemId} className="relative shrink-0" title={entry.name}>
-                  <ItemCover item={entry} size="xs" />
+                  <ItemCover item={entry} size="xs" logo={state.category.covers === "logo"} />
                   <span className="absolute -bottom-0.5 -end-0.5 rounded-full bg-gold px-1 text-[9px] font-black text-ink">
                     {entry.price}
                   </span>

@@ -269,7 +269,12 @@ function CategoryCard({
             .filter((item) => item.tier === 5)
             .slice(0, 5)
             .map((item) => (
-              <ItemCover key={item.id} item={item} size="xs" />
+              <ItemCover
+                key={item.id}
+                item={item}
+                size="xs"
+                logo={category.covers === "logo"}
+              />
             ))}
         </span>
       </div>

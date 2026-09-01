@@ -86,6 +86,8 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    * va dritti alla classifica.
    */
   const personal = state.mode === "online" && Boolean(me);
+  // Le liste di marchi si mostrano su fondo chiaro: al buio sparirebbero.
+  const marchi = state.category.covers === "logo";
   const [view, setView] = useState<"recap" | "mine" | "all">(personal ? "recap" : "all");
 
   // Il riepilogo si apre da solo sulla classifica: chi non tocca niente non resta bloccato.
@@ -257,7 +259,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
           </p>
         </div>
 
-        <MyRoster player={me} currency={currency} />
+        <MyRoster player={me} currency={currency} logo={marchi} />
 
         {/*
           Quanto ha reso la partita, o cosa ci si perde a giocare da ospiti:
@@ -346,7 +348,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
           <p className="mb-3 text-sm text-muted">
             {t("results.mineHeadline", { n: me.roster.length, tot: state.config.slots })}
           </p>
-          <MyRoster player={me} currency={currency} />
+          <MyRoster player={me} currency={currency} logo={marchi} />
         </Panel>
       ) : (
         <>
@@ -517,9 +519,12 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
 function MyRoster({
   player,
   currency,
+  logo = false,
 }: {
   player: Player;
   currency: GameState["config"]["currency"];
+  /** La lista e' fatta di marchi: vanno mostrati su fondo chiaro. */
+  logo?: boolean;
 }) {
   const t = useT();
   return (
@@ -547,7 +552,7 @@ function MyRoster({
               className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-2 px-3 py-2"
             >
               <span className="flex min-w-0 items-center gap-2">
-                <ItemCover item={entry} size="xs" />
+                <ItemCover item={entry} size="xs" logo={logo} />
                 <span className="truncate text-sm font-semibold">{entry.name}</span>
               </span>
               <span className="shrink-0 font-mono text-sm font-black text-gold">

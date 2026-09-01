@@ -209,6 +209,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
                 covered={covered}
                 auto={autoImages}
                 hint={state.category.name}
+                logo={state.category.covers === "logo"}
               />
             </motion.div>
           </AnimatePresence>
@@ -352,6 +353,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
                         size="lg"
                         auto={autoImages}
                         hint={state.category.name}
+                        logo={state.category.covers === "logo"}
                       />
                     </motion.div>
                     <span className="flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-faint">

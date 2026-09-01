@@ -38,6 +38,14 @@ interface ItemCoverProps {
   auto?: boolean;
   /** Nome della categoria: rende più precisa la ricerca automatica. */
   hint?: string;
+  /**
+   * L'immagine e' un marchio, non una foto.
+   *
+   * I loghi sono quasi sempre neri su sfondo trasparente: sul fondo scuro
+   * delle card sparirebbero. Qui vanno su una lastra chiara e per intero,
+   * senza ritaglio -- meta' di un marchio non e' riconoscibile.
+   */
+  logo?: boolean;
   className?: string;
 }
 
@@ -48,6 +56,7 @@ export function ItemCover({
   mystery = false,
   auto = false,
   hint,
+  logo = false,
   className,
 }: ItemCoverProps) {
   const hide = mystery || covered || !item;
@@ -76,13 +85,17 @@ export function ItemCover({
   const cover = coverContent(item);
   const large = size === "xl";
 
+  // La lastra chiara vale solo quando c'e' davvero un'immagine: senza, resta
+  // il riquadro colorato con l'emoji, che sul chiaro si leggerebbe male.
+  const plate = logo && Boolean(src);
+
   return (
     <div
-      style={large ? undefined : cover.style}
+      style={large || plate ? undefined : cover.style}
       className={cn(
         "relative shrink-0 overflow-hidden border",
         // Fondo scuro fisso dietro le foto: fa risaltare PNG e JPG ad alto contrasto.
-        large ? "border-line bg-zinc-950" : "border-white/10",
+        plate ? "border-white/15 bg-white" : large ? "border-line bg-zinc-950" : "border-white/10",
         SIZES[size],
         className,
       )}
@@ -98,8 +111,11 @@ export function ItemCover({
           onError={onError}
           className={cn(
             large
-              ? "h-full w-full object-contain p-6 drop-shadow-2xl transition-all duration-300 hover:scale-105"
+              ? "h-full w-full object-contain p-6 transition-all duration-300 hover:scale-105"
               : "size-full object-cover",
+            large && !plate && "drop-shadow-2xl",
+            // Un marchio non si ritaglia mai, nemmeno nelle miniature.
+            plate && !large && "size-full object-contain p-1.5",
           )}
         />
       ) : (
