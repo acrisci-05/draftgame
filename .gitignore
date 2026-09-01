@@ -55,3 +55,6 @@ public/_review.html
 
 # Impostazioni locali degli strumenti di sviluppo.
 .claude/
+
+# profili e schermate dei browser usati nei controlli
+scripts/shots/

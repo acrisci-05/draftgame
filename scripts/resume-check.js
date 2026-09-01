@@ -44,9 +44,20 @@ check("senza stanze aperte non si propone niente", st.resumableSession() === nul
 st.saveSession(stanza("ABCDE"));
 check("appena entrati la stanza si ripropone", st.resumableSession()?.code === "ABCDE");
 
-// Finita la partita, la sessione si chiude.
-st.clearSession("ABCDE");
+// Finita la partita si segna, ma NON si cancella.
+//
+// E' il punto in cui il gioco si era rotto: cancellandola, la stanza non
+// trovava piu' chi fosse il giocatore e la schermata dei risultati spariva
+// prima di registrare partita e punti. La sessione deve restare leggibile.
+st.markSessionFinished("ABCDE");
 check("a partita finita non si ripropone piu'", st.resumableSession() === null);
+check("ma la sessione resta leggibile dalla stanza",
+  st.getSession("ABCDE")?.code === "ABCDE", st.getSession("ABCDE"));
+check("ed e' segnata come conclusa", Boolean(st.getSession("ABCDE")?.finishedAt));
+
+// Cancellarla del tutto resta possibile: si usa uscendo apposta.
+st.clearSession("ABCDE");
+check("uscendo apposta la sessione sparisce", st.getSession("ABCDE") === null);
 
 // La scadenza a tempo, per chi non e' arrivato a chiuderla.
 st.saveSession(stanza("FGHJK"));

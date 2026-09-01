@@ -154,6 +154,24 @@ export function saveSession(session: RoomSession) {
   write(SESSION_PREFIX + session.code, { openedAt: Date.now(), ...session });
 }
 
+/**
+ * Segna la partita come conclusa, senza togliere la sessione.
+ *
+ * Cancellarla del tutto sembrava la cosa giusta, ed era un errore: la stanza
+ * legge la sessione per sapere chi sei, e togliendola mentre i risultati sono
+ * a schermo la schermata finale spariva di colpo — sostituita da "entra nella
+ * stanza" — portandosi via anche la registrazione della partita e i punti,
+ * che non facevano in tempo a partire.
+ *
+ * Qui si lascia tutto al suo posto e si scrive soltanto quando è finita: basta
+ * alla home per non riproporla, e la stanza continua a funzionare.
+ */
+export function markSessionFinished(code: string) {
+  const session = getSession(code);
+  if (!session || session.finishedAt) return;
+  write(SESSION_PREFIX + code, { ...session, finishedAt: Date.now() });
+}
+
 export function clearSession(code: string) {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(SESSION_PREFIX + code);
@@ -250,6 +268,8 @@ export function resumableSession(maxAgeHours = 1): RoomSession | null {
     if (!key?.startsWith(SESSION_PREFIX)) continue;
     const session = read<RoomSession | null>(key, null);
     if (!session) continue;
+    // Una partita conclusa non si ripropone, per quanto recente sia.
+    if (session.finishedAt) continue;
     const at = session.openedAt ?? 0;
     if (!migliore || at > migliore.at) migliore = { session, at };
   }

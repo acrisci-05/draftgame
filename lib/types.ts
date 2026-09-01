@@ -179,6 +179,11 @@ export interface RoomSession {
    * riproporla dopo un ricarico: una stanza di ieri e' una partita finita.
    */
   openedAt?: number;
+  /**
+   * Quando la partita si e' conclusa. La sessione resta -- serve alla stanza
+   * per sapere chi sei -- ma la home smette di riproporla.
+   */
+  finishedAt?: number;
 }
 
 export interface Profile {
