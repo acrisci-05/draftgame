@@ -111,9 +111,13 @@ export type AuthError =
   | "email-invalid"
   | "password-short"
   | "password-weak"
+  | "password-leaked"
   | "wrong-credentials"
   | "email-taken"
+  | "email-unconfirmed"
   | "confirm-email"
+  | "too-many"
+  | "signup-closed"
   | "offline"
   | "unknown";
 
@@ -122,6 +126,73 @@ export class AuthFailure extends Error {
     super(reason);
     this.name = "AuthFailure";
   }
+}
+
+/**
+ * Traduce l'errore del servizio di autenticazione in un motivo nostro.
+ *
+ * Senza questo passaggio ogni intoppo finiva in "Qualcosa non ha funzionato":
+ * chi si iscriveva non capiva cosa cambiare, e da qui non si poteva nemmeno
+ * sapere cosa fosse successo davvero. I due casi che capitano sul serio sono
+ * la quota di email del progetto -- poche all'ora finche' non si collega un
+ * servizio di posta proprio -- e la password che rispetta le quattro regole ma
+ * compare in una fuga di dati nota, che il servizio rifiuta di sua iniziativa.
+ */
+function reasonFor(
+  error: { message?: string; code?: string; status?: number },
+  fallback: AuthError = "unknown",
+): AuthError {
+  switch (error.code) {
+    case "over_email_send_rate_limit":
+    case "over_request_rate_limit":
+      return "too-many";
+    case "weak_password":
+      return "password-leaked";
+    case "user_already_exists":
+    case "email_exists":
+    case "identity_already_exists":
+      return "email-taken";
+    case "email_address_invalid":
+    case "email_address_not_authorized":
+      return "email-invalid";
+    case "email_not_confirmed":
+      return "email-unconfirmed";
+    case "invalid_credentials":
+      return "wrong-credentials";
+    case "signup_disabled":
+    case "email_provider_disabled":
+      return "signup-closed";
+  }
+
+  if (error.status === 429) return "too-many";
+
+  /* Progetti non ancora aggiornati rispondono senza codice: resta il testo. */
+  const message = error.message ?? "";
+  if (/already registered|already exists/i.test(message)) return "email-taken";
+  if (/rate limit|only request this|too many/i.test(message)) return "too-many";
+  if (/pwned|leaked|easy to guess/i.test(message)) return "password-leaked";
+  if (/not confirmed/i.test(message)) return "email-unconfirmed";
+  if (/signups? not allowed|signup is disabled/i.test(message)) return "signup-closed";
+  if (/invalid.{0,10}email|email.{0,10}invalid/i.test(message)) return "email-invalid";
+
+  return fallback;
+}
+
+/**
+ * Prepara l'errore da mostrare e, quando resta senza nome, lo scrive nella
+ * console: e' l'unico modo per capire, a distanza, cosa ha visto chi si e'
+ * fermato sul messaggio generico.
+ */
+function authFailure(
+  where: string,
+  error: { message?: string; code?: string; status?: number },
+  fallback: AuthError = "unknown",
+): AuthFailure {
+  const reason = reasonFor(error, fallback);
+  if (reason === "unknown") {
+    console.warn(`[auth] ${where}:`, error.code ?? error.status ?? "?", error.message);
+  }
+  return new AuthFailure(reason);
 }
 
 export const MIN_PASSWORD = 8;
@@ -302,13 +373,17 @@ export async function signUpWithPassword(input: {
   if (!supabase) throw new AuthFailure("offline");
 
   const nickname = normalizeNickname(input.nickname);
+  // L'indirizzo si ripulisce prima di guardarlo: uno spazio in coda, che sui
+  // telefoni arriva da solo col completamento, faceva passare il controllo e
+  // poi veniva rifiutato dal servizio senza spiegazioni.
+  const email = input.email.trim();
   if (nickname.length < 3) throw new AuthFailure("nickname-invalid");
   if (!isStrongPassword(input.password)) throw new AuthFailure("password-weak");
-  if (!input.email.includes("@")) throw new AuthFailure("email-invalid");
+  if (!/^[^s@]+@[^s@]+.[^s@]+$/.test(email)) throw new AuthFailure("email-invalid");
   if (!(await isNicknameAvailable(nickname))) throw new AuthFailure("nickname-taken");
 
   const { data, error } = await supabase.auth.signUp({
-    email: input.email.trim(),
+    email,
     password: input.password,
     options: {
       /*
@@ -329,10 +404,7 @@ export async function signUpWithPassword(input: {
     },
   });
 
-  if (error) {
-    if (/already/i.test(error.message)) throw new AuthFailure("email-taken");
-    throw new AuthFailure("unknown");
-  }
+  if (error) throw authFailure("registrazione", error);
 
   // Con la conferma via email attiva la sessione arriva solo dopo il clic sul link.
   if (!data.session) {
@@ -352,7 +424,10 @@ export async function signInWithPassword(email: string, password: string): Promi
     email: email.trim(),
     password,
   });
-  if (error) throw new AuthFailure("wrong-credentials");
+  // Le credenziali sbagliate sono il caso comune, ma non l'unico: chi non ha
+  // ancora confermato l'indirizzo, o ha provato troppe volte di fila, deve
+  // leggere quello, non "email o password non corretti".
+  if (error) throw authFailure("accesso", error, "wrong-credentials");
 }
 
 /** Manda il link per reimpostare la password. */
@@ -362,7 +437,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
   const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
     redirectTo: typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
   });
-  if (error) throw new AuthFailure("unknown");
+  if (error) throw authFailure("reimposta password", error);
 }
 
 export async function signInWithEmail(email: string): Promise<void> {

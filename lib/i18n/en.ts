@@ -419,8 +419,15 @@ export const en: Dictionary = {
   "auth.errEmailInvalid": "Invalid email address.",
   "auth.errPasswordShort": "The password needs at least {n} characters.",
   "auth.errPasswordWeak": "The password does not meet all four requirements.",
+  "auth.errPasswordLeaked":
+    "This password shows up in a known data breach: it meets the rules but it is already out there. Pick another one.",
   "auth.errWrongCredentials": "Wrong email or password.",
   "auth.errEmailTaken": "An account with this email already exists: sign in.",
+  "auth.errEmailUnconfirmed":
+    "Confirm your address from the link we sent first. Check your spam folder too.",
+  "auth.errTooMany":
+    "Too many requests in a short time: the email service paused. Try again in a few minutes.",
+  "auth.errSignupClosed": "Sign-ups are closed right now.",
   "auth.errOffline": "Creating an account needs the database.",
   "auth.errUnknown": "Something went wrong. Try again.",
   "auth.nicknameFree": "Nickname available",

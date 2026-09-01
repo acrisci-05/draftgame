@@ -428,8 +428,15 @@ export const it = {
   "auth.errEmailInvalid": "Indirizzo email non valido.",
   "auth.errPasswordShort": "La password deve avere almeno {n} caratteri.",
   "auth.errPasswordWeak": "La password non rispetta tutti e quattro i requisiti.",
+  "auth.errPasswordLeaked":
+    "Questa password compare in una fuga di dati nota: rispetta le regole ma è già in giro. Scegline un'altra.",
   "auth.errWrongCredentials": "Email o password non corretti.",
   "auth.errEmailTaken": "Esiste già un account con questa email: accedi.",
+  "auth.errEmailUnconfirmed":
+    "Devi prima confermare l'indirizzo dal link che ti abbiamo mandato. Controlla anche lo spam.",
+  "auth.errTooMany":
+    "Troppe richieste in poco tempo: il servizio email si è messo in pausa. Riprova fra qualche minuto.",
+  "auth.errSignupClosed": "Le registrazioni sono chiuse in questo momento.",
   "auth.errOffline": "Serve il database per creare un account.",
   "auth.errUnknown": "Qualcosa non ha funzionato. Riprova.",
   "auth.nicknameFree": "Nickname libero",

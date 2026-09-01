@@ -74,9 +74,13 @@ const ERROR_KEYS: Record<AuthError, TranslationKey> = {
   "email-invalid": "auth.errEmailInvalid",
   "password-short": "auth.errPasswordShort",
   "password-weak": "auth.errPasswordWeak",
+  "password-leaked": "auth.errPasswordLeaked",
   "wrong-credentials": "auth.errWrongCredentials",
   "email-taken": "auth.errEmailTaken",
+  "email-unconfirmed": "auth.errEmailUnconfirmed",
   "confirm-email": "auth.confirmSent",
+  "too-many": "auth.errTooMany",
+  "signup-closed": "auth.errSignupClosed",
   offline: "auth.errOffline",
   unknown: "auth.errUnknown",
 };
