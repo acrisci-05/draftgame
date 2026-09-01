@@ -550,6 +550,13 @@ export const en: Dictionary = {
 
   "nav.admin": "Creator mode",
   "nav.rate": "Rate the game",
+  "nav.sectionAccount": "Account and friends",
+  "nav.sectionGame": "Game and content",
+  "nav.sectionCommunity": "Community and tools",
+  "nav.sectionSettings": "Settings and language",
+  "nav.sectionSupport": "Support the project",
+  "nav.installNow": "Get the app",
+  "nav.installHint": "Opens full screen, without the browser bar",
 
   "admin.title": "Creator area",
   "admin.hint": "Only the creator adds official lists. Enter the key to unlock the Studio.",

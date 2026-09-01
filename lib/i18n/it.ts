@@ -560,6 +560,13 @@ export const it = {
 
   "nav.admin": "Modalità creatore",
   "nav.rate": "Vota il gioco",
+  "nav.sectionAccount": "Account e amici",
+  "nav.sectionGame": "Gioco e contenuti",
+  "nav.sectionCommunity": "Community e strumenti",
+  "nav.sectionSettings": "Impostazioni e lingua",
+  "nav.sectionSupport": "Sostieni il progetto",
+  "nav.installNow": "Scarica l'app",
+  "nav.installHint": "Si apre a schermo intero, senza barra del browser",
 
   "admin.title": "Area creatore",
   "admin.hint":

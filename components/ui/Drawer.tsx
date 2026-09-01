@@ -33,7 +33,7 @@ export function Drawer({ open, title, onClose, children }: DrawerProps) {
           onClick={onClose}
         >
           <motion.aside
-            className="glass-dark flex h-full w-[86%] max-w-sm flex-col gap-4 overflow-y-auto border-s border-white/10 bg-zinc-950/80 p-5 backdrop-blur-xl"
+            className="glass-dark flex h-full w-[86%] max-w-sm flex-col gap-3 overflow-y-auto border-s border-white/10 bg-zinc-950/80 p-4 backdrop-blur-xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
