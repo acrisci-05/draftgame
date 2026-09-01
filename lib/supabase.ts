@@ -234,22 +234,31 @@ export interface RatingSummary {
   count: number;
 }
 
-/** Un voto per dispositivo: `voterKey` evita i doppioni. */
+/**
+ * Un voto per dispositivo: `voterKey` evita i doppioni.
+ *
+ * Passa dal nostro server invece di scrivere dritto sul database, perché è lì
+ * che vive il token del bot Telegram: il voto viene archiviato e nello stesso
+ * momento arriva la notifica al creatore. Il commento è facoltativo.
+ */
 export async function sendRating(
   stars: number,
   comment: string,
   voterKey: string,
 ): Promise<void> {
-  const supabase = requireClient();
-  const { error } = await supabase.from(FEEDBACK_TABLE).upsert(
-    {
-      stars: Math.min(5, Math.max(1, Math.round(stars))),
-      comment: comment.trim().slice(0, 1000) || null,
-      voter_key: voterKey,
+  // Il token serve solo a firmare il messaggio col nickname: votare non
+  // richiede un account, e chi non ce l'ha resta anonimo.
+  const token = await accessToken();
+
+  const response = await fetch("/api/rating", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    { onConflict: "voter_key" },
-  );
-  if (error) throw new Error(error.message);
+    body: JSON.stringify({ stars, comment, voterKey }),
+  });
+  if (!response.ok) throw new Error("rating-failed");
 }
 
 /** Media e numero di voti: la vista espone solo i due numeri, non i commenti. */

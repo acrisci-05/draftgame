@@ -98,3 +98,40 @@ export function suggestionMessage(input: {
 
   return lines.join("\n");
 }
+
+/**
+ * Il messaggio di una valutazione.
+ *
+ * Si distingue a colpo d'occhio da un suggerimento: stelle invece della
+ * lampadina, e il voto scritto anche in cifre, perché contare cinque simboli
+ * su uno schermo piccolo non è immediato.
+ */
+export function ratingMessage(input: {
+  stars: number;
+  comment: string;
+  nickname: string | null;
+}): string {
+  const piene = "⭐".repeat(input.stars);
+  const vuote = "☆".repeat(Math.max(0, 5 - input.stars));
+  const commento = input.comment.trim();
+  const chi = input.nickname
+    ? `<code>@${escapeHtml(input.nickname)}</code>`
+    : "<i>Anonimo</i>";
+
+  const righe = [
+    "⭐ <b>NUOVA VALUTAZIONE</b>",
+    RULE,
+    "",
+    `<b>Voto:</b> ${piene}${vuote}  ${input.stars}/5`,
+    "",
+  ];
+
+  if (commento) {
+    righe.push("<b>Commento</b>", `<blockquote>${escapeHtml(commento)}</blockquote>`, "");
+  } else {
+    righe.push("<i>Nessun commento.</i>", "");
+  }
+
+  righe.push(RULE, `👤 ${chi}  ·  🕐 ${romeTime(new Date())}`);
+  return righe.join("\n");
+}

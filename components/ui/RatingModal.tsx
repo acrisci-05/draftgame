@@ -9,6 +9,7 @@ import type { RatingSummary } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 import { Textarea } from "./Input";
+import { showToast } from "@/lib/toast";
 import { Modal } from "./Modal";
 
 export function RatingModal({
@@ -48,6 +49,7 @@ export function RatingModal({
   }, [open, status]);
 
   const submit = async () => {
+    // Bastano le stelle: il commento e' facoltativo e resta vuoto se non c'e'.
     if (stars < 1) return;
     setStatus("sending");
     try {
@@ -59,6 +61,16 @@ export function RatingModal({
       }
       setStatus("sent");
       setComment("");
+      showToast(t("rate.thanks"), "success");
+      /*
+       * La finestra si chiude da sola dopo un istante: il tempo di vedere la
+       * spunta, senza costringere a cercare la X quando si e' gia' finito.
+       */
+      setTimeout(() => {
+        onClose();
+        setStatus("idle");
+        setStars(0);
+      }, 900);
     } catch {
       setStatus("error");
     }
