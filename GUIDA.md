@@ -122,7 +122,7 @@ components/ui/              bottoni, badge, input, modali, navbar, menu
 components/game/            asta, timer, controlli offerta, card finale, editor liste
 lib/                        motore di gioco, realtime, catalogo, immagini, accesso, amici
 lib/i18n/                   dizionari delle 10 lingue
-data/categories.json        33 liste ufficiali (30 elementi, 20 per le regioni)
+data/categories.json        34 liste ufficiali (30 elementi; 20 le regioni, 45 le auto)
 scripts/engine-check.js     verifiche automatiche del motore
 supabase/schema.sql         schema del database con tutte le policy
 public/logo.svg             marchio dell'app
@@ -186,11 +186,14 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Effetti sonori sintetizzati (nessun file audio da scaricare) e vibrazione dove supportata.
 
 ### Categorie
-- **33 liste ufficiali** da 30 elementi (le Regioni Italiane ne hanno 20, quante sono davvero):
+- **34 liste ufficiali** da 30 elementi. Due fanno eccezione, e in entrambi i casi e' l'argomento
+  a dettare il numero: le Regioni Italiane sono 20, quante sono davvero, e le Auto sono 45, quante
+  sono le marche che vale la pena mettere in gara. Le fasce restano uguali fra loro in ogni lista,
+  altrimenti una uscirebbe piu' spesso delle altre.
   burger, best feelings, Pixar, social, Marvel, superpoteri, drink, snack, pizze, giochi da tavolo,
   videogiochi, giochi mobile, Clash Royale, calcio, sport, artisti musicali, app, capitali europee,
   città italiane, città americane, regioni italiane, beach, colazione, fast food, dolci, anime,
-  cartoni, serie TV, meme, duo iconici, scuse per non uscire, momenti cringe, isola deserta.
+  cartoni, serie TV, meme, duo iconici, scuse per non uscire, momenti cringe, isola deserta, auto.
 - Pagina categorie con il **numero di elementi** sotto ogni nome, **ricerca istantanea**
   (cerca anche dentro gli elementi) e **filtri per tema** (Sport, Pop Culture, Gaming, Cibo,
   Vita quotidiana).
@@ -205,6 +208,11 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Le liste ufficiali hanno le **foto già fissate** dentro `data/categories.json`: arrivano da
   Wikipedia e non dipendono da alcuna ricerca durante la partita. Si aggiornano con
   `npm run images:fetch`, che riprende da dove si era interrotto.
+- **Foto o marchi**: una lista può dichiarare `"covers": "logo"` (lo fa la lista Auto). Le foto
+  stanno bene sul fondo scuro delle card; i loghi no, perché quasi tutti sono neri su sfondo
+  trasparente e sparirebbero — la Ford era un riquadro vuoto. Con `logo` si mette dietro una
+  lastra bianca e si mostra l'immagine intera invece di ritagliarla, perché metà di un marchio
+  non si riconosce. Vale nell'asta, nelle miniature e nella card da condividere.
 - **Abbinamenti a mano** in `data/image-hints.json`: ogni elemento che la ricerca automatica non
   trova ha una fonte scelta da noi, e ognuna è l'archivio ufficiale del suo mondo.
 
@@ -594,7 +602,7 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 
 ## 10. Stato del lavoro e limiti noti
 
-**Funziona senza configurazione**: partita locale, tutte le 33 categorie (980 elementi), regole
+**Funziona senza configurazione**: partita locale, tutte le 34 categorie (1025 elementi), regole
 complete, card 9:16 scaricabile, lingue, temi, audio.
 
 **Richiede Supabase**: stanze online, accesso, Pickmates, votazioni, suggerimenti, voto a stelle,

@@ -31,7 +31,7 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
 - **Foto per 960 dei 980 elementi**, fissate in `data/categories.json` e prese dall'archivio giusto
   per ognuno (Wikipedia, Wikimedia Commons, Fandom, App Store, Steam, TVmaze, Imgflip) secondo gli
   abbinamenti di `data/image-hints.json`. In partita non si cerca niente: gli indirizzi sono già lì.
-- **33 liste ufficiali** con nomi corti ed emoji di copertina, definite in `data/categories.json`,
+- **34 liste ufficiali** con nomi corti ed emoji di copertina, definite in `data/categories.json`,
   con ricerca istantanea e filtri per macro-tema nella pagina Categorie. Sotto ogni nome c'è il
   numero di elementi; le fasce di valore restano solo come prezzo di apertura dell'asta.
 - **Modalità creatore**: Studio ed editor delle categorie sono già aperti in sviluppo; online li
@@ -96,7 +96,7 @@ components/ui/          bottoni, badge, input, modali, pannelli, selettore lingu
 components/game/        asta, timer, controlli di offerta, card finale, editor categorie
 lib/                    motore di gioco, realtime, catalogo, storage, i18n, accesso, amici
 lib/i18n/               dizionari delle 10 lingue (italiano lingua sorgente)
-data/categories.json    liste ufficiali: 33 categorie (30 elementi, 20 per le regioni)
+data/categories.json    liste ufficiali: 34 categorie (30 elementi; 20 le regioni, 45 le auto)
 scripts/engine-check.js controlli sul motore di gioco e sul catalogo
 public/logo.svg         marchio dell'app, sostituibile con il file originale
 supabase/               schema SQL per categorie condivise, suggerimenti, risultati e voti
