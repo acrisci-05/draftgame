@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Crown,
   Download,
+  GraduationCap,
   Heart,
   LayoutGrid,
   Lightbulb,
@@ -33,6 +34,7 @@ import { useSettings } from "@/lib/settings";
 import { showToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { AdminModal } from "./AdminModal";
+import { OnboardingModal } from "./OnboardingModal";
 import { AccountChip } from "./AccountChip";
 import { AuthModal } from "./AuthModal";
 import { PickerBenefitsModal } from "./PickerBenefits";
@@ -222,6 +224,16 @@ export function Navbar() {
 
         <Section title={t("nav.sectionGame")}>
           <MenuButton icon={BookOpen} label={t("nav.rules")} onClick={() => openPanel("rules")} />
+          {/*
+            Il tutorial resta raggiungibile dopo la prima volta: compare da solo
+            all'inizio, ma chi l'ha saltato -- o chi passa il telefono a un
+            amico che non ha mai giocato -- deve poterlo richiamare.
+          */}
+          <MenuButton
+            icon={GraduationCap}
+            label={t("tutorial.title")}
+            onClick={() => openPanel("tutorial")}
+          />
           <MenuLink
             href="/categories"
             icon={LayoutGrid}
@@ -281,6 +293,15 @@ export function Navbar() {
       </Drawer>
 
       <RulesModal open={panel === "rules"} onClose={() => setPanel(null)} />
+      {/*
+        Il tutorial vive qui e non nel layout: qui c'e' gia' il meccanismo dei
+        pannelli, quindi la stessa finestra serve sia la prima apertura -- dove
+        si mostra da sola -- sia la voce di menu che la richiama.
+      */}
+      <OnboardingModal
+        forceOpen={panel === "tutorial"}
+        onForcedClose={() => setPanel(null)}
+      />
       <SuggestModal open={panel === "suggest"} onClose={() => setPanel(null)} />
       <CreatorModal
         open={panel === "creator"}

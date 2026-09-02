@@ -263,6 +263,23 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    */
   const winnerCardRef = useRef<HTMLDivElement | null>(null);
   const giaFestaRef = useRef(false);
+  /*
+   * L'esperienza che si aveva prima di questa partita.
+   *
+   * Si legge una volta sola, al montaggio: qui l'assegnazione non e' ancora
+   * partita, quindi il totale e' esattamente quello di prima. Ricavarla come
+   * "totale di adesso meno quello guadagnato" sembrava equivalente e non lo e':
+   * fra l'assegnazione e la rilettura del profilo passa un istante in cui il
+   * totale e' ancora quello vecchio, e in quell'istante la sottrazione dava un
+   * livello piu' basso del vero -- annunciando una salita mai avvenuta.
+   *
+   * Resta null per gli ospiti e per chi arriva qui col profilo non ancora
+   * caricato: in quel caso la finestra non compare. Meglio saltare una festa
+   * che farne una per un livello che non e' cambiato.
+   */
+  const [xpPrima] = useState<number | null>(() =>
+    account && !account.local ? (account.xp ?? 0) : null,
+  );
 
   /*
    * La battuta del bot, quando e' lui a vincere l'uno contro uno.
@@ -285,9 +302,9 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    * della partita: il "prima" e' sempre ricavabile dal "dopo" meno quello che
    * questa partita ha pagato.
    */
-  const xpTotali = account?.xp ?? 0;
+  const xpTotali = (xpPrima ?? 0) + earnedXp;
   const salitoDiLivello =
-    earnedXp > 0 && levelFor(xpTotali).level > levelFor(Math.max(0, xpTotali - earnedXp)).level;
+    earnedXp > 0 && xpPrima !== null && levelFor(xpTotali).level > levelFor(xpPrima).level;
   const [levelUpVisto, setLevelUpVisto] = useState(false);
 
   useEffect(() => {

@@ -1,13 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Download, PlusSquare, Share, Smartphone, X } from "lucide-react";
+import { Check, Download, PlusSquare, Share, X } from "lucide-react";
 import { useState } from "react";
 import type { TranslationKey } from "@/lib/i18n";
 import { dismissInstall, useInstallState, type Platform } from "@/lib/pwa";
 import { useT } from "@/lib/settings";
 import { cn } from "@/lib/utils";
 import { Button } from "./Button";
+import { LogoMark } from "./Logo";
 import { Modal } from "./Modal";
 
 type Tab = Exclude<Platform, "desktop">;
@@ -131,9 +132,12 @@ export function PwaInstallBanner() {
             className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-zinc-950/95 p-3 backdrop-blur safe-bottom sm:hidden"
           >
             <div className="mx-auto flex w-full max-w-2xl items-center gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-neon text-ink">
-                <Smartphone className="size-5" />
-              </span>
+              {/*
+                Il logo, non un'icona qualunque: un banner che invita a
+                installare "qualcosa" viene scacciato, uno che mostra la cosa
+                che stai gia' usando si capisce in un colpo d'occhio.
+              */}
+              <LogoMark size={44} className="shrink-0" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-bold text-zinc-100">
                   {t("install.title")}

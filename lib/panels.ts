@@ -21,7 +21,9 @@ export type PanelName =
   | "register"
   /** "Perche' diventare un Picker?": i vantaggi del profilo. */
   | "picker"
-  | "install";
+  | "install"
+  /** Il tutorial di benvenuto, richiamabile anche dopo la prima volta. */
+  | "tutorial";
 
 const EVENT = "pp:panel";
 

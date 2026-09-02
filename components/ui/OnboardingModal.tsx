@@ -36,7 +36,14 @@ function primaVolta(): boolean {
   }
 }
 
-export function OnboardingModal() {
+export function OnboardingModal({
+  forceOpen = false,
+  onForcedClose,
+}: {
+  /** Riaperto a mano dal menu: allora si mostra anche a chi l'ha gia' visto. */
+  forceOpen?: boolean;
+  onForcedClose?: () => void;
+} = {}) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [card, setCard] = useState(0);
@@ -49,8 +56,26 @@ export function OnboardingModal() {
     return () => clearTimeout(timer);
   }, []);
 
+  /**
+   * Chiusura per sbaglio: si chiude, ma non si segna niente.
+   *
+   * Il tutorial compare da solo dopo un secondo, cioe' proprio mentre uno sta
+   * ancora toccando la pagina. Un tocco a vuoto che cade sullo sfondo lo
+   * chiudeva e lo marcava come visto per sempre -- e uno non sa nemmeno di
+   * averlo avuto davanti. Adesso solo i due pulsanti in fondo dicono "visto":
+   * quelli si premono apposta.
+   */
+  const chiudiSenzaSegnare = () => {
+    setOpen(false);
+    // Si riparte sempre dalla prima card: riaprirlo a meta' non ha senso.
+    setCard(0);
+    onForcedClose?.();
+  };
+
   const chiudi = () => {
     setOpen(false);
+    setCard(0);
+    onForcedClose?.();
     try {
       window.localStorage.setItem(SEEN_KEY, "1");
     } catch {
@@ -62,7 +87,7 @@ export function OnboardingModal() {
   const ultima = card === CARDS.length - 1;
 
   return (
-    <Modal open={open} title={t("tutorial.title")} onClose={chiudi}>
+    <Modal open={open || forceOpen} title={t("tutorial.title")} onClose={chiudiSenzaSegnare}>
       <div className="flex flex-col gap-4">
         <AnimatePresence mode="wait">
           <motion.div

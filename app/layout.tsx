@@ -2,9 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { APP_FULL_NAME, APP_NAME, SITE_URL } from "@/lib/config";
 import { MaintenanceGate } from "@/components/ui/MaintenanceGate";
-import { InstallBanner } from "@/components/ui/InstallBanner";
 import { Navbar } from "@/components/ui/Navbar";
-import { OnboardingModal } from "@/components/ui/OnboardingModal";
 import { PresenceBeacon } from "@/components/ui/PresenceBeacon";
 import { PwaInstallBanner } from "@/components/ui/InstallPwaModal";
 import "./globals.css";
@@ -86,9 +84,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <MaintenanceGate>
           <Navbar />
-          {/* Le due cose che si fanno vedere da sole, e una volta sola. */}
-          <OnboardingModal />
-          <InstallBanner />
           <PresenceBeacon />
           {children}
           <PwaInstallBanner />
