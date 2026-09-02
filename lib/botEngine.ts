@@ -2,22 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  OPENING_BID,
   SNIPE_WINDOW_SECONDS,
   canBid,
   canClaim,
+  canCompete,
   canPass,
   canReact,
   canVote,
+  currentItem,
   hasVoted,
+  isMysteryLot,
   maxBid,
   minimumBid,
   liveReactions,
   playerById,
+  rosterFull,
   slotsLeft,
   type GameAction,
   type ReactionEmoji,
 } from "./game";
-import type { GameState, Player } from "./types";
+import type { GameState, Player, Tier } from "./types";
 
 /**
  * Il Pick-asso Bot: l'avversario per giocare da soli.
@@ -119,6 +124,122 @@ export function maxBidFor(state: GameState, bot: Player, share: number): number 
   return Math.min(maxBid(state, bot), Math.max(perQuota, affordableCeiling(state, bot)));
 }
 
+/* ------------------------------------------------------------------ */
+/* Quanto vale il lotto, e quando conviene lasciarlo andare             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Le cinque fasce lette in tre gradini.
+ *
+ * Al bot non serve la scala fine: gli serve sapere se questo lotto e' roba per
+ * cui vale la pena litigare, roba normale, o riempitivo. Top da solo in cima
+ * perche' e' l'unico che giustifica di sfondare la quota; Elite e Standard
+ * stanno insieme perche' si giocano allo stesso modo -- si prendono se il
+ * prezzo resta ragionevole; le due fasce Base si chiamano Base tutte e due
+ * anche nell'interfaccia, e qui valgono uguale.
+ */
+export type LotAppeal = "top" | "middle" | "base";
+
+export function lotAppeal(tier: Tier): LotAppeal {
+  if (tier >= 5) return "top";
+  if (tier >= 3) return "middle";
+  return "base";
+}
+
+/**
+ * Quanto spesso il bot molla un lotto Base che qualcuno ha gia' aperto.
+ *
+ * Tre volte su quattro, non sempre: un avversario che sui lotti Base si ritira
+ * *sempre* diventa un orologio -- basta offrire un credito su ogni cosa verde
+ * per prendersela, e chi gioca lo capisce al quarto lotto. La quarta volta che
+ * resta a contendere e' quella che rende le altre tre una scelta.
+ */
+export const BASE_PASS_CHANCE = 0.75;
+
+/**
+ * Sotto quale quota per posto i crediti si considerano stretti.
+ *
+ * Non e' una cifra assoluta -- due crediti sono tanti sull'ultimo posto e
+ * niente quando ne restano quattro da coprire -- ma la quota per posto, cioe'
+ * quanto il bot puo' mettere in media su ognuno di quelli che gli mancano.
+ * Sotto i due, litigare su un lotto Base vuol dire spendere per uno il budget
+ * che serviva a coprirne due.
+ */
+export const TIGHT_CEILING = 2;
+
+export function isTightOnCredits(state: GameState, bot: Player): boolean {
+  return affordableCeiling(state, bot) <= TIGHT_CEILING;
+}
+
+/**
+ * L'offerta sfonda la riserva del regolamento?
+ *
+ * La regola del gioco e' che si tiene un credito per ogni posto che
+ * resterebbe vuoto: `maxBid` la calcola, e sopra quel numero il riduttore
+ * rifiuterebbe l'offerta comunque. Qui serve a nominarla: quando e' lei a
+ * fermare il bot, il bot non sta scegliendo di passare, e' costretto.
+ */
+export function violatesReserve(state: GameState, bot: Player, amount: number): boolean {
+  return amount > maxBid(state, bot);
+}
+
+/**
+ * I lotti che restano bastano appena a riempire la lista?
+ *
+ * E' la valvola che tiene in piedi tutto il resto. Un bot che fa lo
+ * schizzinoso sui lotti Base e' un avversario migliore solo finche' il mazzo e'
+ * lungo: sul fondo, dove le occasioni sono contate, la stessa prudenza
+ * diventerebbe una lista a meta' e dei crediti che non servono piu' a niente.
+ * Da qui in poi si prende quello che passa.
+ *
+ * Il conto tiene dentro chi altro deve ancora servirsi: i lotti non sono tutti
+ * per il bot, e in due se ne aggiudica sui due che escono all'incirca uno.
+ */
+export function lotsRunningShort(state: GameState, bot: Player): boolean {
+  const rimasti = (state.queue?.length ?? 0) + (state.currentItemId ? 1 : 0);
+  const daServire = Math.max(1, state.players.filter((p) => !rosterFull(state, p)).length);
+  return rimasti <= slotsLeft(state, bot) * daServire;
+}
+
+/**
+ * Questo lotto si lascia perdere.
+ *
+ * Il bot non passava mai. Non per una scelta: semplicemente non c'era nessuna
+ * strada che portasse li' se non "non me lo posso permettere", e siccome la
+ * soglia per posto e' quasi sempre piu' alta del prezzo di un lotto Base, si
+ * ritrovava a comprare riempitivo a due e tre crediti fino a restare senza
+ * niente per i lotti che contano. Da fuori sembrava avidita' cieca, ed era.
+ *
+ * L'ordine dei controlli e' la regola vera, piu' delle probabilita':
+ *
+ * 1. **Solo i lotti Base si lasciano.** Su Top ed Elite si combatte: e' li'
+ *    che si vince, ed e' li' che il budget ha senso di finire.
+ * 2. **Un posto per un credito non si rifiuta mai.** Se nessuno ha ancora
+ *    aperto, il lotto costa il minimo: riempire uno slot a quel prezzo e' il
+ *    miglior affare del tabellone, e rinunciarci vorrebbe dire finire la
+ *    partita con la lista corta e i crediti in mano -- che e' esattamente il
+ *    modo di perdere che questa funzione dovrebbe evitare.
+ * 3. **Sul fondo del mazzo non si sceglie piu'** (vedi `lotsRunningShort`).
+ * 4. **Coi crediti stretti si passa sempre**, senza tirare a sorte: qui non e'
+ *    piu' una preferenza, e' aritmetica.
+ * 5. Altrimenti si passa quasi sempre, ma non sempre.
+ */
+export function shouldSkipLot(
+  state: GameState,
+  bot: Player,
+  options: { roll?: number } = {},
+): boolean {
+  if (isMysteryLot(state)) return false;
+  const item = currentItem(state);
+  if (!item || lotAppeal(item.tier) !== "base") return false;
+
+  if (minimumBid(state) <= OPENING_BID) return false;
+  if (lotsRunningShort(state, bot)) return false;
+  if (isTightOnCredits(state, bot)) return true;
+
+  return (options.roll ?? Math.random()) < BASE_PASS_CHANCE;
+}
+
 export type BotMove =
   | { kind: "bid"; amount: number; delay: number }
   | { kind: "claim"; delay: number }
@@ -134,7 +255,7 @@ export type BotMove =
 export function decideBotMove(
   state: GameState,
   botId: string = BOT_PLAYER_ID,
-  options: { now?: number; share?: number } = {},
+  options: { now?: number; share?: number; roll?: number } = {},
 ): BotMove | null {
   const bot = playerById(state, botId);
   if (!bot) return null;
@@ -189,22 +310,55 @@ export function decideBotMove(
   const allUltimo =
     Boolean(state.highBidderId) && scadenza > 0 && scadenza <= SNIPE_WINDOW_SECONDS * 1000;
 
+  /*
+   * Il guardrail del regolamento, prima di qualunque ragionamento.
+   *
+   * Un credito per ogni posto che resterebbe vuoto: se il minimo per restare
+   * in gara sfonda la riserva, il bot non sta scegliendo di lasciar perdere,
+   * e' costretto -- e nessun lotto, per quanto pregiato, vale la lista a meta'.
+   */
+  if (violatesReserve(state, bot, minimo)) {
+    if (canPass(state, botId)) return { kind: "pass", delay: getBotDelay("pass") };
+    return null;
+  }
+
   if (minimo > tetto) {
     /*
-     * Non ci si arriva. Restano due modi di uscirne, e non sono equivalenti:
-     * passare vuol dire lasciare il lotto alla persona, che se e' rimasta sola
-     * se lo prende al prezzo di partenza. Se pero' i flop non sono finiti e non
-     * siamo agli ultimi lotti, passare e' anche il modo di mandarlo negli
-     * scarti -- il lotto non lo prende nessuno e i crediti dell'avversario
-     * restano fermi. E' la stessa mossa, ma qui e' una scelta, non una resa.
+     * Sotto la riserva, ma sopra la quota che si e' dato per questo lotto.
+     * Restano due modi di uscirne, e non sono equivalenti: passare vuol dire
+     * lasciare il lotto alla persona, che se e' rimasta sola se lo prende al
+     * prezzo di partenza. Se pero' i flop non sono finiti e non siamo agli
+     * ultimi lotti, passare e' anche il modo di mandarlo negli scarti -- il
+     * lotto non lo prende nessuno e i crediti dell'avversario restano fermi.
+     * E' la stessa mossa, ma qui e' una scelta, non una resa.
      */
     if (canPass(state, botId)) return { kind: "pass", delay: getBotDelay("pass") };
     return null;
   }
 
-  // Rilancio di uno o due, mai di piu': i salti grossi bruciano il budget su
-  // un lotto solo e lasciano la lista a meta'.
-  const passo = Math.random() < 0.5 ? 1 : 2;
+  /*
+   * E qui la scelta vera: se lo puo' pagare ma non gli conviene, lo lascia.
+   * E' l'unico punto in cui il bot rinuncia a qualcosa che potrebbe prendersi.
+   */
+  if (shouldSkipLot(state, bot, { roll: options.roll }) && canPass(state, botId)) {
+    return { kind: "pass", delay: getBotDelay("pass") };
+  }
+
+  /*
+   * Quanto offrire.
+   *
+   * Sopra il minimo si va solo per scavalcare qualcuno che puo' rispondere. Se
+   * il piatto e' vuoto -- nessuno ha aperto, o l'avversario ha gia' passato e
+   * non e' rimasto nessun altro in gara -- il lotto e' gia' del bot al prezzo
+   * di partenza, e offrire due invece di uno e' un credito buttato per niente.
+   * Rilanciava a due una volta su due anche cosi': su una partita intera sono
+   * i crediti di un lotto Top regalati al nulla.
+   */
+  const contesa = state.players.some((p) => p.id !== botId && canCompete(state, p));
+  const rilancioUtile = Boolean(state.highBidderId) && contesa;
+  // Contro qualcuno: uno o due, mai di piu'. I salti grossi bruciano il budget
+  // su un lotto solo e lasciano la lista a meta'.
+  const passo = rilancioUtile ? (Math.random() < 0.5 ? 1 : 2) : 1;
   const amount = Math.min(minimo + passo - 1, tetto);
   if (!canBid(state, botId, amount)) {
     if (canPass(state, botId)) return { kind: "pass", delay: getBotDelay("pass") };

@@ -256,6 +256,233 @@ check(
   );
 }
 
+/* ---------------- La scelta sul singolo lotto ---------------- */
+
+/*
+ * Due guasti veri, tutti e due invisibili dentro una partita simulata perche'
+ * non rompevano niente: il bot finiva la partita lo stesso, con la lista piena,
+ * e i controlli passavano. Si vedevano solo giocando.
+ *
+ * Il primo: con il piatto vuoto e l'avversario gia' fuori, il lotto era suo a
+ * un credito e ne offriva due una volta su due. Il secondo, piu' grosso: non
+ * passava mai. Non per scelta -- non esisteva proprio una strada che portasse
+ * al "passa" se non "non me lo posso permettere" -- e siccome la quota per
+ * posto e' quasi sempre piu' alta del prezzo di un lotto Base, comprava
+ * riempitivo finche' non restava niente per i lotti che contano.
+ *
+ * Qui i lotti si costruiscono uno per uno, con la fascia e il prezzo che
+ * servono, e si guarda la mossa. Il tiro a sorte si passa da fuori: una
+ * probabilita' non si prova sperando che esca.
+ */
+
+/** Un'asta su misura: fascia del lotto, piatto, e come sta messo il bot. */
+function scenario({
+  tier = 1,
+  currentBid = 0,
+  highBidder = null,
+  passed = [],
+  botBudget = 20,
+  botRoster = 0,
+  queueLeft = 20,
+  slots = 5,
+} = {}) {
+  const items = Array.from({ length: queueLeft + 1 }, (_, i) => ({
+    id: `it${i}`,
+    name: `Elemento ${i}`,
+    tier: i === 0 ? tier : 3,
+  }));
+  const roster = Array.from({ length: botRoster }, (_, i) => ({
+    itemId: `avuto${i}`,
+    name: `Avuto ${i}`,
+    tier: 3,
+    price: 1,
+  }));
+  return {
+    phase: "auction",
+    config: { ...game.DEFAULT_CONFIG, slots, allowDiscards: true },
+    items,
+    queue: items.slice(1).map((it) => it.id),
+    currentItemId: "it0",
+    lotKind: "normal",
+    lotPrice: 0,
+    currentBid,
+    highBidderId: highBidder,
+    passed,
+    turnId: bot.BOT_PLAYER_ID,
+    deadline: 2_000_000,
+    discards: [],
+    players: [
+      { id: HUMAN_ID, name: "Umano", emoji: "cat", budget: 20, roster: [], passes: 0 },
+      {
+        id: bot.BOT_PLAYER_ID,
+        name: bot.BOT_NAME,
+        emoji: bot.BOT_AVATAR,
+        budget: botBudget,
+        roster,
+        passes: 0,
+      },
+    ],
+  };
+}
+
+const ORA = 1_000_000;
+const mossa = (stato, roll) =>
+  bot.decideBotMove(stato, bot.BOT_PLAYER_ID, { now: ORA, roll, share: bot.BID_SHARE_MIN });
+
+/* --- 1. L'offerta minima quando non c'e' nessuno a contendere --- */
+
+{
+  // L'avversario ha passato, il piatto e' vuoto: il lotto e' gia' suo a uno.
+  const fuori = scenario({ tier: 5, passed: [HUMAN_ID] });
+  const cento = Array.from({ length: 100 }, () => mossa(fuori, 0));
+  check(
+    "avversario fuori e piatto vuoto: offre uno, sempre",
+    cento.every((m) => m.kind === "bid" && m.amount === 1),
+    [...new Set(cento.map((m) => `${m.kind}:${m.amount ?? "-"}`))].join(" "),
+  );
+
+  // E anche con l'avversario ancora in gara: sul piatto vuoto non c'e' niente
+  // da scavalcare, e aprire a due e' un credito regalato.
+  const aperto = scenario({ tier: 5 });
+  const apertura = Array.from({ length: 100 }, () => mossa(aperto, 0));
+  check(
+    "piatto vuoto: si apre al minimo, non a due",
+    apertura.every((m) => m.kind === "bid" && m.amount === 1),
+    [...new Set(apertura.map((m) => m.amount))].join(" "),
+  );
+
+  // Contro un'offerta vera invece si rilancia, di uno o di due.
+  const contesa = scenario({ tier: 5, currentBid: 3, highBidder: HUMAN_ID });
+  const rilanci = new Set(
+    Array.from({ length: 200 }, () => mossa(contesa, 0)).map((m) => m.amount),
+  );
+  check(
+    "contro un'offerta vera rilancia di uno o due",
+    [...rilanci].every((a) => a === 4 || a === 5) && rilanci.size === 2,
+    [...rilanci].join(" "),
+  );
+}
+
+/* --- 2. Il "passa" sui lotti Base --- */
+
+{
+  const base = scenario({ tier: 1, currentBid: 1, highBidder: HUMAN_ID });
+  check(
+    "lotto Base gia' aperto: col tiro basso lascia perdere",
+    mossa(base, 0.1).kind === "pass",
+    mossa(base, 0.1).kind,
+  );
+  check(
+    "ma non sempre: col tiro alto resta a contendere",
+    mossa(base, 0.99).kind === "bid",
+    mossa(base, 0.99).kind,
+  );
+  check(
+    "la soglia e' tre volte su quattro",
+    bot.BASE_PASS_CHANCE >= 0.7 && bot.BASE_PASS_CHANCE <= 0.8,
+    bot.BASE_PASS_CHANCE,
+  );
+
+  // Un posto per un credito non si rifiuta: qui il tiro non conta niente.
+  const gratis = scenario({ tier: 1 });
+  check(
+    "un lotto Base a un credito lo prende comunque",
+    mossa(gratis, 0).kind === "bid" && mossa(gratis, 0).amount === 1,
+  );
+
+  // Sui lotti che contano non si molla per gusto, nemmeno col tiro piu' basso.
+  for (const [nome, t] of [["Top", 5], ["Elite", 4], ["Standard", 3]]) {
+    const pregiato = scenario({ tier: t, currentBid: 2, highBidder: HUMAN_ID });
+    check(
+      `su un lotto ${nome} non lascia perdere per gusto`,
+      mossa(pregiato, 0).kind === "bid",
+      mossa(pregiato, 0).kind,
+    );
+  }
+}
+
+/* --- 3. Crediti stretti: sui Base si passa e basta --- */
+
+{
+  // Quattro crediti e quattro posti da coprire: la quota per posto e' uno.
+  const stretto = scenario({
+    tier: 2,
+    currentBid: 1,
+    highBidder: HUMAN_ID,
+    botBudget: 4,
+    botRoster: 1,
+  });
+  check(
+    "coi crediti stretti il Base si lascia sempre, senza tirare a sorte",
+    Array.from({ length: 100 }, () => mossa(stretto, 0.999)).every((m) => m.kind === "pass"),
+  );
+  check(
+    "e la stretta si misura sulla quota per posto",
+    bot.isTightOnCredits(stretto, game.playerById(stretto, bot.BOT_PLAYER_ID)) === true,
+  );
+  check(
+    "con lo stesso budget ma un posto solo da coprire non e' piu' stretta",
+    bot.isTightOnCredits(
+      scenario({ botBudget: 4, botRoster: 4 }),
+      { budget: 4, roster: new Array(4).fill({}) },
+    ) === false,
+  );
+}
+
+/* --- 4. Sul fondo del mazzo si smette di scegliere --- */
+
+{
+  const fondo = scenario({
+    tier: 1,
+    currentBid: 1,
+    highBidder: HUMAN_ID,
+    botRoster: 3,
+    queueLeft: 2,
+  });
+  check(
+    "quando i lotti stanno finendo il Base si prende lo stesso",
+    Array.from({ length: 50 }, () => mossa(fondo, 0)).every((m) => m.kind === "bid"),
+  );
+  check(
+    "e la valvola si accorge che il mazzo e' corto",
+    bot.lotsRunningShort(fondo, game.playerById(fondo, bot.BOT_PLAYER_ID)) === true,
+  );
+  const largo = scenario({ botRoster: 3, queueLeft: 20 });
+  check(
+    "col mazzo lungo invece si puo' ancora scegliere",
+    bot.lotsRunningShort(largo, game.playerById(largo, bot.BOT_PLAYER_ID)) === false,
+  );
+}
+
+/* --- 5. Il guardrail della riserva --- */
+
+{
+  // Un credito e tre posti da coprire: la riserva ne blocca due, e per stare
+  // in gara ne servirebbero tre. Non e' una scelta, e' un obbligo.
+  const senzaFiato = scenario({
+    tier: 5,
+    currentBid: 2,
+    highBidder: HUMAN_ID,
+    botBudget: 3,
+    botRoster: 2,
+  });
+  const robot = game.playerById(senzaFiato, bot.BOT_PLAYER_ID);
+  check(
+    "l'offerta che sfonda la riserva si riconosce",
+    bot.violatesReserve(senzaFiato, robot, game.minimumBid(senzaFiato)) === true,
+  );
+  check(
+    "e il bot e' costretto a passare, anche su un lotto Top",
+    mossa(senzaFiato, 0.99).kind === "pass",
+    mossa(senzaFiato, 0.99).kind,
+  );
+  check(
+    "la riserva tiene un credito per ogni posto che resterebbe vuoto",
+    game.maxBid(senzaFiato, robot) === 1,
+    game.maxBid(senzaFiato, robot),
+  );
+}
+
 /* ---------------- Cento partite intere ---------------- */
 
 const categoria = catalog.OFFICIAL_CATEGORIES[0];
