@@ -72,7 +72,15 @@ export function ReactionButton({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.9 }}
               transition={{ duration: 0.16 }}
-              className="absolute bottom-full end-0 z-40 mb-2 flex gap-1 rounded-2xl border border-line bg-surface p-1.5 shadow-xl"
+              /*
+                Il ventaglio si apre verso destra, non verso sinistra.
+
+                Era ancorato a destra, e finche' il pulsante stava nell'angolo
+                destro andava bene. Spostandolo a sinistra, la stessa ancora
+                mandava le cinque faccine fuori dallo schermo: se ne vedeva
+                una sola, tagliata a meta' dal bordo.
+              */
+              className="absolute bottom-full start-0 z-40 mb-2 flex gap-1 rounded-2xl border border-line bg-surface p-1.5 shadow-xl"
             >
               {REACTIONS.map((emoji) => (
                 <button

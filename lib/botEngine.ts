@@ -259,13 +259,23 @@ export function botReplyTo(
       if (alVerde) return "😭";
       return inTesta ? "🤌" : "🤡";
     case "💸":
-      // "Stai spendendo troppo": vale come rimando solo se e' lui a farlo.
-      return inTesta ? "🤌" : null;
+      // "Stai spendendo troppo". Se e' vero -- sta vincendo -- se ne vanta;
+      // se e' a secco se la prende; altrimenti rilancia la posta.
+      if (alVerde) return "😭";
+      return inTesta ? "🤌" : "🔥";
     case "🔥":
       // Entusiasmo per il lotto: si sta al gioco, e si rilancia la posta.
       return Math.random() < 0.5 ? "💸" : "🤡";
     case "😭":
       return "🤌";
+    case "🤌":
+      /*
+       * Il gesto: "e allora?". E' la faccina che si manda per prima -- e per un
+       * po' era anche l'unica a cui il bot non rispondeva, quindi chi provava a
+       * provocarlo con quella si convinceva che la funzione non esistesse.
+       */
+      if (alVerde) return "😭";
+      return inTesta ? "🔥" : "🤡";
     default:
       return null;
   }
