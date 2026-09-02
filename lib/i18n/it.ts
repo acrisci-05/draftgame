@@ -118,6 +118,21 @@ export const it = {
   "rules.random.howBody":
     "Da tutte le liste che vedi in elenco: le ufficiali, quelle appena pubblicate e anche le tue. Restano fuori solo quelle troppo corte per reggere una partita, che nell'elenco sono già spente.",
 
+  "rules.flop.title": "🎯 Limite Flop strategico",
+  "rules.flop.body":
+    "Per mantenere alta la tensione dell'asta, il numero di Flop disponibili varia in base ai partecipanti:",
+  "rules.flop.p2": "2 giocatori:",
+  "rules.flop.p2Body": "6 Flop totali.",
+  "rules.flop.p3": "3 giocatori:",
+  "rules.flop.p3Body": "9 Flop totali.",
+  "rules.flop.p4": "4 giocatori:",
+  "rules.flop.p4Body": "8 Flop totali.",
+  "rules.flop.p5": "5 giocatori:",
+  "rules.flop.p5Body": "5 Flop totali.",
+  "rules.flop.out": "Esauriti i Flop.",
+  "rules.flop.outBody":
+    "Ogni lotto successivo dovrà essere assegnato al miglior offerente! Il contatore 🗑️ in alto nell'asta dice a che punto sei.",
+
   "rules.title": "Come si gioca",
 
   "rules.goal.title": "Obiettivo",
@@ -141,7 +156,7 @@ export const it = {
   "rules.special.title": "Casi speciali e fine partita",
   "rules.special.nobid": "Flop Draft: se nessuno offre.",
   "rules.special.nobidBody":
-    "Con il Flop Draft attivo il lotto è un flop: viene scartato all'istante e non lo prende nessuno. Si può buttare finché i lotti che restano bastano a riempire le liste di tutti — il contatore 🗑️ in alto dice quanti flop mancano a quel punto. Esauriti quelli, e con il Flop Draft spento, il lotto va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri, ma bruciare presto i flop significa doversi prendere d'ufficio quello che avanza nella seconda metà.",
+    "Con il Flop Draft attivo il lotto è un flop: viene scartato all'istante e non lo prende nessuno. I flop però non sono infiniti: ogni stanza ne ha un tetto che dipende da quanti siete (vedi qui sotto). Esauriti quelli, e con il Flop Draft spento, il lotto va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri, ma bruciare presto i flop significa doversi prendere d'ufficio quello che avanza nella seconda metà.",
   "rules.special.last": "Ultimo rimasto.",
   "rules.special.lastBody":
     "Se sei l'unico con la lista incompleta e i lotti rimasti bastano appena a riempirla, ti vengono assegnati d'ufficio al prezzo base.",

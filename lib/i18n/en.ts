@@ -120,6 +120,21 @@ export const en: Dictionary = {
   "rules.random.howBody":
     "From every list you see: the official ones, the freshly published ones and your own too. Only lists too short to carry a match stay out, and those are already greyed out.",
 
+  "rules.flop.title": "🎯 Strategic flop limit",
+  "rules.flop.body":
+    "To keep the auction tense, the number of flops available depends on how many are playing:",
+  "rules.flop.p2": "2 players:",
+  "rules.flop.p2Body": "6 flops in total.",
+  "rules.flop.p3": "3 players:",
+  "rules.flop.p3Body": "9 flops in total.",
+  "rules.flop.p4": "4 players:",
+  "rules.flop.p4Body": "8 flops in total.",
+  "rules.flop.p5": "5 players:",
+  "rules.flop.p5Body": "5 flops in total.",
+  "rules.flop.out": "Once the flops are gone.",
+  "rules.flop.outBody":
+    "Every lot after that has to go to the highest bidder! The 🗑️ counter at the top of the auction tells you where you stand.",
+
   "rules.title": "How to play",
 
   "rules.goal.title": "Goal",

@@ -64,6 +64,25 @@ const SECTIONS: Section[] = [
       { label: "rules.special.winner", body: "rules.special.winnerBody" },
     ],
   },
+  /*
+   * Il tetto dei flop, tavolo per tavolo.
+   *
+   * Sta in una sezione sua e non dentro "casi speciali" perche' e' l'unico
+   * numero del gioco che cambia con quanti si e': leggerlo di sfuggita dentro
+   * un paragrafo vorrebbe dire scoprirlo quando la riserva e' gia' finita.
+   */
+  {
+    icon: Target,
+    title: "rules.flop.title",
+    lead: "rules.flop.body",
+    points: [
+      { label: "rules.flop.p2", body: "rules.flop.p2Body" },
+      { label: "rules.flop.p3", body: "rules.flop.p3Body" },
+      { label: "rules.flop.p4", body: "rules.flop.p4Body" },
+      { label: "rules.flop.p5", body: "rules.flop.p5Body" },
+      { label: "rules.flop.out", body: "rules.flop.outBody" },
+    ],
+  },
   {
     icon: Sparkles,
     title: "rules.xp.title",

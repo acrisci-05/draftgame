@@ -307,25 +307,42 @@ export function pendingPlayers(state: GameState): Player[] {
 }
 
 /**
- * Quanti lotti si possono ancora buttare senza lasciare liste incomplete.
+ * Quanti flop si concede una stanza, secondo quanti sono al tavolo.
  *
- * Era un numero fisso -- cinque per partita, chiunque fosse al tavolo -- ed era
- * il tetto sbagliato. Cinque scarti su una partita in due, che consuma dieci
- * lotti su trenta, sono una riserva larga; gli stessi cinque in cinque
- * giocatori, che di lotti ne consumano venticinque, finiscono al quinto flop.
- * Da li' in poi i lotti che non voleva nessuno venivano assegnati d'ufficio, e
- * dal tavolo sembrava che il Flop Draft avesse smesso di funzionare: la
- * segnalazione arrivata dalle stanze a tre, quattro e cinque e' questa.
+ * Era un numero solo -- cinque, chiunque ci fosse -- e trattava male i tavoli
+ * grandi: in due si consumano dieci lotti su trenta e cinque flop sono una
+ * riserva larga, in cinque se ne consumano venticinque e la riserva finiva al
+ * quinto. Da li' in poi i lotti che non voleva nessuno venivano assegnati
+ * d'ufficio e dal tavolo sembrava un guasto -- la segnalazione arrivata dalle
+ * stanze a tre, quattro e cinque era questa.
  *
- * Adesso il conto e' quello vero: si puo' buttare un lotto finche' quelli che
- * restano bastano a riempire le liste di tutti. Nessun numero scritto a mano,
- * e la regola vale identica a due come a cinque.
+ * I numeri non sono una formula: sono scelti tavolo per tavolo. Crescono da due
+ * a tre, dove i lotti avanzano e si puo' essere schizzinosi, e si stringono da
+ * quattro in su, dove ne avanzano pochi e ogni flop tolto e' un lotto che
+ * qualcuno dovra' prendersi d'ufficio piu' avanti.
+ */
+export const FLOP_BUDGET: Readonly<Record<number, number>> = { 2: 6, 3: 9, 4: 8, 5: 5 };
+
+/** Il tetto di flop per una stanza di questa misura. */
+export function flopBudget(players: number): number {
+  return FLOP_BUDGET[players] ?? 0;
+}
+
+/**
+ * Quanti flop restano da qui alla fine.
+ *
+ * Due freni, e vale il piu' stretto: il tetto della stanza qui sopra, e la
+ * capienza vera della lista -- non si puo' buttare un lotto se quelli che
+ * restano servono tutti a riempire le rose. Il secondo entra in gioco solo con
+ * impostazioni fuori dall'ordinario (dieci slot a testa su una lista da
+ * trenta), ma senza si prometterebbe un flop che il mazzo non puo' pagare.
  */
 export function discardsLeft(state: GameState): number {
+  const restanti = flopBudget(state.players.length) - state.discards.length;
   const daRiempire = state.players.reduce((total, p) => total + slotsLeft(state, p), 0);
   // Il lotto in corso e' gia' uscito dalla coda: va contato a parte.
-  const ancoraInGioco = state.queue.length + (state.currentItemId ? 1 : 0);
-  return Math.max(0, ancoraInGioco - daRiempire);
+  const capienza = state.queue.length + (state.currentItemId ? 1 : 0) - daRiempire;
+  return Math.max(0, Math.min(restanti, capienza));
 }
 
 /** Se il lotto in corso, quando non lo vuole nessuno, puo' finire negli scarti. */

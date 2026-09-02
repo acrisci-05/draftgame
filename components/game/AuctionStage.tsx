@@ -18,6 +18,7 @@ import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import {
   discardsLeft,
+  flopBudget,
   colorLook,
   lotSeconds,
   currentItem,
@@ -83,8 +84,14 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
    * Qualcuno ha già passato ma sul lotto non c'è ancora nessuna offerta: qui
    * conviene ricordare che passare non regala niente a nessuno.
    */
-  /* La riserva di scarti e' finita: da qui in poi i lotti si assegnano. */
+  /*
+   * I flop: quanti se ne sono gia' bruciati e quanti ne concede questo tavolo.
+   * Il tetto cambia con i giocatori -- sei in due, nove in tre, otto in
+   * quattro, cinque in cinque -- quindi il contatore lo legge invece di
+   * portarselo scritto dietro.
+   */
   const flopRimasti = discardsLeft(state);
+  const flopTetto = flopBudget(state.players.length);
   const scartiFiniti = flopRimasti === 0;
 
   const nobodyYet =
@@ -178,7 +185,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
               )}
             >
               <span aria-hidden>🗑️</span>
-              {flopRimasti}
+              {state.discards.length}/{flopTetto}
             </span>
           ) : null}
           <RoomCode code={state.code} />

@@ -143,16 +143,24 @@ check("la soglia minima di una lista e' venti", game.MIN_CATEGORY_ITEMS === 20, 
 // quelli che servono a riempire tutte le liste. La stessa regola a due come a
 // cinque -- prima erano cinque scarti per tutti, e in cinque giocatori
 // finivano al quinto flop.
-for (const n of [2, 3, 4, 5]) {
-  const s = stanza(n, { slots: 5, allowDiscards: true });
-  const daRiempire = n * 5;
-  const atteso = Math.max(0, s.queue.length + 1 - daRiempire);
-  check(
-    `in ${n} i flop possibili sono ${atteso}`,
-    game.discardsLeft(s) === atteso,
-    game.discardsLeft(s),
-  );
+const TETTI = { 2: 6, 3: 9, 4: 8, 5: 5 };
+for (const [n, atteso] of Object.entries(TETTI)) {
+  const quanti = Number(n);
+  const s = stanza(quanti, { slots: 5, allowDiscards: true });
+  check(`in ${n} il tetto dei flop e' ${atteso}`, game.flopBudget(quanti) === atteso, game.flopBudget(quanti));
+  check(`in ${n} si parte con ${atteso} flop disponibili`, game.discardsLeft(s) === atteso, game.discardsLeft(s));
   check(`in ${n} il primo lotto si puo' scartare`, game.canDiscardLot(s) === true);
+
+  // Bruciati tutti i flop, non se ne concedono altri: il lotto va assegnato.
+  const esauriti = { ...s, discards: new Array(atteso).fill("x") };
+  check(`in ${n}, finiti i flop non si scarta piu'`, game.canDiscardLot(esauriti) === false);
+}
+
+// La capienza della lista resta il freno piu' stretto: dieci slot a testa in
+// tre non lasciano lotti da buttare, per quanto il tetto ne concederebbe nove.
+{
+  const stretta = stanza(3, { slots: 10, allowDiscards: true });
+  check("con la lista al limite non si scarta", game.discardsLeft(stretta) === 0, game.discardsLeft(stretta));
 }
 
 // Con il Flop Draft spento non si scarta mai, qualunque sia la capienza.
