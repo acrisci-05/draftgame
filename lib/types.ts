@@ -266,6 +266,14 @@ export interface Profile {
 
 export interface VoteResultPayload {
   code: string;
+  /**
+   * true quando la partita era un uno contro uno col Pick-asso Bot.
+   *
+   * Serve alla pagina del voto, che della stanza non sa niente: riceve solo
+   * questo pacchetto. Senza il contrassegno il bot comparirebbe come un
+   * giocatore qualunque, e chi vota crederebbe di scegliere fra due persone.
+   */
+  practice?: boolean;
   categoryName: string;
   categoryEmoji: string;
   currency: CurrencyCode;

@@ -1032,3 +1032,62 @@ $$;
 
 revoke execute on function public.award_match_xp(text, boolean, integer, boolean, boolean) from public;
 grant execute on function public.award_match_xp(text, boolean, integer, boolean, boolean) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Nessuno vota la propria partita.
+--
+-- Il link del voto si manda agli amici, ed e' fatto per loro: chi ha giocato ha
+-- gia' votato dentro la stanza, alla fine dell'asta. Aprire il proprio link e
+-- votarsi da soli non e' un trucco astuto, e' semplicemente il conteggio che
+-- smette di dire qualcosa -- e in una partita fra amici basta che succeda una
+-- volta perche' nessuno si fidi piu' del risultato.
+--
+-- Il divieto sta qui e non nell'app per la ragione di sempre: nell'app basta
+-- aprire gli strumenti da sviluppatore per scavalcarlo.
+--
+-- Come si riconosce chi ha giocato: la chiave del votante e' l'identificativo
+-- del dispositivo, ed e' lo stesso che il giocatore porta dentro la partita.
+-- Se quella chiave compare fra i giocatori salvati nel risultato, chi sta
+-- votando e' uno di loro. Non serve nessuna tabella in piu': l'elenco dei
+-- giocatori e' gia' dentro la riga del risultato.
+-- ---------------------------------------------------------------------------
+
+drop policy if exists "votes_public_insert" on public.votes;
+create policy "votes_public_insert"
+  on public.votes for insert
+  with check (
+    char_length(player_id) between 1 and 64
+    and char_length(voter_key) between 1 and 128
+    and not exists (
+      select 1
+      from public.results r
+      cross join lateral jsonb_array_elements(r.players) as giocatore
+      where r.id = votes.result_id
+        and giocatore->>'id' = votes.voter_key
+    )
+  );
+
+-- ---------------------------------------------------------------------------
+-- Il voto si da' una volta sola.
+--
+-- Prima si poteva cambiare idea: l'app faceva un upsert e la regola di modifica
+-- lo consentiva. Ma un voto che si puo' riscrivere non e' un voto, e' un
+-- sondaggio aperto: chi guarda le percentuali salire puo' spostare il proprio
+-- all'ultimo per far vincere chi vuole. Adesso la modifica non e' concessa a
+-- nessuno, e la chiave doppia (risultato, votante) rifiuta il secondo voto.
+-- ---------------------------------------------------------------------------
+
+drop policy if exists "votes_public_update" on public.votes;
+
+-- Chi ha votato, non solo quanti: serve allo storico per mostrare i nomi.
+-- Vuoto per gli spettatori senza profilo, che restano ospiti anche qui.
+alter table public.votes
+  add column if not exists voter_name text;
+alter table public.votes
+  add column if not exists voter_account uuid references public.profiles on delete set null;
+
+-- Il risultato ricorda se la partita era contro il bot: la pagina del voto non
+-- conosce la stanza, riceve solo questa riga, e senza il contrassegno il bot
+-- comparirebbe come un avversario umano qualunque.
+alter table public.results
+  add column if not exists practice boolean not null default false;

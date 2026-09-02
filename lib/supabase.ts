@@ -285,6 +285,7 @@ interface ResultRow {
   category_emoji: string;
   currency: VoteResultPayload["currency"];
   players: Player[];
+  practice?: boolean | null;
 }
 
 /** Salva i roster finali e restituisce l'id da usare nel link di voto. */
@@ -298,6 +299,7 @@ export async function publishResult(payload: VoteResultPayload): Promise<string>
       category_emoji: payload.categoryEmoji,
       currency: payload.currency,
       players: payload.players,
+      practice: payload.practice === true,
     })
     .select("id")
     .single();
@@ -310,7 +312,7 @@ export async function fetchResult(id: string): Promise<VoteResultPayload> {
   const supabase = requireClient();
   const { data, error } = await supabase
     .from(RESULTS_TABLE)
-    .select("id, code, category_name, category_emoji, currency, players")
+    .select("id, code, category_name, category_emoji, currency, players, practice")
     .eq("id", id)
     .single();
 
@@ -322,21 +324,51 @@ export async function fetchResult(id: string): Promise<VoteResultPayload> {
     categoryEmoji: row.category_emoji,
     currency: row.currency,
     players: row.players,
+    practice: row.practice === true,
   };
 }
 
+/** Perche' un voto puo' essere rifiutato, detto in modo comprensibile. */
+export type VoteRefusal = "self" | "already" | "unknown";
+
+export class VoteFailure extends Error {
+  constructor(readonly reason: VoteRefusal) {
+    super(reason);
+    this.name = "VoteFailure";
+  }
+}
+
+/**
+ * Un voto, una volta sola.
+ *
+ * Inserimento e non piu' upsert: il voto non si cambia. Chi guarda le
+ * percentuali salire non deve poter spostare il proprio all'ultimo momento
+ * per far vincere chi vuole -- a quel punto non e' un voto, e' un sondaggio
+ * aperto.
+ *
+ * Due rifiuti hanno un nome e uno no: il 23505 e' la chiave doppia, cioe' hai
+ * gia' votato; il 42501 e' la regola del database che riconosce nel votante
+ * un giocatore di quella partita.
+ */
 export async function castVote(
   resultId: string,
   playerId: string,
   voterKey: string,
+  voter?: { name?: string; accountId?: string },
 ): Promise<void> {
   const supabase = requireClient();
-  const { error } = await supabase
-    .from(VOTES_TABLE)
-    .upsert({ result_id: resultId, player_id: playerId, voter_key: voterKey }, {
-      onConflict: "result_id,voter_key",
-    });
-  if (error) throw new Error(error.message);
+  const { error } = await supabase.from(VOTES_TABLE).insert({
+    result_id: resultId,
+    player_id: playerId,
+    voter_key: voterKey,
+    voter_name: voter?.name ?? null,
+    voter_account: voter?.accountId ?? null,
+  });
+  if (!error) return;
+  if (error.code === "23505") throw new VoteFailure("already");
+  // 42501 e' il rifiuto delle regole di accesso: qui vuol dire autovoto.
+  if (error.code === "42501") throw new VoteFailure("self");
+  throw new VoteFailure("unknown");
 }
 
 export async function fetchVotes(resultId: string): Promise<VoteTally[]> {
@@ -352,4 +384,41 @@ export async function fetchVotes(resultId: string): Promise<VoteTally[]> {
     counts.set(row.player_id, (counts.get(row.player_id) ?? 0) + 1);
   });
   return [...counts.entries()].map(([playerId, votes]) => ({ playerId, votes }));
+}
+
+export interface Voter {
+  playerId: string;
+  /** Il nickname di chi ha votato, o null se ha votato da ospite. */
+  name: string | null;
+  registered: boolean;
+  at: string;
+}
+
+/**
+ * Chi ha votato chi, non solo quanti.
+ *
+ * Serve allo storico: vedere che tre persone hanno scelto la tua rosa e
+ * quali sono e' tutta un'altra cosa dal vedere il numero tre. Gli ospiti
+ * restano senza nome, perche' un nome non ce l'hanno.
+ */
+export async function fetchVoters(resultId: string): Promise<Voter[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from(VOTES_TABLE)
+    .select("player_id, voter_name, voter_account, created_at")
+    .eq("result_id", resultId)
+    .order("created_at", { ascending: true });
+  if (error || !data) return [];
+  return (data as {
+    player_id: string;
+    voter_name: string | null;
+    voter_account: string | null;
+    created_at: string;
+  }[]).map((row) => ({
+    playerId: row.player_id,
+    name: row.voter_name,
+    registered: Boolean(row.voter_account),
+    at: row.created_at,
+  }));
 }

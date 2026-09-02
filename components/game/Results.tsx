@@ -366,6 +366,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
         categoryEmoji: state.category.emoji,
         currency,
         players: state.players,
+        practice: state.isPractice === true,
       });
       setResultId(id);
       setVoteUrl(voteUrlFor(id));
