@@ -156,6 +156,8 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
       won: mine === 0,
       votes: tally[me.id] ?? 0,
       withMate,
+      // Contro il bot si prende una frazione: quanto, lo decide il database.
+      practice: state.isPractice === true,
     }).then((earned) => {
       if (earned <= 0) return;
       setEarnedXp(earned);

@@ -99,6 +99,25 @@ export const it = {
   "rules.rewards.r5": "Livello 51+ · Tycoon Supremo.",
   "rules.rewards.r5Body": "Cornice d'oro con corona e titolo Tycoon. Da 15.000 XP.",
 
+  "rules.solo.title": "Da solo: 1v1 contro il Bot",
+  "rules.solo.body":
+    "Sei da solo o vuoi affilare i tuoi rilanci? Prova la modalità 1v1 contro Pick-asso Bot 🤖! Perfetta per allenare il tuo fiuto per gli affari, testare la gestione del budget e accumulare XP senza tempi di attesa.",
+  "rules.solo.how": "Si parte con un tocco.",
+  "rules.solo.howBody":
+    "Il pulsante è in home, sotto gli altri due: nessuna stanza da aprire, nessun codice da mandare. La lista la tira il dado, le regole sono le ultime che hai usato. Si gioca su questo dispositivo, anche senza connessione.",
+  "rules.solo.xp": "XP ridotti.",
+  "rules.solo.xpBody":
+    "5 punti per aver finito la partita, 10 in più se la rosa che vince è la tua. Una sfida al bot si può rigiocare all'infinito: se pagasse come una partita fra persone, i livelli premierebbero il tempo libero invece del gioco.",
+  "rules.solo.two": "Il bot vota te.",
+  "rules.solo.twoBody":
+    "A liste piene il bot dà il suo voto alla tua rosa — è l'unica che può votare, come per te la sua. Finisce 1 a 1, quindi vale la regola del due: a decidere sono i crediti risparmiati. Contro il bot, spendere poco è la strada per vincere.",
+  "rules.random.title": "Indeciso su quali lotti chiamare?",
+  "rules.random.body":
+    "Indeciso su quali lotti chiamare? Sfrutta il pulsante “🎲 Categoria Casuale” per far scegliere al sistema e buttarti subito nel draft!",
+  "rules.random.how": "Da dove pesca.",
+  "rules.random.howBody":
+    "Da tutte le liste che vedi in elenco: le ufficiali, quelle appena pubblicate e anche le tue. Restano fuori solo quelle troppo corte per reggere una partita, che nell'elenco sono già spente.",
+
   "rules.title": "Come si gioca",
 
   "rules.goal.title": "Obiettivo",
@@ -324,6 +343,8 @@ export const it = {
 
   "categories.count": "{n} elementi",
   "categories.tooShort": "Troppo corta: servono almeno {n} elementi per giocarci.",
+  "categories.random": "🎲 Categoria Casuale",
+  "categories.randomHint": "Scegliamo noi il lotto da chiamare: tuffati nel draft",
   "categories.title": "Categorie",
   "categories.subtitle": "{n} liste pronte da giocare, più quelle che crei tu.",
   "categories.official": "Liste ufficiali",
@@ -367,6 +388,7 @@ export const it = {
   "room.offline": "offline",
   "room.connecting": "connessione...",
   "room.local": "locale",
+  "room.practice": "vs Pick-asso Bot",
   "room.loading": "Carico la stanza...",
   "room.waitingState": "In attesa dei dati della stanza dall'host...",
   "room.unreachable": "Stanza non raggiungibile.",
@@ -649,6 +671,9 @@ export const it = {
   "home.resume": "Torna alla partita",
   "home.resumeHint": "Hai lasciato aperta la stanza {code}",
   "home.createHint": "Scegli modalità, budget e categoria",
+  "home.playBot": "🤖 Gioca vs Pick-asso Bot",
+  "home.playBotHint": "Uno contro uno, categoria a sorte, parte subito",
+  "home.botNoCategory": "Nessuna lista è abbastanza lunga per una sfida a due.",
   "home.joinCta": "Unisciti con codice",
   "home.joinHint": "Serve il codice a 5 caratteri della stanza",
   "home.codePlaceholder": "K9X2P",

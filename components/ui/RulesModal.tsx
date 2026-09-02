@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, Layers, Medal, Sparkles, Target, Trophy, Users } from "lucide-react";
+import { Bot, Dices, Gavel, Layers, Medal, Sparkles, Target, Trophy, Users } from "lucide-react";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
 import { Modal } from "./Modal";
@@ -98,6 +98,28 @@ const SECTIONS: Section[] = [
         formula: "(numero_giocatori * slot_roster) + 5",
       },
     ],
+  },
+  /*
+   * Le due strade per sedersi al tavolo senza aspettare nessuno: un avversario
+   * che c'e' sempre e una lista scelta dal banditore. Stanno qui, subito dopo
+   * le modalita', perche' rispondono alla stessa domanda -- "e adesso come
+   * comincio?" -- e non a quella delle regole d'asta.
+   */
+  {
+    icon: Bot,
+    title: "rules.solo.title",
+    lead: "rules.solo.body",
+    points: [
+      { label: "rules.solo.how", body: "rules.solo.howBody" },
+      { label: "rules.solo.xp", body: "rules.solo.xpBody" },
+      { label: "rules.solo.two", body: "rules.solo.twoBody" },
+    ],
+  },
+  {
+    icon: Dices,
+    title: "rules.random.title",
+    lead: "rules.random.body",
+    points: [{ label: "rules.random.how", body: "rules.random.howBody" }],
   },
   {
     icon: Users,

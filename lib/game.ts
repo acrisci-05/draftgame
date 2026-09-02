@@ -114,9 +114,18 @@ interface CreateGameArgs {
   hostId: string;
   category: Category;
   config?: Partial<RoomConfig>;
+  /** true per un uno contro uno contro il Pick-asso Bot. */
+  practice?: boolean;
 }
 
-export function createGame({ code, mode, hostId, category, config }: CreateGameArgs): GameState {
+export function createGame({
+  code,
+  mode,
+  hostId,
+  category,
+  config,
+  practice,
+}: CreateGameArgs): GameState {
   const merged: RoomConfig = { ...DEFAULT_CONFIG, ...config };
   return {
     code,
@@ -147,6 +156,9 @@ export function createGame({ code, mode, hostId, category, config }: CreateGameA
     feed: [],
     lotNumber: 0,
     sniped: false,
+    // Si scrive solo quando e' vero: le partite normali restano identiche a
+    // com'erano, senza un campo in piu' che viaggia a ogni aggiornamento.
+    ...(practice ? { isPractice: true } : {}),
     updatedAt: Date.now(),
   };
 }
@@ -187,6 +199,32 @@ export function canStartMatch(
 /** Quanti lotti servono per questa combinazione, margine compreso. */
 export function lotsNeeded(players: number, slots: number): number {
   return players * slots + LOT_MARGIN;
+}
+
+/**
+ * Una lista a caso fra quelle con cui si puo' davvero giocare.
+ *
+ * Pesca dall'elenco che le viene passato -- quello che la schermata sta gia'
+ * mostrando -- e non da una copia scritta qui: aggiungere una categoria al
+ * sorgente, o pubblicarne una dal pannello, la rende sorteggiabile senza
+ * toccare questo file.
+ *
+ * Le liste troppo corte restano fuori: sono spente anche nell'elenco, e un dado
+ * che ogni tanto cade su un pulsante disattivato sarebbe solo un dado rotto.
+ * Con `players` e `slots` si stringe ancora, alla misura di quella partita.
+ * Torna null se non ne resta nessuna.
+ */
+export function randomPlayableCategory(
+  list: readonly Category[],
+  fit?: { players: number; slots: number },
+): Category | null {
+  const playable = list.filter((category) => {
+    if (category.items.length < MIN_CATEGORY_ITEMS) return false;
+    if (!fit) return true;
+    return canStartMatch(fit.players, category.items.length, fit.slots);
+  });
+  if (playable.length === 0) return null;
+  return playable[Math.floor(Math.random() * playable.length)];
 }
 
 /**

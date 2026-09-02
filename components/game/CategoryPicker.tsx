@@ -1,11 +1,11 @@
 "use client";
 
-import { Check, Plus } from "lucide-react";
+import { Check, Dices, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "@/lib/admin";
 import { OFFICIAL_CATEGORIES, categoryName } from "@/lib/catalog";
 import { useClientValue } from "@/lib/client-store";
-import { MIN_CATEGORY_ITEMS } from "@/lib/game";
+import { MIN_CATEGORY_ITEMS, randomPlayableCategory } from "@/lib/game";
 import { useSettings } from "@/lib/settings";
 import { allCategories } from "@/lib/storage";
 import type { Category } from "@/lib/types";
@@ -25,8 +25,43 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
   const categories = useClientValue<Category[]>(allCategories, OFFICIAL_CATEGORIES);
   const isAdmin = useAdmin();
 
+  /*
+   * Il dado pesca dallo stesso elenco che sta qui sotto, non da una lista sua:
+   * quello che si vede e' quello che puo' uscire. Chi non sa cosa scegliere --
+   * ed e' il caso piu' comune davanti a trentaquattro liste -- chiude qui e
+   * comincia a giocare.
+   */
+  const pickRandom = () => {
+    const drawn = randomPlayableCategory(categories);
+    if (drawn) onSelect(drawn);
+  };
+
   return (
     <div className="flex flex-col gap-2">
+      {/*
+        Il dado resta appiccicato in cima mentre si scorre.
+
+        Trentaquattro liste sono tante, e chi apre questa finestra indeciso lo e'
+        ancora di piu' a meta' elenco: un pulsante che sparisce dopo due
+        scorrimenti e' un pulsante che non c'e'. Lo sfondo pieno serve a coprire
+        le righe che gli passano sotto.
+      */}
+      <div className="sticky top-0 z-10 -mt-1 bg-surface pb-2 pt-1">
+        <button
+          type="button"
+          onClick={pickRandom}
+          className="group flex w-full items-center gap-3 rounded-xl border border-violet/60 bg-gradient-to-r from-violet/25 to-violet/5 p-3 text-start transition-colors hover:border-violet hover:from-violet/35"
+        >
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-violet/25 text-violet transition-transform group-hover:rotate-12">
+            <Dices className="size-6" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate font-black text-violet">{t("categories.random")}</span>
+            <span className="mt-0.5 block text-xs text-muted">{t("categories.randomHint")}</span>
+          </span>
+        </button>
+      </div>
+
       {categories.map((category) => {
         const selected = category.id === selectedId;
         /*

@@ -1,10 +1,22 @@
 "use client";
 
-import { ArrowLeft, Home, Loader2, Plus, Radio, SearchX, Smartphone, TriangleAlert } from "lucide-react";
+import {
+  ArrowLeft,
+  Bot,
+  Home,
+  Loader2,
+  Plus,
+  Radio,
+  SearchX,
+  Smartphone,
+  TriangleAlert,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { BOT_AVATAR, BOT_NAME, BOT_PLAYER_ID, useBotEngine } from "@/lib/botEngine";
 import { DEFAULT_CATEGORY } from "@/lib/catalog";
+import { canStartMatch, playerById } from "@/lib/game";
 import { useClientValue, useIsClient } from "@/lib/client-store";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { useRoom } from "@/lib/realtime";
@@ -72,6 +84,8 @@ export function RoomClient({ code }: { code: string }) {
     [session?.playerId, session?.name, session?.emoji, accountId, handle],
   );
 
+  const practice = Boolean(session?.practice);
+
   const room = useRoom({
     code,
     mode: session?.mode ?? "local",
@@ -79,7 +93,45 @@ export function RoomClient({ code }: { code: string }) {
     self,
     category,
     config,
+    practice,
   });
+
+  /*
+   * L'avversario, e poi il fischio d'inizio.
+   *
+   * La sfida al bot si lancia da un pulsante solo: chi la preme non passa dalla
+   * lobby, quindi il secondo giocatore lo iscrive qui l'app, e appena e' dentro
+   * la partita parte da sola. Due passaggi separati e non uno, perche' il
+   * riduttore accetta l'avvio solo quando i giocatori ci sono gia': si aggiunge
+   * il bot, lo stato torna indietro con due giocatori, e il secondo giro fa
+   * partire l'asta.
+   */
+  const stato = room.state;
+  const botPresente = Boolean(stato && playerById(stato, BOT_PLAYER_ID));
+
+  useEffect(() => {
+    if (!practice || !stato || stato.phase !== "lobby") return;
+
+    if (!botPresente) {
+      room.dispatch({
+        type: "add_player",
+        player: { id: BOT_PLAYER_ID, name: BOT_NAME, emoji: BOT_AVATAR },
+      });
+      return;
+    }
+
+    // I lotti devono bastare per due: la lista arriva gia' scelta apposta, ma
+    // chi torna su una vecchia stanza di prova potrebbe averne una che non
+    // regge piu' le regole di adesso. In quel caso si resta in lobby, dove il
+    // problema si vede ed e' rimediabile.
+    if (!canStartMatch(stato.players.length, stato.items.length, stato.config.slots)) return;
+    room.dispatch({ type: "start", now: Date.now() });
+    // room.dispatch e' stabile: si dipende dai dati, non dall'oggetto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [practice, botPresente, stato?.phase, stato?.players.length]);
+
+  /* Da qui in poi il bot gioca da solo: rilancia, passa e vota. */
+  useBotEngine({ state: stato, dispatch: room.dispatch, now: room.now });
 
   /*
    * Il profilo arriva dopo il montaggio, e la stanza si crea subito: senza
@@ -145,8 +197,18 @@ export function RoomClient({ code }: { code: string }) {
           <ArrowLeft className="size-4" />
           {t("room.exit")}
         </button>
-        <Badge tone={session.mode === "online" ? "neon" : "neutral"}>
-          {session.mode === "online" ? (
+        {/*
+          Contro il bot si dice quello e basta: "locale" direbbe una cosa vera
+          ma inutile, mentre sapere che l'avversario e' un programma cambia il
+          senso di tutto quello che succede sotto.
+        */}
+        <Badge tone={practice ? "violet" : session.mode === "online" ? "neon" : "neutral"}>
+          {practice ? (
+            <>
+              <Bot className="size-3" />
+              {t("room.practice")}
+            </>
+          ) : session.mode === "online" ? (
             <>
               <Radio className={cn("size-3", status === "live" ? "text-neon" : "text-amber-400")} />
               {status === "live"

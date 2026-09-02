@@ -142,6 +142,14 @@ export async function awardMatchXp(input: {
   votes: number;
   /** Vero se in stanza c'era almeno un PickMate: apre il bonus giornaliero. */
   withMate: boolean;
+  /**
+   * Vero per le partite contro il Pick-asso Bot, che pagano una frazione.
+   *
+   * Il taglio lo applica il database, non questa riga: qui si dichiara soltanto
+   * contro chi si e' giocato. Altrimenti basterebbe cambiare la pagina per
+   * farsi pagare una sfida al bot come una partita fra persone.
+   */
+  practice?: boolean;
 }): Promise<number> {
   const supabase = getSupabase();
   if (!supabase) return 0;
@@ -151,6 +159,7 @@ export async function awardMatchXp(input: {
       won: input.won,
       votes: input.votes,
       with_mate: input.withMate,
+      practice: input.practice === true,
     });
     if (error) return 0;
     return typeof data === "number" ? data : 0;

@@ -950,3 +950,85 @@ alter table public.match_history
   drop constraint if exists match_history_user_id_code_key;
 alter table public.match_history
   add constraint match_history_user_id_code_key unique (user_id, code);
+
+-- ---------------------------------------------------------------------------
+-- L'esperienza delle partite contro il Pick-asso Bot.
+--
+-- Una sfida al bot non vale come una partita fra persone: l'avversario e' un
+-- programma, si puo' rigiocare all'infinito e a decidere il vincitore c'e' un
+-- voto solo, il suo. Se pagasse come le altre, la classifica dei livelli
+-- diventerebbe la classifica di chi ha piu' tempo libero.
+--
+-- Quindi paga poco, e paga qui: cinque punti per averla finita, dieci in piu'
+-- se la rosa vinta e' la propria. Niente punti per i voti ricevuti -- ce n'e'
+-- uno solo ed e' automatico -- e niente bonus sociale, che esiste per premiare
+-- chi gioca con qualcuno.
+--
+-- Il taglio sta nel database e non nell'app per la stessa ragione di tutto il
+-- resto del conteggio: nell'app basterebbe cambiare la pagina per dichiarare
+-- una partita vera al posto di una di prova.
+-- ---------------------------------------------------------------------------
+
+-- La firma cambia: senza togliere la vecchia, una chiamata a quattro argomenti
+-- resterebbe ambigua fra le due versioni e il database rifiuterebbe entrambe.
+drop function if exists public.award_match_xp(text, boolean, integer, boolean);
+
+create or replace function public.award_match_xp(
+  match_code text,
+  won boolean,
+  votes integer,
+  with_mate boolean,
+  practice boolean default false
+) returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  me uuid := auth.uid();
+  oggi date := (now() at time zone 'utc')::date;
+  bonus_gia_preso date;
+  punti integer;
+  sociale integer := 0;
+begin
+  if me is null then
+    return 0;
+  end if;
+
+  -- I tetti si applicano qui, non nell'app: e' l'unico punto che non si
+  -- puo' scavalcare cambiando il codice della pagina.
+  if coalesce(practice, false) then
+    punti := 5 + (case when won then 10 else 0 end);
+  else
+    punti := 50
+      + (case when won then 100 else 0 end)
+      + least(greatest(coalesce(votes, 0), 0) * 10, 100);
+
+    select last_social_bonus_date into bonus_gia_preso
+    from public.profiles where id = me;
+
+    if coalesce(with_mate, false)
+       and (bonus_gia_preso is null or bonus_gia_preso < oggi) then
+      sociale := 100;
+    end if;
+  end if;
+
+  -- La chiave doppia rifiuta la seconda richiesta sulla stessa partita.
+  begin
+    insert into public.xp_awards (user_id, code, amount)
+    values (me, upper(btrim(match_code)), punti + sociale);
+  exception when unique_violation then
+    return 0;
+  end;
+
+  update public.profiles
+  set xp = xp + punti + sociale,
+      last_social_bonus_date = case when sociale > 0 then oggi else last_social_bonus_date end
+  where id = me;
+
+  return punti + sociale;
+end;
+$$;
+
+revoke execute on function public.award_match_xp(text, boolean, integer, boolean, boolean) from public;
+grant execute on function public.award_match_xp(text, boolean, integer, boolean, boolean) to authenticated;

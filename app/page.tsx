@@ -1,20 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, Heart, LayoutGrid, LogIn, Plus, Undo2, X } from "lucide-react";
+import { Bot, Gavel, Heart, LayoutGrid, LogIn, Plus, Undo2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClientValue } from "@/lib/client-store";
 import { APP_FULL_NAME, APP_TAGLINE, APP_VERSION } from "@/lib/config";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
+import { randomPlayableCategory } from "@/lib/game";
 import { openPanel } from "@/lib/panels";
 import { useSettings } from "@/lib/settings";
 import { useAuth } from "@/lib/auth";
 import { ensureProfile, readProfile, saveProfile, saveSession,
+  allCategories,
+  readConfig,
   resumableSession,
   clearSession,
 } from "@/lib/storage";
+import { showToast } from "@/lib/toast";
 import type { Profile } from "@/lib/types";
+import { roomCode } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { AvatarPicker } from "@/components/ui/Avatar";
 import { Input } from "@/components/ui/Input";
@@ -58,6 +63,43 @@ export default function HomePage() {
   /* La stanza aperta di recente su questo dispositivo, se c'e'. */
   const aperta = useClientValue(resumableSession, null);
   const [scartata, setScartata] = useState(false);
+
+  /*
+   * L'uno contro uno contro il bot.
+   *
+   * Parte e basta: niente schermata di configurazione, niente scelta della
+   * lista. Chi preme qui vuole giocare adesso -- e' il pulsante di chi apre
+   * l'app da solo -- quindi la categoria la tira il dado, fra quelle che
+   * reggono una partita a due, e le regole sono le ultime usate. La sfida vive
+   * su questo dispositivo: non serve una stanza in rete per un avversario che
+   * sta gia' qui dentro.
+   */
+  const playAgainstBot = () => {
+    const config = { ...readConfig(), maxPlayers: 2 };
+    const category = randomPlayableCategory(allCategories(), {
+      players: 2,
+      slots: config.slots,
+    });
+    if (!category) {
+      showToast(t("home.botNoCategory"), "error");
+      return;
+    }
+
+    const profile = persistProfile();
+    const code = roomCode();
+    saveSession({
+      code,
+      mode: "local",
+      playerId: profile.id,
+      isHost: true,
+      name: profile.name || "Player",
+      emoji: profile.emoji,
+      categoryId: category.id,
+      config,
+      practice: true,
+    });
+    router.push(`/room/${code}`);
+  };
 
   const joinRoom = (code: string) => {
     const profile = persistProfile();
@@ -175,7 +217,22 @@ export default function HomePage() {
             </Button>
           </div>
 
+          {/*
+            La terza via, sotto le altre due perche' e' quella che si sceglie
+            quando le prime due non si possono usare: non c'e' nessun altro,
+            oppure non c'e' voglia di aspettare che arrivi.
+          */}
+          <Button
+            variant="outline"
+            className="mt-3 w-full rounded-xl"
+            onClick={playAgainstBot}
+          >
+            <Bot className="size-5" />
+            {t("home.playBot")}
+          </Button>
+
           <p className="mt-2.5 text-center text-xs text-faint">{t("home.createHint")}</p>
+          <p className="mt-1 text-center text-xs text-faint">{t("home.playBotHint")}</p>
         </div>
       </motion.section>
 

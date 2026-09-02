@@ -181,6 +181,15 @@ export interface GameState {
   sniped: boolean;
   /** Voti della fase finale. Assente sulle partite iniziate prima del voto. */
   votes?: VoteMap;
+  /**
+   * true nelle partite contro il Pick-asso Bot.
+   *
+   * Serve a due cose che devono restare distinguibili da una partita vera: il
+   * bot si muove solo dove questo e' acceso, e l'esperienza viene accreditata
+   * ridotta. Assente sulle partite create prima che la modalita' esistesse, che
+   * vale quanto false.
+   */
+  isPractice?: boolean;
   updatedAt: number;
 }
 
@@ -195,6 +204,8 @@ export interface RoomSession {
   categoryId?: string;
   /** Regole scelte nella schermata di configurazione (solo per chi ospita). */
   config?: RoomConfig;
+  /** true se la stanza e' un uno contro uno contro il Pick-asso Bot. */
+  practice?: boolean;
   /**
    * Quando si e' entrati in questa stanza. Serve a capire se vale la pena
    * riproporla dopo un ricarico: una stanza di ieri e' una partita finita.

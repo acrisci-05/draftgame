@@ -34,6 +34,8 @@ interface UseRoomArgs {
   category: Category | null;
   /** Regole scelte in configurazione, usate solo da chi ospita la stanza. */
   config?: RoomConfig;
+  /** true per l'uno contro uno contro il Pick-asso Bot. */
+  practice?: boolean;
 }
 
 export interface RoomApi {
@@ -59,7 +61,15 @@ const HELLO_RETRY_MS = 1500;
  */
 const HOST_GRACE_MS = 6000;
 
-export function useRoom({ code, mode, isHost, self, category, config }: UseRoomArgs): RoomApi {
+export function useRoom({
+  code,
+  mode,
+  isHost,
+  self,
+  category,
+  config,
+  practice,
+}: UseRoomArgs): RoomApi {
   const [state, setState] = useState<GameState | null>(null);
   const [status, setStatus] = useState<RoomStatus>("connecting");
   const [error, setError] = useState<TranslationKey | null>(null);
@@ -82,6 +92,7 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
   const selfRef = useRef(self);
   const categoryRef = useRef(category);
   const configRef = useRef(config);
+  const practiceRef = useRef(practice);
   const isHostRef = useRef(false);
   const presenceRef = useRef<string[]>([]);
   const takeoverRef = useRef<number | null>(null);
@@ -90,10 +101,11 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
     selfRef.current = self;
     categoryRef.current = category;
     configRef.current = config;
+    practiceRef.current = practice;
     // Il ruolo va tenuto anche in un riferimento: i canali lo leggono dentro
     // funzioni create una volta sola, dove lo stato sarebbe quello vecchio.
     isHostRef.current = hosting;
-  }, [self, category, config, hosting]);
+  }, [self, category, config, practice, hosting]);
 
   /** Cambia ruolo in un colpo solo: il riferimento serve subito, lo stato al render dopo. */
   const setRole = useCallback((next: boolean) => {
@@ -188,6 +200,7 @@ export function useRoom({ code, mode, isHost, self, category, config }: UseRoomA
       hostId: selfRef.current.id,
       category: cat,
       config: configRef.current,
+      practice: practiceRef.current,
     });
     const withHost = reducer(base, { type: "add_player", player: selfRef.current });
     stateRef.current = withHost;

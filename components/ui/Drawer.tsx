@@ -32,8 +32,16 @@ export function Drawer({ open, title, onClose, children }: DrawerProps) {
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
+          {/*
+            Il pannello parte dal bordo dello schermo: con viewport-fit=cover la
+            sua cima finisce sotto l'orologio e la batteria, e la "X" non solo si
+            legge male -- non si tocca proprio, perche' quei tocchi se li prende
+            il sistema. Il riempimento in alto e' quello di sempre piu' l'altezza
+            della tacca, che fuori dall'app installata vale zero: cosi' una
+            regola sola serve tutti e due i casi.
+          */}
           <motion.aside
-            className="glass-dark flex h-full w-[86%] max-w-sm flex-col gap-3 overflow-y-auto border-s border-white/10 bg-zinc-950/80 p-4 backdrop-blur-xl"
+            className="glass-dark flex h-full w-[86%] max-w-sm flex-col gap-3 overflow-y-auto border-s border-white/10 bg-zinc-950/80 px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] backdrop-blur-xl"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}

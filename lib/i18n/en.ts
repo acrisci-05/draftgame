@@ -101,6 +101,25 @@ export const en: Dictionary = {
   "rules.rewards.r5": "Level 51+ · Supreme Tycoon.",
   "rules.rewards.r5Body": "Golden frame with crown and Tycoon title. From 15,000 XP.",
 
+  "rules.solo.title": "On your own: 1v1 vs the Bot",
+  "rules.solo.body":
+    "Playing alone, or want to sharpen your raises? Try the 1v1 mode against Pick-asso Bot 🤖! Perfect for training your nose for a bargain, testing your budget management and stacking XP with no waiting around.",
+  "rules.solo.how": "One tap to start.",
+  "rules.solo.howBody":
+    "The button is on the home screen, under the other two: no room to open, no code to send. The dice picks the list, the rules are the last ones you used. It runs on this device, even offline.",
+  "rules.solo.xp": "Reduced XP.",
+  "rules.solo.xpBody":
+    "5 points for finishing the match, 10 more if the winning roster is yours. A bot match can be replayed forever: paying it like a match against people would make levels reward free time instead of play.",
+  "rules.solo.two": "The bot votes for you.",
+  "rules.solo.twoBody":
+    "Once the rosters are full the bot gives its vote to yours — it is the only one it can vote for, just as its own is the only one you can. It ends 1-1, so the two-player rule applies: saved credits decide. Against the bot, spending little is the way to win.",
+  "rules.random.title": "Not sure which lots to call?",
+  "rules.random.body":
+    "Not sure which lots to call? Use the “🎲 Random Category” button to let the system choose and dive straight into the draft!",
+  "rules.random.how": "Where it draws from.",
+  "rules.random.howBody":
+    "From every list you see: the official ones, the freshly published ones and your own too. Only lists too short to carry a match stay out, and those are already greyed out.",
+
   "rules.title": "How to play",
 
   "rules.goal.title": "Goal",
@@ -317,6 +336,8 @@ export const en: Dictionary = {
 
   "categories.count": "{n} items",
   "categories.tooShort": "Too short: at least {n} items are needed to play.",
+  "categories.random": "🎲 Random Category",
+  "categories.randomHint": "We pick the lot to call: dive straight into the draft",
   "categories.title": "Categories",
   "categories.subtitle": "{n} lists ready to play, plus the ones you build.",
   "categories.official": "Official lists",
@@ -358,6 +379,7 @@ export const en: Dictionary = {
   "room.offline": "offline",
   "room.connecting": "connecting...",
   "room.local": "local",
+  "room.practice": "vs Pick-asso Bot",
   "room.loading": "Loading the room...",
   "room.waitingState": "Waiting for room data from the host...",
   "room.unreachable": "Room unreachable.",
@@ -638,6 +660,9 @@ export const en: Dictionary = {
   "home.resume": "Back to the match",
   "home.resumeHint": "You left room {code} open",
   "home.createHint": "Pick the mode, budget and category",
+  "home.playBot": "🤖 Play vs Pick-asso Bot",
+  "home.playBotHint": "One on one, random category, starts right away",
+  "home.botNoCategory": "No list is long enough for a two-player match.",
   "home.joinCta": "Join with a code",
   "home.joinHint": "You need the 5-character room code",
   "home.codePlaceholder": "K9X2P",
