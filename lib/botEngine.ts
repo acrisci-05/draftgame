@@ -46,16 +46,30 @@ export type BotActionKind = "bid" | "pass" | "hesitate";
  * qualunque risposta istantanea. Le tre fasce dicono anche qualcosa: il bot
  * tentenna quando il lotto gli costa caro e taglia corto quando rinuncia, cosi'
  * il tempo che passa e' gia' un indizio su cosa sta per fare.
+ *
+ * I tempi sono stati allungati dopo averlo visto giocare: rispondere in un
+ * secondo e mezzo non sembrava un avversario svelto, sembrava una macchina. Ora
+ * la risposta piu' rapida arriva dopo due secondi e la piu' lenta sfiora i sei,
+ * che su un lotto da quindici secondi lascia comunque il tempo di rispondere.
  */
 export function getBotDelay(actionType: BotActionKind): number {
   const ranges: Record<BotActionKind, [number, number]> = {
-    pass: [1000, 2000], // Rapido quando decide di non spendere.
-    bid: [1500, 2500], // Standard per rilanciare.
-    hesitate: [3000, 4000], // Piu' lento quando il prezzo e' alto.
+    pass: [2000, 3500], // Rinuncia: la piu' breve, ma non piu' istantanea.
+    bid: [2500, 4500], // Rilancio standard.
+    hesitate: [4000, 6000], // Il lotto gli costa: ci pensa su, e si vede.
   };
   const [min, max] = ranges[actionType];
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+/**
+ * Sopra quale quota del budget residuo il bot comincia a tentennare.
+ *
+ * Quaranta per cento e non cinquanta: la pausa lunga e' la cosa piu' visibile
+ * che fa: alzare la soglia la rendeva rara, e una suspense che scatta una volta
+ * ogni dieci lotti non e' suspense, e' un intoppo.
+ */
+const HESITATION_SHARE = 0.4;
 
 /**
  * Quanto il bot puo' permettersi su un lotto solo.
@@ -111,7 +125,7 @@ export function decideBotMove(state: GameState, botId: string = BOT_PLAYER_ID): 
   /* La Mystery Box ha un prezzo solo: o lo si paga o si lascia. */
   if (state.lotKind === "mystery") {
     if (canClaim(state, botId) && state.lotPrice <= soglia) {
-      const caro = state.lotPrice > bot.budget / 2;
+      const caro = state.lotPrice > bot.budget * HESITATION_SHARE;
       return { kind: "claim", delay: getBotDelay(caro ? "hesitate" : "bid") };
     }
     if (canPass(state, botId)) return { kind: "pass", delay: getBotDelay("pass") };
@@ -144,11 +158,12 @@ export function decideBotMove(state: GameState, botId: string = BOT_PLAYER_ID): 
   }
 
   /*
-   * Oltre la meta' di quello che gli resta il bot ci pensa su. E' la mossa che
-   * si legge meglio da fuori: l'attesa lunga dice "questo lotto gli interessa e
-   * gli costa", ed e' l'unico momento in cui il ritmo dell'asta cambia da solo.
+   * Oltre i due quinti di quello che gli resta il bot ci pensa su. E' la mossa
+   * che si legge meglio da fuori: l'attesa lunga dice "questo lotto gli
+   * interessa e gli costa", ed e' l'unico momento in cui il ritmo dell'asta
+   * cambia da solo.
    */
-  const impegnativo = amount > bot.budget / 2;
+  const impegnativo = amount > bot.budget * HESITATION_SHARE;
   return { kind: "bid", amount, delay: getBotDelay(impegnativo ? "hesitate" : "bid") };
 }
 

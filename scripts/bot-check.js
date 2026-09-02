@@ -180,7 +180,7 @@ console.log("\nPick-asso Bot");
 
 /* ---------------- I ritardi ---------------- */
 
-const fasce = { pass: [1000, 2000], bid: [1500, 2500], hesitate: [3000, 4000] };
+const fasce = { pass: [2000, 3500], bid: [2500, 4500], hesitate: [4000, 6000] };
 for (const [tipo, [min, max]] of Object.entries(fasce)) {
   const campioni = Array.from({ length: 500 }, () => bot.getBotDelay(tipo));
   check(

@@ -224,7 +224,14 @@ export default function HomePage() {
           */}
           <Button
             variant="outline"
-            className="mt-3 w-full rounded-xl"
+            /*
+              Il ciano e' quello con cui finisce la scritta del logo: il pulsante
+              si stacca dal fondo nero senza inventarsi un colore nuovo, e senza
+              pestare i piedi ai due sopra -- verde per creare, viola per
+              entrare. L'alone e' appena accennato e cresce al passaggio: deve
+              farsi notare, non illuminare la stanza.
+            */
+            className="mt-3 w-full rounded-xl border-cyan-400/50 text-cyan-300 shadow-[0_0_18px_-7px_rgb(34_211_238/0.7)] transition-all hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-200 hover:shadow-[0_0_26px_-6px_rgb(34_211_238/0.9)]"
             onClick={playAgainstBot}
           >
             <Bot className="size-5" />
