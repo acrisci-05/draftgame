@@ -83,7 +83,15 @@ export function AuctionStage({
    * c'e' piu' un "prima" e un "dopo".
    */
   const totalSeconds = lotSeconds(state);
-  const turnId = nextToAct(state);
+  /*
+   * Di chi e' la mano.
+   *
+   * Adesso e' un fatto e non piu' un suggerimento: lo stato lo dice, e chi
+   * non ce l'ha ha i pulsanti spenti. Le partite cominciate prima dei turni
+   * non portano il campo, e li' si ricade sul vecchio calcolo -- che era
+   * appunto un consiglio su chi dovrebbe muoversi.
+   */
+  const turnId = state.turnId ?? nextToAct(state);
   /*
    * In locale si tiene aperto un pannello di comandi alla volta: quello di chi
    * tocca, finche' non se ne apre un altro a mano. Il lotto che cambia riporta
@@ -491,9 +499,16 @@ export function AuctionStage({
         </AnimatePresence>
       </div>
 
-      {turnId && passaMano ? (
+      {/*
+        Di chi e' la mano, detto sempre e non solo quando il telefono passa
+        di mano: adesso e' una regola, non un consiglio, e chi ha i pulsanti
+        spenti deve sapere perche' -- se no sembrano rotti.
+      */}
+      {turnId && state.phase === "auction" ? (
         <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-violet">
-          {t("auction.turnOf", { player: playerById(state, turnId)?.name ?? "" })}
+          {turnId === selfId && !passaMano
+            ? t("auction.yourTurnNow")
+            : t("auction.turnOf", { player: playerById(state, turnId)?.name ?? "" })}
         </p>
       ) : null}
 

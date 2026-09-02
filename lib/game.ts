@@ -410,8 +410,24 @@ export function activePlayers(state: GameState): Player[] {
   return state.players.filter((p) => canCompete(state, p));
 }
 
+/** L'identificativo del Pick-asso Bot, ripetuto qui per non creare un giro d'import. */
+const BOT_ID = "bot-pickasso";
+
+/**
+ * Se tocca a questo giocatore.
+ *
+ * Le partite cominciate prima dei turni non portano il campo: li' vale la
+ * vecchia regola, tutti possono agire sempre. Serve perche' un aggiornamento
+ * pubblicato a meta' serata non deve bloccare una stanza gia' aperta.
+ */
+export function isMyTurn(state: GameState, playerId: string): boolean {
+  if (state.turnId === undefined || state.turnId === null) return true;
+  return state.turnId === playerId;
+}
+
 export function canBid(state: GameState, playerId: string, amount: number): boolean {
   if (state.phase !== "auction" || isMysteryLot(state)) return false;
+  if (!isMyTurn(state, playerId)) return false;
   const player = playerById(state, playerId);
   if (!player) return false;
   if (state.passed.includes(playerId)) return false;
@@ -423,6 +439,7 @@ export function canBid(state: GameState, playerId: string, amount: number): bool
 
 export function canClaim(state: GameState, playerId: string): boolean {
   if (state.phase !== "auction" || !isMysteryLot(state)) return false;
+  if (!isMyTurn(state, playerId)) return false;
   const player = playerById(state, playerId);
   if (!player) return false;
   if (state.passed.includes(playerId)) return false;
@@ -432,6 +449,7 @@ export function canClaim(state: GameState, playerId: string): boolean {
 
 export function canPass(state: GameState, playerId: string): boolean {
   if (state.phase !== "auction") return false;
+  if (!isMyTurn(state, playerId)) return false;
   const player = playerById(state, playerId);
   if (!player) return false;
   if (state.highBidderId === playerId) return false;
@@ -453,6 +471,61 @@ export function nextHost(state: GameState, present: readonly string[]): string |
     (player) => player.id !== state.hostId && present.includes(player.id),
   );
   return heir?.id ?? null;
+}
+
+/**
+ * Chi apre le danze su questo lotto.
+ *
+ * Il primo lotto lo apre chi ospita la stanza; a ogni lotto il diritto di
+ * aprire scorre al giocatore dopo, cosi' su una partita intera tocca a tutti
+ * lo stesso numero di volte. Aprire conta: chi parla per primo decide se il
+ * lotto vale la pena, chi parla per ultimo sa gia' cosa hanno fatto gli altri.
+ *
+ * Contro il bot non si ruota: apre sempre la persona. Un avversario che apre a
+ * lotti alterni vorrebbe dire vedersi portare via meta' dei lotti prima ancora
+ * di aver potuto dire qualcosa.
+ */
+export function openingTurn(state: GameState): string | null {
+  const quanti = state.players.length;
+  if (quanti === 0) return null;
+
+  if (state.isPractice) {
+    const persona = state.players.find((p) => p.id !== BOT_ID);
+    if (persona && canCompete(state, persona)) return persona.id;
+  }
+
+  const hostIndex = Math.max(
+    0,
+    state.players.findIndex((p) => p.id === state.hostId),
+  );
+  const inizio = (hostIndex + Math.max(0, state.lotNumber - 1)) % quanti;
+  for (let passo = 0; passo < quanti; passo += 1) {
+    const candidato = state.players[(inizio + passo) % quanti];
+    if (canCompete(state, candidato)) return candidato.id;
+  }
+  return null;
+}
+
+/**
+ * A chi passa la mano dopo che ha agito il giocatore indicato.
+ *
+ * Si salta chi non e' piu' in corsa e si salta chi detiene l'offerta piu' alta:
+ * nessuno rilancia contro se stesso. Torna null quando non resta nessuno, e a
+ * quel punto il lotto e' deciso.
+ */
+export function nextTurn(state: GameState, afterId: string): string | null {
+  const quanti = state.players.length;
+  if (quanti === 0) return null;
+  const da = Math.max(
+    0,
+    state.players.findIndex((p) => p.id === afterId),
+  );
+  for (let passo = 1; passo <= quanti; passo += 1) {
+    const candidato = state.players[(da + passo) % quanti];
+    if (candidato.id === state.highBidderId) continue;
+    if (canCompete(state, candidato)) return candidato.id;
+  }
+  return null;
 }
 
 /** Suggerimento su chi dovrebbe agire adesso, per evitare clic sbagliati. */
@@ -810,19 +883,21 @@ function draw(state: GameState, now: number): GameState {
     const price = mysteryPrice(state.config.budget);
     return touch(
       pushFeed(
-        {
-          ...state,
-          phase: "auction",
-          lotKind: "mystery",
-          lotPrice: price,
-          currentItemId: null,
-          currentBid: price,
-          highBidderId: null,
-          passed: [],
-          deadline: now + lotSeconds(state) * 1000,
-          lotNumber,
-          sniped: false,
-        },
+        apriTurno(
+          {
+            ...state,
+            phase: "auction",
+            lotKind: "mystery",
+            lotPrice: price,
+            currentItemId: null,
+            currentBid: price,
+            highBidderId: null,
+            passed: [],
+            lotNumber,
+            sniped: false,
+          },
+          now,
+        ),
         feedEntry("lot", now, { amount: price }),
       ),
     );
@@ -832,23 +907,51 @@ function draw(state: GameState, now: number): GameState {
   const item = state.items.find((i) => i.id === next);
   return touch(
     pushFeed(
-      {
-        ...state,
-        phase: "auction",
-        lotKind: "item",
-        lotPrice: 0,
-        queue: rest,
-        currentItemId: next,
-        currentBid: OPENING_BID,
-        highBidderId: null,
-        passed: [],
-        deadline: now + lotSeconds(state) * 1000,
-        lotNumber,
-        sniped: false,
-      },
+      apriTurno(
+        {
+          ...state,
+          phase: "auction",
+          lotKind: "item",
+          lotPrice: 0,
+          queue: rest,
+          currentItemId: next,
+          currentBid: OPENING_BID,
+          highBidderId: null,
+          passed: [],
+          lotNumber,
+          sniped: false,
+        },
+        now,
+      ),
       feedEntry("lot", now, { itemName: item?.name }),
     ),
   );
+}
+
+/**
+ * Apre il turno sul lotto appena estratto e fa partire il cronometro.
+ *
+ * Il tempo si conta per turno e non per lotto: ognuno ha i suoi secondi per
+ * decidere, e chi lascia scadere il proprio passa d'ufficio. Un cronometro solo
+ * per tutto il lotto avrebbe voluto dire che il primo a parlare se lo consumava
+ * tutto e agli altri non restava niente.
+ */
+function apriTurno(state: GameState, now: number): GameState {
+  const turnId = openingTurn(state);
+  return { ...state, turnId, deadline: now + lotSeconds(state) * 1000 };
+}
+
+/**
+ * Passa la mano dopo un'azione, e chiude il lotto se non resta nessuno.
+ *
+ * Il cronometro riparte da capo a ogni mano: e' il turno ad avere un tempo, non
+ * il lotto. Vale anche come freno al colpo all'ultimo istante, perche' dopo un
+ * rilancio gli altri hanno comunque il loro giro intero per rispondere.
+ */
+function passaLaMano(state: GameState, afterId: string, now: number): GameState {
+  const prossimo = nextTurn(state, afterId);
+  if (!prossimo) return resolve({ ...state, turnId: null }, now);
+  return touch({ ...state, turnId: prossimo, deadline: now + lotSeconds(state) * 1000 });
 }
 
 function award(
@@ -993,23 +1096,6 @@ function resolve(state: GameState, now: number): GameState {
       feedEntry("discard", now, { itemName: item.name }),
     ),
   );
-}
-
-/** Chiude in anticipo il lotto quando la gara non ha più senso. */
-function settleIfUncontested(state: GameState, now: number): GameState {
-  if (state.phase !== "auction" || isMysteryLot(state)) return state;
-  const remaining = activePlayers(state);
-
-  // Il lotto non lo vuole proprio nessuno: si chiude subito, senza aspettare il
-  // timer, e va agli scarti.
-  if (remaining.length === 0) return resolve(state, now);
-
-  // C'è un'offerta e tutti gli altri sono fuori: il lotto è di chi ha offerto.
-  // Se invece l'offerta non c'è, l'ultimo rimasto non viene obbligato a
-  // prenderselo: ha tutto il tempo del timer per offrire o passare anche lui.
-  if (remaining.length === 1 && state.highBidderId) return resolve(state, now);
-
-  return state;
 }
 
 export function reducer(state: GameState, action: GameAction): GameState {
@@ -1199,7 +1285,6 @@ export function reducer(state: GameState, action: GameAction): GameState {
             ...state,
             currentBid: action.amount,
             highBidderId: action.playerId,
-            deadline: action.now + lotSeconds(state) * 1000,
             sniped: lastSecond,
           },
           feedEntry("bid", action.now, {
@@ -1209,7 +1294,8 @@ export function reducer(state: GameState, action: GameAction): GameState {
           }),
         ),
       );
-      return settleIfUncontested(bidded, action.now);
+      // La mano passa a chi viene dopo, col suo tempo pieno per rispondere.
+      return passaLaMano(bidded, action.playerId, action.now);
     }
 
     case "claim": {
@@ -1243,12 +1329,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
           }),
         ),
       );
-      if (isMysteryLot(passed)) {
-        const stillIn = passed.players.filter((p) => canClaim(passed, p.id));
-        if (stillIn.length === 0) return resolve(passed, action.now);
-        return passed;
-      }
-      return settleIfUncontested(passed, action.now);
+      return passaLaMano(passed, action.playerId, action.now);
     }
 
     /**
@@ -1314,7 +1395,28 @@ export function reducer(state: GameState, action: GameAction): GameState {
         }
       }
       if (!state.deadline || action.now < state.deadline) return state;
-      if (state.phase === "auction") return resolve(state, action.now);
+      /*
+       * Tempo scaduto sul proprio turno: si passa d'ufficio e la mano va
+       * avanti. Chiudere il lotto qui, come si faceva prima dei turni,
+       * vorrebbe dire che chi ha la mano e si distrae toglie il giro a tutti
+       * gli altri -- e con l'asta a turni sarebbe la regola sbagliata.
+       */
+      if (state.phase === "auction") {
+        if (state.turnId) {
+          const chi = state.turnId;
+          const fuori = touch(
+            pushFeed(
+              { ...state, passed: [...state.passed, chi] },
+              feedEntry("pass", action.now, {
+                playerName: playerById(state, chi)?.name,
+                playerEmoji: playerById(state, chi)?.emoji,
+              }),
+            ),
+          );
+          return passaLaMano(fuori, chi, action.now);
+        }
+        return resolve(state, action.now);
+      }
       if (state.phase === "result") return draw(state, action.now);
       // Chi non ha votato entro il tempo non vota: si proclama lo stesso.
       if (state.phase === "voting") return closeVoting(state);

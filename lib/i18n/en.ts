@@ -783,6 +783,7 @@ export const en: Dictionary = {
   "auction.botThinking": "Pick-asso is weighing it up",
   "reactions.open": "Send a reaction",
   "reactions.guest": "Sign up for free to unlock reactions!",
+  "auction.yourTurnNow": "Your turn",
   "auction.discardsLeft": "Flops still possible before lots start being assigned",
   "auction.discardsOut": "No flops left: the remaining lots are needed to fill the rosters",
   "auction.nobodyYetForced":

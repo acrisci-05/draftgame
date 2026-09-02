@@ -6087,5 +6087,223 @@
         ]
       ]
     }
+  },
+  {
+    "id": "build-your-room",
+    "name": "Build Your Room",
+    "nameEn": "Build Your Room",
+    "emoji": "🛏️",
+    "theme": "life",
+    "tiers": {
+      "1": [
+        [
+          "Mini Canestro da Porta",
+          "🏀",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Latakia_Sports_City%2C_Hall_No._2%2C_Mini_Basketball_Festival_%2825_March_2018%29.jpg/960px-Latakia_Sports_City%2C_Hall_No._2%2C_Mini_Basketball_Festival_%2825_March_2018%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Diffusore di Aromi Smart",
+          "🕯️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Aroma_Diffuser.jpg/960px-Aroma_Diffuser.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Scalda-Tazza USB",
+          "🍵",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Drying_PMC_works_on_a_mug_warmer.jpg/960px-Drying_PMC_works_on_a_mug_warmer.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Dispenser di Popcorn",
+          "🍿",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/POPCORN_MACHINE_MAKER_POPPER.jpg/960px-POPCORN_MACHINE_MAKER_POPPER.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Cassaforte Segreta",
+          "🔐"
+        ],
+        [
+          "Cuscini Extra",
+          "🛌",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/44_Made_bed_with_richly_decorated_pillows_and_ornate_bedspread.jpg/960px-44_Made_bed_with_richly_decorated_pillows_and_ornate_bedspread.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Lampada da Lettura",
+          "🔦",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Joseph_Cannella%2C_Reading_Lamp%2C_1941%2C_NGA_24860.jpg/960px-Joseph_Cannella%2C_Reading_Lamp%2C_1941%2C_NGA_24860.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Cestino Smart",
+          "🗑️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Waste_bin_with_toilet_tissue_packaging_foil.jpg/960px-Waste_bin_with_toilet_tissue_packaging_foil.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ],
+      "2": [
+        [
+          "Proiettore di Galassie",
+          "🌌",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/Zeiss_ZKP4_star_projector_at_Planetarium_Laupheim.jpg/960px-Zeiss_ZKP4_star_projector_at_Planetarium_Laupheim.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Tappeto Peloso",
+          "🧶",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Carpet016_8K-PNG_Color.png/960px-Carpet016_8K-PNG_Color.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Poltrona Sacco Giant",
+          "🫘",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/%22_12_-_ITALY_-_Pouf_Tuffet_Sacco_di_Zanotta_red_armchair_Triennale_Design_Museum.jpg/960px-%22_12_-_ITALY_-_Pouf_Tuffet_Sacco_di_Zanotta_red_armchair_Triennale_Design_Museum.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Espositore Sneaker",
+          "👟",
+          "https://upload.wikimedia.org/wikipedia/commons/5/55/Adidas_sneakers_display_-_several_left_shoes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Scritta al Neon",
+          "🔤",
+          "https://upload.wikimedia.org/wikipedia/commons/f/f4/SpellBrite-neon-led-custom-signage-changable-letters.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Piante da Interno Giganti",
+          "🪴",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Monstera_siltepecana_%28Silver_Monstera%29_Tropical_Houseplant.jpg/960px-Monstera_siltepecana_%28Silver_Monstera%29_Tropical_Houseplant.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Chitarra con Amplificatore",
+          "🎸",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Michael_Angelo_Batio_workshop_at_Wayne%27s_World_Music_-_The_stage_setup._%282010-11-13_14.07.07_by_minimoniotaku%29.jpg/960px-Michael_Angelo_Batio_workshop_at_Wayne%27s_World_Music_-_The_stage_setup._%282010-11-13_14.07.07_by_minimoniotaku%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Angolo Vanity",
+          "💄",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Makeup_table1886.jpg/960px-Makeup_table1886.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ],
+      "3": [
+        [
+          "Mini Frigo",
+          "🧊",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Mini_Fridge_-_Refrigerator_Wire_Shelves_%2854127913190%29.jpg/960px-Mini_Fridge_-_Refrigerator_Wire_Shelves_%2854127913190%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Macchinetta del Caffè",
+          "☕",
+          "https://upload.wikimedia.org/wikipedia/commons/8/8c/Espresso_Machine_oldest.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Strisce LED RGB",
+          "💡",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/LED_Light_Strip_Huaqiangbei_July_2024.jpg/960px-LED_Light_Strip_Huaqiangbei_July_2024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Caminetto Elettrico",
+          "🔥",
+          "https://upload.wikimedia.org/wikipedia/commons/e/e3/Stove_wood.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Giradischi Vintage",
+          "🎶",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Unitra-Fonica_WG-511_Turntable_Record_Player.jpg/960px-Unitra-Fonica_WG-511_Turntable_Record_Player.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Vetrina Espositiva LED",
+          "🏆",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Qing_Display_Cabinet_01.jpg/960px-Qing_Display_Cabinet_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Specchio a Figura Intera",
+          "🪞",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/Full-length_mirror_from_the_Obrenovic%27s_Old_Court%2C_Gustav_Horton%2C_1895%2C_Vienna.jpg/960px-Full-length_mirror_from_the_Obrenovic%27s_Old_Court%2C_Gustav_Horton%2C_1895%2C_Vienna.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Libreria ad Albero",
+          "📚",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Part_of_a_bookshelf_containing_books_by_ancient_philosophers_%281.1%29.jpg/960px-Part_of_a_bookshelf_containing_books_by_ancient_philosophers_%281.1%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ],
+      "4": [
+        [
+          "Poltrona Massaggiante",
+          "💆",
+          "https://upload.wikimedia.org/wikipedia/commons/6/60/Electrical_Back_Massage_Chair%2C_1919.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Tende Oscuranti",
+          "🌑",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Doreen_Buckner_draws_the_curtains_in_her_family%27s_London_home_to_comply_with_the_nightly_%27Blackout%27_during_the_Second_World_War._D17275.jpg/960px-Doreen_Buckner_draws_the_curtains_in_her_family%27s_London_home_to_comply_with_the_nightly_%27Blackout%27_during_the_Second_World_War._D17275.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Proiettore Portatile",
+          "📽️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Oxygen480-devices-video-projector.svg/960px-Oxygen480-devices-video-projector.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Cabina Armadio con Sensori",
+          "🚪",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Walk-In_Closet.jpg/960px-Walk-In_Closet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Sedia Gaming Ergonomica",
+          "🪑",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Gaming_chair_1.jpg/960px-Gaming_chair_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Scrivania Sit-Stand",
+          "🧍",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/34/Standing_desk_illustration.svg/960px-Standing_desk_illustration.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Acquario Smart",
+          "🐠",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9f/Fish_in_my_home_aquarium_12.jpg/960px-Fish_in_my_home_aquarium_12.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Biliardino da Camera",
+          "⚽",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Table_football_pictogram.png/960px-Table_football_pictogram.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ],
+      "5": [
+        [
+          "Letto King Size",
+          "🛏️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Premium_Cottage_-_bedroom_with_king_size_bed_%2812064018055%29.jpg/960px-Premium_Cottage_-_bedroom_with_king_size_bed_%2812064018055%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "TV OLED 75\"",
+          "📺",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/EFTA00000306_-_Cozy_hotel_room_with_a_large_bed_beige_furniture_striped_curtains_and_a_flat-screen_TV.jpg/960px-EFTA00000306_-_Cozy_hotel_room_with_a_large_bed_beige_furniture_striped_curtains_and_a_flat-screen_TV.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Postazione PC Gaming",
+          "🖥️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Gaming_PC-Setup_-_Astaroth-_The_Completed_System.jpg/960px-Gaming_PC-Setup_-_Astaroth-_The_Completed_System.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Impianto Audio 7.1",
+          "🔊",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Home_Theater_Speakers_3_2019-06-22.jpg/960px-Home_Theater_Speakers_3_2019-06-22.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Finestra Panoramica",
+          "🌆",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Window_inside_Hampton_Court_%28Dining_Room_%5E_Hope-Under-Dinmore%29_-_geograph.org.uk_-_6432657.jpg/960px-Window_inside_Hampton_Court_%28Dining_Room_%5E_Hope-Under-Dinmore%29_-_geograph.org.uk_-_6432657.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Console Next-Gen",
+          "🎮",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/Sony-PlayStation-2-70001-Console-BR.jpg/960px-Sony-PlayStation-2-70001-Console-BR.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Insonorizzazione Pareti",
+          "🧱",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Acoustic_foam_closeup.jpg/960px-Acoustic_foam_closeup.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Condizionatore Silenzioso",
+          "❄️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Panasonic_AIR_CONDITIONER_INDOOR_UNIT_CS-C10KJ2_%282%29.jpg/960px-Panasonic_AIR_CONDITIONER_INDOOR_UNIT_CS-C10KJ2_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ]
+    }
   }
 ]

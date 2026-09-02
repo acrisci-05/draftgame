@@ -354,6 +354,7 @@ export const it = {
   "auction.botThinking": "Pick-asso sta valutando",
   "reactions.open": "Manda una reazione",
   "reactions.guest": "Registrati gratis per sbloccare le reazioni!",
+  "auction.yourTurnNow": "Tocca a te",
   "auction.discardsLeft": "Flop ancora possibili prima che i lotti vengano assegnati d'ufficio",
   "auction.discardsOut": "Flop esauriti: i lotti rimasti servono a riempire le liste e vengono assegnati",
   "auction.nobodyYetForced":

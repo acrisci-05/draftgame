@@ -28,7 +28,7 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
   /*
    * Il dado pesca dallo stesso elenco che sta qui sotto, non da una lista sua:
    * quello che si vede e' quello che puo' uscire. Chi non sa cosa scegliere --
-   * ed e' il caso piu' comune davanti a trentasei liste -- chiude qui e
+   * ed e' il caso piu' comune davanti a trentasette liste -- chiude qui e
    * comincia a giocare.
    */
   const pickRandom = () => {
@@ -41,7 +41,7 @@ export function CategoryPicker({ selectedId, onSelect }: CategoryPickerProps) {
       {/*
         Il dado resta appiccicato in cima mentre si scorre.
 
-        Trentasei liste sono tante, e chi apre questa finestra indeciso lo e'
+        Trentasette liste sono tante, e chi apre questa finestra indeciso lo e'
         ancora di piu' a meta' elenco: un pulsante che sparisce dopo due
         scorrimenti e' un pulsante che non c'e'. Lo sfondo pieno serve a coprire
         le righe che gli passano sotto.

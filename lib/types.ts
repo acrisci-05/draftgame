@@ -192,6 +192,15 @@ export interface GameState {
   currentBid: number;
   highBidderId: string | null;
   passed: string[];
+  /**
+   * Chi ha diritto di agire adesso.
+   *
+   * L'asta e' a turni: uno per volta, non tutti insieme. Assente sulle partite
+   * cominciate prima che i turni esistessero, e in quel caso valgono le vecchie
+   * regole -- chiunque puo' rilanciare quando vuole -- cosi' una stanza gia'
+   * aperta non si blocca a meta' serata per un aggiornamento.
+   */
+  turnId?: string | null;
   /** Timestamp epoch in ms della scadenza del timer corrente. */
   deadline: number;
   players: Player[];

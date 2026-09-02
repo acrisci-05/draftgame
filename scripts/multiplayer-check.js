@@ -113,20 +113,32 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 40));
   check("l'asta parte anche per l'ospite", guestState.phase === "auction");
   check("stesso lotto per entrambi", guestState.currentItemId === hostState.currentItemId);
 
-  guestChannel.postMessage({
-    type: "intent",
-    action: { type: "bid", playerId: "guest", amount: 2, now: t0 + 1000 },
-  });
-  await wait();
-  check("l'offerta dell'ospite arriva all'host", hostState.highBidderId === "guest");
-  check("l'ospite vede la propria offerta confermata", guestState.currentBid === 2);
-  check("stesso timer per entrambi", guestState.deadline === hostState.deadline);
+  // L'asta e' a turni: il primo lotto lo apre chi ospita la stanza, e prima
+  // che tocchi all'ospite l'host deve aver fatto la sua mossa.
+  check("il primo lotto lo apre chi ospita", hostState.turnId === "host", hostState.turnId);
+  check("l'ospite lo vede allo stesso modo", guestState.turnId === "host", guestState.turnId);
 
   guestChannel.postMessage({
     type: "intent",
-    action: { type: "pass", playerId: "host", now: t0 + 2000 },
+    action: { type: "bid", playerId: "guest", amount: 2, now: t0 + 900 },
   });
   await wait();
+  check("fuori turno l'ospite non puo' rilanciare", hostState.highBidderId === null, hostState.highBidderId);
+
+  // L'host passa: la mano va all'ospite.
+  hostState = game.reducer(hostState, { type: "pass", playerId: "host", now: t0 + 1000 });
+  hostChannel.postMessage({ type: "state", state: hostState, now: Date.now() });
+  await wait();
+  check("passata la mano tocca all'ospite", hostState.turnId === "guest", hostState.turnId);
+
+  guestChannel.postMessage({
+    type: "intent",
+    action: { type: "bid", playerId: "guest", amount: 2, now: t0 + 1500 },
+  });
+  await wait();
+  check("nel suo turno l'offerta dell'ospite arriva all'host", hostState.highBidderId === "guest");
+  check("l'ospite vede la propria offerta confermata", guestState.currentBid === 2);
+  check("stesso timer per entrambi", guestState.deadline === hostState.deadline);
   check("con tutti gli altri fuori il lotto è aggiudicato", hostState.phase === "result");
   check("l'ospite si è preso il lotto", hostState.lastResult.winnerId === "guest");
   check("anche l'ospite vede l'aggiudicazione", guestState.lastResult.winnerId === "guest");

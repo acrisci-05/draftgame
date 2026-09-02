@@ -39,12 +39,13 @@ check(
     ),
   ),
 );
-// Quasi tutte le liste hanno 30 elementi. Due fanno eccezione, e in entrambi
-// i casi e' l'argomento a dettare il numero, non la voglia di sgarrare: le
-// Regioni Italiane sono venti, e le Auto sono quarantacinque perche' le marche
-// in vendita sono quelle -- tagliarne quindici per far quadrare il formato
-// vorrebbe dire togliere dal gioco marchi che la gente conosce.
-const QUANTI = { regioni: 20, cars: 45 };
+// Quasi tutte le liste hanno 30 elementi. Tre fanno eccezione, e ogni volta e'
+// l'argomento a dettare il numero, non la voglia di sgarrare: le Regioni
+// Italiane sono venti, le Auto sono quarantacinque perche' le marche in vendita
+// sono quelle -- tagliarne quindici vorrebbe dire togliere dal gioco marchi che
+// la gente conosce -- e Build Your Room ne ha quaranta, otto per fascia, perche'
+// una stanza si arreda con quello che ci sta.
+const QUANTI = { regioni: 20, cars: 45, "build-your-room": 40 };
 const attesi = (c) => QUANTI[c.id] ?? 30;
 check(
   "ogni lista ha il numero di elementi previsto",
@@ -141,9 +142,16 @@ state = game.reducer(state, { type: "tick", now: state.deadline + 1 });
 check("dopo il risultato parte il lotto successivo", state.phase === "auction");
 check("nuovo lotto: flag anti-sniping azzerato", state.sniped === false);
 
-state = game.reducer(state, { type: "tick", now: state.deadline + 1 });
-check("nessuna offerta allo scadere: negli scarti", state.discards.length === 1);
+// Con l'asta a turni il tempo e' di chi ha la mano: allo scadere passa lui e
+// la mano va avanti. Il lotto si chiude quando li' ha lasciati tutti.
+let giri = 0;
+while (state.phase === "auction" && giri < 10) {
+  state = game.reducer(state, { type: "tick", now: state.deadline + 1 });
+  giri += 1;
+}
+check("scaduti tutti i turni: negli scarti", state.discards.length === 1, state.discards.length);
 check("nessun vincitore", state.lastResult.winnerId === null);
+check("bastano tanti turni quanti i giocatori", giri <= state.players.length, giri);
 
 /* ---------------- Quando il lotto non lo vuole nessuno ---------------- */
 
@@ -170,22 +178,38 @@ check("l'ultimo rimasto che offre si aggiudica il lotto", lastTakes.phase === "r
 check("e lo paga il prezzo base", lastTakes.lastResult.winnerId === "b" && lastTakes.lastResult.price === 1);
 
 // Anche allo scadere del tempo, con nessuno in gara, non si assegna d'ufficio.
-const timedOut = game.reducer(nobody, { type: "tick", now: nobody.deadline + 1 });
+const timedOut = scadeIlLotto(nobody);
 check("tempo scaduto senza offerte: nessun vincitore", timedOut.lastResult.winnerId === null);
 
 // Con gli scarti disattivati vale la regola opposta: il lotto va comunque a
 // qualcuno, ma a chi ha la lista più corta, non a chi ha passato per ultimo.
 let forced = lobby({ budget: 20, slots: 4, allowDiscards: false });
 forced = game.reducer(forced, { type: "start", now: t0 });
-forced = game.reducer(forced, { type: "bid", playerId: "a", amount: 1, now: t0 + 500 });
-forced = game.reducer(forced, { type: "pass", playerId: "b", now: t0 + 1000 });
+
+// Primo lotto: se lo prende chi ha la mano, cosi' le due liste non sono piu'
+// lunghe uguali. Senza questo passaggio i due sono identici e la regola da
+// provare -- va a chi ha la lista piu' corta -- non avrebbe niente da dire.
+const primo = forced.turnId;
+forced = game.reducer(forced, { type: "bid", playerId: primo, amount: 1, now: t0 + 500 });
+let giroUno = 0;
+while (forced.phase === "auction" && giroUno < 10) {
+  forced = game.reducer(forced, { type: "pass", playerId: forced.turnId, now: t0 + 1000 + giroUno * 500 });
+  giroUno += 1;
+}
 forced = game.reducer(forced, { type: "tick", now: forced.deadline + 1 });
-forced = game.reducer(forced, { type: "pass", playerId: "a", now: t0 + 60_000 });
-forced = game.reducer(forced, { type: "pass", playerId: "b", now: t0 + 61_000 });
+const altro = forced.players.find((p) => p.id !== primo).id;
+
+// Secondo lotto: non lo vuole nessuno. Con i turni si passa uno per volta, e
+// il lotto si chiude quando li ha lasciati tutti.
+let mano = 0;
+while (forced.phase === "auction" && mano < 10) {
+  forced = game.reducer(forced, { type: "pass", playerId: forced.turnId, now: t0 + 20_000 + mano * 1000 });
+  mano += 1;
+}
 check("senza scarti: il lotto rifiutato da tutti viene assegnato", forced.lastResult.winnerId !== null);
 check(
   "senza scarti: lo prende chi ha la lista più corta",
-  forced.lastResult.winnerId === "b",
+  forced.lastResult.winnerId === altro,
   forced.lastResult.winnerId,
 );
 check("senza scarti: al prezzo base", forced.lastResult.price === 1);
@@ -298,8 +322,9 @@ check(
 let slow = lobby({ budget: 20, slots: 3, lotSeconds: 20 });
 slow = game.reducer(slow, { type: "start", now: t0 });
 check("stanza comoda: 20 secondi all'apertura", slow.deadline === t0 + 20000);
-slow = game.reducer(slow, { type: "bid", playerId: "b", amount: 1, now: t0 + 5000 });
-check("stanza comoda: il rilancio rimette 20 secondi", slow.deadline === t0 + 5000 + 20000);
+// Rilancia chi ha la mano: da li' il cronometro riparte per il prossimo.
+slow = game.reducer(slow, { type: "bid", playerId: slow.turnId, amount: 1, now: t0 + 5000 });
+check("stanza comoda: dopo il rilancio il turno dopo ha 20 secondi", slow.deadline === t0 + 5000 + 20000, slow.deadline - (t0 + 5000));
 
 // Le partite vecchie non hanno la durata scritta: vale lo standard.
 const legacy = game.reducer(
@@ -478,11 +503,20 @@ check(
 );
 check("riserva: può ancora offrire il minimo", game.maxBid(reserve, anaAfter) >= 1);
 
+/** Lascia scadere il tempo a tutti, uno per volta, finche' il lotto si chiude. */
+function scadeIlLotto(state) {
+  let giri = 0;
+  while (state.phase === "auction" && giri < 12) {
+    state = game.reducer(state, { type: "tick", now: state.deadline + 1 });
+    giri += 1;
+  }
+  return state;
+}
 /* ---------------- Scarti disattivati ---------------- */
 
 let noDiscard = lobby({ budget: 20, slots: 4, allowDiscards: false });
 noDiscard = game.reducer(noDiscard, { type: "start", now: t0 });
-noDiscard = game.reducer(noDiscard, { type: "tick", now: noDiscard.deadline + 1 });
+noDiscard = scadeIlLotto(noDiscard);
 check("senza scarti: il lotto viene comunque assegnato", noDiscard.lastResult.winnerId !== null);
 check("senza scarti: prezzo base", noDiscard.lastResult.price === 1);
 check("senza scarti: nessuno scarto registrato", noDiscard.discards.length === 0);
@@ -490,19 +524,30 @@ check("senza scarti: feed segnala l'assegnazione d'ufficio", noDiscard.feed[0].k
 
 let withDiscard = lobby({ budget: 20, slots: 4, allowDiscards: true });
 withDiscard = game.reducer(withDiscard, { type: "start", now: t0 });
-withDiscard = game.reducer(withDiscard, { type: "tick", now: withDiscard.deadline + 1 });
+withDiscard = scadeIlLotto(withDiscard);
 check("con scarti: nessuna offerta manda il lotto agli scarti", withDiscard.discards.length === 1);
 
 /* ---------------- Assegnazione dei lotti finali ---------------- */
 
 let closing = lobby({ budget: 20, slots: 2 });
 closing = game.reducer(closing, { type: "start", now: t0 });
-// Bea completa subito la sua lista, Ana resta l'unica da servire.
-["b", "b"].forEach(() => {
-  closing = game.reducer(closing, { type: "bid", playerId: "b", amount: 1, now: t0 });
-  closing = game.reducer(closing, { type: "pass", playerId: "a", now: t0 });
+// Bea completa subito la sua lista, Ana resta l'unica da servire. Con i turni
+// non si puo' piu' far agire chi si vuole: si aspetta la propria mano, e se
+// tocca ad Ana lei passa.
+for (let lotto = 0; lotto < 2; lotto += 1) {
+  let mosse = 0;
+  while (closing.phase === "auction" && mosse < 6) {
+    const chi = closing.turnId;
+    if (!chi) break;
+    if (chi === "b" && game.canBid(closing, "b", game.minimumBid(closing))) {
+      closing = game.reducer(closing, { type: "bid", playerId: "b", amount: game.minimumBid(closing), now: t0 });
+    } else {
+      closing = game.reducer(closing, { type: "pass", playerId: chi, now: t0 });
+    }
+    mosse += 1;
+  }
   closing = game.reducer(closing, { type: "tick", now: closing.deadline + 1 });
-});
+}
 check("chiusura: Bea ha la lista piena", game.playerById(closing, "b").roster.length === 2);
 let safety = 0;
 while (closing.phase !== "ended" && safety < 80) {

@@ -122,7 +122,7 @@ components/ui/              bottoni, badge, input, modali, navbar, menu
 components/game/            asta, timer, controlli offerta, card finale, editor liste
 lib/                        motore di gioco, realtime, catalogo, immagini, accesso, amici
 lib/i18n/                   dizionari delle 10 lingue
-data/categories.json        36 liste ufficiali (30 elementi; 20 le regioni, 45 le auto)
+data/categories.json        37 liste ufficiali (30 elementi; 20 le regioni, 45 le auto)
 scripts/engine-check.js     verifiche automatiche del motore
 supabase/schema.sql         schema del database con tutte le policy
 public/logo.svg             marchio dell'app
@@ -186,7 +186,7 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Effetti sonori sintetizzati (nessun file audio da scaricare) e vibrazione dove supportata.
 
 ### Categorie
-- **36 liste ufficiali** da 30 elementi. Due fanno eccezione, e in entrambi i casi e' l'argomento
+- **37 liste ufficiali** da 30 elementi. Due fanno eccezione, e in entrambi i casi e' l'argomento
   a dettare il numero: le Regioni Italiane sono 20, quante sono davvero, e le Auto sono 45, quante
   sono le marche che vale la pena mettere in gara. Le fasce restano uguali fra loro in ogni lista,
   altrimenti una uscirebbe piu' spesso delle altre.
@@ -602,7 +602,7 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 
 ## 10. Stato del lavoro e limiti noti
 
-**Funziona senza configurazione**: partita locale, tutte le 36 categorie (1025 elementi), regole
+**Funziona senza configurazione**: partita locale, tutte le 37 categorie (1025 elementi), regole
 complete, card 9:16 scaricabile, lingue, temi, audio.
 
 **Richiede Supabase**: stanze online, accesso, Pickmates, votazioni, suggerimenti, voto a stelle,
