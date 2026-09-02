@@ -177,6 +177,40 @@ async function fromImgflip(name) {
 }
 
 /**
+ * Una foto da Unsplash, per le cose che negli archivi enciclopedici non ci sono.
+ *
+ * Commons e' fatto di documentazione: ha la Scuola di Atene per la filosofia e
+ * la stele romana per il latino, ma non ha "una scrivania ordinata" o "un
+ * gruppo di amici a cena". Unsplash e' l'opposto -- fotografia di catalogo,
+ * bella e generica -- quindi qui e' la seconda scelta e non la prima: bello non
+ * serve a niente se il lotto non si riconosce.
+ *
+ * Serve una chiave gratuita da unsplash.com/developers, in UNSPLASH_ACCESS_KEY.
+ * Senza, questa sorgente si spegne da sola e restano tutte le altre.
+ */
+async function fromUnsplash(query) {
+  const key = process.env.UNSPLASH_ACCESS_KEY;
+  if (!key) return null;
+  const params = new URLSearchParams({
+    query,
+    per_page: "1",
+    orientation: "squarish",
+    content_filter: "high",
+  });
+  try {
+    const response = await fetch(`https://api.unsplash.com/search/photos?${params}`, {
+      headers: { ...HEADERS, Authorization: `Client-ID ${key}`, "Accept-Version": "v1" },
+    });
+    if (!response.ok) return null;
+    const first = ((await response.json()).results ?? [])[0];
+    const url = first?.urls?.regular ?? first?.urls?.small;
+    return url ? { url, title: first.alt_description ?? query, lang: "unsplash" } : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Icona ufficiale di un'app o di un gioco (ricerca dell'App Store). Si prova
  * prima il negozio italiano e poi quello americano: certe app da noi hanno il
  * nome tradotto ("Chess.com" diventa "Scacchi") e non si riconoscerebbero.
@@ -280,6 +314,7 @@ async function fromHint(hint) {
   if (source === "steam") return fromSteam(query);
   if (source === "tvmaze") return fromTvmaze(query);
   if (source === "fandom") return fromFandom(query);
+  if (source === "unsplash") return fromUnsplash(query);
 
   if (source === "commons") {
     // La ricerca parte dalla descrizione completa e, se nessun file la soddisfa

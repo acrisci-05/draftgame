@@ -5748,8 +5748,7 @@
           "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Maserati_logo_2.svg/960px-Maserati_logo_2.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
         ]
       ]
-    },
-    "covers": "logo"
+    }
   },
   {
     "id": "gelato",
@@ -5916,6 +5915,175 @@
           "Nutella",
           "🍫",
           "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Nutella_ak.jpg/960px-Nutella_ak.jpg?utm_source=it.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+        ]
+      ]
+    }
+  },
+  {
+    "id": "school",
+    "name": "Materie Scolastiche",
+    "nameEn": "School Subjects",
+    "emoji": "📚",
+    "theme": "life",
+    "tiers": {
+      "1": [
+        [
+          "Matematica",
+          "➗",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Mathematics_%28cryptography%29_on_a_blackboard.jpg/960px-Mathematics_%28cryptography%29_on_a_blackboard.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Latino",
+          "🏺",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Rome_Colosseum_inscription_2.jpg/960px-Rome_Colosseum_inscription_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+        ],
+        [
+          "Greco",
+          "🦉",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Account_of_the_construction_of_Athena_Parthenos_by_Phidias.jpg/960px-Account_of_the_construction_of_Athena_Parthenos_by_Phidias.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+        ],
+        [
+          "Fisica",
+          "🧲",
+          "https://upload.wikimedia.org/wikipedia/commons/e/e8/Newtons_cradle_animation_book.gif?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Chimica",
+          "⚗️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Laboratory_Glasswares.jpg/960px-Laboratory_Glasswares.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Filosofia",
+          "🤔",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/The_School_of_Athens_Fresco_by_Raphael_%28Ank_Kumar%2C_Infosys_Limited%29_02.jpg/960px-The_School_of_Athens_Fresco_by_Raphael_%28Ank_Kumar%2C_Infosys_Limited%29_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ],
+      "2": [
+        [
+          "Letteratura Italiana",
+          "📖",
+          "https://upload.wikimedia.org/wikipedia/commons/8/82/Dante_Alighieri%27s_portrait_by_Sandro_Botticelli.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Letteratura Straniera",
+          "📕",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Portrait_of_Mr._William_Shakespeare_%284671960%29.jpg/960px-Portrait_of_Mr._William_Shakespeare_%284671960%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Francese",
+          "🥐",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Flag_of_France.svg/960px-Flag_of_France.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Tedesco",
+          "🥨",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/960px-Flag_of_Germany.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Economia",
+          "📈",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Euro_coins_and_banknotes.jpg/960px-Euro_coins_and_banknotes.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Diritto",
+          "⚖️",
+          "https://upload.wikimedia.org/wikipedia/commons/b/ba/Scales_of_Justice_statue%2C_Middlesbrough_%28geograph_4031236%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ]
+      ],
+      "3": [
+        [
+          "Italiano",
+          "✍️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/960px-Flag_of_Italy.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Scienze",
+          "🔬",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Laboratory_Optical_Microscope.jpg/960px-Laboratory_Optical_Microscope.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Biologia",
+          "🧬",
+          "https://upload.wikimedia.org/wikipedia/commons/c/c6/DNA_double_helix_45.PNG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Spagnolo",
+          "💃",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Flag_of_Spain_Torre_del_Oro_Seville_Spain.jpg/960px-Flag_of_Spain_Torre_del_Oro_Seville_Spain.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Psicologia",
+          "🧠",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Rorschach_Inkblot_Test_%28PSF%29.png/960px-Rorschach_Inkblot_Test_%28PSF%29.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Scienze Umane",
+          "👥",
+          "https://upload.wikimedia.org/wikipedia/commons/1/1c/Japanese_students_girls_discussion_group.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ]
+      ],
+      "4": [
+        [
+          "Inglese",
+          "🔤",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/960px-Flag_of_the_United_Kingdom_%281-2%29.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Storia",
+          "🏛️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Colosseum_in_Rome-April_2007-1-_copie_2B.jpg/960px-Colosseum_in_Rome-April_2007-1-_copie_2B.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Geografia",
+          "🌍",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Globe_of_the_Ancient_World_1977.jpg/960px-Globe_of_the_Ancient_World_1977.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Disegno Tecnico",
+          "📐",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Compass_%28drawing%29.svg/960px-Compass_%28drawing%29.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Educazione Civica",
+          "📜",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Costituzione_della_Repubblica_Italiana.jpg/960px-Costituzione_della_Repubblica_Italiana.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Scienze della Terra",
+          "🪨",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Sedimentary_Rock_Layers_in_Cliff_at_Cape_Greco_in_Cyprus.jpg/960px-Sedimentary_Rock_Layers_in_Cliff_at_Cape_Greco_in_Cyprus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ]
+      ],
+      "5": [
+        [
+          "Educazione Fisica",
+          "🤸",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Hamersley_indoor_basketball_court_1.jpg/960px-Hamersley_indoor_basketball_court_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Religione",
+          "✝️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Open_bible_isaiah.jpg/960px-Open_bible_isaiah.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Musica",
+          "🎵",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Music_Sheet%2C_Mozart%27s_Alla_Turca.jpg/960px-Music_Sheet%2C_Mozart%27s_Alla_Turca.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Informatica",
+          "💻",
+          "https://upload.wikimedia.org/wikipedia/commons/0/07/RCoE_-_computer_-_Server_Room.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"
+        ],
+        [
+          "Storia dell'Arte",
+          "🖼️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Paintings%2C_Bristol_Museum_and_Art_Gallery_-_geograph.org.uk_-_5909855.jpg/960px-Paintings%2C_Bristol_Museum_and_Art_Gallery_-_geograph.org.uk_-_5909855.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+        ],
+        [
+          "Tecnologia",
+          "⚙️",
+          "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Repair_tool_kit.jpg/960px-Repair_tool_kit.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
         ]
       ]
     }
