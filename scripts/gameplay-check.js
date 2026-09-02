@@ -137,8 +137,29 @@ for (const lotti of [20, 25, 30]) {
 
 check("la soglia minima di una lista e' venti", game.MIN_CATEGORY_ITEMS === 20, game.MIN_CATEGORY_ITEMS);
 
-/* 7. Gli scarti sono cinque, poi i lotti si assegnano d'ufficio. */
-check("il tetto degli scarti e' cinque", game.MAX_DISCARDS === 5, game.MAX_DISCARDS);
+/* 7. Flop Draft: si scarta finche' i lotti bastano, poi si assegna d'ufficio. */
+
+// Il tetto non e' piu' un numero scritto a mano: e' quanti lotti avanzano oltre
+// quelli che servono a riempire tutte le liste. La stessa regola a due come a
+// cinque -- prima erano cinque scarti per tutti, e in cinque giocatori
+// finivano al quinto flop.
+for (const n of [2, 3, 4, 5]) {
+  const s = stanza(n, { slots: 5, allowDiscards: true });
+  const daRiempire = n * 5;
+  const atteso = Math.max(0, s.queue.length + 1 - daRiempire);
+  check(
+    `in ${n} i flop possibili sono ${atteso}`,
+    game.discardsLeft(s) === atteso,
+    game.discardsLeft(s),
+  );
+  check(`in ${n} il primo lotto si puo' scartare`, game.canDiscardLot(s) === true);
+}
+
+// Con il Flop Draft spento non si scarta mai, qualunque sia la capienza.
+{
+  const spento = stanza(3, { slots: 5, allowDiscards: false });
+  check("con il Flop Draft spento non si scarta", game.canDiscardLot(spento) === false);
+}
 
 // Una partita in cui passano sempre tutti: senza tetto si svuoterebbe il mazzo.
 function passanoTutti() {
@@ -155,8 +176,9 @@ function passanoTutti() {
   return s;
 }
 const passata = passanoTutti();
-check("passando sempre, non si supera il tetto",
-  passata.discards.length <= game.MAX_DISCARDS, passata.discards.length);
+check("passando sempre, restano lotti per tutte le liste",
+  passata.discards.length <= passata.items.length - passata.players.length * passata.config.slots,
+  passata.discards.length);
 check("passando sempre, la partita finisce lo stesso",
   passata.phase === "ended" || passata.phase === "voting", passata.phase);
 check("passando sempre, le liste si riempiono d'ufficio",

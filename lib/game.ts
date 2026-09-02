@@ -52,14 +52,6 @@ export const RAISE_STEPS = [1, 2, 5] as const;
 export const BUDGET_PRESETS = [10, 20, 50, 100];
 /** Ogni quanti lotti compare una Mystery Box, quando è attiva. */
 export const MYSTERY_EVERY = 5;
-/**
- * Quanti lotti si possono buttare in una partita.
- *
- * E' un tetto di stanza, condiviso da tutti: bruciarli presto su elementi
- * poco interessanti vuol dire ritrovarsi, nella seconda meta', a doversi
- * prendere d'ufficio quello che avanza.
- */
-export const MAX_DISCARDS = 5;
 export const FEED_LIMIT = 24;
 
 /** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
@@ -312,6 +304,33 @@ export function maxBidOption(state: GameState, player: Player): number | null {
 /** Giocatori che devono ancora completare la lista. */
 export function pendingPlayers(state: GameState): Player[] {
   return state.players.filter((p) => !rosterFull(state, p));
+}
+
+/**
+ * Quanti lotti si possono ancora buttare senza lasciare liste incomplete.
+ *
+ * Era un numero fisso -- cinque per partita, chiunque fosse al tavolo -- ed era
+ * il tetto sbagliato. Cinque scarti su una partita in due, che consuma dieci
+ * lotti su trenta, sono una riserva larga; gli stessi cinque in cinque
+ * giocatori, che di lotti ne consumano venticinque, finiscono al quinto flop.
+ * Da li' in poi i lotti che non voleva nessuno venivano assegnati d'ufficio, e
+ * dal tavolo sembrava che il Flop Draft avesse smesso di funzionare: la
+ * segnalazione arrivata dalle stanze a tre, quattro e cinque e' questa.
+ *
+ * Adesso il conto e' quello vero: si puo' buttare un lotto finche' quelli che
+ * restano bastano a riempire le liste di tutti. Nessun numero scritto a mano,
+ * e la regola vale identica a due come a cinque.
+ */
+export function discardsLeft(state: GameState): number {
+  const daRiempire = state.players.reduce((total, p) => total + slotsLeft(state, p), 0);
+  // Il lotto in corso e' gia' uscito dalla coda: va contato a parte.
+  const ancoraInGioco = state.queue.length + (state.currentItemId ? 1 : 0);
+  return Math.max(0, ancoraInGioco - daRiempire);
+}
+
+/** Se il lotto in corso, quando non lo vuole nessuno, puo' finire negli scarti. */
+export function canDiscardLot(state: GameState): boolean {
+  return state.config.allowDiscards && discardsLeft(state) > 0;
 }
 
 export function activePlayers(state: GameState): Player[] {
@@ -782,18 +801,18 @@ function resolve(state: GameState, now: number): GameState {
   /*
    * Gli scarti sono una riserva di gruppo, non infinita.
    *
-   * Finiti i cinque, un lotto che non vuole nessuno viene assegnato d'ufficio
-   * a chi ha piu' spazio libero. Serve a garantire che la partita finisca: se
-   * si potesse scartare all'infinito, un tavolo poco interessato bruceriebbe
-   * il mazzo e resterebbe con le liste vuote.
+   * Quando i lotti rimasti bastano appena a riempire le liste, un lotto che non
+   * vuole nessuno viene assegnato d'ufficio a chi ha piu' spazio libero. Serve
+   * a garantire che la partita finisca: se si potesse scartare all'infinito, un
+   * tavolo poco interessato bruceriebbe il mazzo e resterebbe con le liste
+   * vuote.
    *
    * Va a chi ha meno elementi -- non a sorte -- proprio perche' il punto e'
    * chiudere la partita: darlo a caso potrebbe riempire l'ultimo posto di chi
    * era quasi a posto, lasciando a secco chi ne ha ancora quattro da coprire,
    * cioe' ricreando il problema che questa regola esiste per togliere.
    */
-  const scartiFiniti = state.discards.length >= MAX_DISCARDS;
-  if (!state.config.allowDiscards || scartiFiniti) {
+  if (!canDiscardLot(state)) {
     const fallback = pendingPlayers(state)
       .filter((p) => maxBid(state, p) >= OPENING_BID)
       .sort((a, b) => a.roster.length - b.roster.length || b.budget - a.budget)[0];

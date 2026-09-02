@@ -17,7 +17,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import {
-  MAX_DISCARDS,
+  discardsLeft,
   colorLook,
   lotSeconds,
   currentItem,
@@ -84,7 +84,8 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
    * conviene ricordare che passare non regala niente a nessuno.
    */
   /* La riserva di scarti e' finita: da qui in poi i lotti si assegnano. */
-  const scartiFiniti = state.discards.length >= MAX_DISCARDS;
+  const flopRimasti = discardsLeft(state);
+  const scartiFiniti = flopRimasti === 0;
 
   const nobodyYet =
     state.phase === "auction" && !mystery && !state.highBidderId && state.passed.length > 0;
@@ -158,22 +159,26 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
 
         <div className="flex shrink-0 items-center gap-3">
           {/*
-            Gli scarti rimasti. E' una riserva di gruppo: quando finisce, i
+            I flop ancora possibili. E' una riserva di gruppo: quando finisce, i
             lotti che non vuole nessuno vengono assegnati d'ufficio, quindi
             conviene saperlo prima di passare per l'ennesima volta.
+
+            Era nascosto sotto i 640px, cioe' su ogni telefono, ed e' il motivo
+            per cui la riserva esaurita sembrava un guasto: i lotti smettevano
+            di essere scartati e niente diceva perche'. Adesso si vede sempre.
           */}
           {state.config.allowDiscards ? (
             <span
               title={t(scartiFiniti ? "auction.discardsOut" : "auction.discardsLeft")}
               className={cn(
-                "hidden items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold sm:inline-flex",
+                "inline-flex items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold",
                 scartiFiniti
                   ? "border-red-500/50 bg-red-500/10 text-red-400"
                   : "border-line bg-surface-2 text-faint",
               )}
             >
               <span aria-hidden>🗑️</span>
-              {state.discards.length}/{MAX_DISCARDS}
+              {flopRimasti}
             </span>
           ) : null}
           <RoomCode code={state.code} />

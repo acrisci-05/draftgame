@@ -218,6 +218,13 @@ export default function HomePage() {
           </div>
 
           {/*
+            La spiegazione sta attaccata ai due pulsanti che descrive: piu' in
+            basso, dopo la sfida al bot, sembrava riferita a quella -- che
+            invece non fa scegliere niente.
+          */}
+          <p className="mt-2.5 text-center text-xs text-faint">{t("home.createHint")}</p>
+
+          {/*
             La terza via, sotto le altre due perche' e' quella che si sceglie
             quando le prime due non si possono usare: non c'e' nessun altro,
             oppure non c'e' voglia di aspettare che arrivi.
@@ -238,8 +245,7 @@ export default function HomePage() {
             {t("home.playBot")}
           </Button>
 
-          <p className="mt-2.5 text-center text-xs text-faint">{t("home.createHint")}</p>
-          <p className="mt-1 text-center text-xs text-faint">{t("home.playBotHint")}</p>
+          <p className="mt-2 text-center text-xs text-faint">{t("home.playBotHint")}</p>
         </div>
       </motion.section>
 

@@ -139,9 +139,9 @@ export const it = {
     "Tieni sempre un credito per ogni slot che resterebbe vuoto. Se ti mancano 3 elementi puoi spendere fino a lasciartene 2: il lotto in corso riempie il terzo.",
 
   "rules.special.title": "Casi speciali e fine partita",
-  "rules.special.nobid": "Se nessuno offre.",
+  "rules.special.nobid": "Flop Draft: se nessuno offre.",
   "rules.special.nobidBody":
-    "Con gli scarti attivi il lotto viene messo da parte e non lo prende nessuno — ma gli scarti sono cinque per partita, condivisi da tutti. Finiti quelli, e con gli scarti spenti, il lotto va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri, ma bruciare presto i cinque scarti significa doversi prendere d'ufficio quello che avanza nella seconda metà.",
+    "Con il Flop Draft attivo il lotto è un flop: viene scartato all'istante e non lo prende nessuno. Si può buttare finché i lotti che restano bastano a riempire le liste di tutti — il contatore 🗑️ in alto dice quanti flop mancano a quel punto. Esauriti quelli, e con il Flop Draft spento, il lotto va al prezzo base a chi ha meno elementi. Passare non regala niente agli altri, ma bruciare presto i flop significa doversi prendere d'ufficio quello che avanza nella seconda metà.",
   "rules.special.last": "Ultimo rimasto.",
   "rules.special.lastBody":
     "Se sei l'unico con la lista incompleta e i lotti rimasti bastano appena a riempirla, ti vengono assegnati d'ufficio al prezzo base.",
@@ -150,7 +150,7 @@ export const it = {
   "rules.modes.title": "Modalità di gioco",
   "rules.modes.where": "Locale oppure online.",
   "rules.modes.whereBody":
-    "Su un solo dispositivo passandovelo di mano, oppure in una stanza con un codice di 5 caratteri da condividere. Da due a cinque giocatori: le categorie hanno trenta elementi, e in cinque con cinque lotti a testa ne restano cinque per gli scarti. In due la stanza diventa un Duello 1v1, dove a decidere sono i crediti risparmiati.",
+    "Su un solo dispositivo passandovelo di mano, oppure in una stanza con un codice di 5 caratteri da condividere. Da due a cinque giocatori: le categorie hanno trenta elementi, e in cinque con cinque lotti a testa ne restano cinque per i flop. In due la stanza diventa un Duello 1v1, dove a decidere sono i crediti risparmiati.",
   "rules.modes.extras": "Modificatori.",
   "rules.modes.extrasBody":
     "Blind Draft copre nome e immagine fino all'assegnazione. Mystery Box, ogni 5 lotti, mette in palio un elemento a sorpresa a prezzo fisso: se lo prendi è tuo, senza asta. Gli Scarti decidono che fine fa un lotto che non vuole nessuno.",
@@ -285,10 +285,10 @@ export const it = {
   "auction.revealed": "Svelato",
   "auction.awarded": "Aggiudicato",
   "auction.noOffers": "Nessuna offerta",
-  "auction.toDiscards": "Finisce negli scarti",
-  "auction.nobodyYet": "Nessuno ha offerto: se passate tutti il lotto va agli scarti",
-  "auction.discardsLeft": "Lotti buttati finora, su cinque disponibili",
-  "auction.discardsOut": "Scarti esauriti: i prossimi lotti invenduti vengono assegnati",
+  "auction.toDiscards": "È un flop: sparisce",
+  "auction.nobodyYet": "Nessuno ha offerto: se passate tutti il lotto è un flop",
+  "auction.discardsLeft": "Flop ancora possibili prima che i lotti vengano assegnati d'ufficio",
+  "auction.discardsOut": "Flop esauriti: i lotti rimasti servono a riempire le liste e vengono assegnati",
   "auction.nobodyYetForced":
     "Nessuno ha ancora offerto. Passando tutti, il lotto va a chi ha meno elementi al prezzo base.",
   "auction.mysteryLost": "Nessuno ha aperto la box",
@@ -300,7 +300,7 @@ export const it = {
   "auction.feedBid": "{player} offre {amount}",
   "auction.feedPass": "{player} passa",
   "auction.feedWon": "{player} si prende {item} per {amount}",
-  "auction.feedDiscard": "{item} negli scarti",
+  "auction.feedDiscard": "{item}: flop",
   "auction.feedMystery": "{player} apre la box: {item} per {amount}",
   "auction.feedLot": "In asta: {item}",
   "auction.feedStart": "Il draft è iniziato",
@@ -644,13 +644,12 @@ export const it = {
   "categories.filterGaming": "Gaming",
   "categories.filterFood": "Cibo",
   "categories.filterLife": "Vita quotidiana",
-  "lobby.discards":
-    "Elimina lotti invenduti",
-  "lobby.discardsHint": "Se nessuno offre il lotto va agli scarti; disattivandoli viene assegnato d'ufficio",
+  "lobby.discards": "Flop Draft",
+  "lobby.discardsHint": "Se nessuno offre il lotto è un flop e sparisce; disattivandolo viene assegnato d'ufficio",
   "lobby.discardsOff":
     "Se tutti passano, il lotto va al prezzo base a chi ha meno elementi (a parità, a chi ha più crediti).",
   "lobby.discardsOn":
-    "Se tutti passano, il lotto viene scartato e si passa al successivo. Nessuno se lo prende.",
+    "Se tutti i giocatori passano, il lotto è un flop: viene scartato all'istante e si passa al successivo.",
 
   "auction.max": "Max",
   "auction.reserve": "Tieni {amount} per gli slot che ti restano",

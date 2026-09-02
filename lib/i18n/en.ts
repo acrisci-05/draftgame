@@ -283,7 +283,7 @@ export const en: Dictionary = {
   "auction.revealed": "Revealed",
   "auction.awarded": "Sold",
   "auction.noOffers": "No bids",
-  "auction.toDiscards": "Goes to the discards",
+  "auction.toDiscards": "It is a flop: it disappears",
   "auction.mysteryLost": "Nobody opened the box",
   "auction.nextLot": "Next lot",
   "auction.endGame": "End the game and build the card",
@@ -633,13 +633,12 @@ export const en: Dictionary = {
   "categories.filterGaming": "Gaming",
   "categories.filterFood": "Food",
   "categories.filterLife": "Everyday life",
-  "lobby.discards":
-    "Drop unsold lots",
-  "lobby.discardsHint": "With discards a lot nobody bids on is set aside; switch them off and it is assigned anyway",
+  "lobby.discards": "Flop Draft",
+  "lobby.discardsHint": "A lot nobody bids on is a flop and disappears; switch it off and it is assigned anyway",
   "lobby.discardsOff":
     "If everyone passes, the lot goes at base price to whoever has the fewest items (ties go to more credits).",
   "lobby.discardsOn":
-    "If everyone passes, the lot is dropped and the next one comes up. Nobody gets it.",
+    "If every player passes, the lot is a flop: it is discarded instantly and the next one comes up.",
 
   "auction.max": "Max",
   "auction.reserve": "Keep {amount} for the slots you still need",
@@ -707,9 +706,9 @@ export const en: Dictionary = {
     "Paste the JSON into data/categories.json to make the change permanent in the code.",
   "studio.open": "Category studio",
 
-  "auction.nobodyYet": "No bids yet: if everyone passes the lot goes to the discards",
-  "auction.discardsLeft": "Lots dropped so far, out of five",
-  "auction.discardsOut": "No discards left: unsold lots are assigned from now on",
+  "auction.nobodyYet": "No bids yet: if everyone passes the lot is a flop",
+  "auction.discardsLeft": "Flops still possible before lots start being assigned",
+  "auction.discardsOut": "No flops left: the remaining lots are needed to fill the rosters",
   "auction.nobodyYetForced":
     "Nobody has bid yet. If everyone passes, the lot goes at base price to whoever has the fewest items.",
   "results.mineTitle": "Your line-up",
