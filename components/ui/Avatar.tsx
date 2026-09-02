@@ -6,8 +6,8 @@ import {
   Bot,
   Brain,
   Cat,
+  ChefHat,
   Clover,
-  Coins,
   Crown,
   Dices,
   Dog,
@@ -40,7 +40,7 @@ import {
   createLucideIcon,
   type LucideIcon,
 } from "lucide-react";
-import { AVATAR_IDS, isAvatarId, type AvatarId } from "@/lib/avatars";
+import { AVATAR_IDS, resolveAvatar, type AvatarId } from "@/lib/avatars";
 import { cn } from "@/lib/utils";
 
 /**
@@ -76,6 +76,23 @@ const Cactus = createLucideIcon("Cactus", [
   ["path", { d: "M7.5 21h9", key: "cactus-terra" }],
 ]);
 
+/**
+ * La capra, disegnata a mano come l'alieno e il cactus.
+ *
+ * Le corna sono la cosa che la rende riconoscibile, quindi sono grandi e si
+ * arricciano all'indietro con un uncino: dritte sarebbero un toro. Fra tre
+ * versioni ho tenuto questa perche' l'uncino sopravvive anche a quaranta
+ * pixel, che e' la misura a cui un avatar si guarda davvero.
+ */
+const Goat = createLucideIcon("Goat", [
+  ["path", { d: "M9 6.5C7 5 5 3.5 5.5 1.5c.2-.8 1-1 1.5-.3", key: "goat-corno-sx" }],
+  ["path", { d: "M15 6.5c2-1.5 4-3 3.5-5-.2-.8-1-1-1.5-.3", key: "goat-corno-dx" }],
+  ["path", { d: "M9 6.5c-1 3-1 6.5.5 8.5a4 4 0 0 0 5 0c1.5-2 1.5-5.5.5-8.5Z", key: "goat-muso" }],
+  ["path", { d: "M9 9 6 8.5", key: "goat-orecchio-sx" }],
+  ["path", { d: "M15 9l3-.5", key: "goat-orecchio-dx" }],
+  ["path", { d: "M12 18.5v3", key: "goat-barba" }],
+]);
+
 const ICONS: Record<AvatarId, LucideIcon> = {
   flame: Flame,
   zap: Zap,
@@ -102,7 +119,6 @@ const ICONS: Record<AvatarId, LucideIcon> = {
   music: Music,
   snowflake: Snowflake,
   gavel: Gavel,
-  coins: Coins,
   clover: Clover,
   medal: Medal,
   glasses: Glasses,
@@ -115,6 +131,8 @@ const ICONS: Record<AvatarId, LucideIcon> = {
   banana: Banana,
   fish: Fish,
   cactus: Cactus,
+  goat: Goat,
+  chef: ChefHat,
 };
 
 type AvatarSize = "xs" | "sm" | "md" | "lg";
@@ -146,11 +164,12 @@ export function AvatarGlyph({
   size?: number;
   strokeWidth?: number;
 }) {
-  if (!isAvatarId(id)) {
+  const risolto = resolveAvatar(id);
+  if (!risolto) {
     // Profili salvati prima del passaggio alle icone: si mostra il valore vecchio.
     return <span className={className}>{id}</span>;
   }
-  const Icon = ICONS[id];
+  const Icon = ICONS[risolto];
   return <Icon className={className} size={size} strokeWidth={strokeWidth} aria-hidden />;
 }
 

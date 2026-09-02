@@ -111,7 +111,7 @@ export function canReact(state: GameState, playerId: string, now: number): boole
 }
 
 /** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
-export { AVATAR_IDS, DEFAULT_AVATAR, firstFreeAvatar, randomAvatar } from "./avatars";
+export { AVATAR_IDS, DEFAULT_AVATAR, firstFreeAvatar, randomAvatar, resolveAvatar } from "./avatars";
 export { PLAYER_COLORS, DEFAULT_COLOR, colorLook, firstFreeColor } from "./colors";
 
 /** Colori già usati nella stanza: gli altri giocatori non possono prenderli. */

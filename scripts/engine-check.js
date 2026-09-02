@@ -616,5 +616,17 @@ check(
   codes.every((c) => !/[OIL01]/.test(c)),
 );
 
+
+/* ---------------- Avatar ritirati ---------------- */
+
+// Togliere un'icona dall'elenco non deve rompere chi ce l'aveva addosso: il
+// valore resta scritto nel suo profilo, e senza una traduzione si vedrebbe la
+// parola al posto del disegno.
+check("un avatar in elenco si risolve in se stesso", game.resolveAvatar("flame") === "flame");
+check("la moneta ritirata trova un erede", game.resolveAvatar("coins") === "gem", game.resolveAvatar("coins"));
+check("un valore inventato non ne trova nessuno", game.resolveAvatar("pinguino") === null);
+check("la moneta non si puo' piu' scegliere", game.AVATAR_IDS.includes("coins") === false);
+check("capra e cuoco sono scegliibili", game.AVATAR_IDS.includes("goat") && game.AVATAR_IDS.includes("chef"));
+check("nessun avatar ripetuto", new Set(game.AVATAR_IDS).size === game.AVATAR_IDS.length);
 console.log(failures === 0 ? "\nTUTTI I CONTROLLI SUPERATI" : `\n${failures} CONTROLLI FALLITI`);
 process.exit(failures === 0 ? 0 : 1);
