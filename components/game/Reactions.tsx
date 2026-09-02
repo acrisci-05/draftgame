@@ -2,7 +2,9 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Lock, Smile } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useIsClient } from "@/lib/client-store";
 import { REACTIONS, type ReactionEmoji } from "@/lib/game";
 import { useT } from "@/lib/settings";
 import { showToast } from "@/lib/toast";
@@ -121,27 +123,80 @@ export function ReactionButton({
 /**
  * L'emoji che sale sopra l'avatar di chi l'ha mandata.
  *
- * Sta sopra la scheda e non dentro: dentro allargherebbe la riga dei giocatori
- * a ogni reazione, e la barra ballerebbe mentre si gioca.
+ * Disegnata in fondo alla pagina e non dentro la scheda del giocatore, anche
+ * se e' li' che deve comparire. La ragione e' una regola del CSS che si scopre
+ * solo sbattendoci: la barra dei giocatori scorre in orizzontale, e un
+ * contenitore che scorre su un asse ritaglia anche sull'altro. L'emoji nasceva
+ * dentro quella barra e saliva -- e usciva tagliata a meta'.
+ *
+ * Cosi' invece la posizione della scheda si misura al momento del lancio e
+ * l'emoji vive in un livello sopra tutto, che non ritaglia niente.
  */
-export function FloatingReactions({ emojis }: { emojis: { id: string; emoji: string }[] }) {
-  if (emojis.length === 0) return null;
-  return (
+export function FloatingReactions({
+  emojis,
+  anchorRef,
+}: {
+  emojis: { id: string; emoji: string }[];
+  /** La scheda sopra cui far salire l'emoji. */
+  anchorRef: React.RefObject<HTMLElement | null>;
+}) {
+  const isClient = useIsClient();
+  const layerRef = useRef<HTMLSpanElement>(null);
+  const quante = emojis.length;
+
+  /*
+   * La posizione si scrive direttamente sul nodo, non in uno stato.
+   *
+   * Misurare e poi ridisegnare vorrebbe dire un giro di React a ogni pixel di
+   * scorrimento, per un'animazione che dura un secondo e mezzo. Due variabili
+   * CSS aggiornate a mano costano niente e fanno la stessa cosa.
+   */
+  useEffect(() => {
+    if (quante === 0) return;
+    const misura = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      const layer = layerRef.current;
+      if (!rect || !layer) return;
+      layer.style.setProperty("--pp-reaction-x", `${rect.left + rect.width / 2}px`);
+      layer.style.setProperty("--pp-reaction-y", `${rect.top}px`);
+    };
+    misura();
+    /*
+     * La barra si puo' scorrere mentre l'emoji e' per aria, e la pagina pure:
+     * senza questi due ascoltatori l'emoji resterebbe dove era la scheda un
+     * secondo fa, cioe' nel posto sbagliato.
+     */
+    window.addEventListener("scroll", misura, true);
+    window.addEventListener("resize", misura);
+    return () => {
+      window.removeEventListener("scroll", misura, true);
+      window.removeEventListener("resize", misura);
+    };
+  }, [quante, anchorRef]);
+
+  if (!isClient || quante === 0) return null;
+
+  return createPortal(
     <span
+      ref={layerRef}
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 z-20 block h-0 text-center"
+      className="pointer-events-none fixed inset-0 z-[60] block overflow-visible"
     >
       {emojis.map(({ id, emoji }, index) => (
         <span
           key={id}
-          className="reaction-float absolute start-1/2 text-2xl drop-shadow-lg"
-          // Due reazioni ravvicinate non si sovrappongono: la seconda parte
-          // leggermente di lato, come farebbero due mani alzate vicine.
-          style={{ marginInlineStart: `${(index % 3) * 14 - 14}px` }}
+          className="reaction-float absolute text-3xl drop-shadow-lg"
+          style={{
+            // Due reazioni ravvicinate non si sovrappongono: la seconda parte
+            // leggermente di lato, come farebbero due mani alzate vicine.
+            left: `calc(var(--pp-reaction-x, 50vw) + ${(index % 3) * 16 - 16}px)`,
+            top: "var(--pp-reaction-y, 50vh)",
+          }}
         >
           {emoji}
         </span>
       ))}
-    </span>
+    </span>,
+    document.body,
   );
 }

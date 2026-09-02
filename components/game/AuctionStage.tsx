@@ -350,7 +350,7 @@ export function AuctionStage({
           </div>
         </div>
 
-        <div className="mt-5 flex items-end justify-between gap-4 border-t border-line pt-4">
+        <div className="mt-5 flex w-full items-center justify-between gap-2 border-t border-line pt-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-faint">
               {t("auction.currentBid")}
@@ -365,20 +365,33 @@ export function AuctionStage({
               {money(mystery ? state.lotPrice : state.currentBid, currency)}
             </motion.p>
           </div>
-          <div className="text-end">
+          {/*
+            La colonna di destra si restringe invece di spingere.
+
+            Su un telefono stretto "Prezzo base, nessuna offerta" e "2 ancora
+            in gara" finivano una sopra l'altra e sotto il gettone del
+            cronometro. Con min-w-0 e il taglio, la frase si accorcia da sola
+            e la cifra dell'offerta -- che e' la cosa che si guarda -- resta
+            sempre intera.
+          */}
+          <div className="min-w-0 text-end">
             {leader ? (
               <p className="flex items-center justify-end gap-1.5 text-sm font-bold text-neon text-glow">
-                <Gavel className="size-4" />
+                <Gavel className="size-4 shrink-0" />
                 <Avatar id={leader.emoji} size="xs" />
-                {leader.name}
+                <span className="truncate">{leader.name}</span>
               </p>
             ) : (
-              <p className="flex items-center justify-end gap-1.5 text-sm text-faint">
-                <Flame className="size-4" />
-                {mystery ? t("auction.mysteryHint") : t("auction.noBid")}
+              <p className="flex items-center justify-end gap-1.5 text-xs text-faint">
+                <Flame className="size-3.5 shrink-0" />
+                <span className="truncate">
+                  {mystery ? t("auction.mysteryHint") : t("auction.noBid")}
+                </span>
               </p>
             )}
-            <p className="text-xs text-faint">{t("auction.inRace", { n: inRace })}</p>
+            <p className="truncate text-xs text-faint">
+              {t("auction.inRace", { n: inRace })}
+            </p>
           </div>
         </div>
 
@@ -618,12 +631,26 @@ export function AuctionStage({
               {/* Su telefono i comandi restano fissi in basso, a portata di pollice. */}
               <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ink/95 p-3 backdrop-blur safe-bottom sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
                 <div className="relative mx-auto w-full max-w-2xl">
-                  {/* Appena sopra i tasti, a destra: dove cade l'occhio fra un rilancio e l'altro. */}
+                  {/*
+                    La riga sopra i tasti: la faccina a sinistra, il cronometro
+                    a destra, e in mezzo niente.
+
+                    Nessuno dei due si prende una riga sua -- la plancia e' gia'
+                    alta e ogni riga in piu' spinge i tasti sotto la piega -- e
+                    la faccina non finisce in fila con i rilanci, dove prima o
+                    poi qualcuno la premerebbe credendo di offrire.
+                  */}
+                  <ReactionButton
+                    locked={!registrato}
+                    canSend={canReact(state, self.id, now())}
+                    onSend={react}
+                    className="absolute -top-14 start-0 z-10"
+                  />
                   {state.phase === "auction" && state.deadline ? (
                     <FloatingTimer
                       deadline={state.deadline}
                       now={now}
-                      className="absolute -top-12 end-0 z-10"
+                      className="absolute -top-14 end-0 z-10"
                     />
                   ) : null}
                   <BidControls
@@ -636,22 +663,15 @@ export function AuctionStage({
                     onClaim={() => claim(self.id)}
                   />
 
-                  {/*
-                    La faccina accanto ai rilanci, non dentro: dentro sarebbe
-                    un sesto tasto in una fila dove gli altri cinque costano
-                    crediti, e prima o poi qualcuno la premerebbe per sbaglio
-                    credendo di rilanciare.
-                  */}
-                  <div className="mt-2 flex justify-end">
-                    <ReactionButton
-                      locked={!registrato}
-                      canSend={canReact(state, self.id, now())}
-                      onSend={react}
-                    />
-                  </div>
                 </div>
               </div>
-              <div aria-hidden className="h-56 sm:hidden" />
+              {/*
+                Il vuoto che la plancia fissa si prende in fondo alla pagina.
+                Deve bastare per i tasti *e* per la riga che ci sta sopra: era
+                corto di una trentina di pixel, ed e' per questo che il
+                cronometro cadeva sulla scritta dell'offerta.
+              */}
+              <div aria-hidden className="h-64 sm:hidden" />
             </>
           ) : (
             <p className="rounded-2xl border border-line bg-surface p-4 text-center text-sm text-faint">
@@ -666,6 +686,7 @@ export function AuctionStage({
           {t("auction.endGame")}
         </Button>
       ) : null}
+
     </div>
   );
 }

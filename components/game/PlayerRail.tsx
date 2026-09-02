@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Gavel } from "lucide-react";
-import type { GameState } from "@/lib/types";
+import { useRef } from "react";
+import type { GameState, Player } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
 import { colorLook } from "@/lib/game";
 import { useT } from "@/lib/settings";
@@ -36,6 +37,12 @@ function BotThinking({ label }: { label: string }) {
   );
 }
 
+interface Reazione {
+  id: string;
+  playerId: string;
+  emoji: string;
+}
+
 export function PlayerRail({
   state,
   selfId,
@@ -49,76 +56,118 @@ export function PlayerRail({
   /** Chi sta ragionando adesso: sotto di lui compaiono i tre puntini. */
   thinkingId?: string | null;
   /** Le reazioni ancora in volo, gia' filtrate per quelle vive. */
-  reactions?: { id: string; playerId: string; emoji: string }[];
+  reactions?: Reazione[];
+}) {
+  return (
+    <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      {state.players.map((player) => (
+        <Scheda
+          key={player.id}
+          state={state}
+          player={player}
+          selfId={selfId}
+          nextId={nextId}
+          thinkingId={thinkingId}
+          reactions={reactions.filter((r) => r.playerId === player.id)}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * La scheda di un giocatore.
+ *
+ * Sta in un componente suo per una ragione precisa: a ogni scheda serve un
+ * riferimento -- e' l'ancora sopra cui salgono le emoji -- e i riferimenti non
+ * si possono creare dentro un ciclo.
+ */
+function Scheda({
+  state,
+  player,
+  selfId,
+  nextId,
+  thinkingId,
+  reactions,
+}: {
+  state: GameState;
+  player: Player;
+  selfId?: string;
+  nextId?: string | null;
+  thinkingId?: string | null;
+  reactions: Reazione[];
 }) {
   const t = useT();
   const currency = state.config.currency;
+  const schedaRef = useRef<HTMLDivElement>(null);
+
+  const isLeader = state.highBidderId === player.id;
+  const hasPassed = state.passed.includes(player.id);
+  const full = player.roster.length >= state.config.slots;
 
   return (
-    <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-      {state.players.map((player) => {
-        const isLeader = state.highBidderId === player.id;
-        const hasPassed = state.passed.includes(player.id);
-        const full = player.roster.length >= state.config.slots;
-        return (
-          <motion.div
-            key={player.id}
-            layout
-            className={cn(
-              "relative min-w-[136px] shrink-0 rounded-xl border bg-surface p-2.5 transition-colors",
-              isLeader
-                ? "border-neon leader-pulse"
-                : player.id === nextId
-                  ? "border-violet/50"
-                  : "border-line",
-              (hasPassed || full) && !isLeader ? "opacity-45" : "",
-            )}
-          >
-            <FloatingReactions emojis={reactions.filter((r) => r.playerId === player.id)} />
+    <motion.div
+      ref={schedaRef}
+      layout
+      className={cn(
+        "relative min-w-[136px] shrink-0 rounded-xl border bg-surface p-2.5 transition-colors",
+        isLeader
+          ? "border-neon leader-pulse"
+          : player.id === nextId
+            ? "border-violet/50"
+            : "border-line",
+        (hasPassed || full) && !isLeader ? "opacity-45" : "",
+      )}
+    >
+      {/*
+        Le emoji non si disegnano qui dentro: questa scheda vive in una barra
+        che scorre, e un contenitore che scorre ritaglia. Il componente le
+        manda in fondo alla pagina e le posiziona sopra questo riquadro.
+      */}
+      <FloatingReactions emojis={reactions} anchorRef={schedaRef} />
 
-            <div className="flex items-center gap-1.5">
-              {/* L'alone col colore scelto: e' come ci si riconosce al volo
-                  mentre l'asta corre. Chi e' in testa resta verde, perche' quello
-                  vuol dire un'altra cosa. */}
-              <Avatar
-                id={player.emoji}
-                size="xs"
-                selected={isLeader}
-                className={cn(isLeader ? "leader-pulse" : colorLook(player.color).ring)}
-              />
-              <span
-                className={cn(
-                  "truncate text-sm font-semibold",
-                  isLeader ? "" : colorLook(player.color).text,
-                )}
-              >
-                {player.name}
-              </span>
-              {isLeader ? <Gavel className="ms-auto size-3.5 shrink-0 text-neon" /> : null}
-              {player.id === selfId && !isLeader ? (
-                <span className="ms-auto text-[9px] font-bold uppercase text-violet">•</span>
-              ) : null}
-            </div>
-            <div className="mt-2 flex items-baseline justify-between">
-              <span className="font-mono text-lg font-bold text-neon">
-                {money(player.budget, currency)}
-              </span>
-              <span className="text-[10px] uppercase tracking-wider text-faint">
-                {player.roster.length}/{state.config.slots}
-              </span>
-            </div>
+      <div className="flex items-center gap-1.5">
+        {/* L'alone col colore scelto: e' come ci si riconosce al volo mentre
+            l'asta corre. Chi e' in testa resta verde, perche' quello vuol dire
+            un'altra cosa. */}
+        <Avatar
+          id={player.emoji}
+          size="xs"
+          selected={isLeader}
+          className={cn(isLeader ? "leader-pulse" : colorLook(player.color).ring)}
+        />
+        <span
+          className={cn(
+            "truncate text-sm font-semibold",
+            isLeader ? "" : colorLook(player.color).text,
+          )}
+        >
+          {player.name}
+        </span>
+        {isLeader ? <Gavel className="ms-auto size-3.5 shrink-0 text-neon" /> : null}
+        {player.id === selfId && !isLeader ? (
+          <span className="ms-auto text-[9px] font-bold uppercase text-violet">•</span>
+        ) : null}
+      </div>
 
-            {player.id === thinkingId ? <BotThinking label={t("auction.botThinking")} /> : null}
-            <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-2">
-              <motion.div
-                className="h-full rounded-full bg-neon"
-                animate={{ width: `${(player.budget / Math.max(1, state.config.budget)) * 100}%` }}
-                transition={{ type: "spring", stiffness: 180, damping: 24 }}
-              />
-            </div>
-          </motion.div>
-        );
-      })}
-    </div>
+      <div className="mt-2 flex items-baseline justify-between">
+        <span className="font-mono text-lg font-bold text-neon">
+          {money(player.budget, currency)}
+        </span>
+        <span className="text-[10px] uppercase tracking-wider text-faint">
+          {player.roster.length}/{state.config.slots}
+        </span>
+      </div>
+
+      {player.id === thinkingId ? <BotThinking label={t("auction.botThinking")} /> : null}
+
+      <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-2">
+        <motion.div
+          className="h-full rounded-full bg-neon"
+          animate={{ width: `${(player.budget / Math.max(1, state.config.budget)) * 100}%` }}
+          transition={{ type: "spring", stiffness: 180, damping: 24 }}
+        />
+      </div>
+    </motion.div>
   );
 }

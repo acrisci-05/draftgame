@@ -14,7 +14,15 @@ const SIZES: Record<CoverSize, string> = {
   sm: "size-12 rounded-xl text-sm",
   md: "size-20 rounded-2xl text-xl",
   lg: "size-28 rounded-2xl text-3xl",
-  xl: "w-full aspect-square rounded-3xl text-7xl",
+  /*
+   * Su telefono la copertina si ferma a un terzo dello schermo.
+   *
+   * A tutta larghezza su un 390px il quadrato e' alto 390px, cioe' quasi
+   * meta' della pagina: i tasti di rilancio finivano sotto la piega e per
+   * arrivarci bisognava scorrere mentre il cronometro correva. Il tetto
+   * vale su entrambi i lati, cosi' resta quadrata e centrata.
+   */
+  xl: "mx-auto aspect-square w-full max-h-[34dvh] max-w-[34dvh] rounded-3xl text-7xl sm:max-h-none sm:max-w-none",
 };
 
 const FALLBACK_ICON: Record<CoverSize, string> = {
