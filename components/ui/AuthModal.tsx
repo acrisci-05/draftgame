@@ -45,6 +45,7 @@ import {
 } from "@/lib/auth";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
 import { fetchHistory, fetchStats, type PastMatch } from "@/lib/history";
+import { MatchHistory } from "@/components/game/MatchHistory";
 import {
   NO_PROGRESS,
   levelFor,
@@ -58,8 +59,7 @@ import { listPickmates } from "@/lib/pickmates";
 import { setPresenceVisibility } from "@/lib/presence";
 import type { TranslationKey } from "@/lib/i18n";
 import { useT } from "@/lib/settings";
-import type { CurrencyCode } from "@/lib/types";
-import { cn, money } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { AppleGlyph, FacebookGlyph, GoogleGlyph } from "./BrandGlyphs";
 import { Avatar, AvatarPicker } from "./Avatar";
 import { Button } from "./Button";
@@ -277,30 +277,15 @@ function AccountCard({ onDone }: { onDone?: () => void }) {
           <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-faint">
             {t("history.title")}
           </p>
-          <div className="flex flex-col gap-1.5">
-            {history.map((match) => (
-              <div key={match.id} className="flex items-center gap-2 text-sm">
-                <span
-                  className={cn(
-                    "grid size-6 shrink-0 place-items-center rounded-md font-mono text-[11px] font-black",
-                    match.position === 1 ? "bg-gold/20 text-gold" : "bg-surface text-faint",
-                  )}
-                >
-                  {match.position}
-                </span>
-                <span className="min-w-0 flex-1 truncate">{match.category}</span>
-                <span className="shrink-0 font-mono text-xs text-faint">
-                  {money(match.spent, match.currency as CurrencyCode)}
-                </span>
-                <span className="shrink-0 text-[11px] text-faint">
-                  {formatDay(match.playedAt)}
-                </span>
-              </div>
-            ))}
-          </div>
+          {/*
+            Lo storico e' diventato tocccabile: da una riga si apre chi ha
+            votato quella partita. La lista di prima diceva solo categoria e
+            spesa, che e' la meta' meno interessante -- l'altra e' contro chi
+            si e' giocato e chi ha detto che la tua rosa era la migliore.
+          */}
+          <MatchHistory userId={account.id} accountId={account.id} />
         </div>
       ) : null}
-
       {/* Chi non ha ancora giocato non ha statistiche da guardare: ha una partita da fare. */}
       {numbers.played === 0 ? (
         <div className="rounded-2xl border border-violet/40 bg-violet/10 p-4 text-center">
@@ -909,9 +894,3 @@ const PROVIDER_LOOK: Record<
   },
 };
 
-/** Giorno e mese, senza l'anno: serve a collocare, non a datare. */
-function formatDay(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return `${date.getDate()}/${date.getMonth() + 1}`;
-}

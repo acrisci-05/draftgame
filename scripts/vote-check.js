@@ -81,5 +81,45 @@ for (const quanti of [2, 3, 4, 5]) {
   })());
 }
 
+/* ---------------- Lo storico: chi ha votato e come si legge ---------------- */
+
+{
+  const io = "acc-mio";
+  const detail = {
+    practice: false,
+    players: [
+      { id: "p0", name: "io", accountId: io },
+      { id: "p1", name: "Marco", accountId: "acc-marco" },
+    ],
+  };
+  const voti = [
+    { playerId: "p0", name: "sara", registered: true },
+    { playerId: "p0", name: null, registered: false },
+    { playerId: "p1", name: "luca", registered: true },
+  ];
+
+  const mio = detail.players.find((p) => p.accountId === io).id;
+  const pro = voti.filter((v) => v.playerId === mio).length;
+  const contro = voti.length - pro;
+  check("i voti a favore si contano sulla propria rosa", pro === 2, pro);
+  check("gli altri finiscono fra i contrari", contro === 1, contro);
+
+  const ospiti = voti.filter((v) => !v.registered).length;
+  check("gli ospiti restano senza nome", ospiti === 1 && voti.find((v) => !v.registered).name === null);
+
+  const altri = detail.players.filter((p) => p.accountId !== io);
+  check("l'avversario si riconosce dal profilo", altri.length === 1 && altri[0].name === "Marco");
+
+  // Contro il bot il titolo non guarda i profili: il bot non ne ha uno.
+  const contBot = {
+    practice: true,
+    players: [{ id: "umano", accountId: io }, { id: "bot-pickasso", name: "Pick-asso Bot" }],
+  };
+  check("la sfida al bot si riconosce dal contrassegno", contBot.practice === true);
+  check(
+    "e il bot non ha un profilo da confondere col proprio",
+    contBot.players.find((p) => p.id === "bot-pickasso").accountId === undefined,
+  );
+}
 console.log(failures === 0 ? "\nIL VOTO E' IN REGOLA\n" : `\n${failures} controlli falliti.\n`);
 process.exit(failures === 0 ? 0 : 1);

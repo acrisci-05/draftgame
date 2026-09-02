@@ -386,6 +386,41 @@ export async function fetchVotes(resultId: string): Promise<VoteTally[]> {
   return [...counts.entries()].map(([playerId, votes]) => ({ playerId, votes }));
 }
 
+export interface MatchDetail {
+  code: string;
+  resultId: string;
+  practice: boolean;
+  players: Player[];
+}
+
+/**
+ * I risultati pubblicati per un elenco di codici stanza.
+ *
+ * Lo storico personale sa quante persone c'erano ma non chi: quello sta nel
+ * risultato pubblicato, che pero' esiste solo se qualcuno ha generato il link
+ * del voto. Le partite senza link restano senza dettaglio, ed e' giusto cosi'
+ * -- non c'e' niente da mostrare.
+ *
+ * Una richiesta sola per tutta la pagina: dieci partite non devono diventare
+ * dieci giri sul database.
+ */
+export async function fetchResultsByCodes(codes: string[]): Promise<MatchDetail[]> {
+  const supabase = getSupabase();
+  if (!supabase || codes.length === 0) return [];
+  const { data, error } = await supabase
+    .from(RESULTS_TABLE)
+    .select("id, code, players, practice")
+    .in("code", codes);
+  if (error || !data) return [];
+  return (data as { id: string; code: string; players: Player[]; practice: boolean | null }[]).map(
+    (row) => ({
+      code: row.code,
+      resultId: row.id,
+      practice: row.practice === true,
+      players: row.players,
+    }),
+  );
+}
 export interface Voter {
   playerId: string;
   /** Il nickname di chi ha votato, o null se ha votato da ospite. */
