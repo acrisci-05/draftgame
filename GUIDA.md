@@ -166,6 +166,9 @@ migliore.
   tutti finiscano con la lista piena, anche a costo di ricevere qualcosa di indesiderato.
 - **Varianti**: *Blind Draft* (nome e immagine nascosti fino all'assegnazione, poi lo svelamento) e *Mystery Box* (ogni 5
   lotti una scatola a prezzo fisso con elemento casuale).
+- **Targhe di fine partita**: Dominatore, Spendaccione, Braccino Corto e Maestro del Flop. Non
+  danno punti e non spostano la classifica; a parità non si assegnano. Per chi le prende e perché,
+  vedi *Fine partita* più avanti.
 
 Tutte queste regole sono verificate da `npm run check:engine`.
 
@@ -285,11 +288,21 @@ verificarsi.
   sono tutti davanti allo stesso schermo, si va dritti alla classifica.
 - Ogni dispositivo mostra **la propria** rosa: il giocatore si riconosce dall'identificativo della
   sessione salvata su quel dispositivo, quindi in una stanza da otto ognuno vede la sua.
+- **Le targhe.** Sotto i nomi compaiono quattro riconoscimenti che non danno punti e non spostano
+  la classifica — servono proprio per quello, perché vince uno solo e gli altri uscirebbero senza
+  niente da raccontare. **🏆 Dominatore** a chi ha vinto; **💸 Spendaccione** a chi ha finito i
+  crediti per primo, ripercorrendo gli acquisti in ordine; **🪙 Braccino Corto** a chi chiude con
+  più crediti in tasca; **🎯 Maestro del Flop** a chi ha lasciato perdere più lotti. **A parità non
+  si assegnano**, ed è il motivo per cui a volte non ne compare nessuna: due "braccino corto"
+  affiancati non fanno ridere, e in una partita dove non ha speso nessuno la prenderebbero tutti.
+  Sono documentate anche dentro il gioco, nel pannello *Regole*.
 - Card verticale **1080x1920** con roster raggruppato per fascia, badge dorato del prezzo pagato
   su ogni miniatura, budget residuo e QR del voto. Si scarica in PNG o si condivide con il menu
   nativo del telefono.
 - **Votazione pubblica**: si genera un link (`/vote/...`) da mandare a chi vuole, un voto per
-  dispositivo, nessuna registrazione.
+  dispositivo, nessuna registrazione. **Un link per partita**: il pulsante ce l'hanno tutti, e se
+  lo premono in tre ritrovano tutti e tre lo stesso link, altrimenti i voti degli amici si
+  spargerebbero su conteggi separati. La rivincita è un'altra partita e ha il suo link.
 
 ### Account e amici
 - **Registrazione e accesso con email e password**, in due schede dentro la stessa finestra.

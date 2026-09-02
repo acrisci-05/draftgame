@@ -419,7 +419,7 @@ export const it = {
   "vote.generating": "Creo il link...",
   "vote.hint": "Chi vota apre il link o inquadra il QR: nessuna registrazione richiesta.",
   "vote.offline": "La votazione richiede la configurazione del database.",
-  "vote.error": "Creazione del link non riuscita.",
+  "vote.error": "Il link non è uscito. Riprova: se ricapita, qui sotto c'è quello che ha risposto il database.",
   "vote.titleBot": "Umano contro IA",
   "vote.subtitleBot": "Chi ha composto la rosa migliore?",
   "vote.botName": "Pick-asso",

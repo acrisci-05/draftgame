@@ -315,6 +315,12 @@ vengono assegnati d'ufficio al prezzo di apertura. Nessuno resta con i posti vuo
 quando l'host la chiude a mano dal pulsante in fondo alla schermata d'asta. In tutti i casi si
 arriva alla card finale.</p>
 
+<h4>Le targhe</h4>
+<p>A premiazione fatta si assegnano <strong>Dominatore</strong>, <strong>Spendaccione</strong>,
+<strong>Braccino Corto</strong> e <strong>Maestro del Flop</strong>: non danno punti, non spostano
+la classifica e a parità non si assegnano affatto. Chi le prende e perché sta nel capitolo 10, in
+<em>Le targhe di fine partita</em>; dentro il gioco sono nel pannello <em>Regole</em>.</p>
+
 <div class="note">
   <strong>Tutte queste regole sono verificate dai test.</strong> <code>npm run check:engine</code>
   esegue oltre settanta controlli sul motore: apertura, rilanci, anti-sniping, passaggi,
@@ -669,6 +675,23 @@ In una stanza da otto persone ognuno vede la sua: il giocatore si riconosce dall
 su quel dispositivo. Nelle stanze locali la prima schermata non compare, perche' sono tutti davanti
 allo stesso schermo.</p>
 
+<h3>Le targhe di fine partita</h3>
+<p>Sotto i nomi, nella classifica, compaiono quattro targhe. Non danno punti e non spostano la
+classifica: servono proprio per quello. Vince uno solo, e in cinque gli altri quattro uscirebbero
+senza niente da raccontare.</p>
+<ul>
+  <li><strong>🏆 Dominatore</strong> — a chi ha vinto la partita.</li>
+  <li><strong>💸 Spendaccione</strong> — a chi ha finito i crediti per primo, ripercorrendo gli
+    acquisti in ordine: è chi si è trovato senza più niente da offrire prima di tutti gli altri.</li>
+  <li><strong>🪙 Braccino Corto</strong> — a chi chiude con più crediti in tasca. In due vale
+    doppio, perché lì a decidere sono proprio i crediti risparmiati.</li>
+  <li><strong>🎯 Maestro del Flop</strong> — a chi ha lasciato perdere più lotti di tutti. Passare
+    non è un difetto (è il modo di tenersi i crediti per quello che conta), ma esagerare si vede.</li>
+</ul>
+<p><strong>A parità non si assegnano.</strong> Se due sono appaiati la targa non va a nessuno dei
+due: due "braccino corto" affiancati non fanno ridere, e in una partita dove non ha speso nessuno
+la prenderebbero tutti. È il motivo per cui a volte non compare nessuna targa.</p>
+
 <h3>La card 9:16</h3>
 <ul>
   <li>PNG verticale <strong>1080×1920</strong>, esportato a doppia risoluzione perché resti nitido
@@ -685,6 +708,13 @@ allo stesso schermo.</p>
 <p>Si genera un link <code>/vote/…</code> — e il QR corrispondente, stampato sulla card — da
 mandare a chi si vuole: si guardano le liste e si vota la migliore. Un voto per dispositivo,
 nessuna registrazione. È il modo per far decidere agli amici chi ha vinto davvero.</p>
+<p><strong>Un link per partita, chiunque lo generi.</strong> Il pulsante ce l'hanno tutti, e se lo
+premono in tre non escono tre link: il primo lo crea, gli altri due ritrovano quello stesso. Se
+uscissero tre link diversi i voti degli amici si spargerebbero su tre conteggi separati, e ognuno
+mostrerebbe un terzo della verità. La rivincita, invece, è un'altra partita e ha il suo link.</p>
+<p>Chi ha giocato quella partita, aprendo il link, non trova i pulsanti per votare: ha già votato
+nella stanza, alla fine dell'asta. Trova le percentuali dal vivo, che salgono mentre gli amici
+votano.</p>
 
 <!-- =====================================================================
      11. IL CONTORNO: lingue, tema, audio, installazione come app.

@@ -124,32 +124,82 @@ for (const quanti of [2, 3, 4, 5]) {
 /* ---------------- Il link si genera anche col database indietro ---------------- */
 
 /*
- * Nasce da un guasto vero: era stato aggiunto al risultato un contrassegno per
- * le sfide al bot, e su un database senza quella colonna l'inserimento veniva
- * rifiutato per intero. Il pulsante "genera link" smetteva di funzionare per
- * tutti, anche per le partite fra persone, che di quel campo non sanno che
- * farsene.
+ * Nasce da un guasto vero, e da una toppa che non toccava terra.
  *
- * La regola: il contrassegno e' un di piu', il link e' il punto. Se il
- * database non conosce la colonna (42703) si riscrive senza.
+ * Era stato aggiunto al risultato un contrassegno per le sfide al bot, e su un
+ * database senza quella colonna l'inserimento veniva rifiutato per intero: il
+ * pulsante "genera link" smetteva di funzionare per tutti. La toppa doveva
+ * riscrivere la riga senza il contrassegno, ma aspettava il codice 42703 --
+ * quello di Postgres. L'interfaccia REST ferma la richiesta prima e ne dice un
+ * altro, PGRST204. Il controllo di allora provava una copia della regola
+ * scritta apposta nel controllo stesso: passava, mentre il pulsante no.
+ *
+ * Da qui si prova la funzione vera, quella che gira sul telefono di chi gioca.
  */
 {
-  const RIFIUTO_COLONNA = "42703";
-  // Il database finto: rifiuta la prima riga se contiene 'practice'.
-  const scrivi = (riga) =>
-    "practice" in riga
-      ? { data: null, error: { code: RIFIUTO_COLONNA } }
-      : { data: { id: "abc" }, error: null };
+  const { colonnaSconosciuta, RESULT_ESSENTIALS } = require(path.join(OUT, "supabase.js"));
 
-  const base = { code: "AAAAA", players: [] };
-  let { data, error } = scrivi({ ...base, practice: true });
-  if (error?.code === RIFIUTO_COLONNA) ({ data, error } = scrivi(base));
-  check("con la colonna mancante il link esce lo stesso", error === null && data.id === "abc");
+  check(
+    "la colonna mancante si riconosce dall'interfaccia REST",
+    colonnaSconosciuta({
+      code: "PGRST204",
+      message: "Could not find the 'practice' column of 'results' in the schema cache",
+    }) === "practice",
+  );
+  check(
+    "e si riconosce anche da Postgres",
+    colonnaSconosciuta({
+      code: "42703",
+      message: 'column "practice" of relation "results" does not exist',
+    }) === "practice",
+  );
+  check("un rifiuto delle regole di accesso non e' una colonna mancante",
+    colonnaSconosciuta({ code: "42501", message: "new row violates row-level security policy" }) === null);
+  check("e nemmeno la rete caduta, che un codice non ce l'ha",
+    colonnaSconosciuta({ code: "", message: "TypeError: Failed to fetch" }) === null);
 
-  // E su un database aggiornato passa al primo colpo, col contrassegno dentro.
-  const moderno = (riga) => ({ data: { id: "xyz", practice: riga.practice }, error: null });
-  const esito = moderno({ ...base, practice: true });
-  check("con la colonna presente il contrassegno arriva", esito.data.practice === true);
+  /* La riscrittura: si toglie l'accessorio, mai l'essenziale. */
+  const togliibile = (colonna) => Boolean(colonna) && !RESULT_ESSENTIALS.includes(colonna);
+  check("il contrassegno del bot si puo' togliere", togliibile("practice"));
+  check("i giocatori no", togliibile("players") === false);
+  check("nemmeno il codice della stanza", togliibile("code") === false);
+}
+
+/* ---------------- Un link solo per partita, anche in tre ---------------- */
+
+/*
+ * In tre si preme il pulsante in tre, e uscivano tre link diversi sulla stessa
+ * partita: i voti degli amici si spargevano su tre conteggi. L'impronta
+ * riconosce la partita gia' pubblicata -- ma deve distinguere la rivincita,
+ * che ha gli stessi giocatori nella stessa stanza ed e' un'altra partita.
+ */
+{
+  const { improntaPartita } = require(path.join(OUT, "supabase.js"));
+  const rosa = (itemId, price) => [{ itemId, price, name: "x", tier: "gold" }];
+  const partita = [
+    { id: "p1", budget: 40, roster: rosa("a", 10) },
+    { id: "p2", budget: 30, roster: rosa("b", 20) },
+    { id: "p3", budget: 20, roster: rosa("c", 30) },
+  ];
+
+  check(
+    "la stessa partita ha la stessa impronta, in qualunque ordine arrivi",
+    improntaPartita(partita) === improntaPartita([...partita].reverse()),
+  );
+  check(
+    "la rivincita degli stessi tre e' un'altra partita",
+    improntaPartita(partita) !==
+      improntaPartita([
+        { id: "p1", budget: 10, roster: rosa("c", 40) },
+        { id: "p2", budget: 30, roster: rosa("b", 20) },
+        { id: "p3", budget: 20, roster: rosa("a", 30) },
+      ]),
+  );
+  check(
+    "e un quarto giocatore la cambia",
+    improntaPartita(partita) !==
+      improntaPartita([...partita, { id: "p4", budget: 50, roster: rosa("d", 5) }]),
+  );
 }
 console.log(failures === 0 ? "\nIL VOTO E' IN REGOLA\n" : `\n${failures} controlli falliti.\n`);
 process.exit(failures === 0 ? 0 : 1);

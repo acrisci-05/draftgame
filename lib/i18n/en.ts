@@ -408,7 +408,7 @@ export const en: Dictionary = {
   "vote.generating": "Creating the link...",
   "vote.hint": "Voters open the link or scan the QR: no sign-up needed.",
   "vote.offline": "Voting needs the database to be configured.",
-  "vote.error": "Could not create the link.",
+  "vote.error": "The link did not come out. Try again — if it happens twice, below is what the database answered.",
   "vote.titleBot": "Human vs AI",
   "vote.subtitleBot": "Who put together the better line-up?",
   "vote.botName": "Pick-asso",

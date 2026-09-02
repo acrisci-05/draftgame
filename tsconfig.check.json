@@ -22,6 +22,7 @@
     "lib/image-match.ts",
     "lib/rating-prompt.ts",
     "lib/storage.ts",
+    "lib/supabase.ts",
     "lib/history.ts",
     "lib/pickmates.ts"
   ]

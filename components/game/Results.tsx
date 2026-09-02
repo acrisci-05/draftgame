@@ -111,7 +111,14 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   const [voteUrl, setVoteUrl] = useState<string | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
   const [voteBusy, setVoteBusy] = useState(false);
-  const [voteError, setVoteError] = useState(false);
+  /*
+   * Perche' il link non e' uscito, nelle parole del database.
+   *
+   * Non e' un messaggio per chi gioca -- chi gioca legge la riga sopra, in
+   * italiano -- ma senza di esso un pulsante che non funziona resta una cosa
+   * che non si puo' nemmeno raccontare: si legge, si copia, si riferisce.
+   */
+  const [voteError, setVoteError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   // Quanta esperienza ha dato questa partita: zero quando era gia' stata pagata.
   const [earnedXp, setEarnedXp] = useState(0);
@@ -358,7 +365,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
 
   const generateVote = async () => {
     setVoteBusy(true);
-    setVoteError(false);
+    setVoteError(null);
     try {
       const id = await publishResult({
         code: state.code,
@@ -370,8 +377,8 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
       });
       setResultId(id);
       setVoteUrl(voteUrlFor(id));
-    } catch {
-      setVoteError(true);
+    } catch (cause) {
+      setVoteError(cause instanceof Error ? cause.message : String(cause));
     } finally {
       setVoteBusy(false);
     }
@@ -622,7 +629,14 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
         ) : (
           <div className="flex flex-col gap-2">
             <p className="text-sm text-muted">{t("vote.hint")}</p>
-            {voteError ? <p className="text-sm text-red-500">{t("vote.error")}</p> : null}
+            {voteError ? (
+              <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-3">
+                <p className="text-sm font-bold text-red-500">{t("vote.error")}</p>
+                <p className="mt-1 break-words font-mono text-[11px] leading-relaxed text-muted">
+                  {voteError}
+                </p>
+              </div>
+            ) : null}
             <Button variant="violet" disabled={voteBusy} onClick={generateVote}>
               {voteBusy ? (
                 <Loader2 className="size-4 animate-spin" />

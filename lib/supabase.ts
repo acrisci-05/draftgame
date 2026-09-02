@@ -288,36 +288,182 @@ interface ResultRow {
   practice?: boolean | null;
 }
 
-/** Salva i roster finali e restituisce l'id da usare nel link di voto. */
+/**
+ * Quanto si aspetta il database prima di dire che non ce l'ha fatta.
+ *
+ * Senza un limite, una connessione che non risponde -- il telefono in casa di
+ * qualcun altro, la rete dati che va e viene -- lascia il pulsante a girare
+ * per sempre. Chi ha appena finito la partita non vede un errore: vede
+ * un'attesa che non finisce, e per lui il pulsante e' rotto. Meglio
+ * arrendersi in dodici secondi e lasciarlo ritentare.
+ */
+const PUBLISH_TIMEOUT_MS = 12_000;
+
+/** Le colonne senza cui il risultato non e' un risultato: queste non si tolgono. */
+export const RESULT_ESSENTIALS = [
+  "code",
+  "category_name",
+  "category_emoji",
+  "currency",
+  "players",
+];
+
+/**
+ * Un limite di tempo, anche dove `AbortSignal.timeout` non c'e'.
+ *
+ * Sui telefoni piu' vecchi quel metodo manca, e chiamarlo lascerebbe senza
+ * link proprio chi il link lo aspetta.
+ */
+function scadenza(ms: number): AbortSignal {
+  if (typeof AbortSignal.timeout === "function") return AbortSignal.timeout(ms);
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
+
+/**
+ * Il nome della colonna che il database non conosce, se l'errore lo dice.
+ *
+ * Due codici e non uno, ed e' il punto di tutta questa storia. 42703 e'
+ * Postgres, e arriva quando la richiesta lo raggiunge davvero; PGRST204 e'
+ * l'interfaccia REST, che la ferma prima -- confronta la riga con lo schema
+ * che tiene in memoria e la rifiuta li'. Sul nostro database esce sempre il
+ * secondo. La rete di sicurezza contro la colonna mancante c'era gia', ma era
+ * tesa sotto la porta sbagliata: non si era mai aperta.
+ *
+ * Esportata perche' `npm run check:vote` provi questa e non una copia: la
+ * volta scorsa il controllo passava e il pulsante no.
+ */
+export function colonnaSconosciuta(
+  error: { code?: string; message?: string } | null,
+): string | null {
+  if (!error) return null;
+  if (error.code !== "PGRST204" && error.code !== "42703") return null;
+  const citata = /'([^']+)'|"([^"]+)"/.exec(error.message ?? "");
+  return citata?.[1] ?? citata?.[2] ?? null;
+}
+
+/**
+ * Perche' il link non e' uscito, detto in modo che si possa riferire.
+ *
+ * Il messaggio del database viaggia fino allo schermo. Non e' bello, ma un
+ * "riprova" da solo non si puo' riferire a nessuno: chi ha visto fallire il
+ * pulsante non ha modo di dire che cosa e' successo, e chi deve aggiustarlo
+ * non ha modo di saperlo.
+ */
+export class PublishFailure extends Error {
+  constructor(readonly detail: string) {
+    super(detail);
+    this.name = "PublishFailure";
+  }
+}
+
+/**
+ * L'impronta di una partita finita: chi c'era e che cosa si e' portato a casa.
+ *
+ * Serve a riconoscere lo stesso risultato pubblicato due volte. Non bastano i
+ * giocatori: gli stessi tre nella stessa stanza possono rigiocare, e la
+ * rivincita e' un'altra partita. Le rose invece la distinguono, perche' due
+ * aste identiche non capitano.
+ */
+export function improntaPartita(players: readonly Player[]): string {
+  return players
+    .map((p) => `${p.id}:${p.budget}:${p.roster.map((r) => `${r.itemId}@${r.price}`).join(",")}`)
+    .sort()
+    .join("|");
+}
+
+/**
+ * Il link di questa partita, se qualcuno l'ha gia' generato.
+ *
+ * In tre si preme il pulsante in tre, ognuno dal proprio telefono, e finora
+ * ne uscivano tre link diversi sulla stessa partita: i voti degli amici si
+ * spargevano su tre conteggi, e ogni link mostrava un terzo della verita'.
+ * Adesso il primo che pubblica fa il link, e gli altri due ritrovano quello.
+ *
+ * Se la ricerca non riesce non e' un guaio: si pubblica e basta. Meglio un
+ * link in piu' che nessun link.
+ */
+async function linkGiaPubblicato(payload: VoteResultPayload): Promise<string | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from(RESULTS_TABLE)
+    .select("id, players")
+    .eq("code", payload.code)
+    .order("created_at", { ascending: false })
+    .limit(5)
+    .abortSignal(scadenza(PUBLISH_TIMEOUT_MS));
+  if (error || !data) return null;
+
+  const mia = improntaPartita(payload.players);
+  const riga = (data as { id: string; players: Player[] }[]).find(
+    (r) => Array.isArray(r.players) && improntaPartita(r.players) === mia,
+  );
+  return riga?.id ?? null;
+}
+
+/**
+ * Salva i roster finali e restituisce l'id da usare nel link di voto.
+ *
+ * Il link e' il punto: tutto il resto -- il contrassegno della sfida al bot,
+ * qualunque campo si aggiunga domani -- e' un di piu' che non deve poterlo
+ * far cadere. Se il database non conosce una colonna accessoria, la riga si
+ * riscrive senza e il link esce lo stesso; se non conosce una colonna
+ * essenziale, allora il database e' da aggiornare e lo si dice.
+ */
 export async function publishResult(payload: VoteResultPayload): Promise<string> {
   const supabase = requireClient();
-  const base = {
+
+  const gia = await linkGiaPubblicato(payload).catch(() => null);
+  if (gia) return gia;
+
+  const riga: Record<string, unknown> = {
     code: payload.code,
     category_name: payload.categoryName,
     category_emoji: payload.categoryEmoji,
     currency: payload.currency,
     players: payload.players,
+    practice: payload.practice === true,
   };
 
-  const scrivi = (riga: Record<string, unknown>) =>
-    supabase.from(RESULTS_TABLE).insert(riga).select("id").single();
-
   /*
-   * Il contrassegno della sfida al bot e' un di piu'; il link e' il punto.
-   *
-   * Su un database non ancora aggiornato quella colonna non c'e', e
-   * l'inserimento veniva rifiutato per intero: il link non si generava piu' --
-   * nemmeno per le partite fra persone, che di quel campo non sanno che
-   * farsene. Adesso se il database non conosce la colonna (42703) si riscrive
-   * senza, e il link esce lo stesso. Al massimo la pagina del voto mostrera'
-   * il bot come un avversario qualunque, che e' un difetto piccolo accanto a
-   * un pulsante che non funziona.
+   * Un giro per ogni colonna che si puo' togliere, piu' uno per il tentativo
+   * buono e uno per la rete che inciampa. Un numero fisso e non un `while`:
+   * un pulsante che riprova all'infinito e' un altro modo di non funzionare.
    */
-  let { data, error } = await scrivi({ ...base, practice: payload.practice === true });
-  if (error?.code === "42703") ({ data, error } = await scrivi(base));
+  let riprovato = false;
+  for (let tentativo = 0; tentativo < 6; tentativo += 1) {
+    const { data, error } = await supabase
+      .from(RESULTS_TABLE)
+      .insert(riga)
+      .select("id")
+      .abortSignal(scadenza(PUBLISH_TIMEOUT_MS))
+      .single();
 
-  if (error) throw new Error(error.message);
-  return (data as { id: string }).id;
+    if (!error) return (data as { id: string }).id;
+
+    const colonna = colonnaSconosciuta(error);
+    if (colonna && !RESULT_ESSENTIALS.includes(colonna) && colonna in riga) {
+      delete riga[colonna];
+      continue;
+    }
+
+    /*
+     * Senza codice non e' il database che rifiuta: e' la richiesta che non e'
+     * arrivata -- rete caduta, tempo scaduto. Vale un secondo tentativo, uno
+     * solo, perche' e' proprio il momento in cui la connessione di casa di
+     * qualcun altro fa le bizze.
+     */
+    if (!error.code && !riprovato) {
+      riprovato = true;
+      continue;
+    }
+
+    throw new PublishFailure(error.code ? `${error.code}: ${error.message}` : error.message);
+  }
+
+  throw new PublishFailure("troppi tentativi");
 }
 
 export async function fetchResult(id: string): Promise<VoteResultPayload> {
@@ -423,17 +569,37 @@ export async function fetchResultsByCodes(codes: string[]): Promise<MatchDetail[
   if (!supabase || codes.length === 0) return [];
   const { data, error } = await supabase
     .from(RESULTS_TABLE)
-    .select("id, code, players, practice")
-    .in("code", codes);
+    .select("id, code, players, practice, created_at")
+    .in("code", codes)
+    .order("created_at", { ascending: false });
   if (error || !data) return [];
-  return (data as { id: string; code: string; players: Player[]; practice: boolean | null }[]).map(
-    (row) => ({
+
+  /*
+   * Un codice, una partita.
+   *
+   * Lo stesso codice puo' avere piu' righe: i link generati prima che il
+   * pulsante li riunisse, e le rivincite giocate nella stessa stanza. Lo
+   * storico ne vuole una sola, e vuole la piu' recente -- che e' la partita
+   * di cui si sta guardando la riga.
+   */
+  const visti = new Set<string>();
+  const dettagli: MatchDetail[] = [];
+  for (const row of data as {
+    id: string;
+    code: string;
+    players: Player[];
+    practice: boolean | null;
+  }[]) {
+    if (visti.has(row.code)) continue;
+    visti.add(row.code);
+    dettagli.push({
       code: row.code,
       resultId: row.id,
       practice: row.practice === true,
       players: row.players,
-    }),
-  );
+    });
+  }
+  return dettagli;
 }
 export interface Voter {
   playerId: string;
