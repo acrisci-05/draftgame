@@ -107,13 +107,38 @@ export function ItemCover({
   // il riquadro colorato con l'emoji, che sul chiaro si leggerebbe male.
   const plate = logo && Boolean(src);
 
+  /*
+   * Immagine probabilmente ritagliata sul trasparente.
+   *
+   * Non si puo' sapere davvero se un file ha il canale alfa senza scaricarlo e
+   * guardarlo, ma l'estensione basta a indovinare quasi sempre: PNG, SVG e WEBP
+   * sono i formati che si usano per i ritagli, JPG no -- un JPG uno sfondo ce
+   * l'ha per forza.
+   *
+   * Serve a decidere due cose: non ritagliare l'immagine, e darle l'alone. Un
+   * soggetto scuro su trasparente, appoggiato su fondo scuro, sparisce -- ed e'
+   * proprio il caso segnalato.
+   */
+  const ritagliata = /[.](png|svg|webp)([?]|$)/i.test(src ?? "");
+
   return (
     <div
       style={large || plate ? undefined : cover.style}
       className={cn(
         "relative shrink-0 overflow-hidden border",
-        // Fondo scuro fisso dietro le foto: fa risaltare PNG e JPG ad alto contrasto.
-        plate ? "border-white/15 bg-white" : large ? "border-line bg-zinc-950" : "border-white/10",
+        /*
+         * Grigio profondo, non nero pieno.
+         *
+         * Su nero assoluto un ritaglio con i contorni scuri non ha piu' un
+         * bordo: la sagoma finisce e non comincia niente, e l'oggetto
+         * scompare. Bastano pochi punti di luminosita' perche' il nero del
+         * soggetto torni a essere un nero *sopra* qualcosa.
+         */
+        plate
+          ? "border-white/15 bg-white"
+          : large
+            ? "border-line bg-neutral-900"
+            : "border-white/10",
         SIZES[size],
         className,
       )}
@@ -154,6 +179,24 @@ export function ItemCover({
         />
       ) : null}
 
+      {/*
+        Il punto luce dietro il soggetto.
+
+        Sta sopra lo sfondo sfocato e sotto l'immagine: e' un alone chiaro al
+        centro, dove il soggetto sta quasi sempre. Serve a dare al ritaglio un
+        fondo su cui staccarsi -- senza, un contorno scuro finisce nel niente e
+        l'oggetto sembra mangiato dalla card.
+
+        Non si mette sulla lastra dei marchi: li' il fondo e' gia' bianco, e
+        schiarirlo ancora non aggiunge nulla.
+      */}
+      {large && !plate ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.14] via-transparent to-transparent"
+        />
+      ) : null}
+
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -175,9 +218,31 @@ export function ItemCover({
                 // porterebbe via il titolo, e su una foto di gruppo mezza faccia.
                 "relative z-[1] h-full w-full object-contain p-6 transition-all duration-300 hover:scale-105"
               : "size-full object-cover",
-            large && !plate && "drop-shadow-2xl",
+            /*
+             * L'alone e' chiaro, non scuro, e va solo sui ritagli.
+             *
+             * Prima c'era un'ombra nera: su un fondo scuro e' invisibile per
+             * definizione, e non ha mai fatto niente. Un alone bianco invece
+             * disegna il bordo del soggetto, come il contorno delle figurine.
+             *
+             * Ma solo dove serve. Una fotografia e' un rettangolo pieno: non
+             * sparisce, e un alone le disegnerebbe attorno un'aureola
+             * rettangolare che si vede e non si spiega. Un ritaglio invece
+             * finisce nel niente, ed e' li' che il bordo va restituito.
+             */
+            large && !plate && ritagliata && "drop-shadow-[0_0_14px_rgba(255,255,255,0.45)]",
             // Un marchio non si ritaglia mai, nemmeno nelle miniature.
             plate && !large && "size-full object-contain p-1.5",
+            /*
+             * Un ritaglio nelle miniature non si taglia e non si appiccica ai
+             * bordi: senza respiro attorno, la sagoma tocca la cornice e non
+             * si capisce piu' dove finisce l'oggetto e dove comincia la card.
+             */
+            ritagliata && !large && !plate && "size-full object-contain p-1",
+            ritagliata &&
+              !large &&
+              !plate &&
+              "drop-shadow-[0_0_4px_rgba(255,255,255,0.35)]",
           )}
         />
       ) : (
@@ -208,7 +273,7 @@ export function ItemCover({
       {large && src ? (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-1/3 bg-gradient-to-t from-black/50 via-black/15 to-transparent"
         />
       ) : null}
     </div>
