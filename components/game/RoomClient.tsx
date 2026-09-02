@@ -130,8 +130,12 @@ export function RoomClient({ code }: { code: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [practice, botPresente, stato?.phase, stato?.players.length]);
 
-  /* Da qui in poi il bot gioca da solo: rilancia, passa e vota. */
-  useBotEngine({ state: stato, dispatch: room.dispatch, now: room.now });
+  /*
+   * Da qui in poi il bot gioca da solo: rilancia, passa e vota. Torna indietro
+   * se sta aspettando il suo turno, che e' l'unica cosa che l'asta deve sapere
+   * di lui: senza, i secondi di attesa sembrano un blocco.
+   */
+  const bot = useBotEngine({ state: stato, dispatch: room.dispatch, now: room.now });
 
   /*
    * Il profilo arriva dopo il montaggio, e la stanza si crea subito: senza
@@ -252,7 +256,14 @@ export function RoomClient({ code }: { code: string }) {
       ) : state.phase === "ended" ? (
         <Results state={state} isHost={isHost} selfId={self.id} dispatch={dispatch} />
       ) : (
-        <AuctionStage state={state} selfId={self.id} isHost={isHost} now={now} dispatch={dispatch} />
+        <AuctionStage
+          state={state}
+          selfId={self.id}
+          isHost={isHost}
+          now={now}
+          dispatch={dispatch}
+          thinkingId={bot.thinking ? bot.botId : null}
+        />
       )}
 
       <Modal open={leaving} title={t("room.leaveTitle")} onClose={() => setLeaving(false)}>

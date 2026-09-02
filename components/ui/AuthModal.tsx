@@ -26,6 +26,7 @@ import {
   createAccount,
   isNicknameAvailable,
   isStrongPassword,
+  isValidEmail,
   normalizeNickname,
   passwordChecks,
   requestPasswordReset,
@@ -467,7 +468,7 @@ function CredentialsForm({
   };
 
   const forgot = async () => {
-    if (!email.includes("@")) return fail("email-invalid");
+    if (!isValidEmail(email)) return fail("email-invalid");
     setBusy(true);
     setError(null);
     try {
@@ -483,7 +484,9 @@ function CredentialsForm({
   // In accesso basta che la password ci sia: la giudica il servizio. In
   // registrazione devono essere soddisfatti tutti e quattro i requisiti.
   const ready =
-    email.includes("@") &&
+    // Lo stesso controllo che fa il servizio, non una chiocciola qualunque:
+    // altrimenti il pulsante si accende su un indirizzo che verra' rifiutato.
+    isValidEmail(email) &&
     (tab === "in"
       ? password.length > 0
       : isStrongPassword(password) && cleanNick.length >= 3 && nickFree !== false);

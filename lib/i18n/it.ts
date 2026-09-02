@@ -302,6 +302,7 @@ export const it = {
   "auction.noOffers": "Nessuna offerta",
   "auction.toDiscards": "È un flop: sparisce",
   "auction.nobodyYet": "Nessuno ha offerto: se passate tutti il lotto è un flop",
+  "auction.botThinking": "Pick-asso sta valutando",
   "auction.discardsLeft": "Flop ancora possibili prima che i lotti vengano assegnati d'ufficio",
   "auction.discardsOut": "Flop esauriti: i lotti rimasti servono a riempire le liste e vengono assegnati",
   "auction.nobodyYetForced":
@@ -462,7 +463,8 @@ export const it = {
     "Account creato. Conferma l'indirizzo dal link che ti abbiamo mandato, poi torna qui.",
   "auth.errNicknameTaken": "Nickname già preso, scegline un altro.",
   "auth.errNicknameInvalid": "Il nickname deve avere almeno 3 caratteri.",
-  "auth.errEmailInvalid": "Indirizzo email non valido.",
+  "auth.errEmailInvalid":
+    "Inserisci un indirizzo email valido (controlla di non aver lasciato spazi).",
   "auth.errPasswordShort": "La password deve avere almeno {n} caratteri.",
   "auth.errPasswordWeak": "La password non rispetta tutti e quattro i requisiti.",
   "auth.errPasswordLeaked":

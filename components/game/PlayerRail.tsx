@@ -5,17 +5,49 @@ import { Gavel } from "lucide-react";
 import type { GameState } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
 import { colorLook } from "@/lib/game";
+import { useT } from "@/lib/settings";
 import { Avatar } from "@/components/ui/Avatar";
+
+/**
+ * "Sta valutando", con i tre puntini che si accendono a turno.
+ *
+ * Il bot aspetta fino a sei secondi prima di rispondere, ed e' voluto: senza
+ * quell'attesa non sembrerebbe un avversario. Ma un'attesa muta non si
+ * distingue da un blocco, ed e' esattamente quello che veniva segnalato --
+ * l'asta pareva piantata mentre stava solo aspettando il bot. Tre puntini
+ * risolvono tutto: dicono che sta succedendo qualcosa.
+ */
+function BotThinking({ label }: { label: string }) {
+  return (
+    <span className="mt-1.5 flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-violet">
+      <span aria-hidden>💬</span>
+      <span className="truncate">{label}</span>
+      <span aria-hidden className="flex shrink-0 items-center gap-0.5">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="size-1 animate-pulse rounded-full bg-violet"
+            style={{ animationDelay: `${i * 180}ms`, animationDuration: "1.1s" }}
+          />
+        ))}
+      </span>
+    </span>
+  );
+}
 
 export function PlayerRail({
   state,
   selfId,
   nextId,
+  thinkingId,
 }: {
   state: GameState;
   selfId?: string;
   nextId?: string | null;
+  /** Chi sta ragionando adesso: sotto di lui compaiono i tre puntini. */
+  thinkingId?: string | null;
 }) {
+  const t = useT();
   const currency = state.config.currency;
 
   return (
@@ -69,6 +101,8 @@ export function PlayerRail({
                 {player.roster.length}/{state.config.slots}
               </span>
             </div>
+
+            {player.id === thinkingId ? <BotThinking label={t("auction.botThinking")} /> : null}
             <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-2">
               <motion.div
                 className="h-full rounded-full bg-neon"

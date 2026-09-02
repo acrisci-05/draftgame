@@ -140,23 +140,50 @@ function playMatch(category, config) {
     ticks += 1;
     clock += TICK_MS;
 
-    /* Il gancio del bot: ridecide solo quando cambia la situazione. */
+    /*
+     * Il gancio del bot, riprodotto com'e' davvero.
+     *
+     * Alla partenza dell'attesa la mossa serve solo a sapere quanto aspettare;
+     * quella vera si ricalcola quando l'attesa scade, sullo stato di allora.
+     * Se qui si riproducesse il vecchio comportamento -- mandare la mossa
+     * decisa all'inizio -- il controllo direbbe che va tutto bene anche
+     * riportando indietro il codice.
+     */
     const adesso = impronta(state);
     if (adesso !== firma) {
       firma = adesso;
-      const move = bot.decideBotMove(state, bot.BOT_PLAYER_ID);
-      attesa = move ? { at: clock + move.delay, move } : null;
+      const previsione = bot.decideBotMove(state, bot.BOT_PLAYER_ID);
+      attesa = previsione
+        ? { at: clock + previsione.delay + bot.GRACE_AFTER_CHANGE_MS }
+        : null;
     }
 
     if (attesa && clock >= attesa.at) {
-      const prima = game.playerById(state, bot.BOT_PLAYER_ID);
-      const soglia = bot.affordableCeiling(state, prima);
-      if (attesa.move.kind === "bid" && attesa.move.amount > soglia) {
-        problemi.push(`rilancio ${attesa.move.amount} oltre la soglia ${soglia}`);
-      }
-      state = game.reducer(state, toAction(attesa.move, bot.BOT_PLAYER_ID, clock));
       attesa = null;
-      firma = impronta(state);
+      // Le stesse rinunce del gancio: fase cambiata, o gia' in testa.
+      const fermo =
+        (state.phase !== "auction" && state.phase !== "voting") ||
+        (state.phase === "auction" && state.highBidderId === bot.BOT_PLAYER_ID);
+      if (!fermo) {
+        const prima = game.playerById(state, bot.BOT_PLAYER_ID);
+        const mossa = bot.decideBotMove(state, bot.BOT_PLAYER_ID);
+        if (mossa) {
+          const soglia = bot.affordableCeiling(state, prima);
+          if (mossa.kind === "bid" && mossa.amount > soglia) {
+            problemi.push(`rilancio ${mossa.amount} oltre la soglia ${soglia}`);
+          }
+          const prevLotto = state.lotNumber;
+          const prevFase = state.phase;
+          state = game.reducer(state, toAction(mossa, bot.BOT_PLAYER_ID, clock));
+          // La mossa deve fare qualcosa: se il riduttore la rifiuta in
+          // silenzio il bot resta fermo per tutto il lotto, ed e' il guasto
+          // che sembrava un blocco.
+          if (state.lotNumber === prevLotto && state.phase === prevFase && impronta(state) === firma) {
+            problemi.push(`mossa ${mossa.kind} rifiutata dal riduttore`);
+          }
+          firma = impronta(state);
+        }
+      }
     }
 
     const umano = humanAct(state, clock);

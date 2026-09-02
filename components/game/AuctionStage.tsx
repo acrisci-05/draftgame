@@ -50,9 +50,18 @@ interface AuctionStageProps {
   isHost: boolean;
   now: () => number;
   dispatch: (action: GameAction) => void;
+  /** Chi sta ragionando: il bot, mentre aspetta il suo turno. */
+  thinkingId?: string | null;
 }
 
-export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionStageProps) {
+export function AuctionStage({
+  state,
+  selfId,
+  isHost,
+  now,
+  dispatch,
+  thinkingId,
+}: AuctionStageProps) {
   const { locale, sound, autoImages, t } = useSettings();
   const lastFeedRef = useRef<string | null>(null);
 
@@ -435,7 +444,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
             pixel: per arrivare al proprio bisognava scorrere mentre il timer
             correva.
           */}
-          <PlayerRail state={state} nextId={turnId} />
+          <PlayerRail state={state} nextId={turnId} thinkingId={thinkingId} />
 
           <div className="flex flex-col gap-2">
             {state.players.map((player) => {
@@ -502,7 +511,7 @@ export function AuctionStage({ state, selfId, isHost, now, dispatch }: AuctionSt
         </>
       ) : (
         <>
-          <PlayerRail state={state} selfId={selfId} nextId={turnId} />
+          <PlayerRail state={state} selfId={selfId} nextId={turnId} thinkingId={thinkingId} />
 
           {self ? (
             <>

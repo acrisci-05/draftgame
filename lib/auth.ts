@@ -195,6 +195,33 @@ function authFailure(
   return new AuthFailure(reason);
 }
 
+/**
+ * L'indirizzo, ripulito da quello che ci mettono le tastiere.
+ *
+ * Lo spazio in coda arriva dal completamento automatico e dal tocco lungo che
+ * seleziona la parola piu' lo spazio dopo; la maiuscola iniziale la mette il
+ * telefono da solo all'inizio del campo. Nessuna delle due e' un errore di chi
+ * scrive, e nessuna delle due deve costargli l'accesso.
+ */
+export function normalizeEmail(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+/**
+ * La forma minima di un indirizzo: qualcosa, una chiocciola, qualcosa, un
+ * punto, qualcosa -- senza spazi da nessuna parte.
+ *
+ * Volutamente permissiva. Un controllo severo qui non serve a niente, perche'
+ * l'unica prova che un indirizzo esiste e' la mail di conferma che ci arriva:
+ * serve solo a fermare gli errori evidenti prima di far fare un giro a vuoto.
+ * Passano i domini lunghi, i punti, i trattini e il "+" degli alias.
+ */
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function isValidEmail(value: string): boolean {
+  return EMAIL_PATTERN.test(normalizeEmail(value));
+}
+
 export const MIN_PASSWORD = 8;
 
 /**
@@ -373,13 +400,12 @@ export async function signUpWithPassword(input: {
   if (!supabase) throw new AuthFailure("offline");
 
   const nickname = normalizeNickname(input.nickname);
-  // L'indirizzo si ripulisce prima di guardarlo: uno spazio in coda, che sui
-  // telefoni arriva da solo col completamento, faceva passare il controllo e
-  // poi veniva rifiutato dal servizio senza spiegazioni.
-  const email = input.email.trim();
+  // L'indirizzo si ripulisce prima di guardarlo: spazi e maiuscole messe dalla
+  // tastiera del telefono non devono costare la registrazione.
+  const email = normalizeEmail(input.email);
   if (nickname.length < 3) throw new AuthFailure("nickname-invalid");
   if (!isStrongPassword(input.password)) throw new AuthFailure("password-weak");
-  if (!/^[^s@]+@[^s@]+.[^s@]+$/.test(email)) throw new AuthFailure("email-invalid");
+  if (!isValidEmail(email)) throw new AuthFailure("email-invalid");
   if (!(await isNicknameAvailable(nickname))) throw new AuthFailure("nickname-taken");
 
   const { data, error } = await supabase.auth.signUp({
@@ -421,7 +447,7 @@ export async function signInWithPassword(email: string, password: string): Promi
   if (!supabase) throw new AuthFailure("offline");
 
   const { error } = await supabase.auth.signInWithPassword({
-    email: email.trim(),
+    email: normalizeEmail(email),
     password,
   });
   // Le credenziali sbagliate sono il caso comune, ma non l'unico: chi non ha
@@ -434,7 +460,8 @@ export async function signInWithPassword(email: string, password: string): Promi
 export async function requestPasswordReset(email: string): Promise<void> {
   const supabase = getSupabase();
   if (!supabase) throw new AuthFailure("offline");
-  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+  if (!isValidEmail(email)) throw new AuthFailure("email-invalid");
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizeEmail(email), {
     redirectTo: typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
   });
   if (error) throw authFailure("reimposta password", error);
@@ -443,7 +470,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
 export async function signInWithEmail(email: string): Promise<void> {
   const supabase = requireClient();
   const { error } = await supabase.auth.signInWithOtp({
-    email: email.trim(),
+    email: normalizeEmail(email),
     options: {
       shouldCreateUser: true,
       emailRedirectTo:
@@ -457,7 +484,7 @@ export async function signInWithEmail(email: string): Promise<void> {
 export async function verifyEmailCode(email: string, token: string): Promise<void> {
   const supabase = requireClient();
   const { error } = await supabase.auth.verifyOtp({
-    email: email.trim(),
+    email: normalizeEmail(email),
     token: token.trim(),
     type: "email",
   });

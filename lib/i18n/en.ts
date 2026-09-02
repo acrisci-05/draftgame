@@ -453,7 +453,8 @@ export const en: Dictionary = {
     "Account created. Confirm your address from the link we sent, then come back here.",
   "auth.errNicknameTaken": "Nickname already taken, pick another one.",
   "auth.errNicknameInvalid": "The nickname needs at least 3 characters.",
-  "auth.errEmailInvalid": "Invalid email address.",
+  "auth.errEmailInvalid":
+    "Enter a valid email address (check you have not left any spaces).",
   "auth.errPasswordShort": "The password needs at least {n} characters.",
   "auth.errPasswordWeak": "The password does not meet all four requirements.",
   "auth.errPasswordLeaked":
@@ -722,6 +723,7 @@ export const en: Dictionary = {
   "studio.open": "Category studio",
 
   "auction.nobodyYet": "No bids yet: if everyone passes the lot is a flop",
+  "auction.botThinking": "Pick-asso is weighing it up",
   "auction.discardsLeft": "Flops still possible before lots start being assigned",
   "auction.discardsOut": "No flops left: the remaining lots are needed to fill the rosters",
   "auction.nobodyYetForced":

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   canBid,
   canClaim,
@@ -182,12 +182,42 @@ function toAction(move: BotMove, botId: string, now: number): GameAction {
 }
 
 /**
+ * Quanto il bot resta fermo dopo che si e' mosso qualcun altro.
+ *
+ * Serve contro i tocchi rapidi: chi rilancia due volte di fila cambia la
+ * situazione due volte in mezzo secondo, e senza questa pausa il bot
+ * comincerebbe a rispondere alla prima mentre arriva la seconda. Mezzo secondo
+ * su un'attesa che parte da due non si nota, e toglie di mezzo la corsa.
+ */
+export const GRACE_AFTER_CHANGE_MS = 500;
+
+export interface BotStatus {
+  /** true mentre il bot sta aspettando il suo turno: serve al badge a schermo. */
+  thinking: boolean;
+  /** Chi e' il bot, per sapere sotto quale avatar mettere il badge. */
+  botId: string;
+}
+
+/**
  * Attacca il bot a una stanza in corso.
  *
  * Si sveglia a ogni cambio di situazione -- lotto nuovo, rilancio ricevuto,
- * qualcuno che passa -- decide cosa fare e lo fa dopo il suo ritardo. Se nel
- * frattempo la situazione cambia, l'attesa viene buttata e si ricomincia: cosi'
- * il bot non risponde mai a un'asta che non esiste piu'.
+ * qualcuno che passa -- aspetta il suo ritardo e poi si muove.
+ *
+ * ## Perche' la mossa si ricalcola due volte
+ *
+ * Al momento di programmare l'attesa la mossa serve solo a sapere quanto
+ * aspettare. Quella vera si decide quando l'attesa scade, rileggendo lo stato
+ * di allora: fra le due cose passano fino a sei secondi, e in sei secondi
+ * l'asta cambia. Prima si mandava la mossa decisa all'inizio; se nel frattempo
+ * era diventata impraticabile il riduttore la rifiutava in silenzio, il bot
+ * restava fermo per tutto il lotto e da fuori sembrava bloccato.
+ *
+ * ## Perche' c'e' un lucchetto
+ *
+ * Un'attesa alla volta. Senza, un paio di cambi di situazione ravvicinati
+ * lasciavano due attese in volo e il bot rilanciava due volte sullo stesso
+ * lotto, oppure passava subito dopo aver rilanciato.
  *
  * Sta fermo se la stanza non e' una partita di prova o se il bot non c'e'.
  */
@@ -201,16 +231,26 @@ export function useBotEngine({
   dispatch: (action: GameAction) => void;
   now: () => number;
   botId?: string;
-}) {
-  // Le due funzioni arrivano nuove a ogni render: tenerle in un riferimento
-  // evita che l'attesa venga annullata e rifatta di continuo, che vorrebbe dire
-  // un bot che non arriva mai a muoversi.
+}): BotStatus {
+  /*
+   * Lo stato di adesso, non quello di quando l'attesa e' partita.
+   *
+   * Il riferimento si aggiorna a ogni disegno, quindi quando l'attesa scade
+   * contiene l'asta com'e' in quel momento. E' il punto di tutta la faccenda:
+   * dentro il setTimeout non si guarda niente che venga da fuori.
+   */
+  const stateRef = useRef(state);
   const dispatchRef = useRef(dispatch);
   const nowRef = useRef(now);
   useEffect(() => {
+    stateRef.current = state;
     dispatchRef.current = dispatch;
     nowRef.current = now;
-  }, [dispatch, now]);
+  });
+
+  /** Un'attesa alla volta: qui si segna che ce n'e' gia' una in volo. */
+  const isBotThinkingRef = useRef(false);
+  const [thinking, setThinking] = useState(false);
 
   const attivo = Boolean(state?.isPractice) && Boolean(state && playerById(state, botId));
 
@@ -235,17 +275,49 @@ export function useBotEngine({
     : "";
 
   useEffect(() => {
-    if (!attivo || !state) return;
+    if (!attivo) return;
 
-    const move = decideBotMove(state, botId);
-    if (!move) return;
+    // Serve solo a sapere quanto aspettare: quella buona si decide dopo.
+    const previsione = decideBotMove(stateRef.current as GameState, botId);
+    if (!previsione) {
+      setThinking(false);
+      return;
+    }
+
+    isBotThinkingRef.current = true;
+    setThinking(true);
 
     const timer = window.setTimeout(() => {
-      dispatchRef.current(toAction(move, botId, nowRef.current()));
-    }, move.delay);
+      isBotThinkingRef.current = false;
+      setThinking(false);
 
-    return () => window.clearTimeout(timer);
-    // Si dipende dall'impronta, non dall'oggetto stato: vedi sopra.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      /*
+       * Da qui in giu' si guarda solo lo stato di adesso. Ogni motivo per
+       * lasciar perdere e' un caso in cui muoversi farebbe danno o niente:
+       * partita finita, bot uscito, fase cambiata, oppure il bot e' gia' lui
+       * il migliore offerente e rilancerebbe contro se stesso.
+       */
+      const attuale = stateRef.current;
+      if (!attuale || !attuale.isPractice) return;
+      if (!playerById(attuale, botId)) return;
+      if (attuale.phase !== "auction" && attuale.phase !== "voting") return;
+      if (attuale.phase === "auction" && attuale.highBidderId === botId) return;
+
+      const mossa = decideBotMove(attuale, botId);
+      if (!mossa) return;
+
+      dispatchRef.current(toAction(mossa, botId, nowRef.current()));
+    }, previsione.delay + GRACE_AFTER_CHANGE_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+      isBotThinkingRef.current = false;
+      setThinking(false);
+    };
+    // Si dipende dall'impronta e non dall'oggetto stato -- vedi sopra -- e
+    // dentro l'effetto lo stato si legge dal riferimento, non dalla chiusura:
+    // per questo l'elenco e' completo davvero e non serve zittire nessuno.
   }, [attivo, impronta, botId]);
+
+  return { thinking: thinking && attivo, botId };
 }
