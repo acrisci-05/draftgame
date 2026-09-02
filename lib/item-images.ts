@@ -33,6 +33,38 @@
  */
 
 /**
+ * Le foto scelte a mano, che nessuna ricerca deve poter scavalcare.
+ *
+ * I personaggi sotto copyright sono il caso in cui la ricerca automatica non
+ * fallisce per sfortuna, ma per come sono fatti gli archivi: Wikimedia ospita
+ * solo materiale libero, quindi di Mario e Luigi ha la fotografia di due
+ * cosplayer, di Sonic il logo, di Calvin e Hobbes il lettering del titolo.
+ * Unsplash e' anche peggio, perche' quelle parole non le conosce proprio e
+ * restituisce una foto qualunque.
+ *
+ * Qui l'indirizzo e' fissato: si guarda prima di tutto il resto e non si
+ * discute. Sono pochi apposta -- ogni voce e' un indirizzo che qualcuno deve
+ * ricontrollare se un giorno si rompe -- e valgono solo dove la ricerca ha
+ * dimostrato di non farcela.
+ */
+export const CUSTOM_ITEM_IMAGES: Readonly<Record<string, string>> = {
+  "Mario & Luigi":
+    "https://static.wikia.nocookie.net/mario/images/f/fc/M%26L_logo.png/revision/latest/scale-to-width-down/600?cb=20230731203605",
+  "Tom & Jerry":
+    "https://static.tvmaze.com/uploads/images/original_untouched/483/1209807.jpg",
+  "Batman & Robin":
+    "https://static.wikia.nocookie.net/batman/images/6/68/The_Robin_Character.jpg/revision/latest/scale-to-width-down/483?cb=20250111191936",
+  "Sherlock & Watson":
+    "https://static.tvmaze.com/uploads/images/original_untouched/171/428042.jpg",
+  "Sonic & Tails":
+    "https://static.wikia.nocookie.net/sonic/images/7/78/Sonic_Model_Sheet_2.png/revision/latest?cb=20250312210855",
+  "Naruto & Sasuke":
+    "https://static.wikia.nocookie.net/naruto/images/d/d6/Naruto_Part_I.png/revision/latest/scale-to-width-down/600?cb=20251228135525",
+  "Calvin & Hobbes":
+    "https://static.wikia.nocookie.net/candh/images/e/ed/Cavintrans.png/revision/latest/scale-to-width-down/558?cb=20201026002306",
+};
+
+/**
  * Le parole con cui cercare, in inglese e descrittive.
  *
  * Il nome italiano da solo non basta e a volte porta altrove: "Pesca" cercata
@@ -58,7 +90,7 @@ export function queryFor(itemName: string, hint?: string): string {
   return hint ?? ITEM_QUERIES[itemName] ?? itemName;
 }
 
-export type ImageSource = "unsplash" | "commons" | "picsum";
+export type ImageSource = "custom" | "unsplash" | "commons" | "picsum";
 
 export interface ItemImage {
   url: string;
@@ -172,6 +204,16 @@ export async function fetchItemImage(
   itemName: string,
   options: { hint?: string; preferUnsplash?: boolean } = {},
 ): Promise<ItemImage> {
+  /*
+   * Prima di tutto: c'e' una scelta fatta a mano per questo elemento?
+   *
+   * Sta qui in cima e non in fondo perche' e' una decisione, non un ripiego.
+   * Se qualcuno ha guardato quella foto e ha detto "e' questa", non ha senso
+   * interrogare due archivi per poi ignorarne le risposte.
+   */
+  const fissata = CUSTOM_ITEM_IMAGES[itemName];
+  if (fissata) return { url: fissata, source: "custom", query: itemName };
+
   const query = queryFor(itemName, options.hint);
 
   /*

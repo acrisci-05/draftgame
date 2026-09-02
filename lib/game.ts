@@ -2,6 +2,7 @@ import { firstFreeAvatar, isAvatarId } from "./avatars";
 import { firstFreeColor, isPlayerColor } from "./colors";
 import type {
   AuctionResult,
+  Reaction,
   CatalogItem,
   Category,
   FeedEntry,
@@ -53,6 +54,61 @@ export const BUDGET_PRESETS = [10, 20, 50, 100];
 /** Ogni quanti lotti compare una Mystery Box, quando è attiva. */
 export const MYSTERY_EVERY = 5;
 export const FEED_LIMIT = 24;
+
+/* ------------------------------------------------------------------ */
+/* Reazioni                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Le cinque faccine, e sono cinque apposta.
+ *
+ * Bastano a dire tutto quello che si dice a un tavolo d'asta -- quanto stai
+ * spendendo, quanto sei ridicolo, quanto e' bello questo lotto, quanto ti
+ * dispiace, e quel gesto che non ha bisogno di traduzione -- e sono poche
+ * abbastanza da scegliersi senza guardare, con il pollice, mentre il timer
+ * corre.
+ */
+export const REACTIONS = ["💸", "🤡", "🔥", "😭", "🤌"] as const;
+
+export type ReactionEmoji = (typeof REACTIONS)[number];
+
+export function isReaction(value: string): value is ReactionEmoji {
+  return (REACTIONS as readonly string[]).includes(value);
+}
+
+/**
+ * Quanto resta a schermo una reazione. E' anche la sua durata nello stato:
+ * finita l'animazione non c'e' motivo di continuare a portarsela dietro.
+ */
+export const REACTION_TTL_MS = 2200;
+
+/**
+ * Quanto si aspetta fra una reazione e l'altra, per persona.
+ *
+ * E' il freno che rende la cosa simpatica invece che fastidiosa. Senza, la
+ * prima persona che scopre il pulsante ci tamburella sopra e la partita diventa
+ * illeggibile: il freno sta nel riduttore e non nel pulsante, perche' nel
+ * pulsante basterebbe un tocco piu' veloce dell'animazione per aggirarlo.
+ */
+export const REACTION_COOLDOWN_MS = 2500;
+
+/** Quante ne restano a schermo insieme, comunque vada. */
+const REACTION_LIMIT = 8;
+
+/** Le reazioni ancora vive a questo istante. */
+export function liveReactions(state: GameState, now: number): Reaction[] {
+  return (state.reactions ?? []).filter((r) => now - r.at < REACTION_TTL_MS);
+}
+
+/** Se questo giocatore puo' mandarne una adesso, o deve ancora aspettare. */
+export function canReact(state: GameState, playerId: string, now: number): boolean {
+  if (state.phase !== "auction" && state.phase !== "result") return false;
+  if (!playerById(state, playerId)) return false;
+  const ultima = (state.reactions ?? [])
+    .filter((r) => r.playerId === playerId)
+    .reduce((piuRecente, r) => Math.max(piuRecente, r.at), 0);
+  return now - ultima >= REACTION_COOLDOWN_MS;
+}
 
 /** Gli avatar sono icone SVG: qui circola solo il loro identificativo. */
 export { AVATAR_IDS, DEFAULT_AVATAR, firstFreeAvatar, randomAvatar } from "./avatars";
@@ -653,6 +709,7 @@ export type GameAction =
   | { type: "claim"; playerId: string; now: number }
   | { type: "pass"; playerId: string; now: number }
   | { type: "vote"; voterId: string; targetId: string; now: number }
+  | { type: "react"; playerId: string; emoji: string; now: number }
   | { type: "next"; now: number }
   | { type: "tick"; now: number }
   | { type: "restart" }
@@ -1215,12 +1272,47 @@ export function reducer(state: GameState, action: GameAction): GameState {
       return pendingVoters(voted).length === 0 ? closeVoting(voted) : voted;
     }
 
+    /*
+     * Una reazione. Non tocca niente della partita: non cambia crediti, non
+     * cambia il timer, non conta per nessuna classifica. E' l'unica azione del
+     * gioco che si puo' ignorare del tutto senza cambiare come finisce.
+     */
+    case "react": {
+      if (!isReaction(action.emoji)) return state;
+      if (!canReact(state, action.playerId, action.now)) return state;
+      const vive = liveReactions(state, action.now);
+      return touch({
+        ...state,
+        reactions: [
+          ...vive,
+          {
+            id: `${action.playerId}-${action.now}`,
+            playerId: action.playerId,
+            emoji: action.emoji,
+            at: action.now,
+          },
+        ].slice(-REACTION_LIMIT),
+      });
+    }
+
     case "next": {
       if (state.phase !== "result") return state;
       return draw(state, action.now);
     }
 
     case "tick": {
+      /*
+       * Le reazioni scadute se ne vanno da sole, prima di ogni altra cosa:
+       * altrimenti resterebbero nello stato fino al lotto dopo, e chi entra in
+       * quel momento le vedrebbe comparire tutte insieme.
+       */
+      if (state.reactions?.length) {
+        const vive = liveReactions(state, action.now);
+        if (vive.length !== state.reactions.length) {
+          const ripulito = { ...state, reactions: vive };
+          return reducer(ripulito, { ...action, now: action.now });
+        }
+      }
       if (!state.deadline || action.now < state.deadline) return state;
       if (state.phase === "auction") return resolve(state, action.now);
       if (state.phase === "result") return draw(state, action.now);

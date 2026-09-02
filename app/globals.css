@@ -166,6 +166,56 @@ body {
     padding-top: env(safe-area-inset-top);
   }
 
+  /*
+   * Una reazione che sale sopra l'avatar di chi l'ha mandata.
+   *
+   * Parte piccola, si gonfia in un lampo, sale di ottanta pixel e svanisce.
+   * Un secondo e mezzo: abbastanza da vederla anche guardando altrove, poco
+   * abbastanza da non coprire i crediti di nessuno mentre si rilancia.
+   */
+  .reaction-float {
+    animation: reaction-rise 1.5s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
+    will-change: transform, opacity;
+  }
+
+  @keyframes reaction-rise {
+    0% {
+      transform: translate(-50%, 0) scale(0.4);
+      opacity: 0;
+    }
+    18% {
+      transform: translate(-50%, -14px) scale(1.15);
+      opacity: 1;
+    }
+    35% {
+      transform: translate(-50%, -26px) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -80px) scale(0.9);
+      opacity: 0;
+    }
+  }
+
+  /* Chi ha chiesto meno animazioni la vede comparire e sparire, senza volo. */
+  @media (prefers-reduced-motion: reduce) {
+    .reaction-float {
+      animation: reaction-fade 1.5s ease-out forwards;
+    }
+
+    @keyframes reaction-fade {
+      0%,
+      70% {
+        transform: translate(-50%, -20px) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -20px) scale(1);
+        opacity: 0;
+      }
+    }
+  }
+
   /* Un coriandolo: cade, deriva di lato e gira su sé stesso. */
   .confetti-piece {
     position: absolute;

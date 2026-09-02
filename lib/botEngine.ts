@@ -2,16 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  SNIPE_WINDOW_SECONDS,
   canBid,
   canClaim,
   canPass,
+  canReact,
   canVote,
   hasVoted,
   maxBid,
   minimumBid,
+  liveReactions,
   playerById,
   slotsLeft,
   type GameAction,
+  type ReactionEmoji,
 } from "./game";
 import type { GameState, Player } from "./types";
 
@@ -37,7 +41,7 @@ export const BOT_NAME = "Pick-asso Bot 🤖";
 /** L'icona del bot, quando non l'ha gia' presa la persona che gioca. */
 export const BOT_AVATAR = "bot";
 
-export type BotActionKind = "bid" | "pass" | "hesitate";
+export type BotActionKind = "bid" | "pass" | "hesitate" | "snipe";
 
 /**
  * Il ritardo prima di ogni mossa, mai lo stesso due volte.
@@ -57,6 +61,9 @@ export function getBotDelay(actionType: BotActionKind): number {
     pass: [2000, 3500], // Rinuncia: la piu' breve, ma non piu' istantanea.
     bid: [2500, 4500], // Rilancio standard.
     hesitate: [4000, 6000], // Il lotto gli costa: ci pensa su, e si vede.
+    // Ultimi secondi: qui prendersela comoda vorrebbe dire regalare il lotto.
+    // Una persona in quel momento smette di pensare e preme, e il bot pure.
+    snipe: [800, 1200],
   };
   const [min, max] = ranges[actionType];
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -86,6 +93,32 @@ export function affordableCeiling(state: GameState, bot: Player): number {
   return Math.floor(bot.budget / rimasti);
 }
 
+/**
+ * La quota di budget che il bot mette su un lotto solo.
+ *
+ * Fra un quarto e due quinti di quello che gli resta, tirata a sorte a ogni
+ * lotto. La casualita' non e' un vezzo: con una frazione fissa il bot si
+ * rilegge in tre lotti -- si capisce esattamente dove si fermera' e basta
+ * offrire un credito in piu' ogni volta. Cosi' invece bisogna tentarlo.
+ *
+ * Il tiro si stringe verso l'alto quando restano pochi posti da riempire: sul
+ * penultimo e sull'ultimo tenere da parte non serve piu' a niente.
+ */
+export const BID_SHARE_MIN = 0.25;
+export const BID_SHARE_MAX = 0.4;
+
+export function bidShare(slotsRemaining: number): number {
+  const base = BID_SHARE_MIN + Math.random() * (BID_SHARE_MAX - BID_SHARE_MIN);
+  // Con due posti o meno da coprire si puo' osare di piu': niente da risparmiare per dopo.
+  return slotsRemaining <= 2 ? Math.min(1, base * 1.6) : base;
+}
+
+/** Il massimo che il bot spende su questo lotto: la quota, o la soglia se piu' bassa. */
+export function maxBidFor(state: GameState, bot: Player, share: number): number {
+  const perQuota = Math.floor(bot.budget * share);
+  return Math.min(maxBid(state, bot), Math.max(perQuota, affordableCeiling(state, bot)));
+}
+
 export type BotMove =
   | { kind: "bid"; amount: number; delay: number }
   | { kind: "claim"; delay: number }
@@ -98,9 +131,17 @@ export type BotMove =
  * E' una funzione pura: guarda lo stato e risponde. Chi la chiama decide
  * quando applicarla, ed e' li' che entra in gioco il ritardo.
  */
-export function decideBotMove(state: GameState, botId: string = BOT_PLAYER_ID): BotMove | null {
+export function decideBotMove(
+  state: GameState,
+  botId: string = BOT_PLAYER_ID,
+  options: { now?: number; share?: number } = {},
+): BotMove | null {
   const bot = playerById(state, botId);
   if (!bot) return null;
+  const now = options.now ?? Date.now();
+  // La quota del lotto si tira una volta e si tiene per tutta la decisione: se
+  // la si ritirasse a ogni passaggio il tetto ballerebbe dentro la stessa mossa.
+  const share = options.share ?? bidShare(slotsLeft(state, bot));
 
   /*
    * Il voto finale.
@@ -136,14 +177,27 @@ export function decideBotMove(state: GameState, botId: string = BOT_PLAYER_ID): 
   if (state.highBidderId === botId) return null;
 
   const minimo = minimumBid(state);
-  const tetto = Math.min(maxBid(state, bot), soglia);
-
   /*
-   * Sopra la soglia sostenibile si rinuncia, e si rinuncia in fretta: tenere
-   * la persona in attesa per poi passare e' il modo piu' sicuro di rendere
-   * lenta una partita in cui non succede niente.
+   * Il tetto per questo lotto: la quota di budget tirata a sorte, e mai piu' di
+   * quanto la regola del saldo consenta. Sopra questo numero il bot non rilancia
+   * piu', per quanto gli piaccia il lotto.
    */
+  const tetto = maxBidFor(state, bot, share);
+
+  /* Ultimi secondi con un'offerta sul piatto: si risponde subito o si perde. */
+  const scadenza = state.deadline - now;
+  const allUltimo =
+    Boolean(state.highBidderId) && scadenza > 0 && scadenza <= SNIPE_WINDOW_SECONDS * 1000;
+
   if (minimo > tetto) {
+    /*
+     * Non ci si arriva. Restano due modi di uscirne, e non sono equivalenti:
+     * passare vuol dire lasciare il lotto alla persona, che se e' rimasta sola
+     * se lo prende al prezzo di partenza. Se pero' i flop non sono finiti e non
+     * siamo agli ultimi lotti, passare e' anche il modo di mandarlo negli
+     * scarti -- il lotto non lo prende nessuno e i crediti dell'avversario
+     * restano fermi. E' la stessa mossa, ma qui e' una scelta, non una resa.
+     */
     if (canPass(state, botId)) return { kind: "pass", delay: getBotDelay("pass") };
     return null;
   }
@@ -157,6 +211,8 @@ export function decideBotMove(state: GameState, botId: string = BOT_PLAYER_ID): 
     return null;
   }
 
+  if (allUltimo) return { kind: "bid", amount, delay: getBotDelay("snipe") };
+
   /*
    * Oltre i due quinti di quello che gli resta il bot ci pensa su. E' la mossa
    * che si legge meglio da fuori: l'attesa lunga dice "questo lotto gli
@@ -165,6 +221,116 @@ export function decideBotMove(state: GameState, botId: string = BOT_PLAYER_ID): 
    */
   const impegnativo = amount > bot.budget * HESITATION_SHARE;
   return { kind: "bid", amount, delay: getBotDelay(impegnativo ? "hesitate" : "bid") };
+}
+
+
+/* ------------------------------------------------------------------ */
+/* Le risposte del bot                                                 */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Cosa risponde il bot a una faccina, e quando non risponde affatto.
+ *
+ * La regola che conta e' quella negativa: **non manda mai niente a caso**. Un
+ * avversario che sputa emoji a intervalli regolari smette di essere divertente
+ * al terzo lotto e diventa rumore -- e il rumore, in una partita fra amici, e'
+ * la cosa che fa spegnere una funzione.
+ *
+ * Risponde solo se gli hanno parlato, e quello che risponde dipende da come sta
+ * andando: la stessa provocazione vale una spallata quando e' in testa e un
+ * pianto quando ha finito i crediti. E' tutta qui l'intelligenza -- guardare il
+ * tabellone prima di rispondere -- ma basta a far sembrare che abbia capito.
+ */
+export function botReplyTo(
+  emoji: string,
+  state: GameState,
+  botId: string = BOT_PLAYER_ID,
+): ReactionEmoji | null {
+  const bot = playerById(state, botId);
+  if (!bot) return null;
+
+  const inTesta = state.highBidderId === botId;
+  const alVerde = maxBid(state, bot) < minimumBid(state);
+
+  switch (emoji) {
+    case "🤡":
+      // Lo sfotto' colpisce solo chi e' in difficolta': se ha finito i crediti
+      // se la prende, se sta vincendo risponde col gesto.
+      if (alVerde) return "😭";
+      return inTesta ? "🤌" : "🤡";
+    case "💸":
+      // "Stai spendendo troppo": vale come rimando solo se e' lui a farlo.
+      return inTesta ? "🤌" : null;
+    case "🔥":
+      // Entusiasmo per il lotto: si sta al gioco, e si rilancia la posta.
+      return Math.random() < 0.5 ? "💸" : "🤡";
+    case "😭":
+      return "🤌";
+    default:
+      return null;
+  }
+}
+
+/**
+ * Le reazioni che il bot manda di sua iniziativa, e solo su tre fatti precisi.
+ *
+ * Tre, non "ogni tanto": un colpo all'ultimo secondo, un lotto buttato via
+ * dalla persona, e un lotto perso dopo averci messo mezzo budget. Sono i tre
+ * momenti in cui a un tavolo vero qualcuno direbbe qualcosa, e in nessun altro.
+ */
+export function botSpontaneousReaction(
+  state: GameState,
+  previous: GameState | null,
+  botId: string = BOT_PLAYER_ID,
+): ReactionEmoji | null {
+  if (!previous) return null;
+  const bot = playerById(state, botId);
+  if (!bot) return null;
+
+  // Il colpo in extremis: il bot ha appena rilanciato negli ultimi secondi.
+  if (
+    state.phase === "auction" &&
+    state.highBidderId === botId &&
+    previous.highBidderId !== botId &&
+    state.sniped
+  ) {
+    return "💸";
+  }
+
+  // Il lotto e' finito negli scarti perche' non lo voleva nessuno: la persona
+  // ha appena chiamato flop, e il bot glielo fa notare.
+  if (
+    state.phase === "result" &&
+    previous.phase === "auction" &&
+    state.discards.length > previous.discards.length
+  ) {
+    return "🤡";
+  }
+
+  // Ha perso un lotto su cui aveva impegnato piu' di meta' budget.
+  if (
+    state.phase === "result" &&
+    previous.phase === "auction" &&
+    previous.highBidderId === botId &&
+    state.lastResult?.winnerId &&
+    state.lastResult.winnerId !== botId &&
+    previous.currentBid > bot.budget / 2
+  ) {
+    return "😭";
+  }
+
+  return null;
+}
+
+/** L'ultima reazione arrivata da qualcun altro, se e' nuova. */
+export function latestForeignReaction(
+  state: GameState,
+  now: number,
+  botId: string = BOT_PLAYER_ID,
+): { id: string; emoji: string } | null {
+  const altrui = liveReactions(state, now).filter((r) => r.playerId !== botId);
+  const ultima = altrui[altrui.length - 1];
+  return ultima ? { id: ultima.id, emoji: ultima.emoji } : null;
 }
 
 /** La mossa tradotta nell'azione che capisce il riduttore. */
@@ -274,11 +440,16 @@ export function useBotEngine({
       ].join(":")
     : "";
 
+  /* Le reazioni arrivate, per riconoscere quando ne compare una nuova. */
+  const reazioni = (state?.reactions ?? []).map((r) => r.id).join(",");
+
   useEffect(() => {
     if (!attivo) return;
 
     // Serve solo a sapere quanto aspettare: quella buona si decide dopo.
-    const previsione = decideBotMove(stateRef.current as GameState, botId);
+    const previsione = decideBotMove(stateRef.current as GameState, botId, {
+      now: nowRef.current(),
+    });
     if (!previsione) {
       setThinking(false);
       return;
@@ -303,7 +474,10 @@ export function useBotEngine({
       if (attuale.phase !== "auction" && attuale.phase !== "voting") return;
       if (attuale.phase === "auction" && attuale.highBidderId === botId) return;
 
-      const mossa = decideBotMove(attuale, botId);
+      // L'orologio della stanza, non quello di sistema: sul telefono che non
+      // ospita la partita sono sfasati, e il conto degli ultimi secondi con
+      // l'orologio sbagliato direbbe sempre la cosa sbagliata.
+      const mossa = decideBotMove(attuale, botId, { now: nowRef.current() });
       if (!mossa) return;
 
       dispatchRef.current(toAction(mossa, botId, nowRef.current()));
@@ -318,6 +492,55 @@ export function useBotEngine({
     // dentro l'effetto lo stato si legge dal riferimento, non dalla chiusura:
     // per questo l'elenco e' completo davvero e non serve zittire nessuno.
   }, [attivo, impronta, botId]);
+
+  /*
+   * Le reazioni del bot: un effetto separato, e non e' pigrizia.
+   *
+   * Rispondere a una faccina non e' una mossa d'asta -- non cambia il lotto,
+   * non consuma il suo turno -- e infilarla nella stessa attesa avrebbe voluto
+   * dire o ritardare il rilancio per rispondere, o zittire il bot mentre
+   * ragiona. Sono due cose che accadono in parallelo, come a un tavolo vero.
+   */
+  const rispostoA = useRef<string | null>(null);
+  const precedenteRef = useRef<GameState | null>(null);
+
+  useEffect(() => {
+    if (!attivo) return;
+    const attuale = stateRef.current;
+    if (!attuale) return;
+
+    const manda = (emoji: ReactionEmoji, ritardo: number) =>
+      window.setTimeout(() => {
+        const adesso = stateRef.current;
+        if (!adesso || !canReact(adesso, botId, nowRef.current())) return;
+        dispatchRef.current({
+          type: "react",
+          playerId: botId,
+          emoji,
+          now: nowRef.current(),
+        });
+      }, ritardo);
+
+    const timers: number[] = [];
+
+    /* Qualcuno gli ha parlato: si risponde una volta sola, e a tono. */
+    const ultima = latestForeignReaction(attuale, nowRef.current(), botId);
+    if (ultima && rispostoA.current !== ultima.id) {
+      rispostoA.current = ultima.id;
+      const risposta = botReplyTo(ultima.emoji, attuale, botId);
+      // Un secondo o due: il tempo di leggerla, non di consultare un manuale.
+      if (risposta) timers.push(manda(risposta, 1000 + Math.random() * 1000));
+    }
+
+    /* Oppure e' successo qualcosa che merita un commento. */
+    const spontanea = botSpontaneousReaction(attuale, precedenteRef.current, botId);
+    precedenteRef.current = attuale;
+    if (spontanea) timers.push(manda(spontanea, 600 + Math.random() * 600));
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+    // Stessa impronta delle mosse, piu' le reazioni arrivate: lo stato si
+    // legge dai riferimenti, quindi l'elenco e' completo davvero.
+  }, [attivo, impronta, reazioni, botId]);
 
   return { thinking: thinking && attivo, botId };
 }

@@ -274,5 +274,64 @@ console.log("");
   check("a parita' non si assegnano targhe", conTargheDiSpesa.length === 0, JSON.stringify(titoliPari));
 }
 
+
+/* 9. Le reazioni: simpatiche, non moleste. */
+{
+  let s = stanza(3, { slots: 3, allowDiscards: true });
+  const t0 = 5_000_000;
+
+  check("una reazione sconosciuta viene ignorata",
+    game.reducer(s, { type: "react", playerId: "p0", emoji: "🍕", now: t0 }) === s);
+
+  const conUna = game.reducer(s, { type: "react", playerId: "p0", emoji: "🔥", now: t0 });
+  check("una reazione valida arriva a schermo", game.liveReactions(conUna, t0).length === 1);
+
+  // Il martellamento: chi tamburella non riempie lo schermo.
+  let raffica = conUna;
+  for (let i = 1; i <= 5; i += 1) {
+    raffica = game.reducer(raffica, { type: "react", playerId: "p0", emoji: "🤡", now: t0 + i * 200 });
+  }
+  check("premere a raffica non ne manda cinque",
+    game.liveReactions(raffica, t0 + 1000).length === 1,
+    game.liveReactions(raffica, t0 + 1000).length);
+
+  check("passata l'attesa se ne puo' mandare un'altra",
+    game.canReact(conUna, "p0", t0 + game.REACTION_COOLDOWN_MS) === true);
+  check("prima dell'attesa no",
+    game.canReact(conUna, "p0", t0 + 500) === false);
+  check("un altro giocatore non e' frenato dal mio invio",
+    game.canReact(conUna, "p1", t0 + 100) === true);
+
+  check("le reazioni scadono da sole", game.liveReactions(conUna, t0 + 5000).length === 0);
+  check("una reazione non tocca crediti ne' lotto",
+    conUna.players.every((p, i) => p.budget === s.players[i].budget) &&
+      conUna.currentBid === s.currentBid && conUna.lotNumber === s.lotNumber);
+
+  // Il bot risponde a tono, e solo se gli hanno parlato.
+  const bot = require(path.join(OUT, "botEngine.js"));
+  let conBot = game.createGame({ code: "REACT", mode: "local", hostId: "p0",
+    category: catalog.OFFICIAL_CATEGORIES[0], config: { maxPlayers: 2, slots: 3 }, practice: true });
+  conBot = game.reducer(conBot, { type: "add_player", player: { id: "p0", name: "umano" } });
+  conBot = game.reducer(conBot, { type: "add_player", player: { id: bot.BOT_PLAYER_ID, name: "bot" } });
+  conBot = game.reducer(conBot, { type: "start", now: t0 });
+
+  const inTesta = { ...conBot, highBidderId: bot.BOT_PLAYER_ID };
+  check("sfottuto mentre vince, il bot risponde col gesto",
+    bot.botReplyTo("🤡", inTesta) === "🤌", bot.botReplyTo("🤡", inTesta));
+
+  const alVerde = {
+    ...conBot,
+    players: conBot.players.map((p) => (p.id === bot.BOT_PLAYER_ID ? { ...p, budget: 0 } : p)),
+  };
+  check("sfottuto senza crediti, il bot se la prende",
+    bot.botReplyTo("🤡", alVerde) === "😭", bot.botReplyTo("🤡", alVerde));
+  check("a 🔥 risponde sempre qualcosa",
+    ["💸", "🤡"].includes(bot.botReplyTo("🔥", conBot)));
+  check("a una faccina che non conosce non risponde",
+    bot.botReplyTo("🍕", conBot) === null);
+  check("senza che nessuno gli parli non manda niente di sua iniziativa",
+    bot.botSpontaneousReaction(conBot, conBot) === null);
+}
+
 console.log(ko === 0 ? "TUTTI I CASI LIMITE REGGONO" : `${ko} CONTROLLI FALLITI`);
 process.exit(ko === 0 ? 0 : 1);

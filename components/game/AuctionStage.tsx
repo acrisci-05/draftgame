@@ -23,13 +23,17 @@ import {
   lotSeconds,
   currentItem,
   drawnCount,
+  liveReactions,
+  canReact,
   isMysteryLot,
   itemById,
   nextToAct,
   playerById,
   type GameAction,
+  type ReactionEmoji,
 } from "@/lib/game";
 import { HAPTIC_BID, HAPTIC_PASS, HAPTIC_WIN, vibrate } from "@/lib/haptics";
+import { useAuth } from "@/lib/auth";
 import { BOT_PLAYER_ID } from "@/lib/botEngine";
 import { useSettings } from "@/lib/settings";
 import type { GameState } from "@/lib/types";
@@ -40,6 +44,7 @@ import { RoomCode } from "@/components/ui/RoomCode";
 import { BidControls } from "./BidControls";
 import { ItemCover } from "./ItemCover";
 import { PlayerRail } from "./PlayerRail";
+import { ReactionButton } from "./Reactions";
 import { FloatingTimer } from "./Timer";
 
 /** Finestra entro cui un secondo tocco identico viene ignorato. */
@@ -64,6 +69,7 @@ export function AuctionStage({
   thinkingId,
 }: AuctionStageProps) {
   const { locale, sound, autoImages, t } = useSettings();
+  const { account } = useAuth();
   const lastFeedRef = useRef<string | null>(null);
 
   const mystery = isMysteryLot(state);
@@ -185,6 +191,22 @@ export function AuctionStage({
     vibrate(HAPTIC_PASS);
     dispatch({ type: "pass", playerId, now: now() });
   };
+  /*
+   * Le reazioni sono per chi ha un profilo.
+   *
+   * Non e' un paywall -- e' gratis -- ma un nome sopra una faccina cambia
+   * cosa vuol dire mandarla: un ospite e' anonimo e resta anonimo la partita
+   * dopo, e la stessa emoji da un anonimo e da qualcuno che si ritrovera' fra
+   * i PickMates non sono la stessa cosa.
+   */
+  const registrato = Boolean(account && !account.local);
+  const reazioni = liveReactions(state, now());
+
+  const react = (emoji: ReactionEmoji) => {
+    if (!registrato || !selfId) return;
+    dispatch({ type: "react", playerId: selfId, emoji, now: now() });
+  };
+
   const claim = (playerId: string) => {
     if (!attoreValido(playerId)) return;
     if (!once(`claim:${playerId}`)) return;
@@ -484,7 +506,12 @@ export function AuctionStage({
             pixel: per arrivare al proprio bisognava scorrere mentre il timer
             correva.
           */}
-          <PlayerRail state={state} nextId={turnId} thinkingId={thinkingId} />
+          <PlayerRail
+            state={state}
+            nextId={turnId}
+            thinkingId={thinkingId}
+            reactions={reazioni}
+          />
 
           {/*
             Qui i pannelli sono tanti e la pagina e' alta: il gettone resta
@@ -563,7 +590,13 @@ export function AuctionStage({
         </>
       ) : (
         <>
-          <PlayerRail state={state} selfId={selfId} nextId={turnId} thinkingId={thinkingId} />
+          <PlayerRail
+            state={state}
+            selfId={selfId}
+            nextId={turnId}
+            thinkingId={thinkingId}
+            reactions={reazioni}
+          />
 
           {self ? (
             <>
@@ -587,6 +620,20 @@ export function AuctionStage({
                     onPass={() => pass(self.id)}
                     onClaim={() => claim(self.id)}
                   />
+
+                  {/*
+                    La faccina accanto ai rilanci, non dentro: dentro sarebbe
+                    un sesto tasto in una fila dove gli altri cinque costano
+                    crediti, e prima o poi qualcuno la premerebbe per sbaglio
+                    credendo di rilanciare.
+                  */}
+                  <div className="mt-2 flex justify-end">
+                    <ReactionButton
+                      locked={!registrato}
+                      canSend={canReact(state, self.id, now())}
+                      onSend={react}
+                    />
+                  </div>
                 </div>
               </div>
               <div aria-hidden className="h-56 sm:hidden" />

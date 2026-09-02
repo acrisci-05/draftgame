@@ -120,6 +120,9 @@ export const en: Dictionary = {
   "rules.random.howBody":
     "From every list you see: the official ones, the freshly published ones and your own too. Only lists too short to carry a match stay out, and those are already greyed out.",
 
+  "rules.modes.reactions": "💬 Live reactions.",
+  "rules.modes.reactionsBody":
+    "Players with a profile can send 💸 🤡 🔥 😭 🤌 during the auction: the emoji floats above your avatar and is gone in a second and a half. One every two and a half seconds, to keep it a joke and not a nuisance. Careful how you use them on Pick-asso Bot: it understands the taunts, and answers in kind.",
   "rules.flop.title": "🎯 Strategic flop limit",
   "rules.flop.body":
     "To keep the auction tense, the number of flops available depends on how many are playing:",
@@ -192,6 +195,8 @@ export const en: Dictionary = {
   "creator.independent": "Independent project",
   "creator.changelog": "What's new",
   "creator.log00": "🚀 Latest news and updates",
+  "creator.log000":
+    "🎭 Emoji reactions (members only) — say what you think in real time with 💸, 🤡, 🔥, 😭, 🤌 during the auction. Careful how you use them: Pick-asso Bot understands taunts, and answers in kind!",
   "creator.log00a":
     "🤖 1v1 vs Pick-asso Bot — take on the solo opponent: strategic budget handling, human reaction times and its own neon-cyan look.",
   "creator.log00b":
@@ -741,6 +746,8 @@ export const en: Dictionary = {
 
   "auction.nobodyYet": "No bids yet: if everyone passes the lot is a flop",
   "auction.botThinking": "Pick-asso is weighing it up",
+  "reactions.open": "Send a reaction",
+  "reactions.guest": "Sign up for free to unlock reactions!",
   "auction.discardsLeft": "Flops still possible before lots start being assigned",
   "auction.discardsOut": "No flops left: the remaining lots are needed to fill the rosters",
   "auction.nobodyYetForced":

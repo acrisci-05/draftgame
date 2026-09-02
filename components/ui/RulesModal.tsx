@@ -111,6 +111,7 @@ const SECTIONS: Section[] = [
     points: [
       { label: "rules.modes.where", body: "rules.modes.whereBody" },
       { label: "rules.modes.extras", body: "rules.modes.extrasBody" },
+      { label: "rules.modes.reactions", body: "rules.modes.reactionsBody" },
       {
         label: "rules.modes.pool",
         body: "rules.modes.poolBody",

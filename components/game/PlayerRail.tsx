@@ -7,6 +7,7 @@ import { cn, money } from "@/lib/utils";
 import { colorLook } from "@/lib/game";
 import { useT } from "@/lib/settings";
 import { Avatar } from "@/components/ui/Avatar";
+import { FloatingReactions } from "./Reactions";
 
 /**
  * "Sta valutando", con i tre puntini che si accendono a turno.
@@ -40,12 +41,15 @@ export function PlayerRail({
   selfId,
   nextId,
   thinkingId,
+  reactions = [],
 }: {
   state: GameState;
   selfId?: string;
   nextId?: string | null;
   /** Chi sta ragionando adesso: sotto di lui compaiono i tre puntini. */
   thinkingId?: string | null;
+  /** Le reazioni ancora in volo, gia' filtrate per quelle vive. */
+  reactions?: { id: string; playerId: string; emoji: string }[];
 }) {
   const t = useT();
   const currency = state.config.currency;
@@ -61,7 +65,7 @@ export function PlayerRail({
             key={player.id}
             layout
             className={cn(
-              "min-w-[136px] shrink-0 rounded-xl border bg-surface p-2.5 transition-colors",
+              "relative min-w-[136px] shrink-0 rounded-xl border bg-surface p-2.5 transition-colors",
               isLeader
                 ? "border-neon leader-pulse"
                 : player.id === nextId
@@ -70,6 +74,8 @@ export function PlayerRail({
               (hasPassed || full) && !isLeader ? "opacity-45" : "",
             )}
           >
+            <FloatingReactions emojis={reactions.filter((r) => r.playerId === player.id)} />
+
             <div className="flex items-center gap-1.5">
               {/* L'alone col colore scelto: e' come ci si riconosce al volo
                   mentre l'asta corre. Chi e' in testa resta verde, perche' quello

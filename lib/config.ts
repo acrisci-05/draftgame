@@ -54,6 +54,7 @@ export const CHANGELOG: {
     date: "2026-09",
     key: "creator.log00",
     highlights: [
+      "creator.log000",
       "creator.log00a",
       "creator.log00b",
       "creator.log00c",

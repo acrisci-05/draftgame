@@ -118,6 +118,9 @@ export const it = {
   "rules.random.howBody":
     "Da tutte le liste che vedi in elenco: le ufficiali, quelle appena pubblicate e anche le tue. Restano fuori solo quelle troppo corte per reggere una partita, che nell'elenco sono già spente.",
 
+  "rules.modes.reactions": "💬 Reazioni live.",
+  "rules.modes.reactionsBody":
+    "Chi ha un profilo può mandare 💸 🤡 🔥 😭 🤌 durante l'asta: l'emoji sale sopra il tuo avatar e sparisce in un secondo e mezzo. Una ogni due secondi e mezzo, per tenerla una battuta e non un disturbo. Attento a come le usi con Pick-asso Bot: le provocazioni le capisce, e risponde a tono.",
   "rules.flop.title": "🎯 Limite Flop strategico",
   "rules.flop.body":
     "Per mantenere alta la tensione dell'asta, il numero di Flop disponibili varia in base ai partecipanti:",
@@ -193,6 +196,8 @@ export const it = {
   "creator.independent": "Progetto indipendente",
   "creator.changelog": "Ultime novità",
   "creator.log00": "🚀 Ultime novità e aggiornamenti",
+  "creator.log000":
+    "🎭 Reazioni emoji (esclusiva per chi ha un profilo) — esprimi quello che pensi in tempo reale con 💸, 🤡, 🔥, 😭, 🤌 durante l'asta. Attento a come le usi: Pick-asso Bot capisce le provocazioni e risponde a tono!",
   "creator.log00a":
     "🤖 Modalità 1v1 vs Pick-asso Bot — sfida l'avversario in solitaria: gestione strategica del budget, tempi di riflessione umani e stile azzurro neon dedicato.",
   "creator.log00b":
@@ -316,6 +321,8 @@ export const it = {
   "auction.toDiscards": "È un flop: sparisce",
   "auction.nobodyYet": "Nessuno ha offerto: se passate tutti il lotto è un flop",
   "auction.botThinking": "Pick-asso sta valutando",
+  "reactions.open": "Manda una reazione",
+  "reactions.guest": "Registrati gratis per sbloccare le reazioni!",
   "auction.discardsLeft": "Flop ancora possibili prima che i lotti vengano assegnati d'ufficio",
   "auction.discardsOut": "Flop esauriti: i lotti rimasti servono a riempire le liste e vengono assegnati",
   "auction.nobodyYetForced":

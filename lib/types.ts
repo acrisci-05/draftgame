@@ -81,6 +81,21 @@ export interface Player {
   passes?: number;
 }
 
+/**
+ * Una reazione lanciata durante l'asta.
+ *
+ * Vive dentro lo stato della partita e non in un canale a parte, per la stessa
+ * ragione per cui ci vivono le offerte: e' l'unico posto che arriva a tutti i
+ * dispositivi allo stesso modo, e l'unico che esiste anche quando si gioca
+ * senza rete. Dura pochi secondi e poi viene buttata via.
+ */
+export interface Reaction {
+  id: string;
+  playerId: string;
+  emoji: string;
+  at: number;
+}
+
 /** Chi ha votato chi: la chiave è chi vota, il valore è la rosa votata. */
 export type VoteMap = Record<string, string>;
 
@@ -198,6 +213,14 @@ export interface GameState {
    * vale quanto false.
    */
   isPractice?: boolean;
+  /**
+   * Le reazioni ancora a schermo. Assente finché nessuno ne manda una.
+   *
+   * Le vecchie non si accumulano: a ogni nuova reazione, e a ogni battito
+   * dell'orologio, quelle scadute escono. Senza, una partita lunga si porterebbe
+   * dietro tutte le emoji della serata dentro ogni aggiornamento di stato.
+   */
+  reactions?: Reaction[];
   updatedAt: number;
 }
 

@@ -152,7 +152,7 @@ function playMatch(category, config) {
     const adesso = impronta(state);
     if (adesso !== firma) {
       firma = adesso;
-      const previsione = bot.decideBotMove(state, bot.BOT_PLAYER_ID);
+      const previsione = bot.decideBotMove(state, bot.BOT_PLAYER_ID, { now: clock });
       attesa = previsione
         ? { at: clock + previsione.delay + bot.GRACE_AFTER_CHANGE_MS }
         : null;
@@ -166,11 +166,13 @@ function playMatch(category, config) {
         (state.phase === "auction" && state.highBidderId === bot.BOT_PLAYER_ID);
       if (!fermo) {
         const prima = game.playerById(state, bot.BOT_PLAYER_ID);
-        const mossa = bot.decideBotMove(state, bot.BOT_PLAYER_ID);
+        const mossa = bot.decideBotMove(state, bot.BOT_PLAYER_ID, { now: clock });
         if (mossa) {
-          const soglia = bot.affordableCeiling(state, prima);
-          if (mossa.kind === "bid" && mossa.amount > soglia) {
-            problemi.push(`rilancio ${mossa.amount} oltre la soglia ${soglia}`);
+          // Il tetto piu' largo che il bot possa darsi su un lotto: la quota
+          // massima, o la regola del saldo se e' quella a stringere.
+          const tetto = bot.maxBidFor(state, prima, bot.BID_SHARE_MAX * 1.6);
+          if (mossa.kind === "bid" && mossa.amount > tetto) {
+            problemi.push(`rilancio ${mossa.amount} oltre il tetto ${tetto}`);
           }
           const prevLotto = state.lotNumber;
           const prevFase = state.phase;
@@ -207,7 +209,7 @@ console.log("\nPick-asso Bot");
 
 /* ---------------- I ritardi ---------------- */
 
-const fasce = { pass: [2000, 3500], bid: [2500, 4500], hesitate: [4000, 6000] };
+const fasce = { pass: [2000, 3500], bid: [2500, 4500], hesitate: [4000, 6000], snipe: [800, 1200] };
 for (const [tipo, [min, max]] of Object.entries(fasce)) {
   const campioni = Array.from({ length: 500 }, () => bot.getBotDelay(tipo));
   check(
@@ -237,6 +239,22 @@ check(
   "soglia: a lista piena non si spende piu' niente",
   bot.affordableCeiling({ config: { slots: 5 } }, { budget: 9, roster: [1, 2, 3, 4, 5] }) === 0,
 );
+
+/* ---------------- La quota di budget per lotto ---------------- */
+
+{
+  const quote = Array.from({ length: 400 }, () => bot.bidShare(5));
+  check(
+    "la quota di budget sta fra un quarto e due quinti",
+    quote.every((q) => q >= bot.BID_SHARE_MIN && q <= bot.BID_SHARE_MAX),
+    `${Math.min(...quote).toFixed(3)}-${Math.max(...quote).toFixed(3)}`,
+  );
+  check("la quota non e' mai due volte la stessa", new Set(quote).size > 350, new Set(quote).size);
+  check(
+    "sugli ultimi posti il bot puo' osare di piu'",
+    Array.from({ length: 200 }, () => bot.bidShare(1)).some((q) => q > bot.BID_SHARE_MAX),
+  );
+}
 
 /* ---------------- Cento partite intere ---------------- */
 
