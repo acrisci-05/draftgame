@@ -545,6 +545,84 @@ export function winnerOf(state: GameState): Standing | null {
   return finalStandings(state)[0] ?? null;
 }
 
+/* ------------------------------------------------------------------ */
+/* I titoli di fine partita                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Le targhe che si consegnano a premiazione finita.
+ *
+ * Non contano niente -- non danno punti, non cambiano la classifica -- e
+ * servono proprio per quello: la classifica premia uno solo, e in una partita
+ * in cinque gli altri quattro escono senza niente da raccontare. Un titolo da'
+ * a ognuno un modo di essere stato qualcosa, fosse anche il piu' tirchio.
+ */
+export type EndTitleId = "dominator" | "spender" | "tightwad" | "flopMaster";
+
+export const END_TITLE_EMOJI: Readonly<Record<EndTitleId, string>> = {
+  dominator: "🏆",
+  spender: "💸",
+  tightwad: "🪙",
+  flopMaster: "🎯",
+};
+
+/** Chi ha finito i crediti per primo, ripercorrendo gli acquisti in ordine. */
+function firstToRunDry(state: GameState): string | null {
+  const residuo = new Map(state.players.map((p) => [p.id, state.config.budget]));
+  for (const risultato of state.history) {
+    if (!risultato.winnerId) continue;
+    const prima = residuo.get(risultato.winnerId);
+    if (prima === undefined) continue;
+    const dopo = prima - risultato.price;
+    residuo.set(risultato.winnerId, dopo);
+    // Sotto l'offerta minima non si puo' piu' comprare niente: e' finito qui.
+    if (dopo < OPENING_BID) return risultato.winnerId;
+  }
+  return null;
+}
+
+/**
+ * Il migliore per un certo conto, ma solo se e' uno solo.
+ *
+ * A parita' non si assegna niente: due "braccino corto" appaiati non fanno
+ * ridere nessuno, e in una partita dove nessuno ha speso li prenderebbero
+ * tutti.
+ */
+function soloVincitore(
+  players: readonly Player[],
+  valore: (p: Player) => number,
+  minimo: number,
+): string | null {
+  let migliore: Player | null = null;
+  let pari = false;
+  for (const p of players) {
+    if (valore(p) < minimo) continue;
+    if (!migliore || valore(p) > valore(migliore)) {
+      migliore = p;
+      pari = false;
+    } else if (valore(p) === valore(migliore)) {
+      pari = true;
+    }
+  }
+  return migliore && !pari ? migliore.id : null;
+}
+
+/** I titoli, per giocatore. Chi non ne ha preso nessuno non compare. */
+export function endTitles(state: GameState): Record<string, EndTitleId[]> {
+  const titoli: Record<string, EndTitleId[]> = {};
+  const assegna = (playerId: string | null, id: EndTitleId) => {
+    if (!playerId) return;
+    (titoli[playerId] ??= []).push(id);
+  };
+
+  assegna(winnerOf(state)?.player.id ?? null, "dominator");
+  assegna(firstToRunDry(state), "spender");
+  assegna(soloVincitore(state.players, (p) => p.budget, 1), "tightwad");
+  assegna(soloVincitore(state.players, (p) => p.passes ?? 0, 1), "flopMaster");
+
+  return titoli;
+}
+
 export function drawnCount(state: GameState): number {
   return state.lotNumber;
 }
@@ -1041,7 +1119,12 @@ export function reducer(state: GameState, action: GameAction): GameState {
           lotNumber: 0,
           sniped: false,
           feed: [feedEntry("start", action.now)],
-          players: state.players.map((p) => ({ ...p, budget: state.config.budget, roster: [] })),
+          players: state.players.map((p) => ({
+            ...p,
+            budget: state.config.budget,
+            roster: [],
+            passes: 0,
+          })),
         },
         action.now,
       );
@@ -1089,7 +1172,14 @@ export function reducer(state: GameState, action: GameAction): GameState {
       const player = playerById(state, action.playerId);
       const passed = touch(
         pushFeed(
-          { ...state, passed: [...state.passed, action.playerId] },
+          {
+            ...state,
+            passed: [...state.passed, action.playerId],
+            // Il conto delle rinunce, che a fine partita diventa un titolo.
+            players: state.players.map((p) =>
+              p.id === action.playerId ? { ...p, passes: (p.passes ?? 0) + 1 } : p,
+            ),
+          },
           feedEntry("pass", action.now, {
             playerName: player?.name,
             playerEmoji: player?.emoji,
@@ -1158,7 +1248,12 @@ export function reducer(state: GameState, action: GameAction): GameState {
         lotNumber: 0,
         sniped: false,
         votes: {},
-        players: state.players.map((p) => ({ ...p, budget: state.config.budget, roster: [] })),
+        players: state.players.map((p) => ({
+          ...p,
+          budget: state.config.budget,
+          roster: [],
+          passes: 0,
+        })),
       });
     }
 

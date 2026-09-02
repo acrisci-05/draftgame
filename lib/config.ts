@@ -33,10 +33,35 @@ export const KOFI_URL = process.env.NEXT_PUBLIC_KOFI_URL?.trim() ?? "";
 
 export const CREATOR_NAME = "Antonio";
 
-export const APP_VERSION = "1.1.0";
+export const APP_VERSION = "1.2.0";
 
-/** Ultime novità mostrate nella scheda del creatore, dalla più recente. */
-export const CHANGELOG: { version: string; date: string; key: TranslationKey }[] = [
+/**
+ * Ultime novità mostrate nella scheda del creatore, dalla più recente.
+ *
+ * La riga sola bastava finché una versione portava una cosa. Quando ne porta
+ * sei, la riga diventa un elenco separato da virgole che non si legge: da qui
+ * una versione può avere un titolo e sotto i suoi punti.
+ */
+export const CHANGELOG: {
+  version: string;
+  date: string;
+  key: TranslationKey;
+  /** I punti sotto il titolo. Le versioni vecchie non ne hanno. */
+  highlights?: TranslationKey[];
+}[] = [
+  {
+    version: "1.2.0",
+    date: "2026-09",
+    key: "creator.log00",
+    highlights: [
+      "creator.log00a",
+      "creator.log00b",
+      "creator.log00c",
+      "creator.log00d",
+      "creator.log00e",
+      "creator.log00f",
+    ],
+  },
   { version: "1.1.0", date: "2026-08", key: "creator.log0" },
   { version: "1.0.0", date: "2026-08", key: "creator.log1" },
   { version: "0.9.0", date: "2026-08", key: "creator.log2" },

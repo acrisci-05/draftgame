@@ -191,6 +191,19 @@ export const en: Dictionary = {
   "creator.donate": "Buy me a coffee",
   "creator.independent": "Independent project",
   "creator.changelog": "What's new",
+  "creator.log00": "🚀 Latest news and updates",
+  "creator.log00a":
+    "🤖 1v1 vs Pick-asso Bot — take on the solo opponent: strategic budget handling, human reaction times and its own neon-cyan look.",
+  "creator.log00b":
+    "🎲 Random Category button — not sure what to auction? The button at the top of the picker starts a match on a surprise theme.",
+  "creator.log00c":
+    "🍦 New cult categories — Gelato Flavours (30 flavours, from pistachio to the dreaded blue one) and School Subjects (30 subjects, from the desks to the glory of PE).",
+  "creator.log00d":
+    "🎯 Flop Draft balance — the flop cap now depends on how many are playing, from 5 to 9, to keep the auction tense at every table.",
+  "creator.log00e":
+    "🎭 7 new avatars — gavel, coins, clover, medal, glasses, alien and palette, drawn in the same outline style as the rest.",
+  "creator.log00f":
+    "📱 Fixes and polish — the timer moved down next to the buttons, confetti aimed at the winning roster, tongue-in-cheek end-of-game titles, overlapping-bid timing fixed and a menu that no longer hides under the phone's notch.",
   "creator.log0": "Final card tuned for 1 to 5 players, with a crown for the winner and the stake on show.",
   "creator.log1": "Pickmates, live challenge notifications and the creator card.",
   "creator.log2": "Photos checked one by one for every item in the official lists.",
@@ -315,6 +328,10 @@ export const en: Dictionary = {
 
   "results.title": "Draft complete",
   "results.subtitle": "{n} lots sold · room {code}",
+  "results.titleDominator": "Dominator",
+  "results.titleSpender": "Big Spender",
+  "results.titleTightwad": "Tightwad",
+  "results.titleFlopMaster": "Flop Master",
   "results.rosters": "Final rosters",
   "results.spent": "{amount} spent",
   "results.left": "{amount} left",

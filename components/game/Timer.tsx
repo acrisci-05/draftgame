@@ -1,10 +1,64 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Hourglass } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { useSettings } from "@/lib/settings";
 import { cn, clamp } from "@/lib/utils";
+
+/**
+ * Il cronometro dove serve guardarlo: accanto al pollice.
+ *
+ * La clessidra grande stava in cima alla pagina, e in cima alla pagina non ci
+ * si guarda mentre si rilancia -- si guarda il lotto e i pulsanti, che stanno
+ * in fondo. Per leggere i secondi bisognava alzare gli occhi e riabbassarli, e
+ * su un lotto da dieci secondi e' un movimento che costa un rilancio.
+ *
+ * Questo e' lo stesso conto, ridotto a un gettone che sta appena sopra i tasti.
+ * Sotto i tre secondi diventa rosso e pulsa: a quel punto non serve leggerlo,
+ * basta vederlo con la coda dell'occhio.
+ */
+export function FloatingTimer({
+  deadline,
+  now,
+  className,
+}: {
+  deadline: number;
+  now: () => number;
+  className?: string;
+}) {
+  const [remaining, setRemaining] = useState(() => Math.max(0, deadline - now()));
+
+  useEffect(() => {
+    const update = () => setRemaining(Math.max(0, deadline - now()));
+    update();
+    const timer = setInterval(update, 100);
+    return () => clearInterval(timer);
+  }, [deadline, now]);
+
+  const seconds = Math.ceil(remaining / 1000);
+  const urgente = seconds <= 3;
+
+  return (
+    <span
+      role="timer"
+      aria-live="off"
+      className={cn(
+        "pointer-events-none inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-mono text-lg font-black tabular-nums leading-none backdrop-blur transition-colors",
+        urgente
+          ? "animate-pulse border-red-400 bg-red-500 text-white shadow-lg shadow-red-500/50"
+          : seconds <= 6
+            ? "border-amber-500/50 bg-amber-500/15 text-amber-400"
+            : "border-line bg-surface/90 text-neon",
+        className,
+      )}
+    >
+      <Hourglass className="size-4 shrink-0" aria-hidden />
+      {seconds}
+    </span>
+  );
+}
 
 interface TimerProps {
   deadline: number;

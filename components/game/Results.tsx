@@ -15,18 +15,22 @@ import {
   Vote,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { useAuth } from "@/lib/auth";
 import { categoryName } from "@/lib/catalog";
 import { voteUrlFor } from "@/lib/config";
+import confetti from "canvas-confetti";
 import {
+  END_TITLE_EMOJI,
+  endTitles,
   finalStandings,
   voteTally,
   itemById,
   playerById,
   rosterValue,
   type GameAction,
+  type EndTitleId,
   type WinReason,
 } from "@/lib/game";
 import { awardMatchXp, recordMatch } from "@/lib/history";
@@ -63,6 +67,14 @@ interface ResultsProps {
   selfId: string;
   dispatch: (action: GameAction) => void;
 }
+
+/** Come si chiama ogni targa nella lingua scelta. */
+const TITLE_KEYS: Record<EndTitleId, TranslationKey> = {
+  dominator: "results.titleDominator",
+  spender: "results.titleSpender",
+  tightwad: "results.titleTightwad",
+  flopMaster: "results.titleFlopMaster",
+};
 
 /** Secondi dopo i quali la classifica si apre da sola, se non si tocca niente. */
 const RECAP_SECONDS = 5;
@@ -211,6 +223,53 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
 
   const currency = state.config.currency;
   const ordered = finalStandings(state);
+  const titoli = endTitles(state);
+
+  /*
+   * I coriandoli partono dalla rosa che ha vinto, non dal soffitto.
+   *
+   * Un'esplosione a schermo intero e' bella e non dice niente: festeggia la
+   * pagina. Partendo dal riquadro del primo classificato l'occhio ci va sopra
+   * da solo, ed e' la stessa ragione per cui in televisione l'inquadratura si
+   * stringe sul vincitore invece di allargarsi sullo stadio.
+   *
+   * La posizione si misura al momento del lancio -- la classifica entra con
+   * un'animazione, e mezzo secondo prima quel riquadro era altrove.
+   */
+  const winnerCardRef = useRef<HTMLDivElement | null>(null);
+  const giaFestaRef = useRef(false);
+
+  useEffect(() => {
+    if (view === "recap" || giaFestaRef.current) return;
+    // Chi ha chiesto meno animazioni non vuole nemmeno questa.
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
+    giaFestaRef.current = true;
+    const lanci = [0, 220, 460];
+    const timers = lanci.map((ritardo, i) =>
+      window.setTimeout(() => {
+        const box = winnerCardRef.current?.getBoundingClientRect();
+        if (!box) return;
+        confetti({
+          particleCount: i === 0 ? 90 : 55,
+          spread: 70 + i * 15,
+          startVelocity: 38 - i * 4,
+          decay: 0.92,
+          scalar: 0.9,
+          // Da coordinate dello schermo a frazioni di finestra, che e' l'unica
+          // cosa che canvas-confetti capisce.
+          origin: {
+            x: (box.left + box.width / 2) / window.innerWidth,
+            y: (box.top + box.height / 2) / window.innerHeight,
+          },
+          colors: ["#facc15", "#22c55e", "#a855f7", "#22d3ee", "#ffffff"],
+          disableForReducedMotion: true,
+        });
+      }, ritardo),
+    );
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [view]);
 
   /*
    * L'invito a farsi un profilo si mostra solo a chi non ce l'ha e ha davvero
@@ -360,6 +419,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
           {ordered.map(({ player, votes, reason }, index) => (
             <motion.div
               key={player.id}
+              ref={index === 0 ? winnerCardRef : undefined}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
@@ -395,6 +455,24 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
                   </span>
                 ) : null}
               </div>
+
+              {/*
+                Le targhe ironiche. Sotto il nome e non accanto: su un telefono
+                stretto accanto sparirebbe il nome, che e' la cosa che serve.
+              */}
+              {titoli[player.id]?.length ? (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {titoli[player.id].map((id) => (
+                    <span
+                      key={id}
+                      className="inline-flex items-center gap-1 rounded-full border border-violet/40 bg-violet/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-violet"
+                    >
+                      <span aria-hidden>{END_TITLE_EMOJI[id]}</span>
+                      {t(TITLE_KEYS[id])}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
               <div className="mt-2 flex flex-wrap items-center gap-1.5">
                 <Badge tone={votes > 0 ? "gold" : "neutral"}>
                   {votes === 0

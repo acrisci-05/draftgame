@@ -30,6 +30,7 @@ import {
   type GameAction,
 } from "@/lib/game";
 import { HAPTIC_BID, HAPTIC_PASS, HAPTIC_WIN, vibrate } from "@/lib/haptics";
+import { BOT_PLAYER_ID } from "@/lib/botEngine";
 import { useSettings } from "@/lib/settings";
 import type { GameState } from "@/lib/types";
 import { TIER_STYLES, cn, money } from "@/lib/utils";
@@ -39,7 +40,7 @@ import { RoomCode } from "@/components/ui/RoomCode";
 import { BidControls } from "./BidControls";
 import { ItemCover } from "./ItemCover";
 import { PlayerRail } from "./PlayerRail";
-import { Timer } from "./Timer";
+import { FloatingTimer } from "./Timer";
 
 /** Finestra entro cui un secondo tocco identico viene ignorato. */
 const DOUBLE_TAP_MS = 400;
@@ -84,6 +85,17 @@ export function AuctionStage({
    */
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const expandedId = openPanel ?? turnId;
+  /*
+   * Il telefono passa di mano solo fra persone.
+   *
+   * Una stanza locale disegna i comandi di tutti, perche' si gioca in tanti
+   * sullo stesso schermo. Contro il bot i comandi erano due, e il secondo era
+   * i suoi: bastava aprirlo per rilanciare e passare al posto dell'avversario.
+   * Contro il bot c'e' una persona sola, e la sua interfaccia e' quella delle
+   * stanze online.
+   */
+  const passaMano = state.mode === "local" && !state.isPractice;
+
   const inRace = state.players.filter(
     (p) => !state.passed.includes(p.id) && p.roster.length < state.config.slots,
   ).length;
@@ -144,17 +156,37 @@ export function AuctionStage({
     return true;
   }, []);
 
+  /*
+   * Il portone: da qui non passa nessuno che non sia chi ha in mano il telefono.
+   *
+   * Sembra ridondante -- i comandi del bot non vengono nemmeno disegnati -- ed
+   * e' voluto: e' esattamente la strada da cui e' arrivato il guasto. In una
+   * stanza di prova ogni azione partita dall'interfaccia e' della persona, e
+   * quella del bot arriva da un'altra parte (il suo motore, che chiama
+   * dispatch per conto proprio). Se qui si presenta l'identificativo del bot,
+   * o quello di chiunque altro, la mossa non parte: due controlli sono meglio
+   * di uno quando il costo di sbagliare e' giocare al posto dell'avversario.
+   */
+  const attoreValido = (playerId: string): boolean => {
+    if (playerId === BOT_PLAYER_ID) return false;
+    if (state.isPractice && playerId !== selfId) return false;
+    return true;
+  };
+
   const bid = (playerId: string, amount: number) => {
+    if (!attoreValido(playerId)) return;
     if (!once(`bid:${playerId}:${amount}`)) return;
     vibrate(HAPTIC_BID);
     dispatch({ type: "bid", playerId, amount, now: now() });
   };
   const pass = (playerId: string) => {
+    if (!attoreValido(playerId)) return;
     if (!once(`pass:${playerId}`)) return;
     vibrate(HAPTIC_PASS);
     dispatch({ type: "pass", playerId, now: now() });
   };
   const claim = (playerId: string) => {
+    if (!attoreValido(playerId)) return;
     if (!once(`claim:${playerId}`)) return;
     vibrate(HAPTIC_BID);
     dispatch({ type: "claim", playerId, now: now() });
@@ -162,46 +194,54 @@ export function AuctionStage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="text-xl">{state.category.emoji}</span>
-          <div className="min-w-0 leading-tight">
-            <p className="truncate text-sm font-bold">{categoryName(state.category, locale)}</p>
-            <p className="text-xs text-faint">
-              {t("auction.lot", { current: drawnCount(state), total: state.items.length })}
-            </p>
-          </div>
-        </div>
+      {/*
+        La barra di contesto: tre cose, tre posti fissi.
 
-        <div className="flex shrink-0 items-center gap-3">
-          {/*
-            I flop ancora possibili. E' una riserva di gruppo: quando finisce, i
-            lotti che non vuole nessuno vengono assegnati d'ufficio, quindi
-            conviene saperlo prima di passare per l'ennesima volta.
-
-            Era nascosto sotto i 640px, cioe' su ogni telefono, ed e' il motivo
-            per cui la riserva esaurita sembrava un guasto: i lotti smettevano
-            di essere scartati e niente diceva perche'. Adesso si vede sempre.
-          */}
-          {state.config.allowDiscards ? (
-            <span
-              title={t(scartiFiniti ? "auction.discardsOut" : "auction.discardsLeft")}
-              className={cn(
-                "inline-flex items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold",
-                scartiFiniti
-                  ? "border-red-500/50 bg-red-500/10 text-red-400"
-                  : "border-line bg-surface-2 text-faint",
-              )}
-            >
-              <span aria-hidden>🗑️</span>
-              {state.discards.length}/{flopTetto}
-            </span>
-          ) : null}
+        Prima erano tutte in fila a destra e si spingevano fra loro: su un
+        telefono stretto il nome della categoria finiva sotto i puntini e la
+        clessidra mangiava meta' riga. Adesso a sinistra sta chi sei e a cosa
+        stai giocando, in mezzo a che punto sei, a destra quanto puoi ancora
+        permetterti di rinunciare. Il cronometro non e' piu' qui: e' sceso
+        vicino ai pulsanti, dove si guarda davvero.
+      */}
+      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
+        <div className="flex min-w-0 flex-col gap-1">
           <RoomCode code={state.code} />
-          {state.phase === "auction" && state.deadline ? (
-            <Timer deadline={state.deadline} totalSeconds={totalSeconds} now={now} />
-          ) : null}
+          <span className="flex min-w-0 items-center gap-1.5 rounded-full border border-line bg-surface-2 px-2 py-0.5 text-[11px] font-semibold text-muted">
+            <span aria-hidden>{state.category.emoji}</span>
+            <span className="truncate">{categoryName(state.category, locale)}</span>
+          </span>
         </div>
+
+        <p className="shrink-0 text-center text-xs font-bold uppercase tracking-wider text-faint">
+          {t("auction.lot", { current: drawnCount(state), total: state.items.length })}
+        </p>
+
+        {/*
+          I flop ancora possibili. E' una riserva di gruppo: quando finisce, i
+          lotti che non vuole nessuno vengono assegnati d'ufficio, quindi
+          conviene saperlo prima di passare per l'ennesima volta.
+
+          Era nascosto sotto i 640px, cioe' su ogni telefono, ed e' il motivo
+          per cui la riserva esaurita sembrava un guasto: i lotti smettevano
+          di essere scartati e niente diceva perche'. Adesso si vede sempre.
+        */}
+        {state.config.allowDiscards ? (
+          <span
+            title={t(scartiFiniti ? "auction.discardsOut" : "auction.discardsLeft")}
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold",
+              scartiFiniti
+                ? "border-red-500/50 bg-red-500/10 text-red-400"
+                : "border-line bg-surface-2 text-faint",
+            )}
+          >
+            <span aria-hidden>🎯</span>
+            {state.discards.length}/{flopTetto}
+          </span>
+        ) : (
+          <span />
+        )}
       </div>
 
       <div
@@ -429,13 +469,13 @@ export function AuctionStage({
         </AnimatePresence>
       </div>
 
-      {turnId && state.mode === "local" ? (
+      {turnId && passaMano ? (
         <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-violet">
           {t("auction.turnOf", { player: playerById(state, turnId)?.name ?? "" })}
         </p>
       ) : null}
 
-      {state.mode === "local" ? (
+      {passaMano ? (
         <>
           {/*
             La striscia con tutti: avatar, crediti e stato di ognuno in una
@@ -445,6 +485,17 @@ export function AuctionStage({
             correva.
           */}
           <PlayerRail state={state} nextId={turnId} thinkingId={thinkingId} />
+
+          {/*
+            Qui i pannelli sono tanti e la pagina e' alta: il gettone resta
+            appiccicato in fondo mentre si scorre, se no per vedere i secondi
+            bisognerebbe tornare in cima proprio mentre stanno finendo.
+          */}
+          {state.phase === "auction" && state.deadline ? (
+            <div className="pointer-events-none sticky bottom-3 z-30 -mt-2 flex justify-end">
+              <FloatingTimer deadline={state.deadline} now={now} />
+            </div>
+          ) : null}
 
           <div className="flex flex-col gap-2">
             {state.players.map((player) => {
@@ -456,6 +507,7 @@ export function AuctionStage({
                     compact
                     state={state}
                     player={player}
+                    locked={Boolean(thinkingId)}
                     highlight={player.id === turnId}
                     onBid={(amount) => bid(player.id, amount)}
                     onPass={() => pass(player.id)}
@@ -517,10 +569,19 @@ export function AuctionStage({
             <>
               {/* Su telefono i comandi restano fissi in basso, a portata di pollice. */}
               <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ink/95 p-3 backdrop-blur safe-bottom sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
-                <div className="mx-auto w-full max-w-2xl">
+                <div className="relative mx-auto w-full max-w-2xl">
+                  {/* Appena sopra i tasti, a destra: dove cade l'occhio fra un rilancio e l'altro. */}
+                  {state.phase === "auction" && state.deadline ? (
+                    <FloatingTimer
+                      deadline={state.deadline}
+                      now={now}
+                      className="absolute -top-12 end-0 z-10"
+                    />
+                  ) : null}
                   <BidControls
                     state={state}
                     player={self}
+                    locked={Boolean(thinkingId)}
                     highlight={self.id === turnId}
                     onBid={(amount) => bid(self.id, amount)}
                     onPass={() => pass(self.id)}

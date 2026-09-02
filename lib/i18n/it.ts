@@ -192,6 +192,19 @@ export const it = {
   "creator.donateNote": "Il pagamento avviene su PayPal o Revolut: da qui non passa nessun dato.",
   "creator.independent": "Progetto indipendente",
   "creator.changelog": "Ultime novità",
+  "creator.log00": "🚀 Ultime novità e aggiornamenti",
+  "creator.log00a":
+    "🤖 Modalità 1v1 vs Pick-asso Bot — sfida l'avversario in solitaria: gestione strategica del budget, tempi di riflessione umani e stile azzurro neon dedicato.",
+  "creator.log00b":
+    "🎲 Tasto Categoria Casuale — non sai cosa mettere all'asta? Il pulsante in cima alla selezione lancia subito una partita su un tema a sorpresa.",
+  "creator.log00c":
+    "🍦 Nuove categorie cult — Gusti di Gelato (30 gusti, dal pistacchio al temuto puffo) e Materie Scolastiche (30 materie, dai banchi al mito di Educazione Fisica).",
+  "creator.log00d":
+    "🎯 Bilanciamento Flop Draft — il tetto dei flop ora dipende da quanti siete, da 5 a 9, per tenere la tensione dell'asta su ogni tavolo.",
+  "creator.log00e":
+    "🎭 7 avatar nuovi — martelletto d'asta, monete, quadrifoglio, medaglia, occhiali, alieno e tavolozza, con lo stesso tratto degli altri.",
+  "creator.log00f":
+    "📱 Correzioni e rifiniture — cronometro sceso accanto ai pulsanti, coriandoli mirati sulla rosa vincente, titoli ironici di fine partita, sovrapposizioni fra rilanci sistemate e menu che non finisce più sotto la tacca del telefono.",
   "creator.log0": "Card finale su misura da 1 a 5 giocatori, con corona al vincitore e pegno in palio.",
   "creator.log1": "Pickmates, notifiche di sfida in tempo reale e scheda del creatore.",
   "creator.log2": "Foto verificate una per una per tutti gli elementi delle liste ufficiali.",
@@ -323,6 +336,10 @@ export const it = {
 
   "results.title": "Draft completato",
   "results.subtitle": "{n} lotti aggiudicati · stanza {code}",
+  "results.titleDominator": "Dominatore",
+  "results.titleSpender": "Spendaccione",
+  "results.titleTightwad": "Braccino Corto",
+  "results.titleFlopMaster": "Maestro del Flop",
   "results.rosters": "Roster finali",
   "results.spent": "{amount} spesi",
   "results.left": "{amount} rimasti",

@@ -71,6 +71,14 @@ export interface Player {
   handle?: string;
   budget: number;
   roster: RosterEntry[];
+  /**
+   * Quante volte ha lasciato perdere un lotto.
+   *
+   * Non serve a giocare: serve al titolo di fine partita, e si conta qui
+   * perche' `passed` si svuota a ogni lotto e a fine partita non resterebbe
+   * traccia di niente. Assente sulle partite cominciate prima che esistesse.
+   */
+  passes?: number;
 }
 
 /** Chi ha votato chi: la chiave è chi vota, il valore è la rosa votata. */

@@ -234,5 +234,45 @@ const trovato = game.finalStandings(conProfilo)
 check("a fine partita il profilo viene ritrovato in classifica", trovato >= 0, trovato);
 
 console.log("");
+
+/* 8. I titoli di fine partita: targhe, non punti. */
+{
+  // Una partita finita a mano: due giocatori, uno spende tutto, l'altro passa.
+  let s = stanza(3, { slots: 3, budget: 10, allowDiscards: true });
+  s = {
+    ...s,
+    phase: "ended",
+    history: [
+      { itemId: "a", itemName: "A", tier: 3, winnerId: "p0", winnerName: "g0", price: 6 },
+      { itemId: "b", itemName: "B", tier: 3, winnerId: "p0", winnerName: "g0", price: 4 },
+      { itemId: "c", itemName: "C", tier: 3, winnerId: "p1", winnerName: "g1", price: 2 },
+    ],
+    players: s.players.map((p) =>
+      p.id === "p0"
+        ? { ...p, budget: 0, passes: 1 }
+        : p.id === "p1"
+          ? { ...p, budget: 8, passes: 5 }
+          : { ...p, budget: 4, passes: 2 },
+    ),
+    votes: { p0: "p1", p1: "p2", p2: "p1" },
+  };
+
+  const titoli = game.endTitles(s);
+  check("chi finisce i crediti per primo e' lo Spendaccione",
+    (titoli.p0 ?? []).includes("spender"), JSON.stringify(titoli));
+  check("chi resta con piu' crediti e' il Braccino Corto",
+    (titoli.p1 ?? []).includes("tightwad"), JSON.stringify(titoli));
+  check("chi ha rinunciato di piu' e' il Maestro del Flop",
+    (titoli.p1 ?? []).includes("flopMaster"), JSON.stringify(titoli));
+  check("il vincitore e' il Dominatore",
+    (titoli[game.winnerOf(s).player.id] ?? []).includes("dominator"), JSON.stringify(titoli));
+
+  // A parita' non si assegna: due "braccino corto" appaiati non dicono niente.
+  const pari = { ...s, players: s.players.map((p) => ({ ...p, budget: 5, passes: 2 })) };
+  const titoliPari = game.endTitles(pari);
+  const conTargheDiSpesa = Object.values(titoliPari).flat().filter((id) => id !== "dominator" && id !== "spender");
+  check("a parita' non si assegnano targhe", conTargheDiSpesa.length === 0, JSON.stringify(titoliPari));
+}
+
 console.log(ko === 0 ? "TUTTI I CASI LIMITE REGGONO" : `${ko} CONTROLLI FALLITI`);
 process.exit(ko === 0 ? 0 : 1);

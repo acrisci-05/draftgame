@@ -147,7 +147,19 @@ export function CreatorModal({
                 <span className="shrink-0 font-mono text-xs font-bold text-neon">
                   v{release.version}
                 </span>
-                <span className="text-muted">{t(release.key)}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-muted">{t(release.key)}</span>
+                  {/* I punti della versione, quando ce ne sono più d'uno. */}
+                  {release.highlights?.length ? (
+                    <span className="mt-1.5 flex flex-col gap-1">
+                      {release.highlights.map((key) => (
+                        <span key={key} className="block text-xs leading-relaxed text-faint">
+                          {t(key)}
+                        </span>
+                      ))}
+                    </span>
+                  ) : null}
+                </span>
               </li>
             ))}
           </ul>

@@ -29,6 +29,12 @@ interface BidControlsProps {
   highlight?: boolean;
   /** Layout ridotto per la modalità locale con più giocatori sullo stesso schermo. */
   compact?: boolean;
+  /**
+   * Comandi spenti perche' sta agendo qualcun altro: contro il bot, i secondi
+   * in cui sta decidendo la sua mossa. Si somma alle regole del gioco -- chi e'
+   * gia' in testa, chi ha passato, chi non copre l'offerta -- non le sostituisce.
+   */
+  locked?: boolean;
 }
 
 export function BidControls({
@@ -39,6 +45,7 @@ export function BidControls({
   onClaim,
   highlight = false,
   compact = false,
+  locked = false,
 }: BidControlsProps) {
   const t = useT();
   const currency = state.config.currency;
@@ -119,12 +126,12 @@ export function BidControls({
         <div className="grid grid-cols-2 gap-1.5">
           <button
             type="button"
-            disabled={!canClaim(state, player.id)}
+            disabled={!canClaim(state, player.id) || locked}
             onClick={onClaim}
             className={cn(
               "flex touch-manipulation items-center justify-center gap-1.5 rounded-xl border font-bold transition-colors active:scale-[0.97]",
               buttonHeight,
-              canClaim(state, player.id)
+              canClaim(state, player.id) && !locked
                 ? "border-violet/60 bg-violet/15 text-violet hover:bg-violet/25"
                 : "cursor-not-allowed border-line bg-surface-2 text-faint",
             )}
@@ -134,7 +141,7 @@ export function BidControls({
           </button>
           <PassButton
             height={buttonHeight}
-            disabled={!canPass(state, player.id)}
+            disabled={!canPass(state, player.id) || locked}
             onClick={onPass}
             label={t("auction.pass")}
           />
@@ -148,12 +155,12 @@ export function BidControls({
                 <button
                   key={step}
                   type="button"
-                  disabled={!enabled}
+                  disabled={!enabled || locked}
                   onClick={() => onBid(amount)}
                   className={cn(
                     "flex touch-manipulation flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
                     buttonHeight,
-                    enabled
+                    enabled && !locked
                       ? "border-neon/50 bg-neon/10 text-neon hover:bg-neon/20"
                       : "cursor-not-allowed border-line bg-surface-2 text-faint",
                   )}
@@ -173,12 +180,12 @@ export function BidControls({
             {showMax && max !== null ? (
               <button
                 type="button"
-                disabled={!canBid(state, player.id, max)}
+                disabled={!canBid(state, player.id, max) || locked}
                 onClick={() => onBid(max)}
                 className={cn(
                   "flex touch-manipulation flex-col items-center justify-center rounded-xl border font-bold transition-colors active:scale-[0.97]",
                   buttonHeight,
-                  canBid(state, player.id, max)
+                  canBid(state, player.id, max) && !locked
                     ? "border-gold/60 bg-gold/10 text-gold hover:bg-gold/20"
                     : "cursor-not-allowed border-line bg-surface-2 text-faint",
                 )}
@@ -198,7 +205,7 @@ export function BidControls({
 
           <PassButton
             height={buttonHeight}
-            disabled={!canPass(state, player.id)}
+            disabled={!canPass(state, player.id) || locked}
             onClick={onPass}
             label={t("auction.pass")}
             full
