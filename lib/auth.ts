@@ -357,10 +357,18 @@ export function enabledProviders(): Promise<OAuthProvider[]> {
 }
 
 /**
- * Manda al servizio scelto e torna indietro sulla pagina dei Pickmates.
+ * Manda al servizio scelto e torna indietro dov'eri.
  *
- * Al ritorno la sessione c'è già ma il profilo di gioco no: l'app chiede
- * nickname e avatar, che restano l'unica cosa da scegliere.
+ * Prima si tornava sempre sulla pagina dei Pickmates, perche' e' li' che l'app
+ * chiede nickname e avatar a chi entra per la prima volta. Funzionava, ma
+ * spediva altrove anche chi aveva solo premuto "accedi" dalla home per creare
+ * una partita: si tornava dentro e ci si ritrovava sulla pagina degli amici.
+ *
+ * Adesso si torna alla pagina da cui si e' partiti, e il profilo mancante lo
+ * chiede la barra in alto -- che c'e' su ogni pagina -- appena si accorge che
+ * c'e' una sessione senza nickname.
+ *
+ * L'indirizzo deve comunque essere fra quelli consentiti nel pannello Supabase.
  */
 export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
   const supabase = getSupabase();
@@ -371,7 +379,9 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<void>
     provider,
     options: {
       redirectTo:
-        typeof window === "undefined" ? undefined : `${window.location.origin}/pickmates`,
+        typeof window === "undefined"
+          ? undefined
+          : `${window.location.origin}${window.location.pathname}`,
     },
   });
   if (error) throw new AuthFailure("unknown");

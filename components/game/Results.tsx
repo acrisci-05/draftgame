@@ -116,6 +116,9 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   // Quanta esperienza ha dato questa partita: zero quando era gia' stata pagata.
   const [earnedXp, setEarnedXp] = useState(0);
 
+  const currency = state.config.currency;
+  const ordered = finalStandings(state);
+
   const me = playerById(state, selfId);
   /**
    * Il riepilogo personale ha senso solo quando ogni dispositivo ha il suo
@@ -136,10 +139,17 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
 
   const myAccountId = account && !account.local ? account.id : null;
 
-  // Coriandoli e squillo di chiusura: una volta sola, all'arrivo dei risultati.
+  /*
+   * Lo squillo di chiusura, una volta sola.
+   *
+   * Contro il bot, quando vince lui, e' un altro: le stesse note al contrario.
+   * Suonare la fanfara della vittoria a chi ha appena perso e' il modo piu'
+   * rapido di far sembrare che il gioco non si sia accorto di niente.
+   */
+  const perdutoColBot = state.isPractice === true && ordered[0]?.player.id === BOT_PLAYER_ID;
   useEffect(() => {
-    playSfx("win", sound);
-  }, [sound]);
+    playSfx(perdutoColBot ? "lose" : "win", sound);
+  }, [sound, perdutoColBot]);
 
   /**
    * A partita finita gli avversari con un profilo finiscono fra i "recenti":
@@ -246,8 +256,6 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
     dopo?.();
   };
 
-  const currency = state.config.currency;
-  const ordered = finalStandings(state);
   const titoli = endTitles(state);
 
   /*
@@ -292,7 +300,6 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   const [battuta] = useState(
     () => BOT_DEFEAT_QUOTES[Math.floor(Math.random() * BOT_DEFEAT_QUOTES.length)],
   );
-  const botHaVinto = state.isPractice === true && ordered[0]?.player.id === BOT_PLAYER_ID;
 
   /*
    * Il salto di livello.
@@ -529,7 +536,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
                 ha vinto lui: quando perde non dice niente, perche' un
                 programma che fa il gradasso dopo aver perso e' triste.
               */}
-              {index === 0 && botHaVinto ? (
+              {index === 0 && perdutoColBot ? (
                 <motion.p
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}

@@ -5,7 +5,7 @@
  * nessuna richiesta di rete. Il contesto parte al primo tocco dell'utente.
  */
 
-export type Sfx = "bid" | "pass" | "tick" | "timeup" | "win" | "mystery" | "start";
+export type Sfx = "bid" | "pass" | "tick" | "timeup" | "win" | "lose" | "mystery" | "start";
 
 let context: AudioContext | null = null;
 
@@ -73,6 +73,16 @@ export function playSfx(name: Sfx, enabled = true) {
       tone(ctx, { frequency: 660, duration: 0.16, type: "triangle", gain: 0.13 });
       tone(ctx, { frequency: 880, duration: 0.16, type: "triangle", gain: 0.13, delay: 0.12 });
       tone(ctx, { frequency: 1320, duration: 0.26, type: "triangle", gain: 0.12, delay: 0.24 });
+      break;
+    /*
+     * La sconfitta: le stesse tre note della vittoria, al contrario e piu'
+     * gravi. Deve far sorridere, non mortificare -- e' un gioco in cui si
+     * perde spesso, e un suono davvero cupo a fine partita stanca alla terza.
+     */
+    case "lose":
+      tone(ctx, { frequency: 520, duration: 0.16, type: "triangle", gain: 0.11 });
+      tone(ctx, { frequency: 390, duration: 0.18, type: "triangle", gain: 0.11, delay: 0.13 });
+      tone(ctx, { frequency: 260, duration: 0.3, type: "triangle", gain: 0.1, delay: 0.27, sweepTo: 180 });
       break;
     case "mystery":
       tone(ctx, { frequency: 520, duration: 0.1, type: "sine", gain: 0.1, sweepTo: 1040 });

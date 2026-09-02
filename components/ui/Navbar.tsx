@@ -22,7 +22,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INSTAGRAM_URL } from "@/lib/config";
 import { primeAudio } from "@/lib/audio";
 import { signOut, useAuth } from "@/lib/auth";
@@ -69,7 +69,7 @@ const QUICK_DONATION = 2;
 export function Navbar() {
   const { locale, theme, sound, autoImages, toggleTheme, toggleSound, setAutoImages, t } =
     useSettings();
-  const { account, ready: authReady } = useAuth();
+  const { account, session, ready: authReady } = useAuth();
   const install = useInstallState();
   const [menuOpen, setMenuOpen] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
@@ -81,6 +81,22 @@ export function Navbar() {
 
   // Pannelli aperti da altre parti del sito (piè di pagina, notifiche).
   useEffect(() => onPanelRequest((name) => setPanel(name)), []);
+
+  /*
+   * Sessione senza profilo: manca solo il nickname.
+   *
+   * Capita a chi entra con Google la prima volta -- il servizio sa chi e', il
+   * gioco no -- e a chi conferma l'email da un dispositivo diverso da quello
+   * dove si e' iscritto. Prima bisognava accorgersene da soli e andare a
+   * cercare il pannello; adesso si apre da solo, una volta per caricamento, e
+   * chi lo chiude non se lo ritrova piu' addosso.
+   */
+  const chiestoRef = useRef(false);
+  useEffect(() => {
+    if (!authReady || account || !session || chiestoRef.current) return;
+    chiestoRef.current = true;
+    setPanel("account");
+  }, [authReady, account, session]);
 
   const language = languageOption(locale);
 
