@@ -121,5 +121,35 @@ for (const quanti of [2, 3, 4, 5]) {
     contBot.players.find((p) => p.id === "bot-pickasso").accountId === undefined,
   );
 }
+/* ---------------- Il link si genera anche col database indietro ---------------- */
+
+/*
+ * Nasce da un guasto vero: era stato aggiunto al risultato un contrassegno per
+ * le sfide al bot, e su un database senza quella colonna l'inserimento veniva
+ * rifiutato per intero. Il pulsante "genera link" smetteva di funzionare per
+ * tutti, anche per le partite fra persone, che di quel campo non sanno che
+ * farsene.
+ *
+ * La regola: il contrassegno e' un di piu', il link e' il punto. Se il
+ * database non conosce la colonna (42703) si riscrive senza.
+ */
+{
+  const RIFIUTO_COLONNA = "42703";
+  // Il database finto: rifiuta la prima riga se contiene 'practice'.
+  const scrivi = (riga) =>
+    "practice" in riga
+      ? { data: null, error: { code: RIFIUTO_COLONNA } }
+      : { data: { id: "abc" }, error: null };
+
+  const base = { code: "AAAAA", players: [] };
+  let { data, error } = scrivi({ ...base, practice: true });
+  if (error?.code === RIFIUTO_COLONNA) ({ data, error } = scrivi(base));
+  check("con la colonna mancante il link esce lo stesso", error === null && data.id === "abc");
+
+  // E su un database aggiornato passa al primo colpo, col contrassegno dentro.
+  const moderno = (riga) => ({ data: { id: "xyz", practice: riga.practice }, error: null });
+  const esito = moderno({ ...base, practice: true });
+  check("con la colonna presente il contrassegno arriva", esito.data.practice === true);
+}
 console.log(failures === 0 ? "\nIL VOTO E' IN REGOLA\n" : `\n${failures} controlli falliti.\n`);
 process.exit(failures === 0 ? 0 : 1);

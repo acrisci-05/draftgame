@@ -121,6 +121,21 @@ export const it = {
   "rules.modes.reactions": "💬 Reazioni live.",
   "rules.modes.reactionsBody":
     "Chi ha un profilo può mandare 💸 🤡 🔥 😭 🤌 durante l'asta: l'emoji sale sopra il tuo avatar e sparisce in un secondo e mezzo. Una ogni due secondi e mezzo, per tenerla una battuta e non un disturbo. Attento a come le usi con Pick-asso Bot: le provocazioni le capisce, e risponde a tono.",
+  "rules.titles.title": "Le targhe di fine partita",
+  "rules.titles.body":
+    "A premiazione finita, sotto i nomi, compaiono quattro targhe. Non danno punti e non cambiano la classifica: servono proprio per quello. Vince uno solo, e in cinque gli altri quattro uscirebbero senza niente da raccontare.",
+  "rules.titles.dominator": "🏆 Dominatore.",
+  "rules.titles.dominatorBody": "A chi ha vinto la partita.",
+  "rules.titles.spender": "💸 Spendaccione.",
+  "rules.titles.spenderBody":
+    "A chi ha finito i crediti per primo, ripercorrendo gli acquisti in ordine: è chi si è trovato senza più niente da offrire prima di tutti gli altri.",
+  "rules.titles.tightwad": "🪙 Braccino Corto.",
+  "rules.titles.tightwadBody": "A chi chiude con più crediti in tasca. In due vale doppio, perché lì a decidere sono proprio i crediti risparmiati.",
+  "rules.titles.flopMaster": "🎯 Maestro del Flop.",
+  "rules.titles.flopMasterBody": "A chi ha lasciato perdere più lotti di tutti. Passare non è un difetto — è il modo di tenersi i crediti per quello che conta — ma esagerare si vede.",
+  "rules.titles.tie": "A parità, niente.",
+  "rules.titles.tieBody":
+    "Se due sono appaiati la targa non si assegna a nessuno dei due: due \"braccino corto\" affiancati non fanno ridere, e in una partita dove non ha speso nessuno la prenderebbero tutti.",
   "rules.flop.title": "🎯 Limite Flop strategico",
   "rules.flop.body":
     "Per mantenere alta la tensione dell'asta, il numero di Flop disponibili varia in base ai partecipanti:",

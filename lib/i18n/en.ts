@@ -123,6 +123,21 @@ export const en: Dictionary = {
   "rules.modes.reactions": "💬 Live reactions.",
   "rules.modes.reactionsBody":
     "Players with a profile can send 💸 🤡 🔥 😭 🤌 during the auction: the emoji floats above your avatar and is gone in a second and a half. One every two and a half seconds, to keep it a joke and not a nuisance. Careful how you use them on Pick-asso Bot: it understands the taunts, and answers in kind.",
+  "rules.titles.title": "End-of-match badges",
+  "rules.titles.body":
+    "Once the winner is announced, four badges appear under the names. They give no points and change no ranking: that is exactly the point. Only one player wins, and in a five-player game the other four would walk away with nothing to talk about.",
+  "rules.titles.dominator": "🏆 Dominator.",
+  "rules.titles.dominatorBody": "To whoever won the match.",
+  "rules.titles.spender": "💸 Big Spender.",
+  "rules.titles.spenderBody":
+    "To whoever ran out of credits first, replaying the purchases in order: the one left with nothing to bid before anyone else.",
+  "rules.titles.tightwad": "🪙 Tightwad.",
+  "rules.titles.tightwadBody": "To whoever ends with the most credits left. In a two-player game it counts double, since saved credits are what decides it there.",
+  "rules.titles.flopMaster": "🎯 Flop Master.",
+  "rules.titles.flopMasterBody": "To whoever passed on the most lots. Passing is not a flaw — it is how you keep credits for what matters — but overdoing it shows.",
+  "rules.titles.tie": "On a tie, nothing.",
+  "rules.titles.tieBody":
+    "If two players are level the badge goes to neither: two tightwads side by side is not funny, and in a match where nobody spent, everyone would get it.",
   "rules.flop.title": "🎯 Strategic flop limit",
   "rules.flop.body":
     "To keep the auction tense, the number of flops available depends on how many are playing:",

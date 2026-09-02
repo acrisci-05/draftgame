@@ -291,18 +291,30 @@ interface ResultRow {
 /** Salva i roster finali e restituisce l'id da usare nel link di voto. */
 export async function publishResult(payload: VoteResultPayload): Promise<string> {
   const supabase = requireClient();
-  const { data, error } = await supabase
-    .from(RESULTS_TABLE)
-    .insert({
-      code: payload.code,
-      category_name: payload.categoryName,
-      category_emoji: payload.categoryEmoji,
-      currency: payload.currency,
-      players: payload.players,
-      practice: payload.practice === true,
-    })
-    .select("id")
-    .single();
+  const base = {
+    code: payload.code,
+    category_name: payload.categoryName,
+    category_emoji: payload.categoryEmoji,
+    currency: payload.currency,
+    players: payload.players,
+  };
+
+  const scrivi = (riga: Record<string, unknown>) =>
+    supabase.from(RESULTS_TABLE).insert(riga).select("id").single();
+
+  /*
+   * Il contrassegno della sfida al bot e' un di piu'; il link e' il punto.
+   *
+   * Su un database non ancora aggiornato quella colonna non c'e', e
+   * l'inserimento veniva rifiutato per intero: il link non si generava piu' --
+   * nemmeno per le partite fra persone, che di quel campo non sanno che
+   * farsene. Adesso se il database non conosce la colonna (42703) si riscrive
+   * senza, e il link esce lo stesso. Al massimo la pagina del voto mostrera'
+   * il bot come un avversario qualunque, che e' un difetto piccolo accanto a
+   * un pulsante che non funziona.
+   */
+  let { data, error } = await scrivi({ ...base, practice: payload.practice === true });
+  if (error?.code === "42703") ({ data, error } = await scrivi(base));
 
   if (error) throw new Error(error.message);
   return (data as { id: string }).id;
@@ -312,7 +324,9 @@ export async function fetchResult(id: string): Promise<VoteResultPayload> {
   const supabase = requireClient();
   const { data, error } = await supabase
     .from(RESULTS_TABLE)
-    .select("id, code, category_name, category_emoji, currency, players, practice")
+    // Tutte le colonne, non un elenco: cosi' il risultato si legge anche su un
+    // database che non ha ancora il contrassegno, invece di dare errore.
+    .select("*")
     .eq("id", id)
     .single();
 

@@ -83,6 +83,27 @@ const SECTIONS: Section[] = [
       { label: "rules.flop.out", body: "rules.flop.outBody" },
     ],
   },
+  /*
+   * Le targhe di fine partita.
+   *
+   * Stanno subito dopo "come si vince" perche' e' la stessa schermata: la
+   * classifica premia uno solo, e queste servono a dare qualcosa da
+   * raccontare anche agli altri quattro. Non erano documentate da nessuna
+   * parte, quindi comparivano a fine partita senza che nessuno sapesse cosa
+   * fossero.
+   */
+  {
+    icon: Medal,
+    title: "rules.titles.title",
+    lead: "rules.titles.body",
+    points: [
+      { label: "rules.titles.dominator", body: "rules.titles.dominatorBody" },
+      { label: "rules.titles.spender", body: "rules.titles.spenderBody" },
+      { label: "rules.titles.tightwad", body: "rules.titles.tightwadBody" },
+      { label: "rules.titles.flopMaster", body: "rules.titles.flopMasterBody" },
+      { label: "rules.titles.tie", body: "rules.titles.tieBody" },
+    ],
+  },
   {
     icon: Sparkles,
     title: "rules.xp.title",
