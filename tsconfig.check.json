@@ -11,6 +11,7 @@
   },
   "include": [
     "lib/game.ts",
+    "lib/item-images.ts",
     "lib/auth.ts",
     "lib/botEngine.ts",
     "lib/levels.ts",

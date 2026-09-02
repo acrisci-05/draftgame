@@ -211,6 +211,52 @@ async function fromUnsplash(query) {
 }
 
 /**
+ * Locandine di film e serie, e volti di attori (themoviedb.org).
+ *
+ * E' l'unica sorgente che le ha: le locandine sono protette, quindi Wikimedia
+ * non le ospita e Unsplash non sa cosa siano. Serve TMDB_API_KEY, gratuita.
+ */
+async function fromTmdb(query) {
+  const key = process.env.TMDB_API_KEY;
+  if (!key) return null;
+  try {
+    const params = new URLSearchParams({ api_key: key, query, include_adult: "false" });
+    const response = await fetch(`https://api.themoviedb.org/3/search/multi?${params}`, {
+      headers: HEADERS,
+    });
+    if (!response.ok) return null;
+    const risultati = (await response.json()).results ?? [];
+    const primo = risultati.find((r) => r.poster_path || r.profile_path);
+    const percorso = primo?.poster_path ?? primo?.profile_path;
+    if (!percorso) return null;
+    return {
+      url: `https://image.tmdb.org/t/p/w780${percorso}`,
+      title: primo.title ?? primo.name ?? query,
+      lang: "tmdb",
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Copertine di videogiochi (rawg.io). Serve RAWG_API_KEY, gratuita. */
+async function fromRawg(query) {
+  const key = process.env.RAWG_API_KEY;
+  if (!key) return null;
+  try {
+    const params = new URLSearchParams({ key, search: query, page_size: "1" });
+    const response = await fetch(`https://api.rawg.io/api/games?${params}`, { headers: HEADERS });
+    if (!response.ok) return null;
+    const primo = ((await response.json()).results ?? [])[0];
+    return primo?.background_image
+      ? { url: primo.background_image, title: primo.name ?? query, lang: "rawg" }
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Icona ufficiale di un'app o di un gioco (ricerca dell'App Store). Si prova
  * prima il negozio italiano e poi quello americano: certe app da noi hanno il
  * nome tradotto ("Chess.com" diventa "Scacchi") e non si riconoscerebbero.
@@ -315,6 +361,8 @@ async function fromHint(hint) {
   if (source === "tvmaze") return fromTvmaze(query);
   if (source === "fandom") return fromFandom(query);
   if (source === "unsplash") return fromUnsplash(query);
+  if (source === "tmdb") return fromTmdb(query);
+  if (source === "rawg") return fromRawg(query);
 
   if (source === "commons") {
     // La ricerca parte dalla descrizione completa e, se nessun file la soddisfa

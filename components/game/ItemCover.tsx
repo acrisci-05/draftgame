@@ -125,6 +125,35 @@ export function ItemCover({
         />
       ) : null}
 
+      {/*
+        Lo sfondo sfocato che riempie il nero.
+
+        Le foto del catalogo hanno tutte le forme: una locandina e' alta e
+        stretta, un logo e' largo e basso, una fotografia e' quadrata. Dentro un
+        riquadro quadrato l'immagine intera lascia due bande nere, e il lotto
+        sembra piccolo e ritagliato male.
+
+        La stessa immagine, ingrandita e sfocata sotto, riempie quelle bande
+        con i colori del soggetto: il riquadro si tinge di quello che c'e'
+        dentro invece di restare nero. E' la tecnica delle copertine sui
+        lettori musicali, e funziona per la stessa ragione -- l'occhio legge un
+        blocco solo invece di una figura appoggiata su un vuoto.
+
+        Non si fa sui marchi: quelli stanno su una lastra bianca apposta,
+        perche' un logo nero su fondo colorato non si legge.
+      */}
+      {large && src && !plate ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt=""
+          aria-hidden
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+          className="pointer-events-none absolute inset-0 size-full scale-125 object-cover opacity-30 blur-xl"
+        />
+      ) : null}
+
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -142,7 +171,9 @@ export function ItemCover({
           }}
           className={cn(
             large
-              ? "h-full w-full object-contain p-6 transition-all duration-300 hover:scale-105"
+              ? // Intera e centrata, mai tagliata: su una locandina il ritaglio
+                // porterebbe via il titolo, e su una foto di gruppo mezza faccia.
+                "relative z-[1] h-full w-full object-contain p-6 transition-all duration-300 hover:scale-105"
               : "size-full object-cover",
             large && !plate && "drop-shadow-2xl",
             // Un marchio non si ritaglia mai, nemmeno nelle miniature.
@@ -164,6 +195,22 @@ export function ItemCover({
           </span>
         </div>
       )}
+
+      {/*
+        Un velo scuro appoggiato in basso.
+
+        Serve a due cose insieme: appoggia l'immagine sul riquadro invece di
+        lasciarla galleggiare, e tiene sotto controllo lo sfondo sfocato quando
+        il soggetto e' chiaro -- una foto su fondo bianco, sfocata al 30%,
+        schiarisce tutto il riquadro e il nome sotto perde contrasto. E' appena
+        accennato e non tocca il centro, dove sta il soggetto.
+      */}
+      {large && src ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-1/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+        />
+      ) : null}
     </div>
   );
 }

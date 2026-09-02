@@ -5,6 +5,8 @@
     "\"it:<Titolo>\" o \"en:<Titolo>\" prendono la foto di quella voce di Wikipedia.",
     "\"unsplash:<ricerca>\" cerca una foto su Unsplash (serve UNSPLASH_ACCESS_KEY),",
     "utile per le cose che gli archivi enciclopedici non documentano.",
+    "\"tmdb:<ricerca>\" prende la locandina di un film o di una serie (TMDB_API_KEY),",
+    "\"rawg:<ricerca>\" la copertina di un videogioco (RAWG_API_KEY).",
     "Servono per gli elementi astratti (una sensazione, un superpotere) e per",
     "quelli il cui nome italiano non porta alla voce giusta.",
     "\"none\" lascia di proposito l'elemento senza foto."

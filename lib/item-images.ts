@@ -90,7 +90,14 @@ export function queryFor(itemName: string, hint?: string): string {
   return hint ?? ITEM_QUERIES[itemName] ?? itemName;
 }
 
-export type ImageSource = "custom" | "unsplash" | "commons" | "picsum";
+export type ImageSource =
+  | "custom"
+  | "tmdb"
+  | "rawg"
+  | "unsplash"
+  | "commons"
+  | "generated"
+  | "picsum";
 
 export interface ItemImage {
   url: string;
@@ -195,42 +202,152 @@ async function fromCommons(query: string): Promise<string | null> {
 }
 
 /**
- * La foto di un elemento. Non fallisce mai: al peggio torna il ripiego.
+ * La locandina di un film o di una serie (TMDB).
  *
- * `hint` scavalca la traduzione automatica quando la ricerca giusta la si
- * conosce gia' (e' il contenuto di `data/image-hints.json`).
+ * Per la cultura pop e' la sorgente giusta e le altre non ci arrivano: Commons
+ * non ha le locandine -- sono protette -- e Unsplash non sa cosa sia
+ * "Breaking Bad". Serve una chiave gratuita da themoviedb.org.
  */
+async function fromTmdb(query: string): Promise<string | null> {
+  const key = process.env.TMDB_API_KEY;
+  if (!key) return null;
+  try {
+    const params = new URLSearchParams({ api_key: key, query, include_adult: "false" });
+    const response = await fetch(`https://api.themoviedb.org/3/search/multi?${params}`, {
+      headers: { "User-Agent": AGENT },
+    });
+    if (!response.ok) return null;
+    const risultati = ((await response.json()) as {
+      results?: { poster_path?: string | null; profile_path?: string | null }[];
+    }).results;
+    const primo = (risultati ?? []).find((r) => r.poster_path || r.profile_path);
+    const percorso = primo?.poster_path ?? primo?.profile_path;
+    return percorso ? `https://image.tmdb.org/t/p/w780${percorso}` : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * La copertina di un videogioco (RAWG).
+ *
+ * Stessa storia della cultura pop: le copertine dei giochi sono protette e
+ * negli archivi liberi non ci sono. Chiave gratuita da rawg.io/apidocs.
+ */
+async function fromRawg(query: string): Promise<string | null> {
+  const key = process.env.RAWG_API_KEY;
+  if (!key) return null;
+  try {
+    const params = new URLSearchParams({ key, search: query, page_size: "1" });
+    const response = await fetch(`https://api.rawg.io/api/games?${params}`, {
+      headers: { "User-Agent": AGENT },
+    });
+    if (!response.ok) return null;
+    const primo = ((await response.json()) as {
+      results?: { background_image?: string | null }[];
+    }).results?.[0];
+    return primo?.background_image ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Un'immagine generata, per quello che una fotografia non ha.
+ *
+ * "Scuse per non uscire", "Momenti cringe": non esistono foto di un concetto,
+ * e ogni archivio risponde con qualcosa che non c'entra. Un disegno generato
+ * almeno parla dell'idea giusta.
+ *
+ * Ultima prima dei ripieghi, e non prima: un'immagine inventata e' sempre
+ * peggio di una vera che esiste davvero, e il seme fisso serve a farla uscire
+ * sempre uguale -- in asta due giocatori devono vedere lo stesso lotto.
+ */
+export function generatedImage(itemName: string, style = "3d render, pop art, clean background"): string {
+  const prompt = encodeURIComponent(`${itemName}, ${style}`);
+  return `https://image.pollinations.ai/prompt/${prompt}?width=768&height=768&nologo=true&seed=${seedOf(itemName)}`;
+}
+/**
+ * La foto di un elemento, cercata in ordine di pertinenza.
+ *
+ * L'ordine non e' un'opinione: ogni sorgente sa una cosa sola, e chiederla a
+ * quella sbagliata porta via tempo e restituisce spazzatura. Il tema della
+ * lista dice quale interrogare per prima.
+ *
+ * 1. **Scelta a mano**, se c'e': qualcuno ha guardato quella foto e ha deciso.
+ * 2. **TMDB** per la cultura pop -- locandine e volti che gli archivi liberi
+ *    non hanno, perche' sono protetti.
+ * 3. **RAWG** per i videogiochi, per la stessa ragione.
+ * 4. **Unsplash** per cibo, oggetti e vita quotidiana: fotografia di catalogo,
+ *    che li' e' esattamente quello che serve.
+ * 5. **Wikimedia Commons** per persone, luoghi, monumenti e concetti: e' un
+ *    archivio enciclopedico, e per la filosofia ha la Scuola di Atene invece di
+ *    uno sconosciuto pensieroso.
+ * 6. **Un'immagine generata**, per i concetti che una fotografia non ha.
+ * 7. **Picsum**, che non cerca niente.
+ *
+ * Gli ultimi due gradini non stanno qui ma nel componente che disegna la card:
+ * l'icona del giocatore e la copertina con emoji su fondo sfumato si producono
+ * senza andare in rete, e sono l'unica cosa che funziona anche offline.
+ *
+ * Ogni sorgente che vuole una chiave si spegne da sola quando la chiave non
+ * c'e': senza nessuna chiave restano la scelta a mano, Commons e i ripieghi,
+ * che e' esattamente il comportamento di prima.
+ */
+export type ImageTheme = "sport" | "pop" | "gaming" | "food" | "life";
+
+/** Le sorgenti da provare, nell'ordine giusto per questo tema. */
+export function sourceOrderFor(theme?: ImageTheme): ImageSource[] {
+  switch (theme) {
+    case "pop":
+      return ["tmdb", "commons", "unsplash"];
+    case "gaming":
+      return ["rawg", "tmdb", "commons"];
+    case "food":
+    case "life":
+      return ["unsplash", "commons"];
+    case "sport":
+      // Atleti, piloti, stadi: gente e luoghi veri, che Commons documenta bene.
+      return ["commons", "unsplash"];
+    default:
+      return ["commons", "unsplash"];
+  }
+}
+
+const CERCATORI: Record<string, (query: string) => Promise<string | null>> = {
+  tmdb: fromTmdb,
+  rawg: fromRawg,
+  unsplash: fromUnsplash,
+  commons: fromCommons,
+};
+
 export async function fetchItemImage(
   itemName: string,
-  options: { hint?: string; preferUnsplash?: boolean } = {},
+  options: { hint?: string; theme?: ImageTheme; allowGenerated?: boolean } = {},
 ): Promise<ItemImage> {
   /*
    * Prima di tutto: c'e' una scelta fatta a mano per questo elemento?
    *
    * Sta qui in cima e non in fondo perche' e' una decisione, non un ripiego.
    * Se qualcuno ha guardato quella foto e ha detto "e' questa", non ha senso
-   * interrogare due archivi per poi ignorarne le risposte.
+   * interrogare quattro archivi per poi ignorarne le risposte.
    */
   const fissata = CUSTOM_ITEM_IMAGES[itemName];
   if (fissata) return { url: fissata, source: "custom", query: itemName };
 
   const query = queryFor(itemName, options.hint);
 
-  /*
-   * L'ordine si puo' invertire. Per le cose concrete -- un gusto di gelato, un
-   * panino -- Unsplash da' foto piu' belle; per i concetti Commons e' piu'
-   * pertinente, che e' l'unica cosa che conta davvero su una card d'asta.
-   */
-  const ordine = options.preferUnsplash
-    ? ([fromUnsplash, fromCommons] as const)
-    : ([fromCommons, fromUnsplash] as const);
-  const nomi: ImageSource[] = options.preferUnsplash
-    ? ["unsplash", "commons"]
-    : ["commons", "unsplash"];
+  for (const sorgente of sourceOrderFor(options.theme)) {
+    const cerca = CERCATORI[sorgente];
+    if (!cerca) continue;
+    const url = await cerca(query);
+    if (url) return { url, source: sorgente, query };
+  }
 
-  for (let i = 0; i < ordine.length; i += 1) {
-    const url = await ordine[i](query);
-    if (url) return { url, source: nomi[i], query };
+  // Un disegno inventato e' meglio di una foto a caso, ma peggio di qualunque
+  // foto vera: per questo si chiede solo a chi lo vuole.
+  if (options.allowGenerated) {
+    return { url: generatedImage(itemName), source: "generated", query };
   }
 
   return { url: fallbackImage(itemName), source: "picsum", query };
