@@ -44,6 +44,20 @@ export const AVATAR_IDS = [
   "glasses",
   "alien",
   "palette",
+  /*
+   * Il secondo gruppo tematico: nottambuli, veloci, caotici e chi si difende.
+   *
+   * In coda come il primo, e per la stessa ragione: l'ordine di questo elenco
+   * decide quale avatar tocca a chi entra in stanza, e infilarli in mezzo lo
+   * cambierebbe a tutti quelli gia' seduti.
+   */
+  "moon",
+  "rabbit",
+  "toilet",
+  "magnet",
+  "banana",
+  "fish",
+  "cactus",
 ] as const;
 
 export type AvatarId = (typeof AVATAR_IDS)[number];
@@ -63,7 +77,7 @@ export function avatarForIndex(index: number): AvatarId {
  * Primo avatar ancora libero.
  * In una stanza due giocatori non possono avere la stessa icona: quando qualcuno
  * entra gli si dà il primo che nessuno ha preso, e se fossero finiti (non può
- * succedere con cinque giocatori e trentuno icone) si riparte dal primo.
+ * succedere con cinque giocatori e trentotto icone) si riparte dal primo.
  */
 export function firstFreeAvatar(taken: readonly string[]): AvatarId {
   return AVATAR_IDS.find((id) => !taken.includes(id)) ?? AVATAR_IDS[0];

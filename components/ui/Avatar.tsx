@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Banana,
   Bomb,
   Bot,
   Brain,
@@ -10,6 +11,7 @@ import {
   Crown,
   Dices,
   Dog,
+  Fish,
   Flame,
   Gamepad2,
   Gavel,
@@ -17,11 +19,14 @@ import {
   Ghost,
   Glasses,
   Heart,
+  Magnet,
   Medal,
+  Moon,
   Music,
   Palette,
   Pizza,
   Popcorn,
+  Rabbit,
   Rocket,
   Shield,
   Skull,
@@ -29,6 +34,7 @@ import {
   Star,
   Swords,
   Target,
+  Toilet,
   Trophy,
   Zap,
   createLucideIcon,
@@ -53,6 +59,21 @@ const Alien = createLucideIcon("Alien", [
   // Occhi a mandorla, inclinati verso il basso e verso l'interno.
   ["ellipse", { cx: "9", cy: "10.4", rx: "1.3", ry: "2", transform: "rotate(-28 9 10.4)", key: "alien-eye-left" }],
   ["ellipse", { cx: "15", cy: "10.4", rx: "1.3", ry: "2", transform: "rotate(28 15 10.4)", key: "alien-eye-right" }],
+]);
+
+/**
+ * Il cactus, disegnato a mano come l'alieno.
+ *
+ * Anche questo la libreria non ce l'ha. Stesso attrezzo, stessa griglia
+ * 24x24, stesso tratto: un fusto con la cima arrotondata, due braccia a
+ * altezze diverse -- se fossero simmetriche sembrerebbe un candelabro -- e
+ * la riga di terra sotto.
+ */
+const Cactus = createLucideIcon("Cactus", [
+  ["path", { d: "M9 21V6a3 3 0 0 1 6 0v15", key: "cactus-fusto" }],
+  ["path", { d: "M9 14H7.5A2.5 2.5 0 0 1 5 11.5V10", key: "cactus-braccio-sx" }],
+  ["path", { d: "M15 11h1.5A2.5 2.5 0 0 0 19 8.5V7.5", key: "cactus-braccio-dx" }],
+  ["path", { d: "M7.5 21h9", key: "cactus-terra" }],
 ]);
 
 const ICONS: Record<AvatarId, LucideIcon> = {
@@ -87,6 +108,13 @@ const ICONS: Record<AvatarId, LucideIcon> = {
   glasses: Glasses,
   alien: Alien,
   palette: Palette,
+  moon: Moon,
+  rabbit: Rabbit,
+  toilet: Toilet,
+  magnet: Magnet,
+  banana: Banana,
+  fish: Fish,
+  cactus: Cactus,
 };
 
 type AvatarSize = "xs" | "sm" | "md" | "lg";
