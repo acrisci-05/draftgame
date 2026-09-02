@@ -1,6 +1,7 @@
 "use client";
 
 import { HelpCircle } from "lucide-react";
+import { useState } from "react";
 import { coverContent } from "@/lib/covers";
 import { useItemImage } from "@/lib/images";
 import type { CatalogItem, RosterEntry } from "@/lib/types";
@@ -64,6 +65,19 @@ export function ItemCover({
   // indirizzo che passi dalla pagina prima del tempo.
   const { src, onError } = useItemImage(item, hint, auto && !hide);
 
+  /*
+   * Lo scheletro dura finche' la foto non e' arrivata.
+   *
+   * Si tiene l'indirizzo che ha finito di caricare, non un si'/no: cosi' al
+   * lotto dopo -- indirizzo diverso -- il riflesso riparte da solo, senza
+   * bisogno di un effetto che azzeri niente. Sta qui sopra e non piu' in basso
+   * perche' i ganci vanno chiamati sempre, anche quando il lotto e' coperto:
+   * saltarli su un ramo e non sull'altro cambia il loro ordine fra un disegno
+   * e l'altro, ed e' il tipo di guasto che si manifesta a caso.
+   */
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const segnaCaricata = () => setLoadedSrc(src ?? null);
+
   if (hide) {
     return (
       <div
@@ -84,6 +98,10 @@ export function ItemCover({
 
   const cover = coverContent(item);
   const large = size === "xl";
+  // Solo sul formato grande: venti miniature che luccicano insieme sarebbero
+  // un disturbo, non un'informazione.
+  const skeleton = large && Boolean(src) && loadedSrc !== src;
+
 
   // La lastra chiara vale solo quando c'e' davvero un'immagine: senza, resta
   // il riquadro colorato con l'emoji, che sul chiaro si leggerebbe male.
@@ -100,6 +118,13 @@ export function ItemCover({
         className,
       )}
     >
+      {skeleton ? (
+        <span
+          aria-hidden
+          className="skeleton-shimmer absolute inset-0 z-10 block rounded-[inherit] bg-surface-2"
+        />
+      ) : null}
+
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -108,7 +133,13 @@ export function ItemCover({
           loading="lazy"
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
-          onError={onError}
+          onLoad={segnaCaricata}
+          onError={() => {
+            // Anche la foto che non arriva smette di "star caricando": senza,
+            // il riflesso resterebbe acceso per sempre su un lotto rotto.
+            segnaCaricata();
+            onError();
+          }}
           className={cn(
             large
               ? "h-full w-full object-contain p-6 transition-all duration-300 hover:scale-105"

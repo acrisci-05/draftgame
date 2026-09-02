@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Hourglass } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
+import { APP_NAME } from "@/lib/config";
 import { useSettings } from "@/lib/settings";
 import { cn, clamp } from "@/lib/utils";
 
@@ -39,6 +40,26 @@ export function FloatingTimer({
 
   const seconds = Math.ceil(remaining / 1000);
   const urgente = seconds <= 3;
+
+  /*
+   * Il conto anche nel titolo della scheda.
+   *
+   * Su computer si gioca con dieci schede aperte e si finisce a leggere un
+   * messaggio mentre il lotto scade. Il titolo si vede anche da un'altra
+   * scheda, ed e' l'unico posto dell'interfaccia che si legge senza tornare
+   * qui. Al termine si rimette il nome dell'app: una scheda che resta a
+   * "⏱️ 0s" quando la partita e' finita da un pezzo e' peggio di niente.
+   */
+  useEffect(() => {
+    if (seconds <= 0) {
+      document.title = APP_NAME;
+      return;
+    }
+    document.title = `⏱️ ${String(seconds).padStart(2, "0")}s | ${APP_NAME}`;
+    return () => {
+      document.title = APP_NAME;
+    };
+  }, [seconds]);
 
   return (
     <span

@@ -33,7 +33,9 @@ import {
   type EndTitleId,
   type WinReason,
 } from "@/lib/game";
+import { BOT_PLAYER_ID } from "@/lib/botEngine";
 import { awardMatchXp, recordMatch } from "@/lib/history";
+import { levelFor } from "@/lib/levels";
 import { markSessionFinished } from "@/lib/storage";
 import {
   countMatch,
@@ -53,6 +55,7 @@ import { TIER_STYLES, cn, copyText, money } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { Panel, PanelTitle } from "@/components/ui/Panel";
 import { QrCode } from "@/components/ui/QrCode";
 import { Confetti } from "./Confetti";
@@ -67,6 +70,28 @@ interface ResultsProps {
   selfId: string;
   dispatch: (action: GameAction) => void;
 }
+
+/**
+ * Quello che il bot dice quando ti batte.
+ *
+ * Sono battute e vanno lette come tali: il bot non sa niente di te, sceglie a
+ * caso fra queste, e il punto e' che perdere contro un programma faccia ridere
+ * invece che infastidire. Per questo nessuna dice che hai giocato male sul
+ * serio -- prendono in giro il portafoglio, non la persona -- e due su nove
+ * sono un invito a rigiocare.
+ */
+const BOT_DEFEAT_QUOTES = [
+  "Arte contemporanea: la tua sconfitta su tela. 🖌️",
+  "I tuoi crediti hanno fatto le valigie! 🧳",
+  "Snipato all'ultimo secondo! Brucia, eh? ⏱️🔥",
+  "Tattica da 10, portafoglio da 2! 🤌",
+  "Ottima mossa! Ti sfido di nuovo, campione.",
+  "Ho visto la tua offerta e ho riso in circuiti! 🤖",
+  "Venduto al signore col budget finito! Riprova! 🔨💸",
+  "Tranquillo, il secondo posto ha il suo fascino! 🥈",
+  "Non piangere, non ci rimanere male baby. 😭🔥",
+  "Non mollare bro, insisti! 🔥",
+] as const;
 
 /** Come si chiama ogni targa nella lingua scelta. */
 const TITLE_KEYS: Record<EndTitleId, TranslationKey> = {
@@ -238,6 +263,32 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    */
   const winnerCardRef = useRef<HTMLDivElement | null>(null);
   const giaFestaRef = useRef(false);
+
+  /*
+   * La battuta del bot, quando e' lui a vincere l'uno contro uno.
+   *
+   * Si pesca una volta sola, al montaggio, e non si tocca piu': una battuta che
+   * si riscrive da sola mentre la stai leggendo non e' una battuta, e' un
+   * guasto. Si estrae comunque, anche quando ha perso -- costa niente -- e si
+   * mostra solo se serve.
+   */
+  const [battuta] = useState(
+    () => BOT_DEFEAT_QUOTES[Math.floor(Math.random() * BOT_DEFEAT_QUOTES.length)],
+  );
+  const botHaVinto = state.isPractice === true && ordered[0]?.player.id === BOT_PLAYER_ID;
+
+  /*
+   * Il salto di livello.
+   *
+   * Si confronta il livello di adesso con quello di un attimo fa, cioe' con i
+   * punti appena guadagnati tolti di mezzo. Non serve ricordarsi niente prima
+   * della partita: il "prima" e' sempre ricavabile dal "dopo" meno quello che
+   * questa partita ha pagato.
+   */
+  const xpTotali = account?.xp ?? 0;
+  const salitoDiLivello =
+    earnedXp > 0 && levelFor(xpTotali).level > levelFor(Math.max(0, xpTotali - earnedXp)).level;
+  const [levelUpVisto, setLevelUpVisto] = useState(false);
 
   useEffect(() => {
     if (view === "recap" || giaFestaRef.current) return;
@@ -457,6 +508,25 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
               </div>
 
               {/*
+                La battuta del bot, in un fumetto sopra la sua rosa. Solo quando
+                ha vinto lui: quando perde non dice niente, perche' un
+                programma che fa il gradasso dopo aver perso e' triste.
+              */}
+              {index === 0 && botHaVinto ? (
+                <motion.p
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mb-2 flex items-start gap-1.5 rounded-xl border border-violet/40 bg-violet/10 p-2.5 text-xs font-semibold leading-relaxed text-violet"
+                >
+                  <span aria-hidden className="shrink-0 text-sm">
+                    🤌
+                  </span>
+                  {battuta}
+                </motion.p>
+              ) : null}
+
+              {/*
                 Le targhe ironiche. Sotto il nome e non accanto: su un telefono
                 stretto accanto sparirebbe il nome, che e' la cosa che serve.
               */}
@@ -579,6 +649,46 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
           {t("common.home")}
         </Button>
       </div>
+
+      {/*
+        Il salto di livello: una finestra sola, che si chiude e non torna.
+
+        Arriva dopo i coriandoli e dopo la barra dell'esperienza, quando si e'
+        gia' capito quanto si e' guadagnato: metterla prima vorrebbe dire
+        annunciare un livello che il giocatore non ha ancora visto salire.
+      */}
+      <Modal
+        open={salitoDiLivello && !levelUpVisto}
+        title={t("level.up")}
+        onClose={() => setLevelUpVisto(true)}
+      >
+        <div className="flex flex-col items-center gap-4 py-2 text-center">
+          <motion.span
+            initial={{ scale: 0.5, rotate: -12, opacity: 0 }}
+            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 14 }}
+            className={cn(
+              "grid size-24 place-items-center rounded-full ring-4 ring-offset-4 ring-offset-surface",
+              levelFor(xpTotali).tier.ring,
+            )}
+          >
+            <span className="font-mono text-4xl font-black text-gold">
+              {levelFor(xpTotali).level}
+            </span>
+          </motion.span>
+
+          <p className="text-sm leading-relaxed text-muted">
+            {t("level.upBody", {
+              lv: levelFor(xpTotali).level,
+              tier: t(levelFor(xpTotali).tier.name),
+            })}
+          </p>
+
+          <Button size="lg" className="w-full" onClick={() => setLevelUpVisto(true)}>
+            {t("level.upCta")}
+          </Button>
+        </div>
+      </Modal>
 
       <RatingModal
         open={rating !== null}

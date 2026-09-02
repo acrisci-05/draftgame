@@ -167,6 +167,40 @@ body {
   }
 
   /*
+   * Il riquadro che luccica mentre la foto del lotto sta arrivando.
+   *
+   * Il lotto compare prima della sua immagine -- la foto viene da un archivio
+   * lontano e ci mette il suo -- e per quel mezzo secondo restava un rettangolo
+   * nero: sembrava un lotto senza foto, non un lotto che sta caricando. Un
+   * riflesso che passa dice "sta arrivando" senza scrivere niente.
+   */
+  .skeleton-shimmer {
+    background-image: linear-gradient(
+      100deg,
+      transparent 20%,
+      color-mix(in srgb, var(--pp-neon) 10%, transparent) 45%,
+      transparent 70%
+    );
+    background-size: 220% 100%;
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-sweep {
+    from {
+      background-position: 160% 0;
+    }
+    to {
+      background-position: -60% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-shimmer {
+      animation: none;
+    }
+  }
+
+  /*
    * Una reazione che sale sopra l'avatar di chi l'ha mandata.
    *
    * Parte piccola, si gonfia in un lampo, sale di ottanta pixel e svanisce.

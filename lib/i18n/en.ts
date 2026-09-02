@@ -138,6 +138,26 @@ export const en: Dictionary = {
   "rules.flop.outBody":
     "Every lot after that has to go to the highest bidder! The 🗑️ counter at the top of the auction tells you where you stand.",
 
+  "tutorial.title": "How it works, in three screens",
+  "tutorial.bid": "Bid and raise",
+  "tutorial.bidBody":
+    "Every lot opens at one credit. Raise with +1, +2 and +5; whoever leads when time runs out takes it home. Each raise resets the clock to full, so bidding at the last second steals nothing from anyone.",
+  "tutorial.flop": "Use flops wisely",
+  "tutorial.flopBody":
+    "Not interested in a lot? Pass. If everyone passes it is a flop: the lot disappears and nobody gets it. But the room's flops are counted — burn them early and you will be handed whatever is left at the end.",
+  "tutorial.rewards": "Win and unlock rewards",
+  "tutorial.rewardsBody":
+    "With full rosters everyone votes for the best line-up. With a free profile every match leaves experience behind, and levelling up changes your avatar frame and the title next to your name. As a guest you play the same, but nothing is kept.",
+  "tutorial.next": "Next",
+  "tutorial.done": "Got it, let's play! 🚀",
+  "tutorial.skip": "Skip, I know how it works",
+  "install.bannerBody":
+    "Install Pick & Pay on your phone to play it full screen.",
+  "install.bannerCta": "Install",
+  "level.up": "LEVEL UP! 🎉",
+  "level.upBody": "You are level {lv} — {tier}. Your avatar frame has changed.",
+  "level.upCta": "Continue",
+
   "rules.title": "How to play",
 
   "rules.goal.title": "Goal",
@@ -195,6 +215,17 @@ export const en: Dictionary = {
   "creator.independent": "Independent project",
   "creator.changelog": "What's new",
   "creator.log00": "🚀 Latest news and updates",
+  "creator.log10": "✨ Polish and conveniences",
+  "creator.log10a":
+    "🎓 Welcome tutorial — three screens on first launch: how to raise, how to use flops, what levelling up unlocks. Skippable in one tap, and it never comes back.",
+  "creator.log10b":
+    "🎉 Level up — when the end-of-match experience takes you to the next level, a window says so: your avatar frame and the title next to your name both change.",
+  "creator.log10c":
+    "🤖 The bot talks back — when it beats you one on one it comments with one of its lines. Ten of them, never the same twice in a row.",
+  "creator.log10d":
+    "⏱️ Countdown in the browser tab title — on a computer you can see it from another window, so the lot does not expire while you are looking elsewhere. And copying the room code now confirms it with a toast.",
+  "creator.log10e":
+    "📱 Profile and sign-out in the menu, an install banner at the bottom of the screen, a loading shimmer on the lot photo, and lighter haptics on raises (firmer on flops), tied to the sound switch.",
   "creator.log000":
     "🎭 Emoji reactions (members only) — say what you think in real time with 💸, 🤡, 🔥, 😭, 🤌 during the auction. Careful how you use them: Pick-asso Bot understands taunts, and answers in kind!",
   "creator.log00a":
@@ -415,6 +446,7 @@ export const en: Dictionary = {
   "room.online": "online",
   "room.offline": "offline",
   "room.connecting": "connecting...",
+  "room.codeCopied": "Room code copied! 📋",
   "room.local": "local",
   "room.practice": "vs Pick-asso Bot",
   "room.loading": "Loading the room...",
@@ -489,6 +521,9 @@ export const en: Dictionary = {
     "Too many requests in a short time: the email service paused. Try again in a few minutes.",
   "auth.errSignupClosed": "Sign-ups are closed right now.",
   "auth.errOffline": "Creating an account needs the database.",
+  "auth.continueGuest": "👤 Continue as a guest",
+  "auth.continueGuestHint":
+    "You play right away, but points, history and reactions are not kept. You can sign up whenever you like.",
   "auth.errUnknown": "Something went wrong. Try again.",
   "auth.nicknameFree": "Nickname available",
   "auth.nicknameChecking": "Checking...",

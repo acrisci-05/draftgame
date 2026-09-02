@@ -14,6 +14,7 @@ import {
   Target,
   Trophy,
   UserPlus,
+  UserRound,
   Users,
   Pencil,
 } from "lucide-react";
@@ -612,6 +613,28 @@ function CredentialsForm({
           {t("auth.forgot")}
         </button>
       ) : null}
+
+      {/*
+        Giocare senza iscriversi, detto a voce.
+        
+        Si poteva gia' fare -- bastava chiudere questa finestra -- ma chi la
+        chiude non sa se sta rinunciando a qualcosa o se sta sbagliando. Un
+        pulsante che lo dice toglie il dubbio, e chi tornera' a iscriversi lo
+        fara' perche' ha visto cosa si perde, non perche' e' stato costretto.
+      */}
+      <div className="mt-1 border-t border-line pt-3">
+        <button
+          type="button"
+          onClick={onDone}
+          className="flex h-11 w-full items-center gap-3 rounded-full border border-line bg-surface-2 px-5 text-sm font-bold text-muted transition-colors hover:border-neon/40 hover:text-fg"
+        >
+          <UserRound className="size-4 shrink-0" />
+          <span className="flex-1 text-start">{t("auth.continueGuest")}</span>
+        </button>
+        <p className="mt-2 text-center text-[11px] leading-relaxed text-faint">
+          {t("auth.continueGuestHint")}
+        </p>
+      </div>
     </div>
   );
 }
@@ -832,12 +855,17 @@ function SocialButtons({ onError }: { onError: () => void }) {
             disabled={busy !== null}
             onClick={() => start(provider)}
             className={cn(
-              "flex h-12 items-center justify-center gap-2.5 rounded-xl font-bold transition-all disabled:opacity-60",
+              // A pillola e con l'icona a sinistra: e' la forma con cui questi
+              // pulsanti si presentano ovunque, e riconoscerli e' meta' del
+              // lavoro che devono fare.
+              "flex h-12 w-full items-center gap-3 rounded-full px-5 font-bold transition-all disabled:opacity-60",
               className,
             )}
           >
-            {busy === provider ? <Loader2 className="size-5 animate-spin" /> : icon}
-            {t(label)}
+            <span className="grid size-5 shrink-0 place-items-center">
+              {busy === provider ? <Loader2 className="size-5 animate-spin" /> : icon}
+            </span>
+            <span className="flex-1 text-start">{t(label)}</span>
           </button>
         );
       })}

@@ -136,6 +136,26 @@ export const it = {
   "rules.flop.outBody":
     "Ogni lotto successivo dovrà essere assegnato al miglior offerente! Il contatore 🗑️ in alto nell'asta dice a che punto sei.",
 
+  "tutorial.title": "Come si gioca, in tre schermate",
+  "tutorial.bid": "Punta e rilancia",
+  "tutorial.bidBody":
+    "Ogni lotto parte da un credito. Con +1, +2 e +5 alzi l'offerta; chi resta in testa allo scadere del tempo se lo porta a casa. Ogni rilancio rimette il cronometro al massimo, quindi rilanciare all'ultimo secondo non ruba niente a nessuno.",
+  "tutorial.flop": "Usa i Flop con astuzia",
+  "tutorial.flopBody":
+    "Se un lotto non ti interessa, passa. Se passate tutti è un flop: il lotto sparisce e nessuno lo prende. Ma i flop della stanza sono contati — bruciarli presto significa doversi prendere d'ufficio quello che avanza alla fine.",
+  "tutorial.rewards": "Vinci e sblocca ricompense",
+  "tutorial.rewardsBody":
+    "A liste piene si vota la rosa migliore. Con un profilo gratuito ogni partita lascia esperienza, e salendo di livello cambiano la cornice del tuo avatar e il titolo accanto al nome. Da ospite si gioca uguale, ma non resta niente.",
+  "tutorial.next": "Avanti",
+  "tutorial.done": "Ho capito, giochiamo! 🚀",
+  "tutorial.skip": "Salta, ho già capito",
+  "install.bannerBody":
+    "Installa Pick & Pay sul telefono per giocarci a schermo intero.",
+  "install.bannerCta": "Installa",
+  "level.up": "LIVELLO AUMENTATO! 🎉",
+  "level.upBody": "Sei al livello {lv} — {tier}. La cornice del tuo avatar è cambiata.",
+  "level.upCta": "Continua",
+
   "rules.title": "Come si gioca",
 
   "rules.goal.title": "Obiettivo",
@@ -196,6 +216,17 @@ export const it = {
   "creator.independent": "Progetto indipendente",
   "creator.changelog": "Ultime novità",
   "creator.log00": "🚀 Ultime novità e aggiornamenti",
+  "creator.log10": "✨ Rifiniture e comodità",
+  "creator.log10a":
+    "🎓 Tutorial di benvenuto — tre schermate al primo avvio: come si rilancia, come si usano i flop, cosa si sblocca salendo di livello. Si salta con un tocco e non torna più.",
+  "creator.log10b":
+    "🎉 Salita di livello — quando l'esperienza di fine partita ti porta al livello dopo, te lo dice una finestra: cambia la cornice del tuo avatar e il titolo accanto al nome.",
+  "creator.log10c":
+    "🤖 Il bot ha la lingua lunga — quando ti batte nell'uno contro uno commenta con una delle sue battute. Dieci frasi, mai la stessa due volte di fila.",
+  "creator.log10d":
+    "⏱️ Il conto alla rovescia nel titolo della scheda — su computer si vede anche da un'altra finestra, così il lotto non scade mentre guardi altrove. E il codice stanza copiato adesso lo conferma con un avviso.",
+  "creator.log10e":
+    "📱 Profilo e uscita nel menu, banner d'installazione in fondo allo schermo, riflesso di caricamento sulla foto del lotto e vibrazione più leggera sui rilanci (e più decisa sul flop), legata all'interruttore del suono.",
   "creator.log000":
     "🎭 Reazioni emoji (esclusiva per chi ha un profilo) — esprimi quello che pensi in tempo reale con 💸, 🤡, 🔥, 😭, 🤌 durante l'asta. Attento a come le usi: Pick-asso Bot capisce le provocazioni e risponde a tono!",
   "creator.log00a":
@@ -427,6 +458,7 @@ export const it = {
   "room.online": "online",
   "room.offline": "offline",
   "room.connecting": "connessione...",
+  "room.codeCopied": "Codice stanza copiato! 📋",
   "room.local": "locale",
   "room.practice": "vs Pick-asso Bot",
   "room.loading": "Carico la stanza...",
@@ -501,6 +533,9 @@ export const it = {
     "Troppe richieste in poco tempo: il servizio email si è messo in pausa. Riprova fra qualche minuto.",
   "auth.errSignupClosed": "Le registrazioni sono chiuse in questo momento.",
   "auth.errOffline": "Serve il database per creare un account.",
+  "auth.continueGuest": "👤 Continua come ospite",
+  "auth.continueGuestHint":
+    "Giochi subito, ma punti, storico e reazioni non restano. Puoi iscriverti quando vuoi.",
   "auth.errUnknown": "Qualcosa non ha funzionato. Riprova.",
   "auth.nicknameFree": "Nickname libero",
   "auth.nicknameChecking": "Controllo...",

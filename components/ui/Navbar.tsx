@@ -8,6 +8,7 @@ import {
   Heart,
   LayoutGrid,
   Lightbulb,
+  LogOut,
   Menu,
   Moon,
   ShieldCheck,
@@ -23,12 +24,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { INSTAGRAM_URL } from "@/lib/config";
 import { primeAudio } from "@/lib/audio";
-import { useAuth } from "@/lib/auth";
+import { signOut, useAuth } from "@/lib/auth";
 import { languageOption } from "@/lib/i18n";
 import { onPanelRequest, type PanelName } from "@/lib/panels";
 import { useInstallState } from "@/lib/pwa";
 import { syncRemoteLists } from "@/lib/remote-lists";
 import { useSettings } from "@/lib/settings";
+import { showToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { AdminModal } from "./AdminModal";
 import { AccountChip } from "./AccountChip";
@@ -177,7 +179,45 @@ export function Navbar() {
         ) : null}
 
         <Section title={t("nav.sectionAccount")}>
-          <MenuLink href="/pickmates" icon={Users} label={t("nav.pickmates")} onGo={() => setMenuOpen(false)} />
+          {/*
+            Il proprio profilo sopra i Pickmates: si guarda piu' spesso il
+            proprio livello che la lista degli amici, e chi cerca "dove sono
+            finiti i miei punti" cerca qui.
+          */}
+          {account ? (
+            <MenuButton
+              icon={UserRound}
+              label={t("account.myProfile")}
+              onClick={() => openPanel("account")}
+            />
+          ) : null}
+
+          <MenuLink
+            href="/pickmates"
+            icon={Users}
+            label={t("nav.pickmates")}
+            onGo={() => setMenuOpen(false)}
+          />
+
+          {/*
+            Uscire sta in fondo e in rosso: e' l'unica voce del menu che si puo'
+            premere per sbaglio e pentirsene, quindi non deve stare in mezzo a
+            quelle che si premono spesso.
+          */}
+          {account ? (
+            <button
+              type="button"
+              onClick={async () => {
+                setMenuOpen(false);
+                await signOut();
+                showToast(t("auth.signedOut"), "info");
+              }}
+              className="mt-1 flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/5 p-3 text-start text-sm font-bold text-red-400 transition-colors hover:border-red-500/60 hover:bg-red-500/10"
+            >
+              <LogOut className="size-4 shrink-0" />
+              <span className="flex-1">{t("auth.signOut")}</span>
+            </button>
+          ) : null}
         </Section>
 
         <Section title={t("nav.sectionGame")}>

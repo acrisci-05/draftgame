@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { useT } from "@/lib/settings";
+import { showToast } from "@/lib/toast";
 import { cn, copyText } from "@/lib/utils";
 
 interface RoomCodeProps {
@@ -20,6 +21,9 @@ export function RoomCode({ code, size = "sm", className }: RoomCodeProps) {
   const copy = async () => {
     if (await copyText(code)) {
       setCopied(true);
+      // La spunta compare sul pulsante, che e' piccolo e sta in un angolo:
+      // chi tocca guarda il dito, non il pulsante sotto il dito.
+      showToast(t("room.codeCopied"), "success");
       setTimeout(() => setCopied(false), 1800);
     }
   };
