@@ -22,7 +22,7 @@ import {
   colorLook,
   lotSeconds,
   currentItem,
-  drawnCount,
+
   liveReactions,
   canReact,
   isMysteryLot,
@@ -234,44 +234,50 @@ export function AuctionStage({
         permetterti di rinunciare. Il cronometro non e' piu' qui: e' sceso
         vicino ai pulsanti, dove si guarda davvero.
       */}
-      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-2">
-        <div className="flex min-w-0 flex-col gap-1">
-          <RoomCode code={state.code} />
-          <span className="flex min-w-0 items-center gap-1.5 rounded-full border border-line bg-surface-2 px-2 py-0.5 text-[11px] font-semibold text-muted">
-            <span aria-hidden>{state.category.emoji}</span>
-            <span className="truncate">{categoryName(state.category, locale)}</span>
-          </span>
-        </div>
+      {/*
+        La barra di contesto, ridotta a due cose.
 
-        <p className="shrink-0 text-center text-xs font-bold uppercase tracking-wider text-faint">
-          {t("auction.lot", { current: drawnCount(state), total: state.items.length })}
+        Il conteggio dei lotti e' sparito: diceva "1 di 40" su una lista da
+        quaranta elementi di cui se ne giocano venticinque, quindi il secondo
+        numero non era la fine della partita e il primo non diceva quanto manca.
+        Un numero che non risponde alla domanda per cui lo si guarda e' peggio
+        di nessun numero.
+
+        Restano la categoria -- che dice a cosa si sta giocando, ed e' la cosa
+        che si dimentica -- e il codice della stanza, che serve per farsi
+        raggiungere. I flop a destra, perche' cambiano durante la partita.
+      */}
+      <div className="flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-surface/80 px-2 py-1.5 backdrop-blur">
+        <p className="flex min-w-0 items-center gap-2 text-base font-extrabold tracking-wide">
+          <span aria-hidden className="shrink-0 text-lg">
+            {state.category.emoji}
+          </span>
+          <span className="truncate">{categoryName(state.category, locale)}</span>
         </p>
 
-        {/*
-          I flop ancora possibili. E' una riserva di gruppo: quando finisce, i
-          lotti che non vuole nessuno vengono assegnati d'ufficio, quindi
-          conviene saperlo prima di passare per l'ennesima volta.
+        <div className="flex shrink-0 items-center gap-2">
+          <RoomCode code={state.code} />
 
-          Era nascosto sotto i 640px, cioe' su ogni telefono, ed e' il motivo
-          per cui la riserva esaurita sembrava un guasto: i lotti smettevano
-          di essere scartati e niente diceva perche'. Adesso si vede sempre.
-        */}
-        {state.config.allowDiscards ? (
-          <span
-            title={t(scartiFiniti ? "auction.discardsOut" : "auction.discardsLeft")}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold",
-              scartiFiniti
-                ? "border-red-500/50 bg-red-500/10 text-red-400"
-                : "border-line bg-surface-2 text-faint",
-            )}
-          >
-            <span aria-hidden>🎯</span>
-            {state.discards.length}/{flopTetto}
-          </span>
-        ) : (
-          <span />
-        )}
+          {/*
+            I flop ancora possibili. E' una riserva di gruppo: quando finisce, i
+            lotti che non vuole nessuno vengono assegnati d'ufficio, quindi
+            conviene saperlo prima di passare per l'ennesima volta.
+          */}
+          {state.config.allowDiscards ? (
+            <span
+              title={t(scartiFiniti ? "auction.discardsOut" : "auction.discardsLeft")}
+              className={cn(
+                "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 font-mono text-[11px] font-bold",
+                scartiFiniti
+                  ? "border-red-500/50 bg-red-500/10 text-red-400"
+                  : "border-line bg-surface-2 text-faint",
+              )}
+            >
+              <span aria-hidden>🎯</span>
+              {state.discards.length}/{flopTetto}
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <div
@@ -630,7 +636,14 @@ export function AuctionStage({
             <>
               {/* Su telefono i comandi restano fissi in basso, a portata di pollice. */}
               <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-ink/95 p-3 backdrop-blur safe-bottom sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
-                <div className="relative mx-auto w-full max-w-2xl">
+                {/*
+                  Su schermo largo la plancia sta in linea, e la riga che
+                  galleggia sopra -- faccina a sinistra, cronometro a destra --
+                  finiva sulle schede dei giocatori, coprendo i crediti del
+                  primo. Il margine le apre lo spazio che su telefono ha gia',
+                  dove la plancia e' ancorata in fondo e sopra c'e' il vuoto.
+                */}
+                <div className="relative mx-auto w-full max-w-2xl sm:mt-14">
                   {/*
                     La riga sopra i tasti: la faccina a sinistra, il cronometro
                     a destra, e in mezzo niente.

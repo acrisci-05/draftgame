@@ -594,6 +594,17 @@ export async function findAccountByNickname(nickname: string): Promise<Account |
 export interface AuthState {
   /** true quando lo stato è stato caricato. */
   ready: boolean;
+  /**
+   * true quando si sa **davvero** se un profilo c'è o no.
+   *
+   * Non è la stessa cosa di `ready`, ed è una differenza che costa cara: la
+   * sessione si legge subito, il profilo un istante dopo. In quell'istante
+   * uno che ha l'account risulta "collegato ma senza profilo", che è lo
+   * stesso stato di chi si è appena iscritto con Google e deve ancora
+   * scegliere il nickname. Chi reagisce a quello stato senza aspettare
+   * questo campo interrompe la partita di tutti a ogni ricarico.
+   */
+  accountReady: boolean;
   mode: AuthMode;
   session: Session | null;
   email: string | null;
@@ -602,11 +613,36 @@ export interface AuthState {
   refreshAccount: () => void;
 }
 
+/**
+ * Se si sa davvero come stanno le cose col profilo.
+ *
+ * Sta fuori dal gancio, in una funzione che si puo' provare, perche' e' una
+ * regola che sembra ovvia e non lo e': fra il momento in cui si conosce la
+ * sessione e quello in cui si conosce il profilo passa un istante, e in quello
+ * istante uno che ha l'account risulta indistinguibile da uno che deve ancora
+ * scegliersi il nickname.
+ *
+ * Chi reagisce a quello stato senza aspettare -- aprendo un pannello, per dire
+ * -- lo fa addosso a chi sta giocando, a ogni ricarico di pagina.
+ */
+export function accountSettled(stato: {
+  /** true quando si sa se una sessione c'e' o no. */
+  sessionLoaded: boolean;
+  hasSession: boolean;
+  /** true quando il profilo e' stato cercato, che l'abbia trovato o no. */
+  accountFetched: boolean;
+}): boolean {
+  if (!stato.sessionLoaded) return false;
+  // Senza sessione non c'e' nessun profilo da aspettare: si sa gia' tutto.
+  if (!stato.hasSession) return true;
+  return stato.accountFetched;
+}
 export function useAuth(): AuthState {
   const isClient = useIsClient();
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [remoteAccount, setRemoteAccount] = useState<Account | null>(null);
+  const [accountLoaded, setAccountLoaded] = useState(false);
   const [version, setVersion] = useState(0);
   const localAccount = useClientValue<Account | null>(readLocalAccount, null);
   const mode = authMode();
@@ -643,6 +679,7 @@ export function useAuth(): AuthState {
       if (!active) return;
       if (result) {
         setRemoteAccount(result);
+        setAccountLoaded(true);
         clearPendingProfile();
         return;
       }
@@ -651,6 +688,7 @@ export function useAuth(): AuthState {
       const pending = readPendingProfile();
       if (!pending) {
         setRemoteAccount(null);
+        setAccountLoaded(true);
         return;
       }
       try {
@@ -658,10 +696,14 @@ export function useAuth(): AuthState {
         if (!active) return;
         clearPendingProfile();
         setRemoteAccount(created);
+        setAccountLoaded(true);
       } catch {
         // Nickname nel frattempo occupato: verrà richiesto di sceglierne un altro.
         clearPendingProfile();
-        if (active) setRemoteAccount(null);
+        if (active) {
+          setRemoteAccount(null);
+          setAccountLoaded(true);
+        }
       }
     });
 
@@ -672,6 +714,14 @@ export function useAuth(): AuthState {
 
   return {
     ready: mode === "local" ? isClient : loaded,
+    accountReady:
+      mode === "local"
+        ? isClient
+        : accountSettled({
+            sessionLoaded: loaded,
+            hasSession: Boolean(userId),
+            accountFetched: accountLoaded,
+          }),
     mode,
     session,
     email: session?.user.email ?? null,

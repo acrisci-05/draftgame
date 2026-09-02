@@ -111,6 +111,33 @@ check("il nickname perde le maiuscole", auth.normalizeNickname("Crispy") === "cr
 check("e i caratteri che il database rifiuta", auth.normalizeNickname("cri spy!") === "crispy");
 check("e si ferma a venti caratteri", auth.normalizeNickname("a".repeat(30)).length === 20);
 
+
+/* ---------------- Quando si sa davvero se c'e' un profilo ---------------- */
+
+/*
+ * Questo blocco nasce da un guasto vero: fra il momento in cui si conosce la
+ * sessione e quello in cui si conosce il profilo passa un istante, e in quello
+ * istante chi il profilo ce l'ha sembra uno che deve ancora scegliersi il
+ * nickname. La barra in alto reagiva li', e a ogni ricarico di pagina la
+ * finestra del profilo saltava addosso a chi stava giocando -- da fuori,
+ * sembrava che la partita fosse andata persa.
+ */
+check(
+  "prima di sapere della sessione non si sa niente",
+  auth.accountSettled({ sessionLoaded: false, hasSession: true, accountFetched: true }) === false,
+);
+check(
+  "con la sessione ma senza il profilo si aspetta",
+  auth.accountSettled({ sessionLoaded: true, hasSession: true, accountFetched: false }) === false,
+);
+check(
+  "letto il profilo si sa",
+  auth.accountSettled({ sessionLoaded: true, hasSession: true, accountFetched: true }) === true,
+);
+check(
+  "senza sessione non c'e' niente da aspettare",
+  auth.accountSettled({ sessionLoaded: true, hasSession: false, accountFetched: false }) === true,
+);
 console.log(
   failures === 0 ? "\nACCESSO IN ORDINE\n" : `\n${failures} controlli falliti.\n`,
 );

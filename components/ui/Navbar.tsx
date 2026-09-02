@@ -69,7 +69,7 @@ const QUICK_DONATION = 2;
 export function Navbar() {
   const { locale, theme, sound, autoImages, toggleTheme, toggleSound, setAutoImages, t } =
     useSettings();
-  const { account, session, ready: authReady } = useAuth();
+  const { account, session, ready: authReady, accountReady } = useAuth();
   const install = useInstallState();
   const [menuOpen, setMenuOpen] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
@@ -93,10 +93,19 @@ export function Navbar() {
    */
   const chiestoRef = useRef(false);
   useEffect(() => {
-    if (!authReady || account || !session || chiestoRef.current) return;
+    /*
+     * Si aspetta che il profilo sia stato *cercato*, non solo la sessione.
+     *
+     * Fra le due cose passa un istante, e in quell'istante chi il profilo ce
+     * l'ha sembra uno che deve ancora scegliersi il nickname. Aprendo li' il
+     * pannello, a ogni ricarico di pagina la finestra del profilo saltava
+     * addosso a chi stava giocando -- e da fuori sembrava che la partita
+     * fosse andata persa.
+     */
+    if (!accountReady || account || !session || chiestoRef.current) return;
     chiestoRef.current = true;
     setPanel("account");
-  }, [authReady, account, session]);
+  }, [accountReady, account, session]);
 
   const language = languageOption(locale);
 
