@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   Moon,
+  QrCode,
   ShieldCheck,
   Smartphone,
   Star,
@@ -49,6 +50,7 @@ import { Modal } from "./Modal";
 import { NotificationBell } from "./NotificationBell";
 import { RatingModal } from "./RatingModal";
 import { RulesModal } from "./RulesModal";
+import { ShareModal } from "./ShareModal";
 import { SuggestModal } from "./SuggestModal";
 import { SupportModal } from "./SupportModal";
 import { Switch } from "./Switch";
@@ -280,6 +282,15 @@ export function Navbar() {
             onClick={() => openPanel("admin")}
           />
           <MenuButton icon={Crown} label={t("nav.creator")} onClick={() => openPanel("creator")} />
+          {/*
+            Passare il gioco a chi hai di fronte: sta fra le voci della
+            community perche' e' l'unica che porta gente nuova dentro.
+          */}
+          <MenuButton
+            icon={QrCode}
+            label={t("nav.share")}
+            onClick={() => openPanel("share")}
+          />
         </Section>
 
         <Section title={t("nav.sectionSettings")}>
@@ -336,6 +347,7 @@ export function Navbar() {
       />
       <SupportModal open={panel === "support"} onClose={() => setPanel(null)} />
       <RatingModal open={panel === "rate"} onClose={() => setPanel(null)} />
+      <ShareModal open={panel === "share"} onClose={() => setPanel(null)} />
       <AdminModal open={panel === "admin"} onClose={() => setPanel(null)} />
       <AuthModal
         open={panel === "account" || panel === "register"}

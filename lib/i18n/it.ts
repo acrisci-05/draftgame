@@ -697,6 +697,7 @@ export const it = {
 
   "nav.admin": "Modalità creatore",
   "nav.rate": "Vota il gioco",
+  "nav.share": "QR Code e Condividi",
   "nav.sectionAccount": "Account e amici",
   "nav.sectionGame": "Gioco e contenuti",
   "nav.sectionCommunity": "Community e strumenti",
@@ -704,6 +705,12 @@ export const it = {
   "nav.sectionSupport": "Sostieni il progetto",
   "nav.installNow": "Scarica l'app",
   "nav.installHint": "Si apre a schermo intero, senza barra del browser",
+
+  "share.title": "Condividi Pick & Pay",
+  "share.hint": "Inquadra il codice o passa il link: il gioco si apre nel browser, senza installare niente.",
+  "share.copy": "Copia link",
+  "share.copied": "Copiato!",
+  "share.download": "Scarica QR Code",
 
   "admin.title": "Area creatore",
   "admin.hint":

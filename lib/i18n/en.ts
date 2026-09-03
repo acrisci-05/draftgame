@@ -682,6 +682,7 @@ export const en: Dictionary = {
 
   "nav.admin": "Creator mode",
   "nav.rate": "Rate the game",
+  "nav.share": "QR code and share",
   "nav.sectionAccount": "Account and friends",
   "nav.sectionGame": "Game and content",
   "nav.sectionCommunity": "Community and tools",
@@ -689,6 +690,12 @@ export const en: Dictionary = {
   "nav.sectionSupport": "Support the project",
   "nav.installNow": "Get the app",
   "nav.installHint": "Opens full screen, without the browser bar",
+
+  "share.title": "Share Pick & Pay",
+  "share.hint": "Scan the code or pass the link: the game opens in the browser, nothing to install.",
+  "share.copy": "Copy link",
+  "share.copied": "Copied!",
+  "share.download": "Download QR code",
 
   "admin.title": "Creator area",
   "admin.hint": "Only the creator adds official lists. Enter the key to unlock the Studio.",

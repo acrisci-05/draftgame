@@ -17,6 +17,17 @@ export const SITE_URL = RAW_SITE_URL && RAW_SITE_URL.length > 0 ? RAW_SITE_URL :
 
 export const SITE_DOMAIN = SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
+/**
+ * Indirizzo pubblico da passare agli altri: QR e "copia link" del menu.
+ *
+ * Non usa l'origine del browser come i link di voto: quelli devono restare sul
+ * server dove si sta giocando, questo invece finisce in una storia o in una
+ * chat e da li' deve funzionare per chiunque -- da `localhost` non ci arriva
+ * nessuno. Se `NEXT_PUBLIC_SITE_URL` e' impostata comanda quella.
+ */
+export const SHARE_URL =
+  RAW_SITE_URL && RAW_SITE_URL.length > 0 ? RAW_SITE_URL : "https://pickandpaygame.vercel.app";
+
 export const INSTAGRAM_URL =
   process.env.NEXT_PUBLIC_INSTAGRAM_URL?.trim() || "https://www.instagram.com/acrisci05";
 

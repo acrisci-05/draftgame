@@ -22,6 +22,8 @@ export type PanelName =
   /** "Perche' diventare un Picker?": i vantaggi del profilo. */
   | "picker"
   | "install"
+  /** QR e link da passare a chi deve entrare nel gioco. */
+  | "share"
   /** Il tutorial di benvenuto, richiamabile anche dopo la prima volta. */
   | "tutorial";
 
