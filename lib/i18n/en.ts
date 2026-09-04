@@ -591,6 +591,10 @@ export const en: Dictionary = {
   "auth.nicknameHint": "It is how friends add you. Letters, numbers and underscore.",
   "auth.nicknamePlaceholder": "e.g. marco_23",
   "auth.nicknameTaken": "Nickname already taken, try another one.",
+  "auth.welcomeTitle": "Pick your Picker username",
+  "auth.welcomeBody":
+    "We prepared one from the profile you signed in with: confirm it or change it now, before you play.",
+  "auth.preparingUsername": "Preparing a name for you...",
   "auth.save": "Save profile",
   "auth.required": "You need a profile to use this section.",
   "auth.localHint":

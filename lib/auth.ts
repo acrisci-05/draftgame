@@ -61,7 +61,7 @@ function requireClient() {
 const LOCAL_ACCOUNT_KEY = "pp:account";
 
 export function normalizeNickname(value: string): string {
-  return value.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+  return value.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, MAX_NICKNAME);
 }
 
 export function readLocalAccount(): Account | null {
@@ -393,6 +393,166 @@ export async function isNicknameAvailable(nickname: string): Promise<boolean> {
   if (clean.length < 3) return false;
   const existing = await findAccountByNickname(clean);
   return existing === null;
+}
+
+/* ------------------------------------------------------------------ */
+/* L'username di chi entra con Google (o con un altro profilo)         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * I limiti veri, quelli scritti nel database: `nickname ~ '^[a-z0-9_]{3,20}$'`.
+ * Stanno qui perche' il nome proposto in automatico deve nascere gia' dentro
+ * quei limiti: un suggerimento che il database rifiuta e' peggio di nessun
+ * suggerimento, perche' l'errore arriva dopo il tocco su "salva".
+ */
+export const MIN_NICKNAME = 3;
+export const MAX_NICKNAME = 20;
+
+/** Quando dal nome non resta niente di utilizzabile. */
+const FALLBACK_BASE = "picker";
+
+/**
+ * Da un nome qualsiasi a un nickname che il database accetta.
+ *
+ * Chi entra con Google non sceglie niente: il servizio consegna un nome vero
+ * ("Mario Rossi") o un indirizzo ("luca.bianchi90@gmail.com"), e finche' non
+ * li si tratta restano quello -- un nome con lo spazio in mezzo che il vincolo
+ * rifiuta, o un'email intera esposta in chiaro sulla card condivisa.
+ *
+ * Le tre regole, in ordine, e ognuna per una ragione sua:
+ *
+ * 1. Gli accenti si scompongono e si buttano via i segni: "Nicolò" diventa
+ *    "nicolo" e non "nicol", che e' quello che succede togliendo la lettera
+ *    accentata insieme al resto.
+ * 2. Gli apostrofi spariscono *prima* del resto: "D'Angelo" e' "dangelo", non
+ *    "d_angelo" -- nel nome quell'apostrofo non separa due parole, le lega.
+ * 3. Tutto il resto -- spazi, punti, trattini, il "+" degli alias, gli emoji --
+ *    diventa un underscore, e i doppioni si fondono in uno solo.
+ *
+ * Il taglio a venti caratteri viene per ultimo, e dopo il taglio si ripulisce
+ * di nuovo la coda: un nome lungo tagliato a meta' di una parola lasciava
+ * l'underscore appeso in fondo.
+ *
+ * "Mario Rossi"            -> "mario_rossi"
+ * "luca.bianchi90"         -> "luca_bianchi90"
+ * "  José   Álvarez-Díaz " -> "jose_alvarez_diaz"
+ * "田中"                    -> "" (niente da salvare: decide chi chiama)
+ */
+export function sanitizeUsername(raw: string): string {
+  return raw
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/['\u2019\u00b4`]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, MAX_NICKNAME)
+    .replace(/_+$/g, "");
+}
+
+/** Quello che si sa di chi ha appena fatto l'accesso. */
+export interface OAuthProfile {
+  email?: string | null;
+  /** `user_metadata` della sessione: cosa contiene lo decide il servizio. */
+  metadata?: Record<string, unknown> | null;
+}
+
+/**
+ * Dove cercare il nome, in ordine di preferenza.
+ *
+ * Google riempie `full_name` e `name`, GitHub `user_name`, altri
+ * `preferred_username`. Nessuno di questi e' garantito: sono campi liberi che
+ * ogni servizio popola come gli pare, ed e' per questo che si prova tutta la
+ * fila invece di fidarsi del primo.
+ */
+const NAME_FIELDS = ["full_name", "name", "preferred_username", "user_name", "nickname"] as const;
+
+/** I nomi possibili, gia' puliti, senza i vuoti e senza ripetizioni. */
+export function usernameCandidates(profile: OAuthProfile): string[] {
+  const metadata = profile.metadata ?? {};
+  const grezzi: string[] = [];
+
+  for (const campo of NAME_FIELDS) {
+    const valore = metadata[campo];
+    if (typeof valore === "string" && valore.trim()) grezzi.push(valore);
+  }
+
+  /*
+   * L'email come ultima risorsa, e solo la parte prima della chiocciola.
+   *
+   * L'indirizzo intero non deve diventare un nickname: il nickname si legge
+   * sulla card che si condivide fuori dal gioco, e regalare l'indirizzo di
+   * posta a chiunque guardi un video non e' una scelta che uno ha fatto.
+   */
+  const email = profile.email ?? (typeof metadata.email === "string" ? metadata.email : "");
+  const locale = (email ?? "").split("@")[0] ?? "";
+  if (locale.trim()) grezzi.push(locale);
+
+  return [...new Set(grezzi.map(sanitizeUsername).filter(Boolean))];
+}
+
+/**
+ * Il nome da cui partire.
+ *
+ * Si preferisce il primo candidato che sta gia' in piedi da solo -- almeno tre
+ * caratteri -- perche' uno che si chiama "Bo" ma scrive da "bo.rossi@..." e'
+ * meglio servito da "bo_rossi" che da "bo" piu' tre cifre a caso. Se non ce
+ * n'e' nessuno buono si tiene comunque il primo, che le cifre lo allungheranno;
+ * se non ce n'e' proprio nessuno -- succede coi nomi in alfabeti che qui non
+ * sopravvivono alla pulizia -- si riparte dalla parola del gioco.
+ */
+export function usernameBase(profile: OAuthProfile): string {
+  const candidati = usernameCandidates(profile);
+  return candidati.find((nome) => nome.length >= MIN_NICKNAME) ?? candidati[0] ?? FALLBACK_BASE;
+}
+
+function randomDigits(count: number): string {
+  let cifre = "";
+  for (let i = 0; i < count; i += 1) cifre += Math.floor(Math.random() * 10);
+  return cifre;
+}
+
+/**
+ * Lo stesso nome con delle cifre in coda: "mario" -> "mario_738".
+ *
+ * Serve quando il nome e' troppo corto o quando qualcuno ce l'ha gia'. Il
+ * tronco si accorcia quanto basta a far stare le cifre dentro i venti
+ * caratteri: allungare un nome gia' al limite lo farebbe solo rifiutare.
+ */
+export function withRandomDigits(base: string, count: number): string {
+  const cifre = randomDigits(count);
+  const spazio = MAX_NICKNAME - cifre.length - 1;
+  const tronco = (base || FALLBACK_BASE).slice(0, spazio).replace(/_+$/, "");
+  return `${tronco || FALLBACK_BASE.slice(0, spazio)}_${cifre}`;
+}
+
+/**
+ * I nomi da provare, in ordine: prima quello pulito, poi le varianti con le
+ * cifre. Sta fuori dalla funzione che interroga il database perche' cosi' si
+ * puo' mettere alla prova senza database.
+ */
+export function usernameAttempts(profile: OAuthProfile): string[] {
+  const base = usernameBase(profile);
+  const tentativi = base.length >= MIN_NICKNAME ? [base] : [];
+  for (const cifre of [3, 3, 4, 4]) tentativi.push(withRandomDigits(base, cifre));
+  return tentativi;
+}
+
+/**
+ * Il nickname da proporre a chi entra la prima volta: pulito e libero.
+ *
+ * Si prova il nome vero, e solo se e' gia' di qualcun altro si passa alle
+ * cifre. Non e' una prenotazione: fra questo controllo e il salvataggio
+ * qualcuno puo' arrivare prima, ed e' il vincolo di unicita' del database ad
+ * avere l'ultima parola. Qui si tratta solo di non mettere davanti agli occhi
+ * un nome che si sa gia' occupato.
+ */
+export async function suggestUsername(profile: OAuthProfile): Promise<string> {
+  const tentativi = usernameAttempts(profile);
+  for (const tentativo of tentativi) {
+    if (await isNicknameAvailable(tentativo)) return tentativo;
+  }
+  return tentativi[tentativi.length - 1];
 }
 
 /**

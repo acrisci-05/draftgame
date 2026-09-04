@@ -11,6 +11,7 @@ import {
   LogOut,
   Rocket,
   Smartphone,
+  Sparkles,
   Target,
   Trophy,
   UserPlus,
@@ -19,9 +20,11 @@ import {
   Pencil,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AuthFailure,
+  MAX_NICKNAME,
+  MIN_NICKNAME,
   MIN_PASSWORD,
   PASSWORD_SPECIALS,
   createAccount,
@@ -35,6 +38,7 @@ import {
   signInWithPassword,
   signOut,
   signUpWithPassword,
+  suggestUsername,
   useAuth,
   type AuthError,
   type PasswordChecks,
@@ -100,8 +104,21 @@ export function AuthModal({
   const t = useT();
   const auth = useAuth();
 
+  /*
+   * Il titolo dice a che punto si e'.
+   *
+   * "Accedi" sopra la finestra di uno che e' gia' entrato con Google era la
+   * frase sbagliata al momento sbagliato: l'accesso e' fatto, quello che manca
+   * e' solo il nome da giocatore. Adesso quel passaggio ha il suo titolo.
+   */
+  const titolo: TranslationKey = auth.account
+    ? "auth.myProfile"
+    : auth.mode === "supabase" && auth.session
+      ? "auth.welcomeTitle"
+      : "auth.title";
+
   return (
-    <Modal open={open} title={t(auth.account ? "auth.myProfile" : "auth.title")} onClose={onClose}>
+    <Modal open={open} title={t(titolo)} onClose={onClose}>
       <AuthPanel
         onDone={onClose}
         initialTab={initialTab}
@@ -127,7 +144,15 @@ export function AuthPanel({
 
   /* Sessione attiva ma nickname ancora da scegliere. */
   if (mode === "supabase" && session) {
-    return <NicknameForm userId={session.user.id} email={email} onSaved={refreshAccount} onDone={onDone} />;
+    return (
+      <NicknameForm
+        userId={session.user.id}
+        email={email}
+        metadata={session.user.user_metadata ?? null}
+        onSaved={refreshAccount}
+        onDone={onDone}
+      />
+    );
   }
 
   /* Senza database non esiste un accesso vero: si offre il profilo locale. */
@@ -667,14 +692,31 @@ function PasswordRules({ password }: { password: string }) {
 
 /* ------------------------------------------------------------------ */
 
+/**
+ * Il nickname di chi e' dentro ma non ha ancora un profilo.
+ *
+ * Capita a chi entra con Google: il servizio sa gia' come si chiama, il gioco
+ * no. Prima qui c'era un campo vuoto, e un campo vuoto davanti a uno che ha
+ * appena premuto un pulsante per *non* compilare moduli e' il momento in cui
+ * si chiude la scheda -- oppure si scrive la prima cosa che viene, che poi
+ * resta firmata sotto ogni card condivisa e non si cambia per trenta giorni.
+ *
+ * Adesso il nome arriva gia' scritto, pulito e verificato libero, e resta
+ * modificabile: chi va bene cosi' preme salva e gioca, chi ne vuole un altro
+ * scrive sopra. Quello che non succede piu' e' che qualcuno si ritrovi
+ * chiamato come il proprio indirizzo di posta.
+ */
 function NicknameForm({
   userId,
   email,
+  metadata,
   onSaved,
   onDone,
 }: {
   userId: string;
   email: string | null;
+  /** `user_metadata` della sessione: da qui esce il nome proposto. */
+  metadata: Record<string, unknown> | null;
   onSaved: () => void;
   onDone?: () => void;
 }) {
@@ -684,7 +726,77 @@ function NicknameForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<TranslationKey | null>(null);
 
+  /*
+   * Vale solo per il testo grigio dentro il campo, mai per bloccarlo: chi ha
+   * gia' in testa il nome che vuole deve poterlo scrivere subito, senza
+   * aspettare una proposta che non gli serve -- e se la rete si impianta, un
+   * campo disabilitato lo lascerebbe fermo li' per sempre.
+   */
+  const [preparando, setPreparando] = useState(true);
+
+  /*
+   * Il campo si riempie una volta sola.
+   *
+   * La proposta arriva dopo un giro al database, e in quel mezzo secondo uno
+   * puo' aver gia' cominciato a scrivere il nome che voleva: sovrascriverglielo
+   * mentre digita sarebbe il modo peggiore di dargli una mano. Vale anche per
+   * dopo -- la sessione si rinnova da sola ogni tanto, e senza questo freno il
+   * nome proposto cambierebbe sotto gli occhi di chi lo sta guardando.
+   */
+  const decisoRef = useRef(false);
+
+  useEffect(() => {
+    let attivo = true;
+    void suggestUsername({ email, metadata })
+      .then((suggerito) => {
+        if (!attivo || decisoRef.current) return;
+        decisoRef.current = true;
+        setNickname(suggerito);
+      })
+      .finally(() => {
+        if (attivo) setPreparando(false);
+      });
+    return () => {
+      attivo = false;
+    };
+  }, [email, metadata]);
+
   const clean = normalizeNickname(nickname);
+
+  /*
+   * Se il nome scelto e' libero, detto prima di premere salva.
+   *
+   * Quello proposto nasce gia' libero, quindi il controllo serve a chi lo
+   * cambia: senza, l'unico modo di scoprire che il nome e' di qualcun altro
+   * era il messaggio rosso dopo il salvataggio.
+   *
+   * La risposta si conserva insieme al nome a cui si riferisce, e non da sola.
+   * Il motivo e' che una risposta senza nome resta appesa: uno cancella una
+   * lettera dal nome libero, ne scrive un'altra, e per mezzo secondo legge
+   * "nickname libero" sotto un nome che nessuno ha ancora controllato.
+   */
+  const [esito, setEsito] = useState<{ nome: string; libero: boolean } | null>(null);
+  const libero = esito && esito.nome === clean ? esito.libero : null;
+
+  useEffect(() => {
+    if (clean.length < MIN_NICKNAME) return;
+    let attivo = true;
+    const timer = setTimeout(() => {
+      void isNicknameAvailable(clean).then((disponibile) => {
+        if (attivo) setEsito({ nome: clean, libero: disponibile });
+      });
+    }, 400);
+    return () => {
+      attivo = false;
+      clearTimeout(timer);
+    };
+  }, [clean]);
+
+  const scrivi = (valore: string) => {
+    decisoRef.current = true;
+    setNickname(normalizeNickname(valore));
+    setError(null);
+  };
 
   const save = async () => {
     setBusy(true);
@@ -702,16 +814,40 @@ function NicknameForm({
 
   return (
     <div className="flex flex-col gap-3">
+      <div className="rounded-2xl border border-neon/30 bg-neon/5 p-4">
+        <p className="flex items-center gap-2 font-bold">
+          <Sparkles className="size-4 shrink-0 text-neon" />
+          {t("auth.welcomeTitle")}
+        </p>
+        <p className="mt-1.5 text-sm text-muted">{t("auth.welcomeBody")}</p>
+      </div>
+
       <p className="text-sm text-muted">{t("auth.signedAs", { email: email ?? "" })}</p>
 
-      <Input
-        label={t("auth.nickname")}
-        hint={t("auth.nicknameHint")}
-        value={nickname}
-        maxLength={20}
-        placeholder={t("auth.nicknamePlaceholder")}
-        onChange={(event) => setNickname(normalizeNickname(event.target.value))}
-      />
+      <div>
+        <Input
+          label={t("auth.nickname")}
+          hint={t("auth.nicknameHint")}
+          value={nickname}
+          maxLength={MAX_NICKNAME}
+          placeholder={t(preparando ? "auth.preparingUsername" : "auth.nicknamePlaceholder")}
+          onChange={(event) => scrivi(event.target.value)}
+        />
+        {clean.length >= MIN_NICKNAME ? (
+          <p
+            className={cn(
+              "mt-1 text-xs",
+              libero === null ? "text-faint" : libero ? "text-neon" : "text-red-500",
+            )}
+          >
+            {libero === null
+              ? t("auth.nicknameChecking")
+              : libero
+                ? t("auth.nicknameFree")
+                : t("auth.errNicknameTaken")}
+          </p>
+        ) : null}
+      </div>
 
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-faint">
@@ -722,7 +858,11 @@ function NicknameForm({
 
       {error ? <p className="text-sm text-red-500">{t(error)}</p> : null}
 
-      <Button size="lg" onClick={save} disabled={busy || clean.length < 3}>
+      <Button
+        size="lg"
+        onClick={save}
+        disabled={busy || clean.length < MIN_NICKNAME || libero === false}
+      >
         {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-5" />}
         {t("auth.save")}
       </Button>

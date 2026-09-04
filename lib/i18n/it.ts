@@ -605,6 +605,10 @@ export const it = {
   "auth.nicknameHint": "È l'indirizzo con cui gli amici ti aggiungono. Lettere, numeri e underscore.",
   "auth.nicknamePlaceholder": "es. marco_23",
   "auth.nicknameTaken": "Nickname già preso, provane un altro.",
+  "auth.welcomeTitle": "Scegli il tuo Username da Picker",
+  "auth.welcomeBody":
+    "Te ne abbiamo preparato uno partendo dal profilo con cui sei entrato: confermalo o cambialo adesso, prima di giocare.",
+  "auth.preparingUsername": "Ti prepariamo un nome...",
   "auth.save": "Salva profilo",
   "auth.required": "Serve un profilo per usare questa sezione.",
   "auth.localHint":
