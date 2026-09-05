@@ -228,8 +228,32 @@ check(
   })(),
 );
 
+/*
+ * La partita conclusa si apre ancora, ed e' voluto.
+ *
+ * La schermata finale vive dentro la stanza, e la stanza legge la sessione per
+ * sapere chi sei: chiudendo qui, la classifica veniva sostituita da "entra
+ * nella stanza" nell'istante in cui la partita finiva -- perche' e' proprio la
+ * schermata dei risultati a segnarla come conclusa. E' successo due volte, la
+ * seconda passando da questa funzione: questi due controlli sono qui perche'
+ * non succeda una terza.
+ */
 st.markSessionFinished("AAAAA");
-check("in una partita finita non si rientra mai", st.sessionForReentry("AAAAA") === null);
+check(
+  "una partita conclusa si apre ancora: la classifica sta li dentro",
+  st.sessionForReentry("AAAAA")?.code === "AAAAA",
+);
+check(
+  "e vale anche se e' finita da un pezzo",
+  (() => {
+    invecchia("AAAAA", 240);
+    return st.sessionForReentry("AAAAA")?.code === "AAAAA";
+  })(),
+);
+check(
+  "la home pero' smette di riproporla",
+  st.resumableSession() === null || st.resumableSession()?.code !== "AAAAA",
+);
 
 check("in una stanza mai vista non si rientra", st.sessionForReentry("ZZZZZ") === null);
 

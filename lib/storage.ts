@@ -169,11 +169,21 @@ export const REENTRY_MINUTES = 3;
  *
  * Il rientro automatico e' comodo dopo un ricarico e sbagliato dopo mezz'ora:
  * nel secondo caso la partita e' un'altra, o non c'e' piu', e ritrovarsi dentro
- * senza aver fatto niente confonde. Torna null anche sulle partite gia'
- * concluse -- li' non c'e' niente in cui rientrare.
+ * senza aver fatto niente confonde.
  *
- * Non cancella la sessione: chi rientra a mano riprende lo stesso posto, perche'
- * l'identificativo del giocatore sta nel profilo e non cambia.
+ * Una partita **conclusa** invece si apre sempre. Sembra il contrario di quello
+ * che serve -- non c'e' piu' niente da giocare -- e non lo e': la schermata
+ * finale vive dentro la stanza, e la stanza legge la sessione per sapere chi
+ * sei. Chiudendola qui, la classifica veniva sostituita da "entra nella stanza"
+ * proprio mentre la si stava guardando, e con lei se ne andavano la
+ * registrazione della partita e i punti. E' lo stesso guasto descritto sopra in
+ * `markSessionFinished`, ripresentato da un'altra porta.
+ *
+ * A non riproporre le partite finite pensa la home, con `resumableSession`: li'
+ * e' una domanda, e una domanda sbagliata non porta via niente.
+ *
+ * Non cancella mai la sessione: chi rientra a mano riprende lo stesso posto,
+ * perche' l'identificativo del giocatore sta nel profilo e non cambia.
  */
 export function sessionForReentry(
   code: string,
@@ -181,7 +191,7 @@ export function sessionForReentry(
 ): RoomSession | null {
   const session = getSession(code);
   if (!session) return null;
-  if (session.finishedAt) return null;
+  if (session.finishedAt) return session;
   const visto = session.lastSeenAt ?? session.openedAt ?? 0;
   return Date.now() - visto <= maxMinutes * 60 * 1000 ? session : null;
 }
