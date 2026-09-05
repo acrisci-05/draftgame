@@ -16,7 +16,11 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
 - **Asta live** con timer da 15 secondi per lotto, riportato a 10 dopo ogni rilancio.
 - **Rilanci +1 / +2 / +5** abilitati solo quando il saldo li copre, più il pulsante "Passa".
 - **Regole configurabili**: budget, valuta (EUR/USD/GBP/JPY), numero di giocatori ed elementi per
-  roster, più le varianti Blind Draft e Mystery Box.
+  roster, più le varianti Blind Draft, Mystery Box e Dutch Draft.
+- **Asta al ribasso (Dutch Draft)**: il prezzo parte al 60% del budget e scende fino a un credito
+  nell'arco del lotto. Niente turni e niente rilanci: se lo prende il primo che preme, al prezzo di
+  quell'istante. Il conto non usa un contatore che scala da solo ma il tempo trascorso, così tutti i
+  dispositivi vedono la stessa cifra. Si combina con le altre tre varianti.
 - **Anti-sniping**: ogni rilancio riporta il timer a 10 secondi, così l'ultimo secondo non decide.
 - **Riserva di budget**: si tiene sempre un credito per ogni slot vuoto, nessuno resta a zero con la
   lista incompleta; i lotti finali vengono assegnati d'ufficio a chi deve ancora completare.
@@ -32,10 +36,10 @@ una card verticale 9:16 pronta da postare e un link di voto per far decidere agl
 - **Votazione** senza registrazione: un voto per dispositivo sul link generato a fine partita. Il
   link è uno per partita: se lo generano in tre, ritrovano tutti e tre lo stesso, così i voti non
   si spargono su conteggi separati.
-- **Foto per 960 dei 980 elementi**, fissate in `data/categories.json` e prese dall'archivio giusto
+- **Foto per 1164 dei 1185 elementi**, fissate in `data/categories.json` e prese dall'archivio giusto
   per ognuno (Wikipedia, Wikimedia Commons, Fandom, App Store, Steam, TVmaze, Imgflip) secondo gli
   abbinamenti di `data/image-hints.json`. In partita non si cerca niente: gli indirizzi sono già lì.
-- **37 liste ufficiali** con nomi corti ed emoji di copertina, definite in `data/categories.json`,
+- **39 liste ufficiali** con nomi corti ed emoji di copertina, definite in `data/categories.json`,
   con ricerca istantanea e filtri per macro-tema nella pagina Categorie. Sotto ogni nome c'è il
   numero di elementi; le fasce di valore restano solo come prezzo di apertura dell'asta.
 - **Modalità creatore**: Studio ed editor delle categorie sono già aperti in sviluppo; online li
@@ -100,7 +104,7 @@ components/ui/          bottoni, badge, input, modali, pannelli, selettore lingu
 components/game/        asta, timer, controlli di offerta, card finale, editor categorie
 lib/                    motore di gioco, realtime, catalogo, storage, i18n, accesso, amici
 lib/i18n/               dizionari delle 10 lingue (italiano lingua sorgente)
-data/categories.json    liste ufficiali: 37 categorie (30 elementi; 20 le regioni, 45 le auto)
+data/categories.json    liste ufficiali: 39 categorie (30 elementi; 20 le regioni, 45 le auto)
 scripts/engine-check.js controlli sul motore di gioco e sul catalogo
 public/logo.svg         marchio dell'app, sostituibile con il file originale
 supabase/               schema SQL per categorie condivise, suggerimenti, risultati e voti

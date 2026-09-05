@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
+import { useDutchPrice } from "@/lib/useDutchPrice";
 import { categoryName } from "@/lib/catalog";
 import {
   discardsLeft,
@@ -25,6 +26,7 @@ import {
 
   liveReactions,
   canReact,
+  isDutchLot,
   isMysteryLot,
   itemById,
   nextToAct,
@@ -73,6 +75,18 @@ export function AuctionStage({
   const lastFeedRef = useRef<string | null>(null);
 
   const mystery = isMysteryLot(state);
+  const dutch = isDutchLot(state);
+  /*
+   * Il ribasso come regola della stanza, non come stato del lotto.
+   *
+   * `dutch` vale solo mentre l'asta e' aperta, ed e' giusto cosi' per le
+   * azioni. Le scritte pero' restano a schermo anche durante l'aggiudicazione,
+   * dietro il riquadro dell'esito: senza questa distinzione per quei quattro
+   * secondi ricomparirebbe "offerta corrente" in una partita dove non si fanno
+   * offerte.
+   */
+  const ribasso = Boolean(state.config.dutchDraft);
+  const dutchPrice = useDutchPrice(state, now);
   const item = currentItem(state);
   const leader = playerById(state, state.highBidderId);
   const self = playerById(state, selfId);
@@ -91,7 +105,15 @@ export function AuctionStage({
    * non portano il campo, e li' si ricade sul vecchio calcolo -- che era
    * appunto un consiglio su chi dovrebbe muoversi.
    */
-  const turnId = state.turnId ?? nextToAct(state);
+  /*
+   * Al ribasso non tocca a nessuno: tocca a tutti.
+   *
+   * Il ripiego su `nextToAct` serve alle partite cominciate prima che i turni
+   * esistessero, dove `turnId` manca e un suggerimento e' meglio di niente. Qui
+   * invece il null e' una regola, e senza questa riga la fascia annuncerebbe
+   * "tocca a" un giocatore a caso mentre il pulsante e' acceso per tutti.
+   */
+  const turnId = dutch ? null : (state.turnId ?? nextToAct(state));
   /*
    * In locale si tiene aperto un pannello di comandi alla volta: quello di chi
    * tocca, finche' non se ne apre un altro a mano. Il lotto che cambia riporta
@@ -99,6 +121,16 @@ export function AuctionStage({
    */
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const expandedId = openPanel ?? turnId;
+  /*
+   * Al ribasso, in locale, i comandi si aprono per tutti.
+   *
+   * Sullo stesso schermo l'asta al ribasso e' una gara a chi tocca per primo:
+   * tenerne aperto uno solo -- come si fa a turni -- vorrebbe dire che gli
+   * altri, per partecipare, devono prima aprire il proprio pannello mentre il
+   * prezzo scende. E siccome senza turni non c'e' nessun pannello da aprire
+   * d'ufficio, senza questa regola non se ne aprirebbe nemmeno uno.
+   */
+  const apriTutti = dutch && state.mode === "local";
   /*
    * Il telefono passa di mano solo fra persone.
    *
@@ -220,6 +252,25 @@ export function AuctionStage({
     if (!once(`claim:${playerId}`)) return;
     vibrate(HAPTIC_BID);
     dispatch({ type: "claim", playerId, now: now() });
+  };
+
+  /*
+   * Il lotto su cui si e' gia' premuto "prendi ora".
+   *
+   * Si segna il numero del lotto e non un semplice si'/no: cosi' l'attesa si
+   * spegne da sola quando ne esce uno nuovo, senza un effetto che azzeri la
+   * bandiera al momento giusto -- e senza il rischio che un ritardo di rete
+   * lasci il pulsante spento sul lotto dopo.
+   */
+  const [takingLot, setTakingLot] = useState<number | null>(null);
+  const taking = takingLot === state.lotNumber && state.phase === "auction";
+
+  const takeDutch = (playerId: string) => {
+    if (!attoreValido(playerId)) return;
+    if (!once(`dutch:${playerId}:${state.lotNumber}`)) return;
+    vibrate(HAPTIC_BID);
+    setTakingLot(state.lotNumber);
+    dispatch({ type: "take_dutch", playerId, now: now() });
   };
 
   return (
@@ -359,17 +410,35 @@ export function AuctionStage({
         <div className="mt-5 flex w-full items-center justify-between gap-2 border-t border-line pt-4">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-faint">
-              {t("auction.currentBid")}
+              {ribasso ? t("auction.dutchNow") : t("auction.currentBid")}
             </p>
-            <motion.p
-              key={`${state.currentBid}-${state.highBidderId ?? "none"}`}
-              initial={{ scale: 1.18 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.3 }}
-              className="font-mono text-4xl font-black"
-            >
-              {money(mystery ? state.lotPrice : state.currentBid, currency)}
-            </motion.p>
+            {ribasso ? (
+              /*
+               * Al ribasso la cifra cambia di continuo: niente animazione a
+               * ogni credito perso, che a quattro scatti al secondo diventa un
+               * tremolio. Cambia colore quando tocca il fondo, e tanto basta.
+               */
+              <p
+                className={cn(
+                  "font-mono text-4xl font-black tabular-nums",
+                  dutchPrice.atFloor ? "text-gold" : "text-neon",
+                )}
+              >
+                {/* Fuori dall'asta si mostra il prezzo di apertura: e' quello
+                    da cui ripartira' il lotto successivo. */}
+                {money(dutch ? dutchPrice.price : state.lotPrice, currency)}
+              </p>
+            ) : (
+              <motion.p
+                key={`${state.currentBid}-${state.highBidderId ?? "none"}`}
+                initial={{ scale: 1.18 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="font-mono text-4xl font-black"
+              >
+                {money(mystery ? state.lotPrice : state.currentBid, currency)}
+              </motion.p>
+            )}
           </div>
           {/*
             La colonna di destra si restringe invece di spingere.
@@ -391,7 +460,11 @@ export function AuctionStage({
               <p className="flex items-center justify-end gap-1.5 text-xs text-faint">
                 <Flame className="size-3.5 shrink-0" />
                 <span className="truncate">
-                  {mystery ? t("auction.mysteryHint") : t("auction.noBid")}
+                  {ribasso
+                    ? t("auction.dutchHint")
+                    : mystery
+                      ? t("auction.mysteryHint")
+                      : t("auction.noBid")}
                 </span>
               </p>
             )}
@@ -560,7 +633,7 @@ export function AuctionStage({
 
           <div className="flex flex-col gap-2">
             {state.players.map((player) => {
-              const aperto = player.id === expandedId;
+              const aperto = apriTutti || player.id === expandedId;
               if (aperto) {
                 return (
                   <BidControls
@@ -573,6 +646,9 @@ export function AuctionStage({
                     onBid={(amount) => bid(player.id, amount)}
                     onPass={() => pass(player.id)}
                     onClaim={() => claim(player.id)}
+                    onTakeDutch={() => takeDutch(player.id)}
+                    now={now}
+                    taking={taking}
                   />
                 );
               }
@@ -674,6 +750,9 @@ export function AuctionStage({
                     onBid={(amount) => bid(self.id, amount)}
                     onPass={() => pass(self.id)}
                     onClaim={() => claim(self.id)}
+                    onTakeDutch={() => takeDutch(self.id)}
+                    now={now}
+                    taking={taking}
                   />
 
                 </div>

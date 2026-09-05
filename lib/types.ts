@@ -132,6 +132,15 @@ export interface RoomConfig {
   blindDraft: boolean;
   mysteryBox: boolean;
   /**
+   * Asta al ribasso: il prezzo parte alto e scende per tutta la durata del
+   * lotto, e se lo aggiudica il primo che lo prende.
+   *
+   * Assente sulle partite cominciate prima che la modalita' esistesse, e in
+   * quel caso vale quanto false: una stanza gia' aperta non cambia regole per
+   * un aggiornamento pubblicato a meta' serata.
+   */
+  dutchDraft?: boolean;
+  /**
    * true: un lotto senza offerte finisce negli scarti.
    * false: ogni lotto viene comunque assegnato a chi ha ancora slot liberi.
    */

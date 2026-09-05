@@ -9,8 +9,13 @@ import {
   canCompete,
   canPass,
   canReact,
+  canTakeDutch,
   canVote,
   currentItem,
+  dutchOpening,
+  dutchPriceAt,
+  isDutchLot,
+  lotSeconds,
   hasVoted,
   isMysteryLot,
   maxBid,
@@ -156,6 +161,86 @@ export function lotAppeal(tier: Tier): LotAppeal {
  */
 export const BASE_PASS_CHANCE = 0.75;
 
+/* ------------------------------------------------------------------ */
+/* Asta al ribasso                                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A che punto della discesa il bot si decide, secondo quanto gli piace il lotto.
+ *
+ * E' una quota del prezzo di partenza, non una cifra: il prezzo di apertura
+ * dipende dal budget della stanza, e una soglia fissa sarebbe avidissima su un
+ * budget da 100 e impossibile su uno da 10.
+ *
+ * I numeri dicono come gioca: su un lotto Top si muove presto e paga caro,
+ * perche' aspettare vuol dire vederselo portare via; su un riempitivo aspetta
+ * quasi il fondo, e se qualcuno lo vuole prima se lo tenga. Fermarsi a 0.18 e
+ * non a zero e' voluto -- un bot che aspetta sempre il pavimento e' un
+ * orologio, e chi gioca imparerebbe in tre lotti che basta prendere un istante
+ * prima di lui.
+ */
+export const DUTCH_TARGET_SHARE: Readonly<Record<LotAppeal, number>> = {
+  top: 0.62,
+  middle: 0.38,
+  base: 0.18,
+};
+
+/** Sopra questa quota di scarto il bot tira via qualche istante in piu'. */
+export const DUTCH_JITTER = 0.08;
+
+/**
+ * Il prezzo a cui questo bot prenderebbe il lotto in corso.
+ *
+ * Torna null quando il lotto non lo interessa a nessun prezzo, o quando
+ * nemmeno il pavimento gli e' accessibile.
+ */
+export function dutchTargetPrice(
+  state: GameState,
+  bot: Player,
+  roll: number = Math.random(),
+): number | null {
+  const item = currentItem(state);
+  /*
+   * Della box non si sa cosa c'e' dentro: la si tratta come un lotto normale.
+   * Sparare alto su una scatola chiusa sarebbe generosita' verso l'avversario,
+   * aspettare il fondo vorrebbe dire non prenderne mai una.
+   */
+  const appeal: LotAppeal = isMysteryLot(state) ? "middle" : item ? lotAppeal(item.tier) : "middle";
+  const apertura = dutchOpening(state.config.budget);
+  const scarto = (roll * 2 - 1) * DUTCH_JITTER;
+  const quota = Math.min(0.95, Math.max(0.05, DUTCH_TARGET_SHARE[appeal] + scarto));
+  const voluto = Math.round(apertura * quota);
+  const tetto = Math.min(maxBid(state, bot), affordableCeiling(state, bot));
+  if (tetto < OPENING_BID) return null;
+  return Math.max(OPENING_BID, Math.min(voluto, tetto));
+}
+
+/**
+ * Fra quanti millisecondi il prezzo scendera' alla cifra voluta.
+ *
+ * Il bot non sta a guardare il prezzo quattro volte al secondo: sa quando la
+ * discesa arrivera' dove gli serve e si sveglia in quel momento. Il tempo che
+ * resta e' il tetto -- oltre la scadenza il lotto e' gia' chiuso.
+ */
+export function dutchWaitFor(state: GameState, target: number, now: number): number {
+  const durata = lotSeconds(state) * 1000;
+  const apertura = dutchOpening(state.config.budget);
+  const corsa = apertura - OPENING_BID;
+  if (corsa <= 0 || durata <= 0) return 0;
+  const inizio = state.deadline - durata;
+  // Istante in cui il prezzo tocca il valore voluto, secondo la stessa retta
+  // che lo fa scendere in interfaccia.
+  const quando = inizio + ((apertura - target) / corsa) * durata;
+  /*
+   * L'ultimo istante utile tiene conto della pausa che il motore aggiunge a
+   * ogni attesa: senza questo margine un bot che punta al pavimento si
+   * sveglierebbe mezzo secondo dopo la chiusura del lotto e non prenderebbe
+   * mai niente al prezzo piu' basso.
+   */
+  const ultimo = state.deadline - now - GRACE_AFTER_CHANGE_MS - 100;
+  return Math.max(0, Math.min(quando - now, Math.max(0, ultimo)));
+}
+
 /**
  * Sotto quale quota per posto i crediti si considerano stretti.
  *
@@ -243,6 +328,7 @@ export function shouldSkipLot(
 export type BotMove =
   | { kind: "bid"; amount: number; delay: number }
   | { kind: "claim"; delay: number }
+  | { kind: "take_dutch"; delay: number }
   | { kind: "pass"; delay: number }
   | { kind: "vote"; targetId: string; delay: number };
 
@@ -283,6 +369,36 @@ export function decideBotMove(
   if (state.phase !== "auction") return null;
 
   const soglia = affordableCeiling(state, bot);
+
+  /*
+   * Asta al ribasso: si aspetta che il prezzo scenda a quello che vale.
+   *
+   * Il ritardo non e' un tempo di riflessione ma il momento esatto in cui la
+   * discesa arriva alla cifra voluta, e quando l'attesa scade si ricontrolla
+   * tutto: se nel frattempo il lotto se l'e' preso qualcun altro, quel
+   * controllo trova la fase gia' cambiata e il bot non fa niente.
+   *
+   * Vale prima della Mystery Box perche' col ribasso acceso scende anche il
+   * prezzo delle box, e trattarle come lotti a prezzo fisso vorrebbe dire
+   * pagarle sempre il massimo.
+   */
+  if (isDutchLot(state)) {
+    if (rosterFull(state, bot)) return null;
+    const target = dutchTargetPrice(state, bot);
+    if (target === null) return null;
+    const attesa = dutchWaitFor(state, target, now);
+    /*
+     * Il prezzo e' gia' sceso dove serve: si prende, con lo scatto di chi
+     * decide sul momento e non con la calma di chi sta ancora valutando.
+     */
+    if (attesa <= 0) {
+      if (!canTakeDutch(state, botId, now)) return null;
+      return { kind: "take_dutch", delay: getBotDelay("snipe") };
+    }
+    // Il prezzo di adesso non basta ancora: ci si sveglia quando bastera'.
+    if (dutchPriceAt(state, now + attesa) > Math.min(maxBid(state, bot), soglia)) return null;
+    return { kind: "take_dutch", delay: attesa };
+  }
 
   /* La Mystery Box ha un prezzo solo: o lo si paga o si lascia. */
   if (state.lotKind === "mystery") {
@@ -504,6 +620,8 @@ function toAction(move: BotMove, botId: string, now: number): GameAction {
       return { type: "bid", playerId: botId, amount: move.amount, now };
     case "claim":
       return { type: "claim", playerId: botId, now };
+    case "take_dutch":
+      return { type: "take_dutch", playerId: botId, now };
     case "pass":
       return { type: "pass", playerId: botId, now };
     case "vote":

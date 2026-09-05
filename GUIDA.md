@@ -92,6 +92,7 @@ un uso vero e continuativo.
 | `npm run start` | serve la versione compilata |
 | `npm run lint` | controlla stile e regole del codice |
 | `npm run check:engine` | esegue le verifiche automatiche su regole d'asta e cataloghi |
+| `npm run check:dutch` | prova l'asta al ribasso da sola e insieme alle altre tre varianti |
 | `npm run check:multiplayer` | prova una stanza online completa fra due partecipanti |
 | `npm run check:rooms` | prova il canale del server con due dispositivi collegati |
 | `npm run check:supabase` | dice se il database è collegato, se le tabelle ci sono tutte, se le sei tabelle private restano illeggibili da fuori e se un estraneo riesce a scriverci |
@@ -122,7 +123,7 @@ components/ui/              bottoni, badge, input, modali, navbar, menu
 components/game/            asta, timer, controlli offerta, card finale, editor liste
 lib/                        motore di gioco, realtime, catalogo, immagini, accesso, amici
 lib/i18n/                   dizionari delle 10 lingue
-data/categories.json        37 liste ufficiali (30 elementi; 20 le regioni, 45 le auto)
+data/categories.json        39 liste ufficiali (30 elementi; 20 le regioni, 45 le auto)
 scripts/engine-check.js     verifiche automatiche del motore
 supabase/schema.sql         schema del database con tutte le policy
 public/logo.svg             marchio dell'app
@@ -166,6 +167,18 @@ migliore.
   tutti finiscano con la lista piena, anche a costo di ricevere qualcosa di indesiderato.
 - **Varianti**: *Blind Draft* (nome e immagine nascosti fino all'assegnazione, poi lo svelamento) e *Mystery Box* (ogni 5
   lotti una scatola a prezzo fisso con elemento casuale).
+- **Asta al ribasso** (*Dutch Draft*): il lotto parte caro e il prezzo scende per tutta la sua
+  durata, fino a un credito. Non ci sono turni e non si rilancia: il lotto e' aperto a tutti insieme
+  e se lo prende il primo che preme, al prezzo esposto in quell'istante. Aspettare costa meno ma
+  rischia di piu', ed e' tutto il gioco. Il prezzo di partenza e' il 60% del budget iniziale, non
+  una cifra fissa: su un budget da 20 sono 12 crediti, su uno da 100 sono 60. Se non lo prende
+  nessuno vale la regola degli scarti, come per un lotto qualsiasi. Si combina con le altre tre
+  varianti -- col Blind si punta su un lotto coperto, e con la Mystery Box scende anche il prezzo
+  della scatola. Verificata da `npm run check:dutch`.
+  - **Da sapere**: chi ospita la stanza fa anche da arbitro, e il suo dispositivo non ha il viaggio
+    in rete che hanno gli altri. Sui tocchi ravvicinati parte avvantaggiato di un tempo di rete.
+    Il prezzo pagato invece e' giusto per tutti: si calcola sull'istante del tocco, non su quello
+    in cui l'azione arriva a destinazione.
 - **Targhe di fine partita**: Dominatore, Spendaccione, Braccino Corto e Maestro del Flop. Non
   danno punti e non spostano la classifica; a parità non si assegnano. Per chi le prende e perché,
   vedi *Fine partita* più avanti.
@@ -189,14 +202,16 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 - Effetti sonori sintetizzati (nessun file audio da scaricare) e vibrazione dove supportata.
 
 ### Categorie
-- **37 liste ufficiali** da 30 elementi. Due fanno eccezione, e in entrambi i casi e' l'argomento
-  a dettare il numero: le Regioni Italiane sono 20, quante sono davvero, e le Auto sono 45, quante
-  sono le marche che vale la pena mettere in gara. Le fasce restano uguali fra loro in ogni lista,
+- **39 liste ufficiali** da 30 elementi. Tre fanno eccezione, e ogni volta e' l'argomento
+  a dettare il numero: le Regioni Italiane sono 20, quante sono davvero, le Auto sono 45, quante
+  sono le marche che vale la pena mettere in gara, e Build Your Room ne ha 40 perche' una stanza si
+  arreda con quello che ci sta. Le fasce restano uguali fra loro in ogni lista,
   altrimenti una uscirebbe piu' spesso delle altre.
   burger, best feelings, Pixar, social, Marvel, superpoteri, drink, snack, pizze, giochi da tavolo,
   videogiochi, giochi mobile, Clash Royale, calcio, sport, artisti musicali, app, capitali europee,
   città italiane, città americane, regioni italiane, beach, colazione, fast food, dolci, anime,
-  cartoni, serie TV, meme, duo iconici, scuse per non uscire, momenti cringe, isola deserta, auto.
+  cartoni, serie TV, meme, duo iconici, scuse per non uscire, momenti cringe, isola deserta, auto,
+  gusti di gelato, materie scolastiche, build your room, 5 dita 5 liquidi, nuclear bunker.
 - Pagina categorie con il **numero di elementi** sotto ogni nome, **ricerca istantanea**
   (cerca anche dentro gli elementi) e **filtri per tema** (Sport, Pop Culture, Gaming, Cibo,
   Vita quotidiana).
@@ -231,11 +246,12 @@ Tutte queste regole sono verificate da `npm run check:engine`.
 
   Il file si legge e si corregge a mano: dopo averlo modificato basta
   `node scripts/fetch-images.js <categoria> --hinted` per rifare solo quegli elementi.
-- **960 elementi su 980 hanno la foto.** I venti senza sono i momenti della categoria Cringe
-  (situazioni, non oggetti: non esiste una foto giusta) e "Niente" a colazione: mostrano la loro
-  icona, ed è una scelta. `npm run check:photos` interroga le foto una per una, segnala quelle che
-  non rispondono più e quelle usate da due elementi; `npm run images:sheet` le mette tutte in
-  griglia su una pagina, per controllare a occhio che l'immagine sia davvero quella giusta.
+- **1164 elementi su 1185 hanno la foto.** I ventuno senza sono i momenti della categoria Cringe
+  (situazioni, non oggetti: non esiste una foto giusta), "Niente" a colazione e la Cassaforte
+  Segreta di Build Your Room: mostrano la loro icona, ed è una scelta. `npm run check:photos`
+  interroga le foto una per una, segnala quelle che non rispondono più e quelle usate da due
+  elementi; `npm run images:sheet` le mette tutte in griglia su una pagina, per controllare a
+  occhio che l'immagine sia davvero quella giusta.
 - Tre regole imparate controllando le foto una per una, e ora applicate dallo script:
   - **niente stemmi, cartine e firme**: per una città vogliamo il panorama, non il puntino sulla
     mappa d'Italia o lo stemma della squadra di calcio; per un cantante la foto, non l'autografo;
@@ -615,7 +631,7 @@ Insieme a `npm run lint` e `npm run build` sono i tre comandi da lanciare prima 
 
 ## 10. Stato del lavoro e limiti noti
 
-**Funziona senza configurazione**: partita locale, tutte le 37 categorie (1025 elementi), regole
+**Funziona senza configurazione**: partita locale, tutte le 39 categorie (1185 elementi), regole
 complete, card 9:16 scaricabile, lingue, temi, audio.
 
 **Richiede Supabase**: stanze online, accesso, Pickmates, votazioni, suggerimenti, voto a stelle,

@@ -178,6 +178,12 @@ export function LobbyConfig({
             label={t("lobby.mystery")}
             hint={t("lobby.mysteryHint")}
           />
+          <Switch
+            checked={Boolean(config.dutchDraft)}
+            onChange={(dutchDraft) => !disabled && onChange({ dutchDraft })}
+            label={t("lobby.dutch")}
+            hint={t("lobby.dutchHint")}
+          />
           {/*
             La spiegazione cambia con l'interruttore: le due conseguenze sono
             opposte, e una descrizione sola le costringerebbe entrambe in una

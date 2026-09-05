@@ -258,6 +258,7 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
             ) : null}
             {state.config.blindDraft ? <Badge tone="violet">{t("lobby.blind")}</Badge> : null}
             {state.config.mysteryBox ? <Badge tone="violet">{t("lobby.mystery")}</Badge> : null}
+            {state.config.dutchDraft ? <Badge tone="neon">{t("lobby.dutch")}</Badge> : null}
           </div>
         </Panel>
       )}

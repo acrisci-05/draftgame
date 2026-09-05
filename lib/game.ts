@@ -1,5 +1,6 @@
 import { firstFreeAvatar, isAvatarId } from "./avatars";
 import { firstFreeColor, isPlayerColor } from "./colors";
+import { clamp } from "./utils";
 import type {
   AuctionResult,
   Reaction,
@@ -138,6 +139,7 @@ export const DEFAULT_CONFIG: RoomConfig = {
   slots: 5,
   blindDraft: false,
   mysteryBox: false,
+  dutchDraft: false,
   allowDiscards: true,
   lotSeconds: LOT_TIMER_DURATION,
 };
@@ -145,6 +147,91 @@ export const DEFAULT_CONFIG: RoomConfig = {
 /** Costo fisso della Mystery Box, proporzionato al budget di partenza. */
 export function mysteryPrice(budget: number): number {
   return Math.max(2, Math.round(budget * 0.15));
+}
+
+/* ------------------------------------------------------------------ */
+/* Asta al ribasso (Dutch Draft)                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Il prezzo di partenza, come quota del budget iniziale.
+ *
+ * Non e' un numero fisso, per la stessa ragione per cui non lo e' quello della
+ * Mystery Box: il budget lo sceglie chi ospita, e un prezzo fisso sarebbe
+ * un'inezia su un budget da 100 e irraggiungibile su uno da 10.
+ *
+ * Sessanta per cento perche' deve essere alto ma pagabile fin dal primo
+ * istante: se partisse sopra il tetto di spesa, i primi secondi di ogni lotto
+ * sarebbero tempo morto col pulsante spento per tutti, e la modalita'
+ * sembrerebbe rotta invece che tesa.
+ */
+export const DUTCH_OPENING_SHARE = 0.6;
+
+/**
+ * Il pavimento del prezzo: un credito, lo stesso da cui parte l'asta normale.
+ *
+ * Zero no: un lotto gratis non toglierebbe niente a nessuno, e la riserva --
+ * un credito per ogni slot ancora vuoto -- esiste proprio perche' ogni
+ * elemento di una rosa sia costato qualcosa.
+ */
+export const DUTCH_FLOOR = OPENING_BID;
+
+/** Da quanto parte il prezzo in questa stanza. */
+export function dutchOpening(budget: number): number {
+  return Math.max(DUTCH_FLOOR + 1, Math.round(budget * DUTCH_OPENING_SHARE));
+}
+
+/** Se il lotto in corso si gioca al ribasso. */
+export function isDutchLot(state: GameState): boolean {
+  return Boolean(state.config.dutchDraft) && state.phase === "auction";
+}
+
+/**
+ * Quando e' cominciato il lotto al ribasso.
+ *
+ * Si ricava dalla scadenza invece di tenere un campo in piu': nell'asta al
+ * ribasso non ci sono turni, quindi il cronometro parte una volta sola e non
+ * viene piu' rimesso a posto. Un timestamp separato sarebbe un secondo valore
+ * da tenere allineato su tutti i dispositivi, e due valori che devono dire la
+ * stessa cosa prima o poi si contraddicono.
+ */
+export function dutchStartedAt(state: GameState): number {
+  return state.deadline - lotSeconds(state) * 1000;
+}
+
+/**
+ * Il prezzo in un dato istante.
+ *
+ * Discesa lineare dal prezzo di partenza al pavimento nell'arco del lotto,
+ * calcolata sul tempo trascorso e non contando i secondi a colpi di timer: ogni
+ * dispositivo che conosce la scadenza arriva allo stesso numero, e non c'e'
+ * niente che possa accumulare ritardo.
+ */
+export function dutchPriceAt(state: GameState, now: number): number {
+  const durata = lotSeconds(state) * 1000;
+  if (durata <= 0) return DUTCH_FLOOR;
+  const apertura = dutchOpening(state.config.budget);
+  const trascorso = clamp(now - dutchStartedAt(state), 0, durata);
+  const quota = trascorso / durata;
+  const prezzo = Math.round(apertura - quota * (apertura - DUTCH_FLOOR));
+  return clamp(prezzo, DUTCH_FLOOR, apertura);
+}
+
+/**
+ * Se questo giocatore puo' aggiudicarsi il lotto adesso.
+ *
+ * Niente controllo sul turno, ed e' il punto della modalita': il lotto e'
+ * aperto a tutti insieme e vince chi si decide per primo.
+ */
+export function canTakeDutch(state: GameState, playerId: string, now: number): boolean {
+  if (state.phase !== "auction" || !isDutchLot(state)) return false;
+  const player = playerById(state, playerId);
+  if (!player) return false;
+  if (state.passed.includes(playerId)) return false;
+  if (rosterFull(state, player)) return false;
+  if (isMysteryLot(state) ? false : !state.currentItemId) return false;
+  if (isMysteryLot(state) && state.queue.length === 0) return false;
+  return maxBid(state, player) >= dutchPriceAt(state, now);
 }
 
 export function shuffle<T>(input: T[]): T[] {
@@ -316,6 +403,15 @@ export function rosterFull(state: GameState, player: Player): boolean {
 
 /** Offerta minima accettabile in questo istante. */
 export function minimumBid(state: GameState): number {
+  /*
+   * Al ribasso conta il pavimento, non il prezzo esposto adesso.
+   *
+   * Serve a chi legge "quanti sono ancora in corsa": il prezzo scende, e chi
+   * in questo istante non arriva alla cifra a schermo potra' comunque
+   * prendersi il lotto fra tre secondi. Misurarlo sul prezzo corrente lo
+   * darebbe per eliminato mentre e' ancora in partita.
+   */
+  if (isDutchLot(state)) return DUTCH_FLOOR;
   if (isMysteryLot(state)) return state.lotPrice;
   return state.highBidderId ? state.currentBid + 1 : OPENING_BID;
 }
@@ -427,6 +523,8 @@ export function isMyTurn(state: GameState, playerId: string): boolean {
 
 export function canBid(state: GameState, playerId: string, amount: number): boolean {
   if (state.phase !== "auction" || isMysteryLot(state)) return false;
+  // Al ribasso non si rilancia: c'e' un prezzo solo e o lo si prende o no.
+  if (isDutchLot(state)) return false;
   if (!isMyTurn(state, playerId)) return false;
   const player = playerById(state, playerId);
   if (!player) return false;
@@ -439,6 +537,8 @@ export function canBid(state: GameState, playerId: string, amount: number): bool
 
 export function canClaim(state: GameState, playerId: string): boolean {
   if (state.phase !== "auction" || !isMysteryLot(state)) return false;
+  // La box al ribasso si prende con take_dutch: il prezzo dipende dall'istante.
+  if (isDutchLot(state)) return false;
   if (!isMyTurn(state, playerId)) return false;
   const player = playerById(state, playerId);
   if (!player) return false;
@@ -449,6 +549,12 @@ export function canClaim(state: GameState, playerId: string): boolean {
 
 export function canPass(state: GameState, playerId: string): boolean {
   if (state.phase !== "auction") return false;
+  /*
+   * Al ribasso non c'e' niente da passare: non essendoci turni, rinunciare
+   * vorrebbe dire solo togliersi la possibilita' di ripensarci mentre il
+   * prezzo scende. Chi non vuole il lotto sta fermo e basta.
+   */
+  if (isDutchLot(state)) return false;
   if (!isMyTurn(state, playerId)) return false;
   const player = playerById(state, playerId);
   if (!player) return false;
@@ -780,6 +886,7 @@ export type GameAction =
   | { type: "start"; now: number }
   | { type: "bid"; playerId: string; amount: number; now: number }
   | { type: "claim"; playerId: string; now: number }
+  | { type: "take_dutch"; playerId: string; now: number }
   | { type: "pass"; playerId: string; now: number }
   | { type: "vote"; voterId: string; targetId: string; now: number }
   | { type: "react"; playerId: string; emoji: string; now: number }
@@ -879,8 +986,17 @@ function draw(state: GameState, now: number): GameState {
 
   const mystery = state.config.mysteryBox && lotNumber % MYSTERY_EVERY === 0;
 
+  /*
+   * Col ribasso acceso il prezzo di apertura e' sempre quello della discesa,
+   * box comprese: una Mystery Box a prezzo fisso dentro una partita al ribasso
+   * sarebbe l'unico lotto della serata che non scende, e da fuori sembrerebbe
+   * un lotto rotto piu' che una regola.
+   */
+  const ribasso = Boolean(state.config.dutchDraft);
+  const aperturaRibasso = dutchOpening(state.config.budget);
+
   if (mystery) {
-    const price = mysteryPrice(state.config.budget);
+    const price = ribasso ? aperturaRibasso : mysteryPrice(state.config.budget);
     return touch(
       pushFeed(
         apriTurno(
@@ -912,10 +1028,10 @@ function draw(state: GameState, now: number): GameState {
           ...state,
           phase: "auction",
           lotKind: "item",
-          lotPrice: 0,
+          lotPrice: ribasso ? aperturaRibasso : 0,
           queue: rest,
           currentItemId: next,
-          currentBid: OPENING_BID,
+          currentBid: ribasso ? aperturaRibasso : OPENING_BID,
           highBidderId: null,
           passed: [],
           lotNumber,
@@ -937,6 +1053,20 @@ function draw(state: GameState, now: number): GameState {
  * tutto e agli altri non restava niente.
  */
 function apriTurno(state: GameState, now: number): GameState {
+  /*
+   * Al ribasso non si apre nessun turno.
+   *
+   * Il lotto e' aperto a tutti insieme e il cronometro e' uno solo per tutto il
+   * lotto, perche' e' proprio lo scorrere del tempo a far scendere il prezzo:
+   * darlo a un giocatore per volta vorrebbe dire che il primo si compra la
+   * discesa intera e agli altri arriva un prezzo gia' al pavimento.
+   *
+   * turnId a null e' la stessa cosa che dice `isMyTurn` alle partite vecchie:
+   * puo' agire chiunque. Qui e' voluto, non un residuo.
+   */
+  if (state.config.dutchDraft) {
+    return { ...state, turnId: null, deadline: now + lotSeconds(state) * 1000 };
+  }
   const turnId = openingTurn(state);
   return { ...state, turnId, deadline: now + lotSeconds(state) * 1000 };
 }
@@ -1308,6 +1438,38 @@ export function reducer(state: GameState, action: GameAction): GameState {
       if (!item) return state;
       const queue = state.queue.filter((_, i) => i !== index);
       return award(state, action.now, player, item, state.lotPrice, { mystery: true, queue });
+    }
+
+    /**
+     * Aggiudicazione al ribasso: se lo prende il primo che si decide.
+     *
+     * Il prezzo lo si calcola sull'istante del clic e non su quello in cui
+     * l'azione arriva a destinazione: fra i due c'e' il viaggio in rete, e
+     * farlo pagare a chi ha la connessione piu' lenta sarebbe una penalita' che
+     * col gioco non c'entra niente. L'istante e' quello dell'orologio comune --
+     * ogni dispositivo lo allinea su quello di chi ospita -- e viene comunque
+     * riportato dentro la durata del lotto, cosi' nessun valore arrivato
+     * sbagliato puo' comprare sotto il pavimento.
+     */
+    case "take_dutch": {
+      if (!canTakeDutch(state, action.playerId, action.now)) return state;
+      const player = playerById(state, action.playerId);
+      if (!player) return state;
+      const price = dutchPriceAt(state, action.now);
+
+      if (isMysteryLot(state)) {
+        if (state.queue.length === 0) return state;
+        const index = Math.floor(Math.random() * state.queue.length);
+        const itemId = state.queue[index];
+        const item = itemById(state, itemId);
+        if (!item) return state;
+        const queue = state.queue.filter((_, i) => i !== index);
+        return award(state, action.now, player, item, price, { mystery: true, queue });
+      }
+
+      const item = currentItem(state);
+      if (!item) return state;
+      return award(state, action.now, player, item, price);
     }
 
     case "pass": {
