@@ -185,6 +185,47 @@ export const DUTCH_TARGET_SHARE: Readonly<Record<LotAppeal, number>> = {
   base: 0.18,
 };
 
+/**
+ * Quante volte la propria quota per posto il bot e' disposto a spendere.
+ *
+ * La quota -- crediti diviso posti da riempire -- e' la spesa sostenibile, non
+ * quella giusta: un draft si vince pagando troppo la roba buona e risparmiando
+ * sul riempitivo, e un avversario che non sfora mai la sua parte gioca tutti i
+ * lotti allo stesso modo.
+ *
+ * Era il guasto: con venti crediti e cinque posti la quota e' quattro, e il
+ * tetto rigido riportava a quattro anche le soglie delle prime tre fasce.
+ * Leggendario e mediocre finivano allo stesso prezzo, e il resto lo si vedeva
+ * comprato sempre a due -- che e' esattamente cio' che si notava giocandoci.
+ *
+ * Sforare non e' un rischio: il tetto vero resta `maxBid`, che tiene da parte
+ * un credito per ogni posto ancora vuoto. Il peggio che puo' capitare e' che il
+ * bot spenda presto e poi si accontenti, che e' una scelta di gioco -- e la
+ * quota si riduce da sola man mano che i crediti calano.
+ */
+export const DUTCH_SPEND_MULTIPLIER: Readonly<Record<LotAppeal, number>> = {
+  top: 2,
+  middle: 1.2,
+  base: 0.55,
+};
+
+/**
+ * Il tempo che il bot ci mette a premere quando il prezzo e' quello giusto.
+ *
+ * Piu' largo dello scatto in extremis dell'asta normale: al ribasso non c'e' un
+ * cronometro che sta per scadere, c'e' una decisione da prendere, e una
+ * risposta sempre uguale a un decimo di secondo si riconosce dopo due lotti.
+ * Dentro questa finestra ci sta anche la sconfitta: se una persona preme prima,
+ * il lotto e' suo e il bot resta a mani vuote -- come capiterebbe fra due
+ * persone.
+ */
+export const DUTCH_REACTION_MS: readonly [number, number] = [800, 2200];
+
+export function dutchReactionDelay(roll: number = Math.random()): number {
+  const [min, max] = DUTCH_REACTION_MS;
+  return Math.round(min + roll * (max - min));
+}
+
 /** Sopra questa quota di scarto il bot tira via qualche istante in piu'. */
 export const DUTCH_JITTER = 0.08;
 
@@ -210,7 +251,15 @@ export function dutchTargetPrice(
   const scarto = (roll * 2 - 1) * DUTCH_JITTER;
   const quota = Math.min(0.95, Math.max(0.05, DUTCH_TARGET_SHARE[appeal] + scarto));
   const voluto = Math.round(apertura * quota);
-  const tetto = Math.min(maxBid(state, bot), affordableCeiling(state, bot));
+  /*
+   * Quanto e' disposto a spendere su *questo* lotto: la quota per posto
+   * moltiplicata secondo quanto gli interessa. Il tetto vero e invalicabile
+   * resta `maxBid`, che e' la riserva del motore -- quella non si tocca.
+   */
+  const disposto = Math.round(
+    affordableCeiling(state, bot) * DUTCH_SPEND_MULTIPLIER[appeal],
+  );
+  const tetto = Math.min(maxBid(state, bot), Math.max(OPENING_BID, disposto));
   if (tetto < OPENING_BID) return null;
   return Math.max(OPENING_BID, Math.min(voluto, tetto));
 }
@@ -393,10 +442,17 @@ export function decideBotMove(
      */
     if (attesa <= 0) {
       if (!canTakeDutch(state, botId, now)) return null;
-      return { kind: "take_dutch", delay: getBotDelay("snipe") };
+      return { kind: "take_dutch", delay: dutchReactionDelay() };
     }
-    // Il prezzo di adesso non basta ancora: ci si sveglia quando bastera'.
-    if (dutchPriceAt(state, now + attesa) > Math.min(maxBid(state, bot), soglia)) return null;
+    /*
+     * Ci si sveglia quando il prezzo sara' quello voluto.
+     *
+     * Il controllo e' solo sulla riserva del motore: la quota per posto qui non
+     * c'entra piu' -- e' proprio quella che il bot ha deciso di sforare su un
+     * lotto che gli interessa. Confrontarci la soglia, come si faceva prima,
+     * annullava ogni volta la decisione appena presa e il bot restava fermo.
+     */
+    if (dutchPriceAt(state, now + attesa) > maxBid(state, bot)) return null;
     return { kind: "take_dutch", delay: attesa };
   }
 

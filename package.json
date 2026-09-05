@@ -17,6 +17,7 @@
     "check:lobby": "tsc -p tsconfig.check.json && node scripts/lobby-check.js .tmp-check/lib",
     "check:dutch-ux": "node scripts/dutch-ux-check.js http://localhost:3000",
     "check:vote-e2e": "node scripts/vote-e2e-check.js http://localhost:3000",
+    "check:bot-mode": "node scripts/bot-mode-check.js http://localhost:3000",
     "check:multiplayer": "tsc -p tsconfig.check.json && node scripts/multiplayer-check.js",
     "check:rooms": "node scripts/room-check.js http://localhost:3000",
     "check:supabase": "node scripts/supabase-check.js",

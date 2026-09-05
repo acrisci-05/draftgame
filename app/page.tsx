@@ -11,7 +11,7 @@ import { randomPlayableCategory } from "@/lib/game";
 import { openPanel } from "@/lib/panels";
 import { useSettings } from "@/lib/settings";
 import { useAuth } from "@/lib/auth";
-import { ensureProfile, readProfile, saveProfile, saveSession,
+import { ensureProfile, readProfile, saveConfig, saveProfile, saveSession,
   allCategories,
   readConfig,
   resumableSession,
@@ -21,6 +21,7 @@ import { showToast } from "@/lib/toast";
 import type { Profile } from "@/lib/types";
 import { roomCode } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { Segmented } from "@/components/ui/Switch";
 import { AvatarPicker } from "@/components/ui/Avatar";
 import { Input } from "@/components/ui/Input";
 import { JoinModal } from "@/components/ui/JoinModal";
@@ -29,6 +30,13 @@ import { PickerBanner } from "@/components/ui/PickerBenefits";
 import { SupportModal } from "@/components/ui/SupportModal";
 
 const HOW_KEYS = ["home.how1", "home.how2", "home.how3", "home.how4"] as const;
+
+/** Come si e' giocato l'ultima volta contro il bot. Fuori dal componente: la
+ *  funzione dev'essere la stessa a ogni disegno, o il valore verrebbe riletto
+ *  da capo di continuo. */
+function leggiModoBot(): "CLASSIC" | "DUTCH" {
+  return readConfig().dutchDraft ? "DUTCH" : "CLASSIC";
+}
 
 export default function HomePage() {
   const router = useRouter();
@@ -74,8 +82,43 @@ export default function HomePage() {
    * su questo dispositivo: non serve una stanza in rete per un avversario che
    * sta gia' qui dentro.
    */
+  /*
+   * La modalita' della sfida al bot.
+   *
+   * Parte da quella dell'ultima partita: chi gioca al ribasso due sere di fila
+   * non deve ridirlo ogni volta. In stato locale come stringa e non come
+   * booleano perche' e' cosi' che si legge nell'interfaccia -- nel motore
+   * resta l'interruttore `dutchDraft`, che e' gia' l'unica verita' sulle
+   * regole e non conviene averne due.
+   */
+  /*
+   * Letto col canale dei valori del dispositivo, non dentro `useState`.
+   *
+   * L'inizializzatore di `useState` gira anche sul server, dove `localStorage`
+   * non esiste: chi aveva scelto il ribasso vedeva il server disegnare
+   * "Classica" e il browser correggerlo subito dopo. Per React sono due
+   * risultati diversi per lo stesso disegno -- l'aggancio fallisce e ridisegna
+   * l'intera pagina, portandosi dietro anche l'avviso sullo script del layout.
+   * `useClientValue` esiste apposta: restituisce il valore del server finche'
+   * l'aggancio non e' finito, e poi passa a quello vero senza strappi.
+   */
+  const modoSalvato = useClientValue<"CLASSIC" | "DUTCH">(
+    leggiModoBot,
+    "CLASSIC",
+  );
+  /** La scelta appena fatta, finche' non finisce nel magazzino. */
+  const [modoScelto, setModoScelto] = useState<"CLASSIC" | "DUTCH" | null>(null);
+  const botMode = modoScelto ?? modoSalvato;
+  const setBotMode = setModoScelto;
+
   const playAgainstBot = () => {
-    const config = { ...readConfig(), maxPlayers: 2 };
+    const config = { ...readConfig(), maxPlayers: 2, dutchDraft: botMode === "DUTCH" };
+    /*
+     * La scelta si mette da parte, non solo nella sessione della partita.
+     * Senza, tornando sulla home il selettore ripartiva da quello di prima e la
+     * promessa di ricordarsela era scritta solo nel commento.
+     */
+    saveConfig(config);
     const category = randomPlayableCategory(allCategories(), {
       players: 2,
       slots: config.slots,
@@ -229,6 +272,29 @@ export default function HomePage() {
             quando le prime due non si possono usare: non c'e' nessun altro,
             oppure non c'e' voglia di aspettare che arrivi.
           */}
+          {/*
+            La modalita' si sceglie qui, non in una schermata a parte.
+            Questo pulsante esiste per chi apre l'app da solo e vuole giocare
+            adesso: mandarlo prima in una pagina di configurazione gli
+            toglierebbe proprio quello. Due caselle sopra il pulsante bastano a
+            far scegliere senza aggiungere un passaggio.
+          */}
+          <p className="mt-4 text-center text-[11px] uppercase tracking-[0.18em] text-faint">
+            {t("home.botMode")}
+          </p>
+          <Segmented
+            className="mt-1.5"
+            value={botMode}
+            onChange={setBotMode}
+            options={[
+              { value: "CLASSIC", label: t("home.botModeClassic") },
+              { value: "DUTCH", label: t("home.botModeDutch") },
+            ]}
+          />
+          <p className="mt-1.5 text-center text-[11px] leading-relaxed text-faint">
+            {botMode === "DUTCH" ? t("home.botModeDutchHint") : t("home.botModeClassicHint")}
+          </p>
+
           <Button
             variant="outline"
             /*
@@ -238,7 +304,7 @@ export default function HomePage() {
               entrare. L'alone e' appena accennato e cresce al passaggio: deve
               farsi notare, non illuminare la stanza.
             */
-            className="mt-3 w-full rounded-xl border-cyan-400/50 text-cyan-300 shadow-[0_0_18px_-7px_rgb(34_211_238/0.7)] transition-all hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-200 hover:shadow-[0_0_26px_-6px_rgb(34_211_238/0.9)]"
+            className="mt-2 w-full rounded-xl border-cyan-400/50 text-cyan-300 shadow-[0_0_18px_-7px_rgb(34_211_238/0.7)] transition-all hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-200 hover:shadow-[0_0_26px_-6px_rgb(34_211_238/0.9)]"
             onClick={playAgainstBot}
           >
             <Bot className="size-5" />

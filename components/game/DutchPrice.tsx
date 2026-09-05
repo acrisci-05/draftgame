@@ -2,7 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { canTakeDutch } from "@/lib/game";
+import { dutchTickGap, dutchTickLength, vibrate } from "@/lib/haptics";
 import { useT } from "@/lib/settings";
 import type { CurrencyCode, GameState } from "@/lib/types";
 import { useDutchPrice } from "@/lib/useDutchPrice";
@@ -84,7 +86,30 @@ export function DutchTakeButton({
   const { price, progress, atFloor } = useDutchPrice(state, now);
   const currency: CurrencyCode = state.config.currency;
 
+  /*
+   * Il battito in mano, sempre piu' fitto.
+   *
+   * Vive nel pulsante e non in un effetto della pagina perche' qui il prezzo
+   * si aggiorna gia' dodici volte al secondo: il colpo va deciso su quello
+   * stesso ritmo, e il momento giusto si stabilisce sull'orologio -- non con
+   * un timer suo, che con la scheda in secondo piano andrebbe per conto
+   * proprio e tornerebbe a vibrare tutto insieme al rientro.
+   *
+   * Batte solo per chi puo' davvero prendere il lotto: a chi ha la rosa piena
+   * o non arriva al prezzo, un telefono che trema non dice niente.
+   */
+  const ultimoColpoRef = useRef(0);
   const puoPrendere = canTakeDutch(state, playerId, now());
+
+  useEffect(() => {
+    if (!puoPrendere || taking || locked) return;
+    const gap = dutchTickGap(progress);
+    if (gap === null) return;
+    const adesso = Date.now();
+    if (adesso - ultimoColpoRef.current < gap) return;
+    ultimoColpoRef.current = adesso;
+    vibrate(dutchTickLength(progress));
+  }, [progress, puoPrendere, taking, locked]);
   const disabled = !puoPrendere || locked || taking;
   const attivo = !disabled;
   /* Spento perche' il prezzo non e' ancora sceso abbastanza, non per altro. */

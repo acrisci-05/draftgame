@@ -444,6 +444,60 @@ check(
     return bot.dutchTargetPrice(alto, botPlayer, 0.5) > bot.dutchTargetPrice(basso, botPlayer, 0.5);
   })(),
 );
+/*
+ * La scala delle soglie deve restare distinta.
+ *
+ * Era il guasto: la quota per posto -- crediti diviso posti liberi, quattro su
+ * un budget da venti -- veniva usata come tetto rigido, e schiacciava a quattro
+ * le prime tre fasce. Leggendario e mediocre si compravano allo stesso prezzo e
+ * il resto sempre a due. Questi controlli tengono separati i gradini.
+ */
+check(
+  "la soglia di un lotto Top sfora la quota per posto",
+  (() => {
+    const botPlayer = game.playerById(s, bot.BOT_PLAYER_ID);
+    const quota = bot.affordableCeiling(s, botPlayer);
+    const alto = { ...s, currentItemId: s.items.find((i) => i.tier === 5).id };
+    return bot.dutchTargetPrice(alto, botPlayer, 0.5) > quota;
+  })(),
+);
+check(
+  "fra Top, medio e riempitivo ci sono tre prezzi diversi",
+  (() => {
+    const botPlayer = game.playerById(s, bot.BOT_PLAYER_ID);
+    const perFascia = (tier) =>
+      bot.dutchTargetPrice({ ...s, currentItemId: s.items.find((i) => i.tier === tier).id },
+        botPlayer, 0.5);
+    const [alto, medio, basso] = [5, 3, 1].map(perFascia);
+    return alto > medio && medio > basso;
+  })(),
+);
+check(
+  "la soglia non sfonda mai la riserva del motore",
+  (() => {
+    const botPlayer = game.playerById(s, bot.BOT_PLAYER_ID);
+    const tetto = game.maxBid(s, botPlayer);
+    return [5, 4, 3, 2, 1].every((tier) => {
+      const st = { ...s, currentItemId: s.items.find((i) => i.tier === tier).id };
+      for (let roll = 0; roll <= 1.0001; roll += 0.1) {
+        const target = bot.dutchTargetPrice(st, botPlayer, Math.min(1, roll));
+        if (target !== null && target > tetto) return false;
+      }
+      return true;
+    });
+  })(),
+);
+check(
+  "il tempo di reazione sta fra 800 e 2200 millesimi",
+  (() => {
+    for (let roll = 0; roll <= 1.0001; roll += 0.05) {
+      const ms = bot.dutchReactionDelay(Math.min(1, roll));
+      if (ms < 800 || ms > 2200) return false;
+    }
+    return bot.dutchReactionDelay(0) === 800 && bot.dutchReactionDelay(1) === 2200;
+  })(),
+);
+
 check(
   "il bot non punta mai sotto il pavimento",
   (() => {

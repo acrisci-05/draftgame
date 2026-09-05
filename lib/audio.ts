@@ -60,6 +60,46 @@ function tone(ctx: AudioContext, options: ToneOptions) {
   oscillator.stop(start + duration + 0.02);
 }
 
+/**
+ * Uno scoppio di rumore, cortissimo.
+ *
+ * Le note qui sopra sanno fare i suoni intonati, e un urto intonato non esiste:
+ * legno che batte sul legno e' rumore su tutte le frequenze insieme, spento in
+ * pochi millesimi. Senza questa parte il martello suonava come un campanello
+ * grave, che e' il difetto che si sentiva.
+ *
+ * Il filtro decide di che materiale sembra: passa-basso stretto per il tonfo
+ * sordo del pugno, aperto per lo schianto secco del martello.
+ */
+function noise(
+  ctx: AudioContext,
+  options: { duration: number; gain?: number; cutoff?: number; delay?: number; type?: BiquadFilterType },
+) {
+  const { duration, gain = 0.1, cutoff = 2000, delay = 0, type = "lowpass" } = options;
+  const start = ctx.currentTime + delay;
+  const frames = Math.max(1, Math.floor(ctx.sampleRate * duration));
+  const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < frames; i += 1) {
+    // Rumore che si spegne da solo: senza la rampa resterebbe un fruscio piatto.
+    data[i] = (Math.random() * 2 - 1) * (1 - i / frames);
+  }
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = type;
+  filter.frequency.setValueAtTime(cutoff, start);
+
+  const envelope = ctx.createGain();
+  envelope.gain.setValueAtTime(gain, start);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+
+  source.connect(filter).connect(envelope).connect(ctx.destination);
+  source.start(start);
+  source.stop(start + duration + 0.02);
+}
+
 export function playSfx(name: Sfx, enabled = true) {
   if (!enabled) return;
   const ctx = getContext();
@@ -111,17 +151,25 @@ export function playSfx(name: Sfx, enabled = true) {
      * come un campanello.
      */
     case "gavel":
-      tone(ctx, { frequency: 1800, duration: 0.035, type: "square", gain: 0.09, sweepTo: 600 });
-      tone(ctx, { frequency: 190, duration: 0.14, type: "triangle", gain: 0.17, sweepTo: 90 });
-      tone(ctx, { frequency: 320, duration: 0.09, type: "sine", gain: 0.1, delay: 0.02, sweepTo: 150 });
+      // Lo schianto: rumore aperto e larghissimo, ma lungo venticinque
+      // millesimi. E' quasi tutto il carattere del suono.
+      noise(ctx, { duration: 0.025, gain: 0.3, cutoff: 7000, type: "highpass" });
+      // Il colpo sul blocco: il corpo scuro del legno, subito sotto.
+      noise(ctx, { duration: 0.07, gain: 0.22, cutoff: 900 });
+      // La risonanza sorda che resta nel banco, e che cade in fretta.
+      tone(ctx, { frequency: 170, duration: 0.17, type: "triangle", gain: 0.16, sweepTo: 72 });
+      tone(ctx, { frequency: 96, duration: 0.22, type: "sine", gain: 0.11, delay: 0.01, sweepTo: 54 });
       break;
     /*
      * Il pugno che ne incontra un altro: un tonfo sordo e corto, senza coda.
      * Piu' morbido del martello, perche' e' un saluto e non una sentenza.
      */
     case "fistbump":
-      tone(ctx, { frequency: 240, duration: 0.1, type: "sine", gain: 0.14, sweepTo: 120 });
-      tone(ctx, { frequency: 700, duration: 0.05, type: "triangle", gain: 0.07, delay: 0.01 });
+      // Il tonfo: due nocche sono carne e osso, quindi grave e senza coda.
+      tone(ctx, { frequency: 150, duration: 0.11, type: "sine", gain: 0.2, sweepTo: 62 });
+      noise(ctx, { duration: 0.045, gain: 0.16, cutoff: 500 });
+      // Lo schiocco del contatto: appena accennato, o diventa uno schiaffo.
+      noise(ctx, { duration: 0.018, gain: 0.08, cutoff: 5200, type: "highpass" });
       break;
   }
 }

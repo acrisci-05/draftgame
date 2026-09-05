@@ -132,6 +132,12 @@ const SECTIONS: Section[] = [
     points: [
       { label: "rules.modes.where", body: "rules.modes.whereBody" },
       { label: "rules.modes.extras", body: "rules.modes.extrasBody" },
+      /*
+       * L'asta al ribasso sta fra i modificatori e le reazioni, non in fondo:
+       * e' l'unica variante che cambia *come si gioca* invece di cosa si vede,
+       * e chi legge le regole deve incontrarla prima dei dettagli.
+       */
+      { label: "rules.dutch", body: "rules.dutchBody" },
       { label: "rules.modes.reactions", body: "rules.modes.reactionsBody" },
       {
         label: "rules.modes.pool",
