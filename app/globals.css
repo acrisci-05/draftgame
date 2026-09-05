@@ -92,6 +92,44 @@ body {
   }
 }
 
+/*
+ * L'alone dorato del vincitore.
+ *
+ * Respira invece di lampeggiare: la classifica si guarda per qualche secondo e
+ * un bordo che pulsa forte diventa fastidioso prima che si sia finito di
+ * leggerla. Piu' lento e piu' ampio dell'alone di chi e' in testa all'asta,
+ * perche' qui non c'e' niente da decidere in fretta -- c'e' solo da vedere chi
+ * ha vinto.
+ */
+@keyframes pp-winner-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--pp-gold) 55%, transparent),
+      0 0 18px -6px color-mix(in srgb, var(--pp-gold) 60%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--pp-gold) 85%, transparent),
+      0 0 34px -4px color-mix(in srgb, var(--pp-gold) 85%, transparent);
+  }
+}
+
+@layer utilities {
+  .winner-glow {
+    animation: pp-winner-glow 2.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .winner-glow {
+      animation: none;
+      box-shadow:
+        0 0 0 2px color-mix(in srgb, var(--pp-gold) 70%, transparent),
+        0 0 24px -6px color-mix(in srgb, var(--pp-gold) 65%, transparent);
+    }
+  }
+}
+
 @layer utilities {
   .leader-pulse {
     animation: pp-leader-pulse 1.6s ease-out infinite;

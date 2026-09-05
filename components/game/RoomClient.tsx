@@ -24,11 +24,12 @@ import { useSettings } from "@/lib/settings";
 import {
   ensureProfile,
   getCategory,
-  getSession,
   readConfig,
   readProfile,
   saveProfile,
   saveSession,
+  sessionForReentry,
+  touchSession,
   clearSession,
 } from "@/lib/storage";
 import type { Profile, RoomSession } from "@/lib/types";
@@ -39,6 +40,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { AuctionStage } from "./AuctionStage";
+import { ConnectionBanner } from "./ConnectionBanner";
 import { Lobby } from "./Lobby";
 import { Results } from "./Results";
 import { VotingStage } from "./VotingStage";
@@ -49,7 +51,17 @@ export function RoomClient({ code }: { code: string }) {
   const isClient = useIsClient();
   const { account } = useAuth();
 
-  const readSession = useCallback(() => getSession(code), [code]);
+  /*
+   * Il rientro automatico vale solo se si e' usciti da poco.
+   *
+   * Dopo un ricarico o una scheda tornata in primo piano l'ultimo segno di vita
+   * e' di un istante fa e non viene chiesto niente. Dopo mezz'ora invece la
+   * stanza chiede di nuovo chi sei: la partita a cui appartenevi puo' essere
+   * finita da un pezzo, e ritrovarcisi dentro senza aver toccato niente
+   * confonde piu' di quanto aiuti. La sessione non si cancella, quindi
+   * rientrando a mano si riprende lo stesso posto.
+   */
+  const readSession = useCallback(() => sessionForReentry(code), [code]);
   const session = useClientValue<RoomSession | null>(readSession, null);
 
   const category = useMemo(() => {
@@ -83,6 +95,40 @@ export function RoomClient({ code }: { code: string }) {
     }),
     [session?.playerId, session?.name, session?.emoji, accountId, handle],
   );
+
+  /*
+   * Il battito che dice "sono ancora qui".
+   *
+   * Ogni venti secondi, e a ogni ritorno della scheda in primo piano: sul
+   * telefono il browser congela le schede nascoste e i timer non scattano, e
+   * senza il secondo aggancio bastherebbe rispondere a un messaggio per
+   * ritrovarsi fuori dalla finestra di rientro.
+   */
+  /*
+   * Si dipende dall'esserci di una sessione, non dall'oggetto.
+   *
+   * Il battito riscrive la sessione, e ogni scrittura fa rileggere i valori
+   * salvati: con l'oggetto fra le dipendenze l'effetto si rimontava a ogni
+   * battito e ribatteva subito, all'infinito. E' il guasto che si vedeva come
+   * "Maximum update depth exceeded".
+   */
+  const haSessione = Boolean(session);
+  useEffect(() => {
+    if (!haSessione) return;
+    const battito = () => touchSession(code);
+    battito();
+    const timer = setInterval(battito, 20_000);
+    const alRitorno = () => {
+      if (document.visibilityState === "visible") battito();
+    };
+    document.addEventListener("visibilitychange", alRitorno);
+    window.addEventListener("focus", alRitorno);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", alRitorno);
+      window.removeEventListener("focus", alRitorno);
+    };
+  }, [code, haSessione]);
 
   const practice = Boolean(session?.practice);
 
@@ -232,6 +278,15 @@ export function RoomClient({ code }: { code: string }) {
           )}
         </Badge>
       </header>
+
+      {/*
+        La striscia della connessione: solo online, e solo a partita avviata.
+        In lobby non c'e' niente che scorra, e un avviso li' allarmerebbe senza
+        che ci sia nulla da perdere.
+      */}
+      {session.mode === "online" && state && state.phase !== "lobby" ? (
+        <ConnectionBanner live={status === "live"} />
+      ) : null}
 
       {errorKey ? (
         <p className="flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-200">

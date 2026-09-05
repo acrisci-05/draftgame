@@ -23,6 +23,7 @@ import { voteUrlFor } from "@/lib/config";
 import confetti from "canvas-confetti";
 import {
   END_TITLE_EMOJI,
+  colorLook,
   endTitles,
   finalStandings,
   voteTally,
@@ -34,6 +35,8 @@ import {
   type WinReason,
 } from "@/lib/game";
 import { BOT_PLAYER_ID } from "@/lib/botEngine";
+import { HAPTIC_TAKE, vibrate } from "@/lib/haptics";
+import { FistBump } from "./FistBump";
 import { awardMatchXp, recordMatch } from "@/lib/history";
 import { levelFor } from "@/lib/levels";
 import { markSessionFinished } from "@/lib/storage";
@@ -120,6 +123,23 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
    */
   const [voteError, setVoteError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  /*
+   * I batti pugno dati, contati per giocatore.
+   *
+   * Restano su questo dispositivo: e' un saluto di fine partita, non un
+   * punteggio, e non cambia niente di quello che e' successo. Farlo viaggiare
+   * fino all'altro telefono richiederebbe un canale aperto dopo la fine
+   * dell'asta, che adesso non c'e'.
+   */
+  const [bumps, setBumps] = useState<Record<string, number>>({});
+  const [bumpScene, setBumpScene] = useState(false);
+
+  const bumpTo = (playerId: string) => {
+    vibrate(HAPTIC_TAKE);
+    playSfx("fistbump", sound);
+    setBumps((prev) => ({ ...prev, [playerId]: (prev[playerId] ?? 0) + 1 }));
+    setBumpScene(true);
+  };
   // Quanta esperienza ha dato questa partita: zero quando era gia' stata pagata.
   const [earnedXp, setEarnedXp] = useState(0);
 
@@ -435,6 +455,8 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
   return (
     <div className="flex flex-col gap-4">
       <Confetti />
+      {/* La scena dei pugni che si scontrano, la stessa della pagina del voto. */}
+      <FistBump show={bumpScene} onDone={() => setBumpScene(false)} />
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.24em] text-faint">{t("results.title")}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
@@ -509,7 +531,7 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
               className={cn(
                 "rounded-xl border p-3",
                 index === 0
-                  ? "border-gold/60 bg-gold/10"
+                  ? "border-gold/60 bg-gold/10 winner-glow"
                   : "border-line bg-surface-2",
               )}
             >
@@ -529,13 +551,57 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
                 Nome e cifre su due righe: su un telefono stretto i badge
                 schiacciavano il nome fino a farlo sparire.
               */}
+              {/*
+                Il colore scelto in lobby arriva fino a qui.
+                Nella classifica finale i nomi stanno uno sull'altro e l'avatar
+                e' piccolo: senza il colore, distinguere chi e' chi vuol dire
+                leggere, e a fine partita si guarda -- non si legge.
+              */}
               <div className="flex min-w-0 items-center gap-2 font-bold">
-                <Avatar id={player.emoji} size="sm" />
-                <span className="truncate">{player.name}</span>
+                <Avatar
+                  id={player.emoji}
+                  size="sm"
+                  className={index === 0 ? undefined : colorLook(player.color).ring}
+                />
+                <span className={cn("truncate", index === 0 ? "" : colorLook(player.color).text)}>
+                  {player.name}
+                </span>
+                {index === 0 ? (
+                  <span aria-hidden className="shrink-0 text-base leading-none">
+                    👑
+                  </span>
+                ) : null}
                 {player.id === selfId ? (
                   <span className="shrink-0 rounded-full bg-neon/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-neon">
                     {t("lobby.you")}
                   </span>
+                ) : null}
+                {/*
+                  Il batti pugno: solo verso gli altri.
+                  Non c'e' contro se stessi perche' non vorrebbe dire niente, e
+                  un pulsante che c'e' su ogni riga tranne la propria si capisce
+                  senza spiegazioni.
+                */}
+                {player.id !== selfId ? (
+                  <button
+                    type="button"
+                    onClick={() => bumpTo(player.id)}
+                    aria-label={t("results.fistBump")}
+                    title={t("results.fistBump")}
+                    className={cn(
+                      "ms-auto flex shrink-0 touch-manipulation select-none items-center gap-1",
+                      "rounded-full border border-line bg-surface px-2.5 py-1 text-xs font-bold",
+                      "transition-colors hover:border-neon/60 hover:text-neon active:scale-90",
+                    )}
+                    style={{ WebkitTapHighlightColor: "transparent" }}
+                  >
+                    <span aria-hidden>🤛</span>
+                    {(bumps[player.id] ?? 0) > 0 ? (
+                      <span className="font-mono tabular-nums text-neon">
+                        {bumps[player.id]}
+                      </span>
+                    ) : null}
+                  </button>
                 ) : null}
               </div>
 
@@ -619,6 +685,15 @@ export function Results({ state, isHost, selfId, dispatch }: ResultsProps) {
           <p className="text-sm text-amber-500">{t("vote.offline")}</p>
         ) : voteUrl ? (
           <div className="flex flex-col items-center gap-3">
+            {/*
+              L'invito prima del codice.
+              Il QR e l'indirizzo dicono *come* si vota, non *perche'*: senza
+              una riga che ingaggi, il riquadro chiede un favore senza
+              spiegarlo, e il link resta li'.
+            */}
+            <p className="text-center text-sm font-semibold text-balance text-muted">
+              {t("results.voteHook")}
+            </p>
             <QrCode value={voteUrl} size={160} />
             <p className="break-all text-center font-mono text-xs text-muted">{voteUrl}</p>
             <Button variant="outline" size="sm" onClick={copyVoteUrl}>

@@ -8,18 +8,17 @@ import {
   canBid,
   canClaim,
   canPass,
-  canTakeDutch,
   isDutchLot,
   isMysteryLot,
   maxBidOption,
   rosterFull,
   slotsLeft,
 } from "@/lib/game";
-import { useDutchPrice } from "@/lib/useDutchPrice";
 import { useT } from "@/lib/settings";
-import type { CurrencyCode, GameState, Player } from "@/lib/types";
+import type { GameState, Player } from "@/lib/types";
 import { cn, money } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
+import { DutchTakeButton } from "./DutchPrice";
 import { ItemCover } from "./ItemCover";
 
 interface BidControlsProps {
@@ -68,7 +67,6 @@ export function BidControls({
 }: BidControlsProps) {
   const t = useT();
   const dutch = isDutchLot(state);
-  const { price, progress, atFloor } = useDutchPrice(state, now);
   const currency = state.config.currency;
   const options = bidOptions(state);
   const isLeader = state.highBidderId === player.id;
@@ -145,15 +143,13 @@ export function BidControls({
 
       {dutch ? (
         <DutchTakeButton
-          price={price}
-          progress={progress}
-          atFloor={atFloor}
-          currency={currency}
+          state={state}
+          playerId={player.id}
+          now={now}
           height={buttonHeight}
           compact={compact}
           taking={taking}
-          disabled={!canTakeDutch(state, player.id, now()) || locked || taking}
-          tooDear={!full && !hasPassed && !canTakeDutch(state, player.id, now())}
+          locked={locked}
           onClick={onTakeDutch}
         />
       ) : mystery ? (
@@ -276,104 +272,6 @@ export function BidControls({
         </div>
       </div>
     </motion.div>
-  );
-}
-
-/**
- * Il pulsante dell'asta al ribasso.
- *
- * Uno solo, perche' al ribasso c'e' una decisione sola da prendere: adesso o
- * mai piu'. La cifra sta dentro il pulsante e non sopra -- e' il prezzo che si
- * paga premendo, non un dato da consultare -- e la barra sotto dice quanto
- * manca al fondo senza che si debba leggere un altro numero.
- */
-function DutchTakeButton({
-  price,
-  progress,
-  atFloor,
-  currency,
-  height,
-  compact,
-  taking,
-  disabled,
-  tooDear,
-  onClick,
-}: {
-  price: number;
-  progress: number;
-  atFloor: boolean;
-  currency: CurrencyCode;
-  height: string;
-  compact: boolean;
-  taking: boolean;
-  disabled: boolean;
-  tooDear: boolean;
-  onClick: () => void;
-}) {
-  const t = useT();
-  const attivo = !disabled;
-
-  return (
-    <div className="flex flex-col gap-1.5">
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={onClick}
-        className={cn(
-          "flex w-full touch-manipulation items-center justify-center gap-2 rounded-xl border font-black transition-colors active:scale-[0.97]",
-          height,
-          attivo
-            ? "border-neon bg-neon/15 text-neon shadow-[0_0_18px_-4px_var(--color-neon)] hover:bg-neon/25"
-            : "cursor-not-allowed border-line bg-surface-2 text-faint",
-        )}
-      >
-        <Zap className={cn("size-4 shrink-0", attivo ? "animate-pulse" : "")} />
-        <span className={compact ? "text-sm" : "text-base"}>
-          {taking ? t("auction.dutchTaking") : t("auction.dutchTake")}
-        </span>
-        {!taking ? (
-          /*
-           * La cifra cambia quattro volte al secondo: la si tiene a larghezza
-           * fissa e in monospazio, altrimenti il testo accanto si sposta a ogni
-           * credito perso e il pulsante balla sotto il pollice.
-           */
-          <motion.span
-            key={price}
-            initial={{ scale: 1.18 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.14 }}
-            className={cn(
-              "font-mono tabular-nums",
-              compact ? "text-lg" : "text-xl",
-              atFloor && attivo ? "text-gold" : "",
-            )}
-          >
-            {money(price, currency)}
-          </motion.span>
-        ) : null}
-      </button>
-
-      {/* Quanto e' scesa: pieno all'apertura, vuoto al pavimento. */}
-      <div className="h-1 overflow-hidden rounded-full bg-surface-2" aria-hidden>
-        <div
-          className={cn(
-            "h-full rounded-full transition-[width] duration-100 ease-linear",
-            atFloor ? "bg-gold" : "bg-neon",
-          )}
-          style={{ width: `${Math.round((1 - progress) * 100)}%` }}
-        />
-      </div>
-
-      <p className="text-center text-[11px] text-faint">
-        {taking
-          ? t("auction.dutchTaking")
-          : tooDear
-            ? t("auction.dutchTooDear")
-            : atFloor
-              ? t("auction.dutchFloor")
-              : t("auction.dutchHint")}
-      </p>
-    </div>
   );
 }
 

@@ -148,10 +148,53 @@ export function getSession(code: string): RoomSession | null {
   return read<RoomSession | null>(SESSION_PREFIX + code, null);
 }
 
+/**
+ * Segna che si e' ancora qui.
+ *
+ * La chiama la stanza a intervalli mentre e' aperta. Non tocca nient'altro
+ * della sessione: se la stanza non c'e' piu' non la ricrea, altrimenti un
+ * battito in ritardo resusciterebbe una sessione appena cancellata.
+ */
+export function touchSession(code: string) {
+  const session = getSession(code);
+  if (!session) return;
+  write(SESSION_PREFIX + code, { ...session, lastSeenAt: Date.now() });
+}
+
+/** Quanti minuti si puo' restare fuori e rientrare senza che venga chiesto niente. */
+export const REENTRY_MINUTES = 3;
+
+/**
+ * La sessione buona per rientrare da soli in questa stanza.
+ *
+ * Il rientro automatico e' comodo dopo un ricarico e sbagliato dopo mezz'ora:
+ * nel secondo caso la partita e' un'altra, o non c'e' piu', e ritrovarsi dentro
+ * senza aver fatto niente confonde. Torna null anche sulle partite gia'
+ * concluse -- li' non c'e' niente in cui rientrare.
+ *
+ * Non cancella la sessione: chi rientra a mano riprende lo stesso posto, perche'
+ * l'identificativo del giocatore sta nel profilo e non cambia.
+ */
+export function sessionForReentry(
+  code: string,
+  maxMinutes = REENTRY_MINUTES,
+): RoomSession | null {
+  const session = getSession(code);
+  if (!session) return null;
+  if (session.finishedAt) return null;
+  const visto = session.lastSeenAt ?? session.openedAt ?? 0;
+  return Date.now() - visto <= maxMinutes * 60 * 1000 ? session : null;
+}
+
 export function saveSession(session: RoomSession) {
   // L'orario di ingresso si segna qui, cosi' nessuno se lo dimentica: serve a
   // sapere se la stanza vale ancora la pena di essere riproposta.
-  write(SESSION_PREFIX + session.code, { openedAt: Date.now(), ...session });
+  write(SESSION_PREFIX + session.code, {
+    openedAt: Date.now(),
+    ...session,
+    // L'ultimo segno di vita e' adesso: si sta entrando proprio ora.
+    lastSeenAt: Date.now(),
+  });
 }
 
 /**

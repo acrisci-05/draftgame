@@ -1,10 +1,11 @@
 import type { TranslationKey } from "./i18n/it";
 
 /**
- * Gli otto colori dei giocatori.
+ * I dieci colori dei giocatori.
  *
- * Uno per posto al tavolo: con otto persone in stanza servono otto tinte che si
- * distinguano a colpo d'occhio su uno schermo di telefono, anche viste di
+ * Piu' di uno per posto al tavolo, cosi' chi entra per ultimo trova ancora
+ * qualcosa che gli piace invece dell'unica tinta avanzata. Devono
+ * distinguersi a colpo d'occhio su uno schermo di telefono, anche viste di
  * sfuggita durante un rilancio. Sono tutte a tinta piena e ben separate sulla
  * ruota dei colori — niente due azzurri vicini, niente grigi: un colore poco
  * saturo su fondo scuro non legge come "questo giocatore", legge come
@@ -24,6 +25,8 @@ export const PLAYER_COLORS = [
   "red",
   "orange",
   "indigo",
+  "lime",
+  "hotpink",
 ] as const;
 
 export type PlayerColor = (typeof PLAYER_COLORS)[number];
@@ -108,6 +111,26 @@ const LOOKS: Record<PlayerColor, ColorLook> = {
     text: "text-[#818cf8]",
     soft: "bg-[#818cf8]/10 border-[#818cf8]/40",
     dot: "bg-[#818cf8]",
+  },
+  lime: {
+    ring: "ring-2 ring-[#a3e635]",
+    text: "text-[#a3e635]",
+    soft: "bg-[#a3e635]/10 border-[#a3e635]/40",
+    dot: "bg-[#a3e635]",
+  },
+  /*
+   * Il fucsia sta lontano dal rosa gia' in elenco.
+   *
+   * #f472b6 e' un rosa tenue, questo e' acceso e vira al magenta: su fondo
+   * scuro si distinguono a colpo d'occhio, che e' la regola con cui sono
+   * scelti tutti gli altri. Metterne uno a mezza via fra i due avrebbe creato
+   * proprio la coppia indistinguibile che questo elenco evita.
+   */
+  hotpink: {
+    ring: "ring-2 ring-[#ff2d95]",
+    text: "text-[#ff2d95]",
+    soft: "bg-[#ff2d95]/10 border-[#ff2d95]/40",
+    dot: "bg-[#ff2d95]",
   },
 };
 

@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { canPass, createGame, nextHost, reducer, type GameAction } from "./game";
+import {
+  canPass,
+  createGame,
+  lobbyAdopter,
+  nextHost,
+  reducer,
+  type GameAction,
+} from "./game";
 import type { TranslationKey } from "./i18n";
 import {
   createTransport,
@@ -164,10 +171,29 @@ export function useRoom({
         const me = selfRef.current;
         if (!now || isHostRef.current) return;
 
-        if (nextHost(now, present) !== me.id) return;
+        const erede = nextHost(now, present) === me.id;
+        /*
+         * La lobby abbandonata da tutti.
+         *
+         * Chi ha appena aperto il link non e' ancora nella lista giocatori --
+         * ce lo mette l'host, e l'host non c'e' piu' -- quindi la successione
+         * normale non lo sceglierebbe mai e la stanza resterebbe ferma. Qui la
+         * adotta: prende il posto di chi ospita e si iscrive, cosi' la stanza
+         * torna viva con la categoria e le regole che erano gia' state scelte.
+         */
+        const adotta = !erede && lobbyAdopter(now, present, me.id);
+        if (!erede && !adotta) return;
 
         setRole(true);
-        const next = reducer(now, { type: "set_host", playerId: me.id });
+        // Chi adotta la stanza prima si iscrive: `set_host` accetta solo chi e'
+        // gia' al tavolo, e da fuori non si puo' prendere il posto di nessuno.
+        let next = adotta
+          ? reducer(now, {
+              type: "add_player",
+              player: { id: me.id, name: me.name, emoji: me.emoji },
+            })
+          : now;
+        next = reducer(next, { type: "set_host", playerId: me.id });
         stateRef.current = next;
         setState(next);
         transportRef.current?.send({ type: "state", state: next, now: Date.now() });

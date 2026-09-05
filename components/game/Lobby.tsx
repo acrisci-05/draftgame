@@ -1,14 +1,28 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, LayoutGrid, Link2, Pencil, Play, Share2, UserPlus, Users, X } from "lucide-react";
-import { useState } from "react";
+import {
+  Check,
+  Gavel,
+  LayoutGrid,
+  Link2,
+  Pencil,
+  Play,
+  Share2,
+  UserPlus,
+  Users,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { playSfx } from "@/lib/audio";
 import { categoryName } from "@/lib/catalog";
 import { useIsClient } from "@/lib/client-store";
 import {
   MIN_PLAYERS,
+  canForceStart,
   canStartMatch,
+  everyoneReady,
+  notReady,
   lotsNeeded,
   lotSeconds,
   PLAYER_COLORS,
@@ -32,6 +46,7 @@ import { WhatsappGlyph } from "@/components/ui/BrandGlyphs";
 import { QrCode } from "@/components/ui/QrCode";
 import { RoomCode } from "@/components/ui/RoomCode";
 import { CategoryPicker } from "./CategoryPicker";
+import { GavelButton } from "./GavelButton";
 import { LobbyConfig } from "./LobbyConfig";
 
 interface LobbyProps {
@@ -92,8 +107,33 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
     state.items.length,
     state.config.slots,
   );
-  const canStart =
-    isHost && state.players.length >= MIN_PLAYERS && state.items.length > 0 && lottiBastano;
+  /*
+   * Un orologio che batte solo in lobby.
+   *
+   * L'avvio forzato compare quando chi non ha battuto il martello e' fermo da
+   * quindici secondi, e senza un battito l'interfaccia non se ne accorgerebbe:
+   * nessuno tocca niente, quindi non c'e' niente che la faccia ridisegnare.
+   * Un secondo basta, e la lobby non ha nulla di costoso da ridisegnare.
+   */
+  const [adesso, setAdesso] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setAdesso(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  /** Il proprio giocatore: online e' quello col martello da battere. */
+  const io = playerById(state, selfId);
+  const tuttiPronti = everyoneReady(state);
+  const mancanti = notReady(state);
+  const puoForzare = isHost && canForceStart(state, adesso);
+  const abbastanza =
+    state.players.length >= MIN_PLAYERS && state.items.length > 0 && lottiBastano;
+  /*
+   * L'host parte quando hanno battuto tutti, oppure quando chi manca e' fermo
+   * da un po'. Il secondo caso non e' una scorciatoia: e' l'unico modo di non
+   * lasciare quattro persone in ostaggio di un telefono posato sul tavolo.
+   */
+  const canStart = isHost && abbastanza && (tuttiPronti || puoForzare);
   const isClient = useIsClient();
   const joinUrl = isClient ? `${window.location.origin}/room/${state.code}` : null;
 
@@ -139,13 +179,63 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
     saveConfig({ ...state.config, ...patch });
   };
 
-  const start = () => {
-    playSfx("start", sound);
-    dispatch({ type: "start", now: Date.now() });
+  const gavel = (playerId: string) => {
+    dispatch({ type: "gavel", playerId });
   };
+
+  /*
+   * "ASTA APERTA!" per un secondo, poi si parte.
+   *
+   * Il passaggio dalla lobby all'asta era istantaneo, e con l'ultimo martello
+   * che arriva da un altro telefono si vedeva la stanza cambiare da sola senza
+   * un motivo apparente. Il cartello e' quel motivo, e regala anche il secondo
+   * che serve a posare gli occhi sullo schermo prima che parta il primo lotto.
+   */
+  const [apertura, setApertura] = useState(false);
+
+  const start = () => {
+    if (apertura) return;
+    playSfx("start", sound);
+    setApertura(true);
+  };
+
+  useEffect(() => {
+    if (!apertura) return;
+    const timer = setTimeout(() => dispatch({ type: "start", now: Date.now() }), 1000);
+    return () => clearTimeout(timer);
+  }, [apertura, dispatch]);
 
   return (
     <div className="flex flex-col gap-4">
+      {/*
+        Il cartello che apre l'asta.
+        Copre lo schermo per un secondo: e' il momento in cui la stanza smette
+        di essere una sala d'attesa, e senza un segno il passaggio sembrava un
+        salto della pagina.
+      */}
+      <AnimatePresence>
+        {apertura ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 grid place-items-center bg-ink/92 p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.7, rotate: -6, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 15 }}
+              className="flex flex-col items-center gap-3 text-center"
+            >
+              <Gavel className="size-14 text-gold" />
+              <p className="text-3xl font-black tracking-tight text-glow">
+                {t("lobby.gavelAllIn")}
+              </p>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
       <div className="rounded-3xl border border-line bg-surface grid-noise p-5">
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-center sm:text-start">
@@ -316,6 +406,24 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
                 >
                   {player.name}
                 </span>
+                {/*
+                  Il martello di ognuno, sempre visibile.
+                  Non basta sapere chi manca: chi ospita deve vedere a colpo
+                  d'occhio *chi* sta bloccando il tavolo, altrimenti non sa a
+                  chi fare un cenno prima di forzare l'avvio.
+                */}
+                <span
+                  aria-label={player.ready ? t("lobby.gavelDone") : t("lobby.gavel")}
+                  title={player.ready ? t("lobby.gavelDone") : t("lobby.gavel")}
+                  className={cn(
+                    "grid size-6 shrink-0 place-items-center rounded-full border transition-colors",
+                    player.ready
+                      ? "border-neon/60 bg-neon/15 text-neon"
+                      : "border-line bg-surface-2 text-faint",
+                  )}
+                >
+                  <Gavel className="size-3.5" />
+                </span>
                 {player.id === state.hostId ? <Badge tone="violet">{t("lobby.host")}</Badge> : null}
                 {player.id === selfId && !isLocal ? (
                   <Badge tone="neon">{t("lobby.you")}</Badge>
@@ -378,6 +486,40 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
         </ul>
       </Panel>
 
+      {/*
+        Il proprio martello.
+        In locale si gioca in tanti da un telefono solo e non c'e' un "proprio":
+        li' battono tutti dallo stesso schermo, uno per riga.
+      */}
+      <Panel>
+        <PanelTitle icon={<Gavel className="size-3.5" />}>{t("lobby.gavelHint")}</PanelTitle>
+        {isLocal ? (
+          <div className="flex flex-wrap gap-2">
+            {state.players.map((player) => (
+              <GavelButton
+                key={player.id}
+                ready={Boolean(player.ready)}
+                name={player.name}
+                onStrike={() => gavel(player.id)}
+                className="flex-1 basis-40 text-sm"
+              />
+            ))}
+          </div>
+        ) : io ? (
+          <GavelButton
+            ready={Boolean(io.ready)}
+            onStrike={() => gavel(io.id)}
+            className="w-full"
+          />
+        ) : null}
+
+        {mancanti.length > 0 ? (
+          <p className="mt-2 text-center text-xs text-faint">
+            {t("lobby.gavelWaiting", { n: mancanti.map((p) => p.name).join(", ") })}
+          </p>
+        ) : null}
+      </Panel>
+
       {isHost ? (
         <>
           {!lottiBastano && state.players.length >= MIN_PLAYERS ? (
@@ -394,10 +536,15 @@ export function Lobby({ state, isHost, selfId, dispatch }: LobbyProps) {
           <Button size="lg" disabled={!canStart} onClick={start}>
             <Play className="size-5" />
             {canStart
-              ? t("lobby.start")
+              ? // Forzare non e' la stessa cosa che partire: si dice.
+                tuttiPronti
+                ? t("lobby.start")
+                : t("lobby.gavelForce")
               : state.players.length < MIN_PLAYERS
                 ? t("lobby.needPlayers", { n: MIN_PLAYERS })
-                : t("lobby.needLots", { n: servono, ha: state.items.length })}
+                : !lottiBastano
+                  ? t("lobby.needLots", { n: servono, ha: state.items.length })
+                  : t("lobby.gavelWaiting", { n: mancanti.map((p) => p.name).join(", ") })}
           </Button>
         </>
       ) : (

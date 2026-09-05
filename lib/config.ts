@@ -2,8 +2,7 @@ import type { TranslationKey } from "./i18n/it";
 
 /**
  * Costanti di configurazione del sito.
- * Dominio e profilo social sono segnaposto: sostituiscili con i tuoi valori reali
- * (oppure imposta NEXT_PUBLIC_SITE_URL in .env.local).
+ * Il profilo social e' un segnaposto: sostituiscilo col tuo valore reale.
  */
 
 export const APP_NAME = "Pick & Pay";
@@ -12,8 +11,19 @@ export const APP_FULL_NAME = `${APP_NAME} - ${APP_TAGLINE}`;
 
 const RAW_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
-/** Dominio mostrato nel footer della card e nei link di voto. */
-export const SITE_URL = RAW_SITE_URL && RAW_SITE_URL.length > 0 ? RAW_SITE_URL : "https://pickandpay.app";
+/**
+ * Dominio mostrato nel footer della card, nei link di voto e nell'anteprima
+ * social dei link di stanza.
+ *
+ * Il ripiego e' l'indirizzo dove il sito sta davvero, non un segnaposto: da qui
+ * esce anche l'indirizzo assoluto dell'immagine di anteprima, e un dominio che
+ * non risponde vuol dire link condivisi senza figura su WhatsApp e Telegram --
+ * cioe' il posto da cui arriva quasi tutto l'invito a giocare. Con
+ * NEXT_PUBLIC_SITE_URL impostata comanda quella: serve il giorno in cui il sito
+ * cambia indirizzo.
+ */
+export const SITE_URL =
+  RAW_SITE_URL && RAW_SITE_URL.length > 0 ? RAW_SITE_URL : "https://pickandpaygame.vercel.app";
 
 export const SITE_DOMAIN = SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
 

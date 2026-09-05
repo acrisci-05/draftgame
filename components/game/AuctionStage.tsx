@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { playSfx } from "@/lib/audio";
-import { useDutchPrice } from "@/lib/useDutchPrice";
 import { categoryName } from "@/lib/catalog";
 import {
   discardsLeft,
@@ -34,7 +33,15 @@ import {
   type GameAction,
   type ReactionEmoji,
 } from "@/lib/game";
-import { HAPTIC_BID, HAPTIC_PASS, HAPTIC_WIN, vibrate } from "@/lib/haptics";
+import {
+  HAPTIC_BID,
+  HAPTIC_FLOP,
+  HAPTIC_PASS,
+  HAPTIC_TAKE,
+  HAPTIC_WIN,
+  vibrate,
+} from "@/lib/haptics";
+import { showToast } from "@/lib/toast";
 import { useAuth } from "@/lib/auth";
 import { BOT_PLAYER_ID } from "@/lib/botEngine";
 import { useSettings } from "@/lib/settings";
@@ -44,6 +51,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { RoomCode } from "@/components/ui/RoomCode";
 import { BidControls } from "./BidControls";
+import { DutchHeadlinePrice } from "./DutchPrice";
 import { ItemCover } from "./ItemCover";
 import { PlayerRail } from "./PlayerRail";
 import { ReactionButton } from "./Reactions";
@@ -86,7 +94,7 @@ export function AuctionStage({
    * offerte.
    */
   const ribasso = Boolean(state.config.dutchDraft);
-  const dutchPrice = useDutchPrice(state, now);
+
   const item = currentItem(state);
   const leader = playerById(state, state.highBidderId);
   const self = playerById(state, selfId);
@@ -180,7 +188,11 @@ export function AuctionStage({
       playSfx("win", sound);
       vibrate(HAPTIC_WIN);
     } else if (latest.kind === "mystery") playSfx("mystery", sound);
-    else if (latest.kind === "discard") playSfx("timeup", sound);
+    else if (latest.kind === "discard") {
+      playSfx("timeup", sound);
+      // Tre colpi staccati: il tempo finito a vuoto, non una cosa successa.
+      vibrate(HAPTIC_FLOP);
+    }
   }, [state.feed, sound]);
 
   /**
@@ -265,10 +277,40 @@ export function AuctionStage({
   const [takingLot, setTakingLot] = useState<number | null>(null);
   const taking = takingLot === state.lotNumber && state.phase === "auction";
 
+  /*
+   * "Soffiato": il lotto e' andato a un altro mentre il tocco era in viaggio.
+   *
+   * Al ribasso vince chi arriva primo, e chi perde per un decimo di secondo
+   * senza spiegazioni vede solo il proprio pulsante spegnersi e il lotto
+   * sparire: sembra che il tocco non sia stato registrato, non che sia arrivato
+   * secondo. Il messaggio dice chi l'ha preso e a quanto, che e' la differenza
+   * fra un guasto e una sconfitta.
+   *
+   * Si annuncia una volta sola per lotto, e solo a chi aveva davvero premuto.
+   */
+  const snipedRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (state.phase !== "result" || !state.lastResult) return;
+    if (takingLot !== state.lotNumber) return;
+    if (snipedRef.current === state.lotNumber) return;
+    const esito = state.lastResult;
+    // Vinto io, oppure non l'ha preso nessuno: non c'e' niente da soffiare.
+    if (!esito.winnerId || esito.winnerId === selfId) return;
+    snipedRef.current = state.lotNumber;
+    showToast(
+      t("auction.dutchSniped", {
+        player: esito.winnerName ?? "",
+        amount: money(esito.price, state.config.currency),
+      }),
+      "info",
+      3200,
+    );
+  }, [state.phase, state.lastResult, state.lotNumber, takingLot, selfId, t, state.config.currency]);
+
   const takeDutch = (playerId: string) => {
     if (!attoreValido(playerId)) return;
     if (!once(`dutch:${playerId}:${state.lotNumber}`)) return;
-    vibrate(HAPTIC_BID);
+    vibrate(HAPTIC_TAKE);
     setTakingLot(state.lotNumber);
     dispatch({ type: "take_dutch", playerId, now: now() });
   };
@@ -413,21 +455,7 @@ export function AuctionStage({
               {ribasso ? t("auction.dutchNow") : t("auction.currentBid")}
             </p>
             {ribasso ? (
-              /*
-               * Al ribasso la cifra cambia di continuo: niente animazione a
-               * ogni credito perso, che a quattro scatti al secondo diventa un
-               * tremolio. Cambia colore quando tocca il fondo, e tanto basta.
-               */
-              <p
-                className={cn(
-                  "font-mono text-4xl font-black tabular-nums",
-                  dutchPrice.atFloor ? "text-gold" : "text-neon",
-                )}
-              >
-                {/* Fuori dall'asta si mostra il prezzo di apertura: e' quello
-                    da cui ripartira' il lotto successivo. */}
-                {money(dutch ? dutchPrice.price : state.lotPrice, currency)}
-              </p>
+              <DutchHeadlinePrice state={state} now={now} live={dutch} />
             ) : (
               <motion.p
                 key={`${state.currentBid}-${state.highBidderId ?? "none"}`}
@@ -563,6 +591,29 @@ export function AuctionStage({
                   </>
                 ) : (
                   <>
+                    {/*
+                      Il flop si disfa invece di comparire.
+                      L'aggiudicazione entra -- la copertina si gira, il nome
+                      sale -- e il flop faceva lo stesso movimento: due esiti
+                      opposti raccontati con la stessa animazione. Qui la scheda
+                      si inclina, si sgonfia e sbiadisce, cosi' si capisce
+                      com'e' finita prima di leggere una parola.
+                    */}
+                    <motion.div
+                      key={`flop-${state.lastResult.itemId}`}
+                      initial={{ scale: 1, opacity: 1, rotate: 0, y: 0 }}
+                      animate={{ scale: 0.86, opacity: 0.35, rotate: -7, y: 14 }}
+                      transition={{ duration: 0.55, ease: "easeIn" }}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <ItemCover
+                        item={resultItem ?? null}
+                        size="lg"
+                        auto={autoImages}
+                        hint={state.category.name}
+                        logo={state.category.covers === "logo"}
+                      />
+                    </motion.div>
                     <Trash2 className="size-9 text-faint" />
                     <p className="text-xs uppercase tracking-[0.2em] text-faint">
                       {t("auction.noOffers")}

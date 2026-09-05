@@ -33,3 +33,18 @@ export function vibrate(pattern: number | number[] = HAPTIC_BID) {
 export const HAPTIC_BID = 10;
 export const HAPTIC_PASS = 35;
 export const HAPTIC_WIN = [24, 40, 24];
+
+/*
+ * Le due dell'asta al ribasso.
+ *
+ * Prendere e' un gesto solo, e va sentito piu' del rilancio: al ribasso si
+ * preme una volta per lotto e quel tocco decide, mentre di rilanci ne partono
+ * decine. Trenta millesimi -- il triplo del rilancio, meno di una rinuncia --
+ * bastano a dire "e' partito" senza sembrare un allarme.
+ *
+ * Il flop e' l'unico caso in cui non ha premuto nessuno, e i tre colpi staccati
+ * lo raccontano meglio di uno lungo: e' il tempo che finisce a vuoto, non una
+ * cosa che e' successa.
+ */
+export const HAPTIC_TAKE = 30;
+export const HAPTIC_FLOP = [50, 50, 50];

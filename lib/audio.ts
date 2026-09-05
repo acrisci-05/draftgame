@@ -5,7 +5,17 @@
  * nessuna richiesta di rete. Il contesto parte al primo tocco dell'utente.
  */
 
-export type Sfx = "bid" | "pass" | "tick" | "timeup" | "win" | "lose" | "mystery" | "start";
+export type Sfx =
+  | "bid"
+  | "pass"
+  | "tick"
+  | "timeup"
+  | "win"
+  | "lose"
+  | "mystery"
+  | "start"
+  | "gavel"
+  | "fistbump";
 
 let context: AudioContext | null = null;
 
@@ -90,6 +100,28 @@ export function playSfx(name: Sfx, enabled = true) {
       break;
     case "start":
       tone(ctx, { frequency: 320, duration: 0.3, type: "triangle", gain: 0.12, sweepTo: 880 });
+      break;
+    /*
+     * Il martello del banditore: legno che batte sul legno.
+     *
+     * Un colpo di martello non e' una nota, e' un urto: tutta l'energia nei
+     * primi millesimi e poi piu' niente. Si ottiene con tre suoni sovrapposti e
+     * brevissimi -- lo schiocco acuto dell'impatto, il corpo grave del blocco,
+     * e una coda che scende -- invece che con una nota tenuta, che suonerebbe
+     * come un campanello.
+     */
+    case "gavel":
+      tone(ctx, { frequency: 1800, duration: 0.035, type: "square", gain: 0.09, sweepTo: 600 });
+      tone(ctx, { frequency: 190, duration: 0.14, type: "triangle", gain: 0.17, sweepTo: 90 });
+      tone(ctx, { frequency: 320, duration: 0.09, type: "sine", gain: 0.1, delay: 0.02, sweepTo: 150 });
+      break;
+    /*
+     * Il pugno che ne incontra un altro: un tonfo sordo e corto, senza coda.
+     * Piu' morbido del martello, perche' e' un saluto e non una sentenza.
+     */
+    case "fistbump":
+      tone(ctx, { frequency: 240, duration: 0.1, type: "sine", gain: 0.14, sweepTo: 120 });
+      tone(ctx, { frequency: 700, duration: 0.05, type: "triangle", gain: 0.07, delay: 0.01 });
       break;
   }
 }

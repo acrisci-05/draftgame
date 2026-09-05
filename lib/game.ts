@@ -323,6 +323,57 @@ export const MIN_CATEGORY_ITEMS = 20;
  * il gioco parte lo stesso e finisce con tutte le liste incomplete, e chi
  * gioca non ha modo di capire cosa sia andato storto.
  */
+/* ------------------------------------------------------------------ */
+/* Il controllo dei pronti                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Dopo quanto un giocatore fermo smette di bloccare il tavolo.
+ *
+ * Quindici secondi: il tempo di leggere la stanza e battere il martello. Serve
+ * contro il caso che rovina la serata -- uno apre il link, posa il telefono e
+ * gli altri quattro restano fermi senza capire perche'. Non toglie il martello
+ * a nessuno: apre solo all'host la possibilita' di partire lo stesso.
+ */
+export const GAVEL_GRACE_SECONDS = 15;
+
+/** Se tutti quelli in stanza hanno battuto il martello. */
+export function everyoneReady(state: GameState): boolean {
+  if (state.players.length === 0) return false;
+  return state.players.every((p) => p.ready === true);
+}
+
+/** Chi non ha ancora battuto il martello. */
+export function notReady(state: GameState): Player[] {
+  return state.players.filter((p) => p.ready !== true);
+}
+
+/**
+ * Chi non e' pronto ed e' in stanza da abbastanza da poterlo scavalcare.
+ *
+ * Le partite cominciate prima che si segnasse l'ora di ingresso non hanno
+ * `joinedAt`: li' si considera il tempo scaduto subito, perche' il contrario
+ * -- non poterli mai scavalcare -- bloccherebbe la stanza per sempre.
+ */
+export function stalledPlayers(state: GameState, now: number): Player[] {
+  return notReady(state).filter(
+    (p) => now - (p.joinedAt ?? 0) >= GAVEL_GRACE_SECONDS * 1000,
+  );
+}
+
+/**
+ * Se chi ospita puo' forzare l'avvio.
+ *
+ * Solo quando chi manca all'appello e' fermo da un po': senza l'attesa il
+ * pulsante comparirebbe subito e il controllo dei pronti non varrebbe niente,
+ * perche' si partirebbe sempre di forza.
+ */
+export function canForceStart(state: GameState, now: number): boolean {
+  const mancano = notReady(state);
+  if (mancano.length === 0) return false;
+  return stalledPlayers(state, now).length === mancano.length;
+}
+
 export function canStartMatch(
   numPlayers: number,
   categoryTotalItems: number,
@@ -591,6 +642,37 @@ export function nextHost(state: GameState, present: readonly string[]): string |
  * lotti alterni vorrebbe dire vedersi portare via meta' dei lotti prima ancora
  * di aver potuto dire qualcosa.
  */
+/**
+ * Chi adotta una lobby rimasta orfana.
+ *
+ * Caso diverso dalla successione qui sopra, e per questo ha una regola sua: li'
+ * l'host sparisce e il posto lo prende un altro giocatore *gia' al tavolo*, qui
+ * invece se ne sono andati tutti e arriva qualcuno che nella lista non c'e'
+ * ancora -- ha appena aperto il link. `nextHost` non lo sceglierebbe mai,
+ * perche' cerca fra i giocatori, e la stanza resterebbe ferma per sempre con
+ * dentro una persona che aspetta un host che non tornera'.
+ *
+ * Vale solo in lobby: a partita avviata una stanza senza piu' nessuno dei suoi
+ * giocatori non e' da adottare, e' finita -- adottarla vorrebbe dire entrare a
+ * meta' di un'asta fra sconosciuti con crediti e rose che non sono di nessuno.
+ *
+ * Fra piu' arrivati insieme ne comanda uno solo: il primo in ordine di
+ * identificativo. E' un ordine qualunque, ma e' lo stesso su tutti i
+ * dispositivi, ed e' l'unica cosa che conta per non ritrovarsi con due host.
+ */
+export function lobbyAdopter(
+  state: GameState,
+  present: readonly string[],
+  candidateId: string,
+): boolean {
+  if (state.phase !== "lobby") return false;
+  if (!present.includes(candidateId)) return false;
+  // Se c'e' ancora qualcuno del tavolo, tocca a lui: vedi nextHost.
+  if (state.players.some((player) => present.includes(player.id))) return false;
+  if (present.includes(state.hostId)) return false;
+  return [...present].sort()[0] === candidateId;
+}
+
 export function openingTurn(state: GameState): string | null {
   const quanti = state.players.length;
   if (quanti === 0) return null;
@@ -880,6 +962,7 @@ export type GameAction =
   | { type: "remove_player"; playerId: string }
   | { type: "set_avatar"; playerId: string; emoji: string }
   | { type: "set_color"; playerId: string; color: string }
+  | { type: "gavel"; playerId: string }
   | { type: "set_host"; playerId: string }
   | { type: "set_category"; category: Category }
   | { type: "set_config"; config: Partial<RoomConfig> }
@@ -1249,6 +1332,7 @@ export function reducer(state: GameState, action: GameAction): GameState {
         handle: action.player.handle,
         budget: state.config.budget,
         roster: [],
+        joinedAt: Date.now(),
       };
       return touch({ ...state, players: [...state.players, player] });
     }
@@ -1341,6 +1425,25 @@ export function reducer(state: GameState, action: GameAction): GameState {
       return touch({
         ...state,
         players: state.players.filter((p) => p.id !== action.playerId),
+      });
+    }
+
+    /**
+     * Il colpo di martello: da qui in poi si e' pronti.
+     *
+     * Si puo' anche ritirare, battendolo di nuovo: chi si accorge di avere
+     * ancora l'avatar sbagliato deve poter fermare il tavolo senza uscire dalla
+     * stanza. Vale solo in lobby, perche' a partita avviata non significa piu'
+     * niente.
+     */
+    case "gavel": {
+      if (state.phase !== "lobby") return state;
+      if (!playerById(state, action.playerId)) return state;
+      return touch({
+        ...state,
+        players: state.players.map((p) =>
+          p.id === action.playerId ? { ...p, ready: !p.ready } : p,
+        ),
       });
     }
 
@@ -1609,6 +1712,9 @@ export function reducer(state: GameState, action: GameAction): GameState {
           budget: state.config.budget,
           roster: [],
           passes: 0,
+          // Si ricomincia dalla lobby: il martello va ribattuto, altrimenti la
+          // seconda partita partirebbe senza che nessuno abbia detto di esserci.
+          ready: false,
         })),
       });
     }

@@ -69,6 +69,19 @@ export interface Player {
    * ospiti, che non hanno un account a cui attribuire niente.
    */
   handle?: string;
+  /**
+   * Ha battuto il martello: e' pronto a cominciare.
+   *
+   * Assente sulle partite create prima del controllo di pronti, e in quel caso
+   * vale quanto false. La lobby lo tratta come "non pronto" e chi ospita ha
+   * comunque l'avvio forzato, cosi' una stanza gia' aperta non resta bloccata.
+   */
+  ready?: boolean;
+  /**
+   * Quando e' entrato in stanza. Serve all'avvio forzato: dice da quanto uno
+   * sta fermo senza battere il martello.
+   */
+  joinedAt?: number;
   budget: number;
   roster: RosterEntry[];
   /**
@@ -260,6 +273,16 @@ export interface RoomSession {
    * riproporla dopo un ricarico: una stanza di ieri e' una partita finita.
    */
   openedAt?: number;
+  /**
+   * L'ultimo segno di vita da dentro la stanza.
+   *
+   * Si aggiorna finche' la scheda e' aperta, e serve al rientro automatico:
+   * dopo un ricarico e' vecchio di un istante e si torna dentro senza chiedere
+   * niente, mentre dopo che si e' chiuso tutto e si torna mezz'ora dopo e'
+   * vecchio davvero. La differenza non si potrebbe leggere da `openedAt`, che
+   * dice quando si e' entrati e non quando si e' smesso di giocare.
+   */
+  lastSeenAt?: number;
   /**
    * Quando la partita si e' conclusa. La sessione resta -- serve alla stanza
    * per sapere chi sei -- ma la home smette di riproporla.
