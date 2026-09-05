@@ -136,6 +136,44 @@ check(
   })(),
 );
 
+/*
+ * Il motore non guarda di chi sia il turno, e non deve cominciare a farlo.
+ *
+ * E' la regola su cui poggia tutta la modalita': se un giorno tornasse un
+ * controllo sul turno dentro questa strada, l'unico effetto visibile sarebbe
+ * un pulsante che non risponde -- difficile da ricondurre alla causa. Qui si
+ * mette per iscritto.
+ */
+check(
+  "si prende anche quando il turno risulta di un altro",
+  (() => {
+    // Stato forzato: turnId di "a", ma a premere e' "b".
+    const conTurno = { ...s, turnId: "a" };
+    return (
+      game.canTakeDutch(conTurno, "b", meta) &&
+      game.reducer(conTurno, { type: "take_dutch", playerId: "b", now: meta })
+        .lastResult?.winnerId === "b"
+    );
+  })(),
+);
+check(
+  "prendere non dipende da chi ha la mano, ma solo da crediti e posti liberi",
+  (() => {
+    const pieno = {
+      ...s,
+      players: s.players.map((p) =>
+        p.id === "a"
+          ? { ...p, roster: Array.from({ length: s.config.slots }, (_, i) => ({
+              itemId: "x" + i, name: "x", tier: 1, price: 1,
+            })) }
+          : p,
+      ),
+    };
+    // Rosa piena: non si prende. L'altro, con i posti liberi, si'.
+    return !game.canTakeDutch(pieno, "a", meta) && game.canTakeDutch(pieno, "b", meta);
+  })(),
+);
+
 check(
   "chi arriva un istante dopo non porta via il lotto",
   (() => {

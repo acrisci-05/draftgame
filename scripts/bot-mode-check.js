@@ -30,6 +30,16 @@ const BROWSERS = [
   process.env["ProgramFiles"] + "/Microsoft/Edge/Application/msedge.exe",
 ];
 
+/** Stato del pulsante del ribasso: c'e'? e' spento? che prezzo mostra? */
+const STATO_PULSANTE =
+  "(() => {" +
+  "  const b = [...document.querySelectorAll('button')]" +
+  "    .find((x) => /PRENDI ORA|INVIO IN CORSO/i.test(x.textContent || ''));" +
+  "  if (!b) return JSON.stringify({ c: false });" +
+  "  const m = b.textContent.match(/(\\d+)/);" +
+  "  return JSON.stringify({ c: true, spento: b.disabled, prezzo: m ? Number(m[1]) : null });" +
+  "})()";
+
 let ko = 0;
 const check = (l, ok, d) => {
   if (ok) console.log("  ok   " + l);
@@ -208,6 +218,83 @@ function premiCol(testo) {
       p1 !== null && (p2 === null || p2 < p1),
       p1 + " -> " + (p2 === null ? "lotto gia' assegnato" : p2),
     );
+
+    /*
+     * L'acquisto vero, al terzo secondo di discesa.
+     *
+     * E' il gesto che non funzionava: contro il bot il pulsante restava spento
+     * per quasi tutta la discesa, perche' l'attesa del bot veniva trattata come
+     * "sta giocando lui" e bloccava i comandi di tutti. Qui si controlla che sia
+     * premibile, che il tocco parta, e soprattutto che lo stato si muova --
+     * crediti scalati e un posto occupato in rosa.
+     */
+    console.log("\n== L'acquisto al terzo secondo ==");
+    // Il lotto puo' essere gia' finito: si aspetta il prossimo e si riparte.
+    let pronto = "";
+    for (let giro = 0; giro < 20; giro += 1) {
+      pronto = await ev(STATO_PULSANTE);
+      const p = JSON.parse(pronto);
+      if (p.c && !p.spento) break;
+      await ev(premiCol("prossimo lotto"));
+      await wait(1200);
+    }
+    const stato = JSON.parse(pronto);
+    check(
+      "il pulsante e' premibile mentre il prezzo scende",
+      stato.c === true && stato.spento === false,
+      stato.c ? (stato.spento ? "SPENTO" : "acceso") : "assente",
+    );
+
+    /*
+     * I crediti di chi gioca, non il massimo a schermo.
+     *
+     * Il massimo prendeva quelli del bot, che finche' non compra restano al
+     * valore iniziale: il controllo passava anche con l'acquisto fallito. Si
+     * legge dentro il pannello comandi del giocatore, riconosciuto dalla riga
+     * "PRESI" che sta solo li'.
+     */
+    const budgetGiocatore = () =>
+      ev(
+        "(() => {" +
+        "  const p = [...document.querySelectorAll('*')]" +
+        "    .find((e) => e.children.length === 0 && /^PRESI$/i.test((e.textContent || '').trim()));" +
+        "  const card = p && p.closest('div[class*=rounded-2xl]');" +
+        "  const m = card && card.textContent.match(/[\\u20ac]\\s?(\\d+)/);" +
+        "  return m ? Number(m[1]) : null;" +
+        "})()",
+      );
+    const primaBudget = await budgetGiocatore();
+    check("il tocco parte", (await ev(premiCol("PRENDI ORA"))) === "premuto");
+    await wait(3500);
+    await shot("mode-acquisto.png");
+
+    const esito = await testo();
+    check(
+      "l'acquisto viene registrato",
+      /aggiudicat|svelato|prossimo lotto/i.test(esito),
+      esito.slice(0, 100).replace(/\n/g, " | "),
+    );
+    const dopoBudget = await budgetGiocatore();
+    check(
+      "i crediti vengono scalati",
+      primaBudget !== null && dopoBudget !== null && dopoBudget < primaBudget,
+      primaBudget + " -> " + dopoBudget,
+    );
+
+    await wait(4500);
+    /* La rosa del giocatore: il contatore dentro i suoi comandi, non il primo
+       "n/n" che capita in pagina -- quello e' il conto dei lotti. */
+    const rosa = await ev(
+      "(() => {" +
+      "  const p = [...document.querySelectorAll('*')]" +
+      "    .find((e) => e.children.length === 0 && /^PRESI$/i.test((e.textContent || '').trim()));" +
+      "  if (!p) return null;" +
+      "  const card = p.closest('div[class*=rounded-2xl]');" +
+      "  const m = card && card.textContent.match(/(\\d+)\\s*\\/\\s*(\\d+)/);" +
+      "  return m ? m[0] : null;" +
+      "})()",
+    );
+    check("un posto in rosa risulta occupato", Boolean(rosa) && !/^0\s*\//.test(rosa), rosa);
 
     console.log("\n== La scelta viene ricordata ==");
     await home();

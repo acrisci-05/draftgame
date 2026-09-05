@@ -94,6 +94,20 @@ export function AuctionStage({
    * offerte.
    */
   const ribasso = Boolean(state.config.dutchDraft);
+  /*
+   * Il blocco "sta pensando il bot" non vale al ribasso.
+   *
+   * Serve all'asta a turni, dove mentre tocca al bot nessun altro deve poter
+   * agire. Al ribasso i turni non ci sono: quel che il bot chiama "pensare" e'
+   * solo l'attesa che il prezzo scenda alla sua soglia, e dura quasi tutto il
+   * lotto -- fino a tredici secondi su quindici. Tenendo il blocco, chi gioca
+   * si trovava "PRENDI ORA" spento per quasi tutta la discesa e il lotto se lo
+   * prendeva sempre il bot: era il guasto per cui il pulsante non rispondeva.
+   *
+   * Nessuna corsa fra i due: entrambi mandano la stessa azione, e il motore
+   * assegna il lotto a chi arriva primo -- che e' proprio il punto del ribasso.
+   */
+  const bloccoBot = Boolean(thinkingId) && !ribasso;
 
   const item = currentItem(state);
   const leader = playerById(state, state.highBidderId);
@@ -692,7 +706,7 @@ export function AuctionStage({
                     compact
                     state={state}
                     player={player}
-                    locked={Boolean(thinkingId)}
+                    locked={bloccoBot}
                     highlight={player.id === turnId}
                     onBid={(amount) => bid(player.id, amount)}
                     onPass={() => pass(player.id)}
@@ -796,7 +810,7 @@ export function AuctionStage({
                   <BidControls
                     state={state}
                     player={self}
-                    locked={Boolean(thinkingId)}
+                    locked={bloccoBot}
                     highlight={self.id === turnId}
                     onBid={(amount) => bid(self.id, amount)}
                     onPass={() => pass(self.id)}
